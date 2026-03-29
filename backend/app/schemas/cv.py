@@ -7,4 +7,6 @@ class ParsedCvResponse(BaseModel):
     work_experience: list[str]
     education: list[str]
     achievements: list[str]
+    pretty_json: str | None = None
+    markdown: str | None = None
     feedback: str
