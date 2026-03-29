@@ -1,3 +1,5 @@
+import json
+
 from fastapi import APIRouter, File, Form, UploadFile, HTTPException, Depends
 from sqlalchemy.orm import Session
 
@@ -51,12 +53,33 @@ async def upload_cv(file: UploadFile = File(...)) -> ParsedCvResponse:
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Failed to parse CV file") from exc
 
+    structured_payload = {
+        "skills": parsed.skills,
+        "work_experience": parsed.work_experience,
+        "education": parsed.education,
+        "achievements": parsed.achievements,
+    }
+
+    pretty_json = json.dumps(structured_payload, indent=2, ensure_ascii=False)
+    markdown = (
+        "## Skills\n"
+        + ("\n".join(f"- {item}" for item in parsed.skills) or "- —")
+        + "\n\n## Experience\n"
+        + ("\n".join(f"- {item}" for item in parsed.work_experience) or "- —")
+        + "\n\n## Education\n"
+        + ("\n".join(f"- {item}" for item in parsed.education) or "- —")
+        + "\n\n## Achievements\n"
+        + ("\n".join(f"- {item}" for item in parsed.achievements) or "- —")
+    )
+
     return ParsedCvResponse(
         raw_text=parsed.raw_text,
         skills=parsed.skills,
         work_experience=parsed.work_experience,
         education=parsed.education,
         achievements=parsed.achievements,
+        pretty_json=pretty_json,
+        markdown=markdown,
         feedback="CV text extracted.",
     )
 
