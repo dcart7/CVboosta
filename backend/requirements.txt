@@ -6,3 +6,4 @@ sqlalchemy
 psycopg
 python-multipart
 google-genai
+pdfplumber

@@ -2,6 +2,7 @@ from fastapi import APIRouter, File, Form, UploadFile, HTTPException, Depends
 from sqlalchemy.orm import Session
 
 from app.schemas.analysis import AnalysisResponse
+from app.schemas.cv import ParsedCvResponse
 from app.schemas.keywords import (
     KeywordExtractionRequest,
     KeywordExtractionResponse,
@@ -39,6 +40,24 @@ async def analyze_cv(
         missing_keywords=[],
         optimized_cv=parsed.raw_text,
         feedback="Stage 3: extracted plain text from CV PDF/TXT.",
+    )
+
+
+@router.post("/upload", response_model=ParsedCvResponse)
+async def upload_cv(file: UploadFile = File(...)) -> ParsedCvResponse:
+    try:
+        file_bytes = await file.read()
+        parsed = parse_cv(file_bytes=file_bytes, filename=file.filename or "")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Failed to parse CV file") from exc
+
+    return ParsedCvResponse(
+        raw_text=parsed.raw_text,
+        skills=parsed.skills,
+        work_experience=parsed.work_experience,
+        education=parsed.education,
+        achievements=parsed.achievements,
+        feedback="CV text extracted.",
     )
 
 
