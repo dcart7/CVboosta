@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.0-flash"
     max_cv_chars: int = 12000
     max_job_chars: int = 12000
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 60
+    rate_limit_window_seconds: int = 60
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[3] / ".env",
