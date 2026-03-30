@@ -3,12 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.analyze import router as analyze_router
 from app.api.routes.optimize import router as optimize_router
+from app.core.api_key import api_key_middleware
 from app.core.rate_limit import rate_limit_middleware
 from app.db.init_db import init_db
 
 app = FastAPI(title="Smart CV Optimizer API")
 
 app.middleware("http")(rate_limit_middleware)
+app.middleware("http")(api_key_middleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

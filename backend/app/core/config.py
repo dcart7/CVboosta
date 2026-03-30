@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     rate_limit_enabled: bool = True
     rate_limit_requests: int = 60
     rate_limit_window_seconds: int = 60
+    api_key_enabled: bool = True
+    api_key: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[3] / ".env",
