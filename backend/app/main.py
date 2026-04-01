@@ -1,16 +1,41 @@
-from fastapi import FastAPI
+import time
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.analyze import router as analyze_router
+from app.api.routes.logs import router as logs_router
 from app.api.routes.optimize import router as optimize_router
 from app.core.api_key import api_key_middleware
 from app.core.rate_limit import rate_limit_middleware
 from app.db.init_db import init_db
+from app.services.request_logger import capture_response_body, log_request_response
 
 app = FastAPI(title="Smart CV Optimizer API")
 
 app.middleware("http")(rate_limit_middleware)
 app.middleware("http")(api_key_middleware)
+
+
+@app.middleware("http")
+async def request_logger_middleware(request: Request, call_next):  # type: ignore[no-untyped-def]
+    start_time = time.perf_counter()
+    content_type = request.headers.get("content-type", "")
+    if "multipart/form-data" in content_type:
+        body = b""
+    else:
+        body = await request.body()
+        request._body = body
+    response = await call_next(request)
+    response, response_body = await capture_response_body(response)
+    await log_request_response(
+        request,
+        response,
+        start_time=start_time,
+        request_body=body,
+        response_body=response_body,
+    )
+    return response
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,6 +46,7 @@ app.add_middleware(
 
 app.include_router(analyze_router, prefix="/analyze", tags=["analyze"])
 app.include_router(optimize_router, tags=["optimize"])
+app.include_router(logs_router, tags=["logs"])
 
 
 @app.on_event("startup")
