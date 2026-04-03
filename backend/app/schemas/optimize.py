@@ -1,13 +1,9 @@
 from pydantic import BaseModel, Field, field_validator
 
-from app.schemas.pipeline import CvAnalysis, JobAnalysis
-
 
 class OptimizeRequest(BaseModel):
     cv_text: str = Field(min_length=1, max_length=12000)
     job_text: str = Field(min_length=1, max_length=12000)
-    cv_analysis: CvAnalysis | None = None
-    job_analysis: JobAnalysis | None = None
 
     @field_validator("cv_text", "job_text", mode="before")
     @classmethod
@@ -23,5 +19,5 @@ class OptimizeRequest(BaseModel):
 class OptimizeResponse(BaseModel):
     optimized_cv: str
     feedback: str
-    missing_skills: list[str] = []
-    recommendations: list[str] = []
+    missing_skills: list[str]
+    recommendations: list[str]
