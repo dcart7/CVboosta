@@ -17,7 +17,9 @@ class Settings(BaseSettings):
     api_key: str | None = None
     request_logging_enabled: bool = True
     request_log_max_chars: int = 4000
-    jwt_secret: str = "change-me"
+    keyword_crf_model_path: str = "ml/models/skill_crf.joblib"
+    keyword_transformer_model_path: str = "ml/models/skill_bert"
+    jwt_secret: str
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
 

@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, field_validator
 class MatchRequest(BaseModel):
     cv_text: str = Field(min_length=1, max_length=12000)
     job_text: str = Field(min_length=1, max_length=12000)
+    keywords: list[str] | None = None
 
     @field_validator("cv_text", "job_text", mode="before")
     @classmethod

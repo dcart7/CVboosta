@@ -10,3 +10,5 @@ pdfplumber
 passlib
 python-jose[cryptography]
 email-validator
+joblib
+sklearn-crfsuite

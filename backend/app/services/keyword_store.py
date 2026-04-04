@@ -28,3 +28,19 @@ def save_keyword_list(
         db.rollback()
         logger.warning("Failed to save keyword list: %s", exc)
         return None
+
+
+def get_keyword_list_by_source_text(
+    db: Session,
+    source_text: str,
+) -> KeywordList | None:
+    try:
+        return (
+            db.query(KeywordList)
+            .filter(KeywordList.source_text == source_text)
+            .order_by(KeywordList.created_at.desc())
+            .first()
+        )
+    except SQLAlchemyError as exc:
+        logger.warning("Failed to load keyword list: %s", exc)
+        return None

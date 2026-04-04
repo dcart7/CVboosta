@@ -28,15 +28,29 @@ export default function WorkspacePage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [keywordCache, setKeywordCache] = useState<string[]>([]);
+  const [keywordInput, setKeywordInput] = useState("");
+  const [keywordSource, setKeywordSource] = useState("");
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const upload = async () => {
-    if (!file) {
+  const hashText = (value: string) => {
+    let hash = 0;
+    for (let i = 0; i < value.length; i += 1) {
+      hash = (hash * 31 + value.charCodeAt(i)) | 0;
+    }
+    return String(hash);
+  };
+
+  const upload = async (override?: File | null) => {
+    const activeFile = override ?? file;
+    if (!activeFile) {
       setStatus("Please choose a file first.");
       return;
     }
     setStatus("Uploading...");
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", activeFile);
     try {
       const response = await fetch(`${apiBase}/analyze/upload`, {
         method: "POST",
@@ -69,6 +83,9 @@ export default function WorkspacePage() {
     setIsDragging(false);
     const dropped = event.dataTransfer.files?.[0] || null;
     handleFileSelect(dropped);
+    if (dropped) {
+      void upload(dropped);
+    }
   };
 
   useEffect(() => {
@@ -110,6 +127,105 @@ export default function WorkspacePage() {
     load();
   }, [apiBase]);
 
+  useEffect(() => {
+    const text = jobText.trim();
+    if (!text) {
+      setKeywordCache([]);
+      setKeywordSource("");
+      localStorage.removeItem("job_keywords");
+      localStorage.removeItem("job_keywords_hash");
+      localStorage.removeItem("job_keywords_source");
+      return;
+    }
+    const currentHash = hashText(text);
+    const storedHash = localStorage.getItem("job_keywords_hash");
+    if (storedHash === currentHash) {
+      const cached = JSON.parse(localStorage.getItem("job_keywords") || "[]");
+      setKeywordCache(Array.isArray(cached) ? cached : []);
+      const cachedSource = localStorage.getItem("job_keywords_source") || "";
+      setKeywordSource(cachedSource);
+    } else {
+      setKeywordCache([]);
+      setKeywordSource("");
+      localStorage.removeItem("job_keywords");
+      localStorage.removeItem("job_keywords_hash");
+      localStorage.removeItem("job_keywords_source");
+    }
+  }, [jobText]);
+
+  const extractKeywords = async () => {
+    if (!jobText.trim()) {
+      setAnalysisStatus("Paste a job description first.");
+      return;
+    }
+    setAnalysisStatus("Extracting keywords...");
+    setIsExtracting(true);
+    try {
+      const response = await fetch(`${apiBase}/analyze/keywords`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ job_text: jobText }),
+      });
+      if (!response.ok) {
+        throw new Error("Keyword extraction failed.");
+      }
+      const data = await response.json();
+      const combined = [
+        ...(data.skills || []),
+        ...(data.requirements || []),
+      ].filter(Boolean);
+      const unique = Array.from(new Set(combined.map((item: string) => item.trim()))).filter(
+        (item) => item.length > 0,
+      );
+      setKeywordCache(unique);
+      localStorage.setItem("job_keywords", JSON.stringify(unique));
+      localStorage.setItem("job_keywords_hash", hashText(jobText.trim()));
+      const sourceText = data.feedback || "Keywords extracted.";
+      setKeywordSource(sourceText);
+      localStorage.setItem("job_keywords_source", sourceText);
+      setAnalysisStatus(sourceText);
+    } catch (err) {
+      setAnalysisStatus(
+        err instanceof Error ? err.message : "Keyword extraction failed.",
+      );
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  const removeKeyword = (value: string) => {
+    const next = keywordCache.filter((item) => item !== value);
+    setKeywordCache(next);
+    localStorage.setItem("job_keywords", JSON.stringify(next));
+    if (jobText.trim()) {
+      localStorage.setItem("job_keywords_hash", hashText(jobText.trim()));
+    }
+  };
+
+  const addKeyword = () => {
+    const cleaned = keywordInput.trim();
+    if (!cleaned) return;
+    const exists = keywordCache.some(
+      (item) => item.toLowerCase() === cleaned.toLowerCase(),
+    );
+    const next = exists ? keywordCache : [...keywordCache, cleaned];
+    setKeywordCache(next);
+    localStorage.setItem("job_keywords", JSON.stringify(next));
+    if (jobText.trim()) {
+      localStorage.setItem("job_keywords_hash", hashText(jobText.trim()));
+    }
+    setKeywordInput("");
+  };
+
+  const clearKeywords = () => {
+    setKeywordCache([]);
+    setKeywordSource("");
+    localStorage.removeItem("job_keywords");
+    localStorage.removeItem("job_keywords_hash");
+    localStorage.removeItem("job_keywords_source");
+    setAnalysisStatus("Keywords cleared.");
+  };
+
   const runAnalysis = async () => {
     if (!parsed?.raw_text) {
       setAnalysisStatus("Upload a CV first.");
@@ -119,11 +235,16 @@ export default function WorkspacePage() {
       setAnalysisStatus("Paste a job description first.");
       return;
     }
+    if (keywordCache.length === 0) {
+      setAnalysisStatus("Extract keywords first.");
+      return;
+    }
     localStorage.setItem("target_role", targetRole);
     localStorage.setItem("target_company", targetCompany);
     localStorage.setItem("job_text", jobText);
     localStorage.setItem("cv_text", parsed.raw_text || "");
     setAnalysisStatus("Analyzing...");
+    setIsAnalyzing(true);
     try {
       const response = await fetch(`${apiBase}/analyze/match`, {
         method: "POST",
@@ -131,6 +252,7 @@ export default function WorkspacePage() {
         body: JSON.stringify({
           cv_text: parsed.raw_text || "",
           job_text: jobText,
+          keywords: keywordCache,
         }),
       });
       if (!response.ok) {
@@ -142,6 +264,8 @@ export default function WorkspacePage() {
       setAnalysisStatus("Analysis complete.");
     } catch (err) {
       setAnalysisStatus(err instanceof Error ? err.message : "Analysis failed.");
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -267,9 +391,61 @@ export default function WorkspacePage() {
                 onChange={(event) => setJobText(event.target.value)}
               />
             </div>
+            <div className="card">
+              <h3>Keywords (editable)</h3>
+              {keywordSource && <p className="muted">{keywordSource}</p>}
+              <div className="keyword-actions">
+                <span className="muted">Total: {keywordCache.length}</span>
+                <div className="keyword-buttons">
+                  <button className="btn ghost" type="button" onClick={extractKeywords}>
+                    {isExtracting ? "Extracting..." : "Extract keywords"}
+                  </button>
+                  <button className="btn ghost" type="button" onClick={clearKeywords}>
+                    Clear
+                  </button>
+                </div>
+              </div>
+              <div className="tag-list">
+                {keywordCache.length === 0 && <span className="tag">—</span>}
+                {keywordCache.map((item) => (
+                  <span className="tag" key={item}>
+                    {item}
+                    <button
+                      className="tag-remove"
+                      type="button"
+                      onClick={() => removeKeyword(item)}
+                      aria-label={`Remove ${item}`}
+                    >
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="keyword-row">
+                <input
+                  className="input"
+                  placeholder="Add keyword"
+                  value={keywordInput}
+                  onChange={(event) => setKeywordInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addKeyword();
+                    }
+                  }}
+                />
+                <button className="btn" type="button" onClick={addKeyword}>
+                  Add
+                </button>
+              </div>
+            </div>
             <div className="nav-actions">
-              <button className="btn primary" type="button" onClick={runAnalysis}>
-                Run analysis
+              <button
+                className="btn primary"
+                type="button"
+                onClick={runAnalysis}
+                disabled={isAnalyzing}
+              >
+                {isAnalyzing ? "Analyzing..." : "Run analysis"}
               </button>
               <Link className="btn ghost" href="/history">
                 View history

@@ -360,6 +360,48 @@ a {
   border-radius: 999px;
   background: #f2f4f8;
   font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-remove {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+}
+
+.tag-remove:hover {
+  color: #0f172a;
+}
+
+.tag-remove::before {
+  content: "×";
+}
+
+.keyword-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 12px;
+}
+
+.keyword-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.keyword-row {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
 }
 
 .history-row {

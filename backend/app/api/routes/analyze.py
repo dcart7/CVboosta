@@ -18,6 +18,15 @@ from app.schemas.pipeline import (
 )
 from app.services.cv_parser import parse_cv
 from app.services.keyword_store import save_keyword_list
+from app.services.keyword_store import get_keyword_list_by_source_text
+from app.services.keyword_clean import (
+    clean_job_text,
+    normalize_keywords,
+    extract_whitelist_keywords,
+)
+from app.services.keyword_fallback import extract_keywords_fallback
+from app.services.keyword_crf import extract_keywords_crf
+from app.services.keyword_transformer import extract_keywords_transformer
 from app.services.llm import (
     LLMServiceError,
     analyze_cv_text,
@@ -134,12 +143,32 @@ def extract_keywords(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user_optional),
 ) -> KeywordExtractionResponse:
+    cleaned_text = clean_job_text(payload.job_text)
     try:
-        result = extract_job_keywords(payload.job_text)
-    except LLMServiceError as exc:
-        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+        result = extract_keywords_transformer(cleaned_text)
+        if result and result.skills:
+            feedback = "Transformer keywords generated."
+        else:
+            result = extract_keywords_crf(cleaned_text)
+            if result and result.skills:
+                feedback = "CRF keywords generated."
+            else:
+                result = extract_job_keywords(cleaned_text)
+                feedback = "LLM keywords generated."
+    except LLMServiceError:
+        cached = get_keyword_list_by_source_text(db, payload.job_text)
+        if cached:
+            result = cached
+            feedback = "Cached keywords loaded."
+        else:
+            result = extract_keywords_fallback(cleaned_text)
+            feedback = "Fallback keywords generated (LLM unavailable)."
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Unexpected server error") from exc
+
+    whitelist_hits = extract_whitelist_keywords(cleaned_text, limit=200)
+    result.skills = normalize_keywords(whitelist_hits + result.skills)
+    result.requirements = normalize_keywords(result.requirements)
 
     keyword_list_id = save_keyword_list(
         db=db,
@@ -155,27 +184,91 @@ def extract_keywords(
         skills=result.skills,
         requirements=result.requirements,
         keyword_list_id=keyword_list_id,
-        feedback="Keyword list saved.",
+        feedback=feedback,
     )
 
 
 @router.post("/match", response_model=MatchResponse)
-def match_cv_job(payload: MatchRequest) -> MatchResponse:
+def match_cv_job(
+    payload: MatchRequest,
+    db: Session = Depends(get_db),
+) -> MatchResponse:
     # Note: this endpoint is intentionally unauthenticated.
-    try:
-        keyword_result = extract_job_keywords(payload.job_text)
-    except LLMServiceError as exc:
-        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail="Unexpected server error") from exc
+    keywords: list[str] | None = None
+    feedback = "Match score computed from extracted keywords."
 
-    keywords = keyword_result.skills + keyword_result.requirements
-    match_percent, matched, missing = compute_match_score(payload.cv_text, keywords)
+    if payload.keywords:
+        keywords = normalize_keywords(payload.keywords, limit=200)
+        feedback = "Match score computed from provided keywords."
+    else:
+        try:
+            cleaned_text = clean_job_text(payload.job_text)
+            keyword_result = extract_keywords_transformer(cleaned_text)
+            if keyword_result and keyword_result.skills:
+                keywords = normalize_keywords(
+                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    + keyword_result.skills
+                    + keyword_result.requirements,
+                    limit=200,
+                )
+                feedback = "Match score computed from transformer keywords."
+            else:
+                keyword_result = extract_keywords_crf(cleaned_text)
+                if keyword_result and keyword_result.skills:
+                    keywords = normalize_keywords(
+                        extract_whitelist_keywords(cleaned_text, limit=200)
+                        + keyword_result.skills
+                        + keyword_result.requirements,
+                        limit=200,
+                    )
+                    feedback = "Match score computed from CRF keywords."
+                else:
+                    keyword_result = extract_job_keywords(cleaned_text)
+                    keywords = normalize_keywords(
+                        extract_whitelist_keywords(cleaned_text, limit=200)
+                        + keyword_result.skills
+                        + keyword_result.requirements,
+                        limit=200,
+                    )
+                    feedback = "Match score computed from LLM keywords."
+        except LLMServiceError:
+            cached = get_keyword_list_by_source_text(db, payload.job_text)
+            if cached:
+                keywords = normalize_keywords(
+                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    + cached.skills
+                    + cached.requirements,
+                    limit=200,
+                )
+                feedback = "Match score computed from cached keywords."
+                keyword_result = cached
+            else:
+                keyword_result = extract_keywords_fallback(cleaned_text)
+                keywords = normalize_keywords(
+                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    + keyword_result.skills
+                    + keyword_result.requirements,
+                    limit=200,
+                )
+                feedback = "Match score computed from fallback keywords."
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500, detail="Unexpected server error"
+            ) from exc
+
+        save_keyword_list(
+            db=db,
+            source_text=payload.job_text,
+            skills=keyword_result.skills,
+            requirements=keyword_result.requirements,
+        )
+
+    match_percent, matched, missing = compute_match_score(payload.cv_text, keywords or [])
 
     return MatchResponse(
         match_percent=match_percent,
         matched_keywords=matched,
         missing_keywords=missing,
         total_keywords=len(matched) + len(missing),
-        feedback="Match score computed from extracted keywords.",
+        feedback=feedback,
     )

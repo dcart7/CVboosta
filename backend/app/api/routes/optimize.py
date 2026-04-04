@@ -4,6 +4,15 @@ from app.schemas.optimize import OptimizeRequest, OptimizeResponse
 from app.services.llm import LLMServiceError, extract_job_keywords, generate_optimized_cv
 from app.services.matching import compute_match_score
 from app.services.recommendations import build_recommendations
+from app.services.keyword_store import get_keyword_list_by_source_text, save_keyword_list
+from app.services.keyword_fallback import extract_keywords_fallback
+from app.services.keyword_crf import extract_keywords_crf
+from app.services.keyword_transformer import extract_keywords_transformer
+from app.services.keyword_clean import (
+    clean_job_text,
+    normalize_keywords,
+    extract_whitelist_keywords,
+)
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
 from app.db.session import get_db
@@ -20,8 +29,57 @@ def optimize_cv(
     current_user=Depends(get_current_user_optional),
 ) -> OptimizeResponse:
     try:
-        keyword_result = extract_job_keywords(payload.job_text)
-        ats_keywords = keyword_result.skills + keyword_result.requirements
+        cleaned_text = clean_job_text(payload.job_text)
+        cached = get_keyword_list_by_source_text(db, payload.job_text)
+        if cached:
+            keyword_result = cached
+            ats_keywords = normalize_keywords(
+                extract_whitelist_keywords(cleaned_text, limit=200)
+                + keyword_result.skills
+                + keyword_result.requirements,
+                limit=200,
+            )
+        else:
+            try:
+                keyword_result = extract_job_keywords(cleaned_text)
+                ats_keywords = normalize_keywords(
+                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    + keyword_result.skills
+                    + keyword_result.requirements,
+                    limit=200,
+                )
+            except LLMServiceError:
+                keyword_result = extract_keywords_transformer(cleaned_text)
+                if keyword_result and keyword_result.skills:
+                    ats_keywords = normalize_keywords(
+                        extract_whitelist_keywords(cleaned_text, limit=200)
+                        + keyword_result.skills
+                        + keyword_result.requirements,
+                        limit=200,
+                    )
+                else:
+                    keyword_result = extract_keywords_crf(cleaned_text)
+                    if keyword_result and keyword_result.skills:
+                        ats_keywords = normalize_keywords(
+                            extract_whitelist_keywords(cleaned_text, limit=200)
+                            + keyword_result.skills
+                            + keyword_result.requirements,
+                            limit=200,
+                        )
+                    else:
+                        keyword_result = extract_keywords_fallback(cleaned_text)
+                        ats_keywords = normalize_keywords(
+                            extract_whitelist_keywords(cleaned_text, limit=200)
+                            + keyword_result.skills
+                            + keyword_result.requirements,
+                            limit=200,
+                        )
+            save_keyword_list(
+                db=db,
+                source_text=payload.job_text,
+                skills=normalize_keywords(keyword_result.skills),
+                requirements=normalize_keywords(keyword_result.requirements),
+            )
         result = generate_optimized_cv(
             cv_text=payload.cv_text,
             job_text=payload.job_text,
