@@ -8,7 +8,6 @@ from google.genai import errors as genai_errors
 
 from app.core.config import settings
 from app.schemas.keywords import KeywordExtractionResult
-from app.schemas.pipeline import CvAnalysis, JobAnalysis
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +27,11 @@ class LLMServiceError(RuntimeError):
 def generate_optimized_cv(
     cv_text: str,
     job_text: str,
-    cv_analysis: CvAnalysis | None = None,
-    job_analysis: JobAnalysis | None = None,
+    cv_analysis: str | None = None,
+    job_analysis: str | None = None,
+    ats_keywords: list[str] | None = None,
+    target_role: str | None = None,
+    target_company: str | None = None,
 ) -> LLMResult:
     cv_text = _truncate(cv_text, settings.max_cv_chars)
     job_text = _truncate(job_text, settings.max_job_chars)
@@ -42,54 +44,32 @@ def generate_optimized_cv(
         job_text=job_text,
         cv_analysis=cv_analysis,
         job_analysis=job_analysis,
+        ats_keywords=ats_keywords,
+        target_role=target_role,
+        target_company=target_company,
     )
 
 
-def analyze_cv_text(cv_text: str) -> CvAnalysis:
+def analyze_cv_text(cv_text: str) -> str:
     cv_text = _truncate(cv_text, settings.max_cv_chars)
     prompt = (
-        "You are a CV analysis assistant. Extract structure and content from the CV.\n"
-        "Return STRICT JSON only with the exact fields below.\n\n"
-        "JSON schema:\n"
-        "{\n"
-        '  "summary": string,\n'
-        '  "core_skills": string[],\n'
-        '  "experience_bullets": string[],\n'
-        '  "achievements": string[],\n'
-        '  "gaps": string[]\n'
-        "}\n\n"
-        "Rules:\n"
-        "- Use concise phrases.\n"
-        "- Use action verbs when possible.\n"
-        "- Do not invent facts.\n\n"
+        "You are a CV analyst. Provide a concise, structured critique.\n"
+        "Include strengths, risks for ATS, and top improvement priorities.\n"
+        "Keep it short and actionable.\n\n"
         f"CV:\n{cv_text}\n"
     )
-    data = _generate_json_with_gemini(prompt)
-    return CvAnalysis.model_validate(data)
+    return _generate_text_with_gemini(prompt)
 
 
-def analyze_job_text(job_text: str) -> JobAnalysis:
+def analyze_job_text(job_text: str) -> str:
     job_text = _truncate(job_text, settings.max_job_chars)
     prompt = (
-        "You are a job description analysis assistant. Extract structure and ATS keywords.\n"
-        "Return STRICT JSON only with the exact fields below.\n\n"
-        "JSON schema:\n"
-        "{\n"
-        '  "title": string,\n'
-        '  "responsibilities": string[],\n'
-        '  "requirements": string[],\n'
-        '  "keywords": string[],\n'
-        '  "tools": string[],\n'
-        '  "seniority": string\n'
-        "}\n\n"
-        "Rules:\n"
-        "- Use concise phrases.\n"
-        "- Keep keywords aligned to the posting.\n"
-        "- Do not invent facts.\n\n"
+        "You are a job posting analyst. Summarize role expectations and key skills.\n"
+        "Highlight must-have requirements and nice-to-haves.\n"
+        "Keep it short and actionable.\n\n"
         f"Job description:\n{job_text}\n"
     )
-    data = _generate_json_with_gemini(prompt)
-    return JobAnalysis.model_validate(data)
+    return _generate_text_with_gemini(prompt)
 
 
 def extract_job_keywords(job_text: str) -> KeywordExtractionResult:
@@ -116,28 +96,48 @@ def extract_job_keywords(job_text: str) -> KeywordExtractionResult:
 def _generate_with_gemini(
     cv_text: str,
     job_text: str,
-    cv_analysis: CvAnalysis,
-    job_analysis: JobAnalysis,
+    cv_analysis: str,
+    job_analysis: str,
+    ats_keywords: list[str] | None,
+    target_role: str | None,
+    target_company: str | None,
 ) -> LLMResult:
     if not settings.gemini_api_key:
         raise LLMServiceError("GEMINI_API_KEY is not set", status_code=500)
 
     client = _get_gemini_client()
 
+    keyword_block = ""
+    if ats_keywords:
+        cleaned = [kw.strip() for kw in ats_keywords if kw.strip()]
+        if cleaned:
+            keyword_block = "ATS keywords to prioritize (use ONLY if supported by the CV):\n"
+            keyword_block += " · ".join(cleaned) + "\n\n"
+
+    target_block = ""
+    if (target_role or "").strip() or (target_company or "").strip():
+        role = (target_role or "").strip() or "—"
+        company = (target_company or "").strip() or "—"
+        target_block = f"Target role: {role}\nTarget company: {company}\n\n"
+
     prompt = (
         "You are an expert CV optimizer. Rewrite the CV to match the job description.\n"
         "Goal: increase ATS match and hiring-manager clarity by 2–3x.\n\n"
         "Rules:\n"
         "- Use strong action verbs at the start of each bullet.\n"
+        "- Use professional resume style. Avoid first-person pronouns.\n"
         "- Keep an ATS-friendly, keyword-rich style aligned to the job description.\n"
         "- Use bullet points for experience and achievements.\n"
         "- Keep structure clean and scannable (section headers + bullets).\n"
         "- Preserve truthful content; do not invent skills, tools, or employers.\n"
+        "- If a keyword is relevant but phrased differently, reword to match the posting.\n"
         "- Prefer quantified impact (%, $, time saved, scale, volume) when present.\n"
         "- Remove fluff, tighten wording, keep it concise.\n"
         "- Output ONLY the improved CV text (no explanations, no extra labels).\n\n"
-        f"CV analysis (JSON):\n{cv_analysis.model_dump_json()}\n\n"
-        f"Job analysis (JSON):\n{job_analysis.model_dump_json()}\n\n"
+        f"{target_block}"
+        f"{keyword_block}"
+        f"CV analysis:\n{cv_analysis}\n\n"
+        f"Job analysis:\n{job_analysis}\n\n"
         f"CV:\n{cv_text}\n\n"
         f"Job description:\n{job_text}\n\n"
         "Return the improved CV text."
@@ -165,6 +165,32 @@ def _generate_with_gemini(
         optimized_cv=optimized_cv,
         feedback="Generated by Gemini API.",
     )
+
+
+def _generate_text_with_gemini(prompt: str) -> str:
+    if not settings.gemini_api_key:
+        raise LLMServiceError("GEMINI_API_KEY is not set", status_code=500)
+
+    client = _get_gemini_client()
+    try:
+        response = client.models.generate_content(
+            model=settings.gemini_model,
+            contents=prompt,
+        )
+    except genai_errors.ClientError as exc:
+        message = str(exc)
+        status_code = _map_gemini_error_to_status(message)
+        logger.warning("Gemini client error: %s", message)
+        raise LLMServiceError(f"GEMINI_ERROR: {message}", status_code=status_code) from exc
+    except Exception as exc:
+        message = str(exc)
+        logger.exception("Gemini unexpected error: %s", message)
+        raise LLMServiceError(f"GEMINI_ERROR: {message}", status_code=503) from exc
+
+    text = (getattr(response, "text", "") or "").strip()
+    if not text:
+        raise LLMServiceError("GEMINI_ERROR: empty response", status_code=502)
+    return text
 
 
 def _generate_json_with_gemini(prompt: str) -> dict:

@@ -22,33 +22,35 @@ def test_upload_cv_text(client):
 
 
 def test_analyze_cv_route(client, monkeypatch):
-    from app.services import llm
+    from app.api.routes import analyze as analyze_routes
 
-    monkeypatch.setattr(llm, "analyze_cv_text", lambda text: "OK")
+    monkeypatch.setattr(analyze_routes, "analyze_cv_text", lambda text: "OK")
+    monkeypatch.setattr(analyze_routes, "record_activity", lambda *_, **__: None)
     response = client.post("/analyze/cv", json={"cv_text": "My CV"})
     assert response.status_code == 200
     assert response.json()["cv_analysis"] == "OK"
 
 
 def test_analyze_job_route(client, monkeypatch):
-    from app.services import llm
+    from app.api.routes import analyze as analyze_routes
 
-    monkeypatch.setattr(llm, "analyze_job_text", lambda text: "OK")
+    monkeypatch.setattr(analyze_routes, "analyze_job_text", lambda text: "OK")
+    monkeypatch.setattr(analyze_routes, "record_activity", lambda *_, **__: None)
     response = client.post("/analyze/job", json={"job_text": "Job"})
     assert response.status_code == 200
     assert response.json()["job_analysis"] == "OK"
 
 
 def test_extract_keywords_route(client, monkeypatch):
-    from app.services import llm
-    from app.services import keyword_store
+    from app.api.routes import analyze as analyze_routes
 
     monkeypatch.setattr(
-        llm,
+        analyze_routes,
         "extract_job_keywords",
         lambda text: KeywordExtractionResult(skills=["Python"], requirements=["SQL"]),
     )
-    monkeypatch.setattr(keyword_store, "save_keyword_list", lambda **_: 123)
+    monkeypatch.setattr(analyze_routes, "save_keyword_list", lambda **_: 123)
+    monkeypatch.setattr(analyze_routes, "record_activity", lambda *_, **__: None)
     response = client.post("/analyze/keywords", json={"job_text": "Job"})
     assert response.status_code == 200
     payload = response.json()
@@ -58,10 +60,10 @@ def test_extract_keywords_route(client, monkeypatch):
 
 
 def test_match_cv_job_route(client, monkeypatch):
-    from app.services import llm
+    from app.api.routes import analyze as analyze_routes
 
     monkeypatch.setattr(
-        llm,
+        analyze_routes,
         "extract_job_keywords",
         lambda text: KeywordExtractionResult(skills=["Python"], requirements=["SQL"]),
     )
@@ -77,24 +79,24 @@ def test_match_cv_job_route(client, monkeypatch):
 
 
 def test_optimize_route(client, monkeypatch):
-    from app.services import llm
-    from app.services import recommendations
+    from app.api.routes import optimize as optimize_routes
 
     monkeypatch.setattr(
-        llm,
+        optimize_routes,
         "generate_optimized_cv",
         lambda **_: LLMResult(optimized_cv="OK", feedback="done"),
     )
     monkeypatch.setattr(
-        llm,
+        optimize_routes,
         "extract_job_keywords",
         lambda text: KeywordExtractionResult(skills=["Python", "SQL"], requirements=[]),
     )
     monkeypatch.setattr(
-        recommendations,
+        optimize_routes,
         "build_recommendations",
         lambda missing: [f"Learn {m}" for m in missing],
     )
+    monkeypatch.setattr(optimize_routes, "record_activity", lambda *_, **__: None)
     response = client.post(
         "/optimize",
         json={
@@ -109,3 +111,5 @@ def test_optimize_route(client, monkeypatch):
     assert payload["optimized_cv"] == "OK"
     assert payload["missing_skills"] == ["SQL"]
     assert payload["recommendations"] == ["Learn SQL"]
+    assert payload["match_before"] == 50
+    assert payload["match_after"] == 0
