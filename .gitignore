@@ -9,6 +9,10 @@ node_modules/
 
 # Env
 .env
+.env.local
+
+# Local databases
+*.db
 
 # macOS
 .DS_Store

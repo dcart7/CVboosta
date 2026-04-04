@@ -3,6 +3,7 @@ import re
 
 def compute_match_score(cv_text: str, keywords: list[str]) -> tuple[int, list[str], list[str]]:
     normalized_cv = _normalize_text(cv_text)
+    cv_tokens = set(normalized_cv.split())
     matched: list[str] = []
     missing: list[str] = []
 
@@ -14,8 +15,12 @@ def compute_match_score(cv_text: str, keywords: list[str]) -> tuple[int, list[st
             continue
         if normalized_kw in normalized_cv:
             matched.append(keyword)
-        else:
-            missing.append(keyword)
+            continue
+        kw_tokens = [token for token in normalized_kw.split() if len(token) >= 3]
+        if kw_tokens and any(token in cv_tokens for token in kw_tokens):
+            matched.append(keyword)
+            continue
+        missing.append(keyword)
 
     total = len(matched) + len(missing)
     if total == 0:

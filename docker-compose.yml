@@ -4,9 +4,9 @@ services:
     container_name: smart_cv_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: smartcv
+      POSTGRES_PASSWORD: smartcv
+      POSTGRES_DB: smart_cv
     ports:
       - "5432:5432"
     volumes:
@@ -22,14 +22,31 @@ services:
       context: ./backend
     container_name: smart_cv_backend
     restart: unless-stopped
-    env_file:
-      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://smartcv:smartcv@postgres:5432/smart_cv
+      API_KEY_ENABLED: "false"
+      RATE_LIMIT_ENABLED: "false"
+      REQUEST_LOGGING_ENABLED: "false"
+      JWT_SECRET: "dev-secret-change-me"
     depends_on:
       postgres:
         condition: service_healthy
     ports:
       - "8000:8000"
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: smart_cv_frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3000"]
 
 volumes:
   postgres_data:

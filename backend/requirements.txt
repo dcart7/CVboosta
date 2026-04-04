@@ -7,3 +7,6 @@ psycopg
 python-multipart
 google-genai
 pdfplumber
+passlib
+python-jose[cryptography]
+email-validator

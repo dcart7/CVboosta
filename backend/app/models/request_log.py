@@ -1,13 +1,14 @@
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import Column, DateTime, Integer, String, Text, ForeignKey
 from sqlalchemy.sql import func
 
-from app.db.base import Base
+from app.db.base_class import Base
 
 
 class RequestLog(Base):
     __tablename__ = "request_logs"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     method = Column(String(16), nullable=False)
     path = Column(String(255), nullable=False)
     status_code = Column(Integer, nullable=False)

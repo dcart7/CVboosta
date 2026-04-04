@@ -9,8 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "jspdf": "^2.5.2",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "25.5.2",
+    "@types/react": "19.2.14",
+    "typescript": "6.0.2"
   }
 }

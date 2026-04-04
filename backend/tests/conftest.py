@@ -22,4 +22,5 @@ from app.main import app  # noqa: E402
 
 @pytest.fixture()
 def client() -> TestClient:
-    return TestClient(app)
+    with TestClient(app) as client:
+        yield client

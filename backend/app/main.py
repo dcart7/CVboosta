@@ -4,6 +4,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.analyze import router as analyze_router
+from app.api.routes.auth import router as auth_router
+from app.api.routes.history import router as history_router
 from app.api.routes.logs import router as logs_router
 from app.api.routes.optimize import router as optimize_router
 from app.core.api_key import api_key_middleware
@@ -47,6 +49,8 @@ app.add_middleware(
 app.include_router(analyze_router, prefix="/analyze", tags=["analyze"])
 app.include_router(optimize_router, tags=["optimize"])
 app.include_router(logs_router, tags=["logs"])
+app.include_router(auth_router, tags=["auth"])
+app.include_router(history_router, tags=["history"])
 
 
 @app.on_event("startup")

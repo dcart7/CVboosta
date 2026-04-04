@@ -11,7 +11,7 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 from app.models.request_log import RequestLog
 
-_SKIP_PATHS = {"/health", "/openapi.json"}
+_SKIP_PATHS = {"/health", "/openapi.json", "/auth/login", "/auth/register"}
 
 
 def _should_skip(path: str) -> bool:
