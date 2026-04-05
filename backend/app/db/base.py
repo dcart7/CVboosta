@@ -1,6 +1,5 @@
-from sqlalchemy.orm import declarative_base
+from app.db.model_base import Base
 
-Base = declarative_base()
 
 # Import models so metadata is populated before create_all
 from app.models.user import User  # noqa: F401
