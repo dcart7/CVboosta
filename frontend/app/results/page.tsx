@@ -99,74 +99,25 @@ export default function ResultsPage() {
       setStatus("No optimized CV found yet.");
       return;
     }
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const marginX = 48;
-    const marginY = 56;
-    const contentWidth = pageWidth - marginX * 2;
-    let cursorY = marginY;
-
-    const addPageIfNeeded = (heightNeeded: number) => {
-      if (cursorY + heightNeeded > pageHeight - marginY) {
-        doc.addPage();
-        cursorY = marginY;
-      }
-    };
-
-    const addWrappedText = (
-      text: string,
-      fontSize: number,
-      isBold = false,
-      indent = 0,
-      lineGap = 4,
-    ) => {
-      doc.setFont("Times", isBold ? "Bold" : "Normal");
-      doc.setFontSize(fontSize);
-      const lines = doc.splitTextToSize(text, contentWidth - indent);
-      const lineHeight = fontSize + lineGap;
-      addPageIfNeeded(lines.length * lineHeight);
-      lines.forEach((line: string) => {
-        doc.text(line, marginX + indent, cursorY);
-        cursorY += lineHeight;
-      });
-      cursorY += lineGap;
-    };
-
-    const lines = optimizedCv.split(/\r?\n/).map((line) => line.trim());
-
-    const isHeader = (line: string) => {
-      if (!line) return false;
-      const upper = line.toUpperCase();
-      if (line.endsWith(":")) return true;
-      if (line.length <= 36 && line === upper) return true;
-      return false;
-    };
-
-    lines.forEach((line) => {
-      if (!line) {
-        cursorY += 6;
-        return;
-      }
-      if (isHeader(line)) {
-        addWrappedText(line.replace(/:$/, ""), 14, true, 0, 6);
-        return;
-      }
-      if (line.startsWith("- ") || line.startsWith("• ")) {
-        const bullet = line.replace(/^[-•]\s*/, "");
-        addWrappedText(`• ${bullet}`, 12, false, 12, 2);
-        return;
-      }
-      addWrappedText(line, 12, false, 0, 2);
-    });
-
-    doc.save("optimized-cv.pdf");
+    window.print();
   };
 
   return (
     <main className="page">
       <TopNav />
-      <div className="shell">
+      {optimizedCv && (
+        <div className="print-only">
+          {optimizedCv.split(/\r?\n/).map((line, idx) => {
+            const isHeading = line === line.toUpperCase() && line.length > 2 && line.length < 50 && !line.startsWith("-");
+            if (idx === 0) return <h1 key={idx} style={{ fontSize: "24pt", margin: "0 0 16pt", borderBottom: "2px solid #333", paddingBottom: "8pt" }}>{line}</h1>;
+            if (isHeading) return <h2 key={idx} style={{ fontSize: "12pt", color: "#1e3a8a", margin: "16pt 0 4pt", textTransform: "uppercase", borderBottom: "1px solid #ccc", paddingBottom: "2pt" }}>{line}</h2>;
+            if (!line.trim()) return <div key={idx} style={{ height: "8pt" }} />;
+            if (line.startsWith("-") || line.startsWith("•")) return <p key={idx} style={{ margin: "2pt 0 2pt 16pt", textIndent: "-8pt" }}>• {line.substring(1).trim()}</p>;
+            return <p key={idx} style={{ margin: "2pt 0" }}>{line}</p>;
+          })}
+        </div>
+      )}
+      <div className="shell hide-print">
         <section className="split fade-up">
           <div className="hero-card">
             <h2 className="section-title">Optimized CV</h2>
