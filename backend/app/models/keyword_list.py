@@ -1,7 +1,8 @@
 from sqlalchemy import Column, DateTime, Integer, JSON, Text
 from sqlalchemy.sql import func
 
-from app.db.base import Base
+from app.db.model_base import Base
+
 
 
 class KeywordList(Base):

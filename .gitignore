@@ -31,3 +31,5 @@ lightning_logs/
 .DS_Store
 .AppleDouble
 .LSOverride
+dummy_cv.txt
+backend/dummy_cv.pdf
