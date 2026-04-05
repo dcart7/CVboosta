@@ -38,6 +38,7 @@ async def request_logger_middleware(request: Request, call_next):  # type: ignor
         response_body=response_body,
     )
     return response
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

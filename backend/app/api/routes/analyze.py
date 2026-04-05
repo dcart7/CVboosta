@@ -17,8 +17,7 @@ from app.schemas.pipeline import (
     AnalyzeJobResponse,
 )
 from app.services.cv_parser import parse_cv
-from app.services.keyword_store import save_keyword_list
-from app.services.keyword_store import get_keyword_list_by_source_text
+from app.services.keyword_store import save_keyword_list, get_keyword_list_by_source_text
 from app.services.keyword_clean import (
     clean_job_text,
     normalize_keywords,

@@ -143,21 +143,10 @@ def _generate_with_gemini(
         "Return the improved CV text."
     )
 
-    try:
-        response = client.models.generate_content(
-            model=settings.gemini_model,
-            contents=prompt,
-        )
-    except genai_errors.ClientError as exc:
-        message = str(exc)
-        status_code = _map_gemini_error_to_status(message)
-        logger.warning("Gemini client error: %s", message)
-        raise LLMServiceError(f"GEMINI_ERROR: {message}", status_code=status_code) from exc
-    except Exception as exc:
-        message = str(exc)
-        logger.exception("Gemini unexpected error: %s", message)
-        raise LLMServiceError(f"GEMINI_ERROR: {message}", status_code=503) from exc
-
+    response = client.models.generate_content(
+        model=settings.gemini_model,
+        contents=prompt,
+    )
     optimized_cv = (getattr(response, "text", "") or "").strip()
     if not optimized_cv:
         raise LLMServiceError("GEMINI_ERROR: empty response", status_code=502)
