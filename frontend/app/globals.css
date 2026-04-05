@@ -41,13 +41,6 @@ p {
   margin: 0 0 24px;
 }
 
-.cta {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
 button {
   border: none;
   background: #0f3d3e;
@@ -58,7 +51,56 @@ button {
   cursor: pointer;
 }
 
-button.secondary {
-  background: #f0b429;
-  color: #1c1c1c;
+.upload-card {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  padding: 24px;
+  border-radius: 16px;
+  background: #fef8ec;
+  border: 1px dashed #e6c58a;
+}
+
+.file-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #e7e1d6;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.file-input input {
+  display: none;
+}
+
+.error {
+  color: #b00020;
+  font-size: 14px;
+  margin: 0;
+}
+
+.result {
+  margin-top: 32px;
+  text-align: left;
+}
+
+.result h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.result textarea {
+  width: 100%;
+  min-height: 240px;
+  border-radius: 12px;
+  border: 1px solid #e7e1d6;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #fffdf7;
+  resize: vertical;
 }

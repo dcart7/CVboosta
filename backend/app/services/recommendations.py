@@ -6,7 +6,10 @@ def build_recommendations(missing_skills: list[str]) -> list[str]:
             "Ensure Skills section mirrors the exact job keywords (only if truthful).",
         ]
 
-    top_skills = missing_skills[:5]
+    top_skills = [s.strip() for s in missing_skills if s.strip()][:5]
+    if not top_skills:
+        return ["Highlight your strongest, most relevant achievements."]
+
     recommendations: list[str] = []
     for skill in top_skills[:3]:
         recommendations.append(
