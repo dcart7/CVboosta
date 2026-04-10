@@ -301,7 +301,9 @@ def interview_prep_route(
 ) -> InterviewPrepResponse:
     try:
         questions = generate_interview_prep(
-            job_text=payload.job_text, missing_keywords=payload.missing_keywords
+            job_text=payload.job_text,
+            missing_keywords=payload.missing_keywords,
+            ui_language=payload.ui_language,
         )
     except LLMServiceError as exc:
         raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc

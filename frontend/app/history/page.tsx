@@ -68,6 +68,7 @@ export default function HistoryPage() {
               <strong>{t("history.company")}</strong>
               <strong>{t("history.score")}</strong>
               <strong>{t("history.date")}</strong>
+              <strong></strong>
             </div>
             {loading && <p>{t("history.loading")}</p>}
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
@@ -75,12 +76,22 @@ export default function HistoryPage() {
               <p>{t("history.empty")}</p>
             )}
             {items.map((item) => (
-              <div className="history-row" key={item.id}>
+              <Link 
+                href={`/results?id=${item.id}`} 
+                key={item.id} 
+                className="history-row" 
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
                 <div>{item.role || "—"}</div>
                 <div>{item.company || "—"}</div>
                 <div>{scoreToLabel(item.score)}</div>
                 <div>{formatDate(item.created_at)}</div>
-              </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span className="btn secondary" style={{ padding: '4px 12px', fontSize: '12px' }}>
+                    {t("history.view")}
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </section>

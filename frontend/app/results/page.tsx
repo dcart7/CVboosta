@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
@@ -302,8 +303,17 @@ function extractSections(cleanedCv: string): { title: string; sections: CvSectio
 }
 
 export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div className="spinner"></div></div>}>
+      <ResultsContent />
+    </Suspense>
+  );
+}
+
+function ResultsContent() {
   const apiBase = getApiBase();
-  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const { t, language } = useTranslation();
   const [optimizedCv, setOptimizedCv] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -316,6 +326,46 @@ export default function ResultsPage() {
   const [interviewQuestions, setInterviewQuestions] = useState<InterviewQuestion[]>([]);
   const [isLoadingPrep, setIsLoadingPrep] = useState(false);
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
+  const [prepError, setPrepError] = useState<string | null>(null);
+  const [isLoadingSession, setIsLoadingSession] = useState(false);
+
+  useEffect(() => {
+    const id = searchParams.get("id");
+    if (!id) return;
+
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+
+    setIsLoadingSession(true);
+    fetch(`${apiBase}/history/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load session (Status: ${res.status})`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setOptimizedCv(data.optimized_cv || "");
+        setMissing(data.missing_skills || []);
+        setRecommendations(data.recommendations || []);
+        setMatchBefore(data.match_before || 0);
+        setMatchAfter(data.match_after || 0);
+        
+        // Save to localStorage so it persists on refresh
+        localStorage.setItem("optimized_cv", data.optimized_cv || "");
+        localStorage.setItem("missing_keywords", JSON.stringify(data.missing_skills || []));
+        localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
+        localStorage.setItem("match_before", (data.match_before || 0).toString());
+        localStorage.setItem("match_after", (data.match_after || 0).toString());
+        localStorage.setItem("job_text", data.job_description || "");
+      })
+      .catch((err) => {
+        console.error("Failed to load session:", err.message || err);
+      })
+      .finally(() => setIsLoadingSession(false));
+  }, [searchParams, apiBase]);
 
   useEffect(() => {
     const storedTemplate = localStorage.getItem("pdf_template");
@@ -446,10 +496,14 @@ export default function ResultsPage() {
   };
 
   const fetchInterviewPrep = async () => {
-    const jobText = localStorage.getItem("job_description") || "";
-    if (!jobText) return;
+    const jobText = localStorage.getItem("job_text") || "";
+    if (!jobText) {
+      console.warn("No job_text found in localStorage");
+      return;
+    }
 
     setIsLoadingPrep(true);
+    setPrepError(null);
     try {
       const response = await fetch(`${apiBase}/analyze/interview-prep`, {
         method: "POST",
@@ -457,14 +511,23 @@ export default function ResultsPage() {
         body: JSON.stringify({
           job_text: jobText,
           missing_keywords: missing,
+          ui_language: language,
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to fetch interview prep");
+      if (!response.ok) {
+        if (response.status === 404) throw new Error("error404");
+        if (response.status === 503) throw new Error("error503");
+        if (response.status === 502) throw new Error("error502");
+        if (response.status >= 500) throw new Error("error500");
+        throw new Error("genericError");
+      }
+      
       const data = await response.json();
       setInterviewQuestions(data.questions || []);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Interview prep error:", err);
+      setPrepError(err.message || "genericError");
     } finally {
       setIsLoadingPrep(false);
     }
@@ -772,6 +835,12 @@ export default function ResultsPage() {
   return (
     <main className="page">
       <TopNav />
+      {isLoadingSession && (
+        <div className="modal-backdrop" style={{ zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(9, 12, 18, 0.8)' }}>
+          <div className="spinner" style={{ marginBottom: '16px' }}></div>
+          <p style={{ color: 'white', fontWeight: 500 }}>{t("results.loadingSession")}</p>
+        </div>
+      )}
       {optimizedCv && (
         <div className="print-only">
           {cleanedCv.split(/\r?\n/).map((line, idx) => {
@@ -959,8 +1028,9 @@ export default function ResultsPage() {
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="form-card" style={{ marginTop: "24px" }}>
+          <div id="interview-prep-section" className="form-card" style={{ marginTop: "24px" }}>
               <div
                 style={{
                   display: "flex",
@@ -977,17 +1047,28 @@ export default function ResultsPage() {
                     {t("results.interviewPrepSubtitle")}
                   </p>
                 </div>
-                {interviewQuestions.length === 0 && (
-                  <button
-                    className="btn secondary"
-                    onClick={fetchInterviewPrep}
-                    disabled={isLoadingPrep}
-                    style={{ marginLeft: "16px" }}
-                  >
-                    {isLoadingPrep ? t("results.loadingPrep") : t("results.generateInterviewPrep")}
-                  </button>
-                )}
+              {interviewQuestions.length === 0 && (
+                <button
+                  className="btn secondary"
+                  onClick={async () => {
+                    await fetchInterviewPrep();
+                    setTimeout(() => {
+                      document.getElementById("interview-prep-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 800);
+                  }}
+                  disabled={isLoadingPrep}
+                  style={{ marginLeft: "16px" }}
+                >
+                  {isLoadingPrep ? t("results.loadingPrep") : t("results.generateInterviewPrep")}
+                </button>
+              )}
               </div>
+
+              {prepError && (
+                <div style={{ marginBottom: "16px", padding: "12px", background: "rgba(180, 35, 24, 0.1)", border: "1px solid rgba(180, 35, 24, 0.2)", borderRadius: "12px", color: "#f04438", fontSize: "14px" }}>
+                  {t(`results.${prepError}`)}
+                </div>
+              )}
 
               {isLoadingPrep && (
                 <div style={{ padding: "40px 0", textAlign: "center" }}>
@@ -1061,12 +1142,12 @@ export default function ResultsPage() {
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="history-actions">
-              <Link className="btn secondary" href="/history">
-                {t("results.saveToHistory")}
-              </Link>
-            </div>
+          </div>
+
+          <div className="history-actions">
+            <Link className="btn secondary" href="/history">
+              {t("results.saveToHistory")}
+            </Link>
           </div>
         </section>
       </div>

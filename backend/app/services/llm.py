@@ -16,6 +16,15 @@ logger = logging.getLogger(__name__)
 
 _GEMINI_FALLBACK_MODELS = ("gemini-2.5-flash",)
 
+# BCP-47-style codes from the frontend LanguageContext
+_UI_LANGUAGE_NAMES: dict[str, str] = {
+    "en": "English",
+    "uk": "Ukrainian",
+    "pl": "Polish",
+    "sk": "Slovak",
+    "es": "Spanish",
+}
+
 
 def _is_model_unavailable(message: str) -> bool:
     lowered = message.lower()
@@ -183,11 +192,15 @@ def extract_job_keywords(job_text: str) -> KeywordExtractionResult:
 
 
 def generate_interview_prep(
-    job_text: str, missing_keywords: list[str]
+    job_text: str,
+    missing_keywords: list[str],
+    ui_language: str = "en",
 ) -> list[dict]:
     job_text = _truncate(job_text, settings.max_job_chars)
     keywords_str = ", ".join(missing_keywords) if missing_keywords else "General role requirements"
-    
+    lang_key = (ui_language or "en").strip().lower()
+    output_language = _UI_LANGUAGE_NAMES.get(lang_key, "English")
+
     prompt = (
         "You are an expert Interview Coach. Generate a list of targeted interview questions "
         "based on the job description and the candidate's missing skills/keywords.\n\n"
@@ -209,11 +222,16 @@ def generate_interview_prep(
         "  ]\n"
         "}\n\n"
         "Rules:\n"
-        "- The language of the questions and tips MUST MATCH the language of the job description.\n"
+        f"- Write every \"question\", \"why\", and \"tips\" field in {output_language}. "
+        "Use clear, professional wording natural for that language.\n"
+        "- The job description may be in any language; still write your JSON text in "
+        f"{output_language}.\n"
         "- Make questions professional, challenging, and specific to the role.\n"
+        "- Keep role-specific technical terms where they are standard (e.g. API, Kubernetes) "
+        "even when the rest is in the target language.\n"
         "- Do not include any text outside the JSON block.\n"
     )
-    
+
     data = _generate_json_with_gemini(prompt)
     return data.get("questions", [])
 

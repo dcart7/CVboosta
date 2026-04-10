@@ -45,6 +45,17 @@ class InterviewQuestion(BaseModel):
 class InterviewPrepRequest(BaseModel):
     job_text: str
     missing_keywords: list[str]
+    ui_language: str = "en"
+
+    @field_validator("ui_language", mode="before")
+    @classmethod
+    def normalize_ui_language(cls, value: object) -> str:
+        if not isinstance(value, str):
+            return "en"
+        v = value.strip().lower()
+        if v in ("en", "uk", "pl", "sk", "es"):
+            return v
+        return "en"
 
 class InterviewPrepResponse(BaseModel):
     questions: list[InterviewQuestion]

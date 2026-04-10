@@ -128,6 +128,12 @@ export const translations = {
       whyThisIsAsked: "Why this is asked",
       howToAnswer: "How to answer",
       loadingPrep: "Generating coaching questions...",
+      error404: "Feature temporarily unavailable. Please restart the backend server.",
+      error500: "Server error. Please try again later.",
+      error502: "AI service is busy. Retrying...",
+      error503: "AI service limit reached. Please wait a minute and try again.",
+      genericError: "Something went wrong. Check your connection.",
+      loadingSession: "Loading session data...",
     },
     dashboard: {
       pill: "Dashboard — all steps in one place",
@@ -229,6 +235,7 @@ export const translations = {
       empty: "No optimized CVs yet. Run optimization to see history.",
       loginRequired: "Please log in to view history.",
       failed: "Failed to load history.",
+      view: "View Results",
     },
     hero: {
       startWithCv: "Start with a CV",
@@ -381,6 +388,12 @@ export const translations = {
       whyThisIsAsked: "Чому це питають",
       howToAnswer: "Як відповідати",
       loadingPrep: "Генеруємо запитання...",
+      error404: "Функція тимчасово недоступна. Будь ласка, перезапустіть бекенд-сервер.",
+      error500: "Помилка сервера. Спробуйте пізніше.",
+      error502: "AI-сервіс зайнятий. Повторна спроба...",
+      error503: "Ліміт AI-сервісу вичерпано. Зачекайте хвилину і спробуйте знову.",
+      genericError: "Щось пішло не так. Перевірте з'єднання.",
+      loadingSession: "Завантаження даних сесії...",
     },
     dashboard: {
       pill: "Панель — всі кроки в одному місці",
@@ -481,6 +494,7 @@ export const translations = {
       empty: "Оптимізованих резюме ще немає. Запустіть оптимізацію, щоб побачити історію.",
       loginRequired: "Увійдіть, щоб переглянути історію.",
       failed: "Не вдалося завантажити історію.",
+      view: "Переглянути",
     },
     hero: {
       startWithCv: "Почати з резюме",

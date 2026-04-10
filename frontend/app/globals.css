@@ -1161,12 +1161,22 @@ a {
 
 .history-row {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 0.6fr 0.8fr;
-  gap: 12px;
+  grid-template-columns: 1.4fr 1.2fr 0.6fr 0.8fr 100px;
+  gap: 16px;
   align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+  border-bottom: 1px solid var(--glass-border);
   font-size: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.history-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
 }
 
 .history-row:last-child {
