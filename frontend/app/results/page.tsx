@@ -855,7 +855,7 @@ export default function ResultsPage() {
                 )}
               </div>
             </div>
-            <div className="nav-actions">
+            <div className="nav-actions main-actions">
               <button className="btn primary" onClick={copyCv}>
                 {t("results.copyFullCv")}
               </button>
@@ -920,9 +920,11 @@ export default function ResultsPage() {
                 </div>
               </div>
             </div>
-            <Link className="btn secondary" href="/history">
-              {t("results.saveToHistory")}
-            </Link>
+            <div className="history-actions">
+              <Link className="btn secondary" href="/history">
+                {t("results.saveToHistory")}
+              </Link>
+            </div>
           </div>
         </section>
       </div>

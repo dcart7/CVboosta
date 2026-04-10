@@ -17,19 +17,14 @@ function SunIcon() {
       height="18"
       viewBox="0 0 24 24"
       fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path
-        d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+      <circle cx="12" cy="12" r="4" fill="currentColor" fillOpacity="0.2" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
     </svg>
   );
 }
@@ -41,14 +36,14 @@ function MoonIcon() {
       height="18"
       viewBox="0 0 24 24"
       fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path
-        d="M21 14.2A8.5 8.5 0 0 1 9.8 3a7 7 0 1 0 11.2 11.2Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
+      <path d="M12 3a6.36 6.36 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" fillOpacity="0.2" />
+      <circle cx="19" cy="5" r="1" fill="currentColor" />
     </svg>
   );
 }
@@ -81,7 +76,14 @@ export default function ThemeToggle() {
       aria-label={label}
       title={label}
     >
-      {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+      <div className="theme-icon-wrapper">
+        <div className={`theme-icon sun ${theme === "dark" ? "active" : ""}`}>
+          <SunIcon />
+        </div>
+        <div className={`theme-icon moon ${theme === "light" ? "active" : ""}`}>
+          <MoonIcon />
+        </div>
+      </div>
     </button>
   );
 }
