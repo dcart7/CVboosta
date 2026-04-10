@@ -26,6 +26,7 @@ from app.services.keyword_clean import (
 from app.services.keyword_fallback import extract_keywords_fallback
 from app.services.keyword_crf import extract_keywords_crf
 from app.services.keyword_transformer import extract_keywords_transformer
+from app.services.lang_detect import is_english_text
 from app.services.llm import (
     LLMServiceError,
     analyze_cv_text,
@@ -144,17 +145,23 @@ def extract_keywords(
     current_user=Depends(get_current_user_optional),
 ) -> KeywordExtractionResponse:
     cleaned_text = clean_job_text(payload.job_text)
+    use_ml = is_english_text(cleaned_text)
     try:
-        result = extract_keywords_transformer(cleaned_text)
-        if result and result.skills:
-            feedback = "Transformer keywords generated."
-        else:
-            result = extract_keywords_crf(cleaned_text)
+        if use_ml:
+            result = extract_keywords_transformer(cleaned_text)
             if result and result.skills:
-                feedback = "CRF keywords generated."
+                feedback = "Transformer keywords generated."
             else:
-                result = extract_job_keywords(cleaned_text)
-                feedback = "LLM keywords generated."
+                result = extract_keywords_crf(cleaned_text)
+                if result and result.skills:
+                    feedback = "CRF keywords generated."
+                else:
+                    result = extract_job_keywords(cleaned_text)
+                    feedback = "LLM keywords generated."
+        else:
+            # Non-English text — skip ML models, go straight to LLM
+            result = extract_job_keywords(cleaned_text)
+            feedback = "LLM keywords generated (non-English text)."
     except LLMServiceError:
         cached = get_keyword_list_by_source_text(db, payload.job_text)
         if cached:
@@ -203,17 +210,9 @@ def match_cv_job(
     else:
         try:
             cleaned_text = clean_job_text(payload.job_text)
-            keyword_result = extract_keywords_transformer(cleaned_text)
-            if keyword_result and keyword_result.skills:
-                keywords = normalize_keywords(
-                    extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
-                    + keyword_result.skills
-                    + keyword_result.requirements,
-                    limit=settings.max_ats_keywords,
-                )
-                feedback = "Match score computed from transformer keywords."
-            else:
-                keyword_result = extract_keywords_crf(cleaned_text)
+            use_ml = is_english_text(cleaned_text)
+            if use_ml:
+                keyword_result = extract_keywords_transformer(cleaned_text)
                 if keyword_result and keyword_result.skills:
                     keywords = normalize_keywords(
                         extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
@@ -221,16 +220,34 @@ def match_cv_job(
                         + keyword_result.requirements,
                         limit=settings.max_ats_keywords,
                     )
-                    feedback = "Match score computed from CRF keywords."
+                    feedback = "Match score computed from transformer keywords."
                 else:
-                    keyword_result = extract_job_keywords(cleaned_text)
-                    keywords = normalize_keywords(
-                        extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
-                        + keyword_result.skills
-                        + keyword_result.requirements,
-                        limit=settings.max_ats_keywords,
-                    )
-                    feedback = "Match score computed from LLM keywords."
+                    keyword_result = extract_keywords_crf(cleaned_text)
+                    if keyword_result and keyword_result.skills:
+                        keywords = normalize_keywords(
+                            extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
+                            + keyword_result.skills
+                            + keyword_result.requirements,
+                            limit=settings.max_ats_keywords,
+                        )
+                        feedback = "Match score computed from CRF keywords."
+                    else:
+                        keyword_result = extract_job_keywords(cleaned_text)
+                        keywords = normalize_keywords(
+                            extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
+                            + keyword_result.skills
+                            + keyword_result.requirements,
+                            limit=settings.max_ats_keywords,
+                        )
+                        feedback = "Match score computed from LLM keywords."
+            else:
+                # Non-English — use LLM directly
+                keyword_result = extract_job_keywords(cleaned_text)
+                keywords = normalize_keywords(
+                    keyword_result.skills + keyword_result.requirements,
+                    limit=settings.max_ats_keywords,
+                )
+                feedback = "Match score computed from LLM keywords (non-English text)."
         except LLMServiceError:
             cached = get_keyword_list_by_source_text(db, payload.job_text)
             if cached:

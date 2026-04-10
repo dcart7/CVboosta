@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getApiBase } from "../lib/apiBase";
 import ThemeToggle from "./ThemeToggle";
 import { useTranslation } from "../lib/LanguageContext";
@@ -11,6 +11,8 @@ export default function TopNav() {
   const [email, setEmail] = useState<string | null>(null);
   const apiBase = getApiBase();
   const { t, language, setLanguage } = useTranslation();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [pillStyle, setPillStyle] = useState({ transform: "translateX(0px)" });
 
   const languages: { code: Language; flag: string }[] = [
     { code: "en", flag: "🇺🇸" },
@@ -19,6 +21,20 @@ export default function TopNav() {
     { code: "sk", flag: "🇸🇰" },
     { code: "es", flag: "🇪🇸" },
   ];
+
+  const activeIndex = languages.findIndex((l) => l.code === language);
+
+  // Slide the pill to the active button
+  useEffect(() => {
+    if (!trackRef.current) return;
+    const buttons = trackRef.current.querySelectorAll<HTMLButtonElement>(".lang-btn");
+    const btn = buttons[activeIndex >= 0 ? activeIndex : 0];
+    if (!btn) return;
+    const trackRect = trackRef.current.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const offset = btnRect.left - trackRect.left;
+    setPillStyle({ transform: `translateX(${offset}px)` });
+  }, [activeIndex]);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -60,16 +76,21 @@ export default function TopNav() {
         </nav>
         <div className="nav-actions">
           <div className="lang-switcher">
-            {languages.map((l) => (
-              <button
-                key={l.code}
-                className={`lang-btn ${language === l.code ? "active" : ""}`}
-                onClick={() => setLanguage(l.code)}
-                title={l.code.toUpperCase()}
-              >
-                {l.flag}
-              </button>
-            ))}
+            <div className="lang-slider-track" ref={trackRef}>
+              {/* Sliding glass pill */}
+              <span className="lang-slider-pill" style={pillStyle} aria-hidden="true" />
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  className={`lang-btn${language === l.code ? " active" : ""}`}
+                  onClick={() => setLanguage(l.code)}
+                  title={l.code.toUpperCase()}
+                  type="button"
+                >
+                  {l.flag}
+                </button>
+              ))}
+            </div>
           </div>
           <ThemeToggle />
           {email ? (

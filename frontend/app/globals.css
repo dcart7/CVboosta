@@ -193,18 +193,69 @@ a {
 }
 
 .lang-switcher {
+  position: relative;
   display: flex;
-  gap: 4px;
-  background: var(--surface-2);
-  padding: 4px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  border: 1px solid var(--line);
-  backdrop-filter: blur(10px);
+  padding: 3px;
+  gap: 0;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .lang-switcher {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.lang-slider-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lang-slider-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px) saturate(200%);
+  -webkit-backdrop-filter: blur(12px) saturate(200%);
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme="dark"] .lang-slider-pill {
+  background: rgba(99, 166, 255, 0.25);
+  border-color: rgba(99, 166, 255, 0.4);
+  box-shadow:
+    0 2px 16px rgba(99, 166, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(99, 166, 255, 0.15);
 }
 
 .lang-btn {
-  width: 28px;
-  height: 28px;
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: none;
   background: transparent;
@@ -212,29 +263,28 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  opacity: 0.4;
-  filter: grayscale(1);
+  font-size: 15px;
   padding: 0;
+  transition: opacity 0.2s ease, filter 0.2s ease, transform 0.15s ease;
+  opacity: 0.38;
+  filter: grayscale(1) brightness(0.85);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .lang-btn:hover {
-  opacity: 0.8;
-  background: var(--glass-hi);
-  filter: grayscale(0.5);
+  opacity: 0.7;
+  filter: grayscale(0.4);
+  transform: scale(1.1);
 }
 
 .lang-btn.active {
   opacity: 1;
-  background: var(--paper);
-  filter: grayscale(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  filter: grayscale(0) drop-shadow(0 1px 3px rgba(0,0,0,0.15));
+  transform: scale(1.05);
 }
 
 [data-theme="dark"] .lang-btn.active {
-  background: var(--accent);
-  color: white;
+  filter: grayscale(0) drop-shadow(0 0 6px rgba(99, 166, 255, 0.5));
 }
 
 .template-picker {
