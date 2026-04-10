@@ -644,12 +644,14 @@ a {
 
 .hero-card {
   position: relative;
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--glass-hi) 90%, transparent),
-      var(--glass));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--glass-hi) 90%, transparent),
+    var(--glass)
+  );
   border: 1px solid var(--glass-border);
   border-radius: 24px;
-  padding: 28px;
+  padding: 36px 32px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(20px) saturate(150%);
   overflow: hidden;
@@ -676,17 +678,19 @@ a {
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  gap: 24px;
 }
 
 .kpi {
   position: relative;
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--glass-hi) 86%, transparent),
-      var(--surface));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--glass-hi) 86%, transparent),
+    var(--surface)
+  );
   border: 1px solid var(--glass-border);
   border-radius: 18px;
-  padding: 18px;
+  padding: 24px 22px;
   box-shadow: var(--card-shadow);
   backdrop-filter: blur(18px) saturate(140%);
   overflow: hidden;
@@ -722,7 +726,7 @@ a {
 
 .section-title {
   font-size: 24px;
-  margin: 0 0 18px;
+  margin: 0 0 24px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--ink);
@@ -747,17 +751,20 @@ a {
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 18px;
+  gap: 24px;
+  margin-bottom: 8px;
 }
 
 .card {
   position: relative;
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--glass-hi) 86%, transparent),
-      var(--surface));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--glass-hi) 86%, transparent),
+    var(--surface)
+  );
   border: 1px solid var(--glass-border);
   border-radius: 20px;
-  padding: 22px;
+  padding: 26px 24px;
   box-shadow: var(--card-shadow);
   backdrop-filter: blur(18px) saturate(140%);
   overflow: hidden;
@@ -818,12 +825,14 @@ a {
 
 .form-card {
   position: relative;
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--glass-hi) 88%, transparent),
-      var(--glass));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--glass-hi) 88%, transparent),
+    var(--glass)
+  );
   border: 1px solid var(--glass-border);
   border-radius: 24px;
-  padding: 28px;
+  padding: 36px 32px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(20px) saturate(150%);
   overflow: hidden;
