@@ -182,6 +182,42 @@ def extract_job_keywords(job_text: str) -> KeywordExtractionResult:
     return KeywordExtractionResult.model_validate(data)
 
 
+def generate_interview_prep(
+    job_text: str, missing_keywords: list[str]
+) -> list[dict]:
+    job_text = _truncate(job_text, settings.max_job_chars)
+    keywords_str = ", ".join(missing_keywords) if missing_keywords else "General role requirements"
+    
+    prompt = (
+        "You are an expert Interview Coach. Generate a list of targeted interview questions "
+        "based on the job description and the candidate's missing skills/keywords.\n\n"
+        "GOAL:\n"
+        "Create 5-8 questions that a recruiter would likely ask to probe these specific gaps "
+        "or to verify the candidate's core competency for the role.\n\n"
+        "MISSING KEYWORDS/SKILLS:\n"
+        f"{keywords_str}\n\n"
+        "JOB DESCRIPTION:\n"
+        f"{job_text}\n\n"
+        "OUTPUT FORMAT (STRICT JSON ONLY):\n"
+        "{\n"
+        '  "questions": [\n'
+        "    {\n"
+        '      "question": "The actual question text",\n'
+        '      "why": "Brief explanation of why a recruiter asks this",\n'
+        '      "tips": "Actionable tips for the candidate on how to answer effectively"\n'
+        "    }\n"
+        "  ]\n"
+        "}\n\n"
+        "Rules:\n"
+        "- The language of the questions and tips MUST MATCH the language of the job description.\n"
+        "- Make questions professional, challenging, and specific to the role.\n"
+        "- Do not include any text outside the JSON block.\n"
+    )
+    
+    data = _generate_json_with_gemini(prompt)
+    return data.get("questions", [])
+
+
 def _generate_with_gemini(
     cv_text: str,
     job_text: str,

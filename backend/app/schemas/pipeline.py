@@ -36,3 +36,16 @@ class AnalyzeJobRequest(BaseModel):
 class AnalyzeJobResponse(BaseModel):
     job_analysis: str
     feedback: str
+
+class InterviewQuestion(BaseModel):
+    question: str
+    why: str
+    tips: str
+
+class InterviewPrepRequest(BaseModel):
+    job_text: str
+    missing_keywords: list[str]
+
+class InterviewPrepResponse(BaseModel):
+    questions: list[InterviewQuestion]
+    feedback: str

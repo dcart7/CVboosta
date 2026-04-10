@@ -34,6 +34,12 @@ type PdfTemplate = {
   fontFamily: "helvetica" | "times";
 };
 
+type InterviewQuestion = {
+  question: string;
+  why: string;
+  tips: string;
+};
+
 const PDF_TEMPLATES: PdfTemplate[] = [
   {
     id: "modern",
@@ -307,6 +313,9 @@ export default function ResultsPage() {
   const [pdfTemplate, setPdfTemplate] =
     useState<PdfTemplateId>(DEFAULT_PDF_TEMPLATE);
   const [showFullCv, setShowFullCv] = useState(false);
+  const [interviewQuestions, setInterviewQuestions] = useState<InterviewQuestion[]>([]);
+  const [isLoadingPrep, setIsLoadingPrep] = useState(false);
+  const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
   useEffect(() => {
     const storedTemplate = localStorage.getItem("pdf_template");
@@ -427,8 +436,38 @@ export default function ResultsPage() {
       setStatus("No optimized CV found yet.");
       return;
     }
-    await navigator.clipboard.writeText(optimizedCv);
-    setStatus("Copied to clipboard.");
+    try {
+      await navigator.clipboard.writeText(optimizedCv);
+      setStatus("Copied to clipboard.");
+    } catch (err) {
+      console.error("Copy failed:", err);
+      setStatus("Failed to copy.");
+    }
+  };
+
+  const fetchInterviewPrep = async () => {
+    const jobText = localStorage.getItem("job_description") || "";
+    if (!jobText) return;
+
+    setIsLoadingPrep(true);
+    try {
+      const response = await fetch(`${apiBase}/analyze/interview-prep`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job_text: jobText,
+          missing_keywords: missing,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch interview prep");
+      const data = await response.json();
+      setInterviewQuestions(data.questions || []);
+    } catch (err) {
+      console.error("Interview prep error:", err);
+    } finally {
+      setIsLoadingPrep(false);
+    }
   };
 
   const updateTemplate = (value: PdfTemplateId) => {
@@ -918,6 +957,109 @@ export default function ResultsPage() {
                     {remainingKeywords.length > 0 ? remainingKeywords.join(" · ") : "—"}
                   </p>
                 </div>
+              </div>
+            </div>
+
+            <div className="form-card" style={{ marginTop: "24px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "20px",
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <h2 className="section-title" style={{ marginBottom: "4px" }}>
+                    {t("results.interviewPrepTitle")}
+                  </h2>
+                  <p className="hero-subtitle" style={{ fontSize: "14px", margin: 0, opacity: 0.8 }}>
+                    {t("results.interviewPrepSubtitle")}
+                  </p>
+                </div>
+                {interviewQuestions.length === 0 && (
+                  <button
+                    className="btn secondary"
+                    onClick={fetchInterviewPrep}
+                    disabled={isLoadingPrep}
+                    style={{ marginLeft: "16px" }}
+                  >
+                    {isLoadingPrep ? t("results.loadingPrep") : t("results.generateInterviewPrep")}
+                  </button>
+                )}
+              </div>
+
+              {isLoadingPrep && (
+                <div style={{ padding: "40px 0", textAlign: "center" }}>
+                  <div className="spinner" style={{ margin: "0 auto 12px" }}></div>
+                  <p style={{ color: "var(--muted)" }}>{t("results.loadingPrep")}</p>
+                </div>
+              )}
+
+              <div className="questions-list" style={{ display: "grid", gap: "12px" }}>
+                {interviewQuestions.map((q, idx) => (
+                  <div
+                    key={idx}
+                    className="question-card"
+                    onClick={() => setExpandedQuestion(expandedQuestion === idx ? null : idx)}
+                    style={{
+                      background: "rgba(255, 255, 255, 0.03)",
+                      border: "1px solid var(--glass-border)",
+                      borderRadius: "16px",
+                      padding: "16px",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "12px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "24px",
+                          height: "24px",
+                          borderRadius: "50%",
+                          background: "var(--accent)",
+                          color: "white",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {idx + 1}
+                      </span>
+                      <p style={{ margin: 0, fontWeight: 600, flexGrow: 1, fontSize: "15px" }}>
+                        {q.question}
+                      </p>
+                      <span style={{ fontSize: "20px", opacity: 0.4 }}>
+                        {expandedQuestion === idx ? "−" : "+"}
+                      </span>
+                    </div>
+                    {expandedQuestion === idx && (
+                      <div className="fade-in" style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--glass-border)" }}>
+                        <div style={{ marginBottom: "16px" }}>
+                          <label style={{ display: "block", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", color: "var(--accent)", marginBottom: "6px", letterSpacing: "0.05em" }}>
+                            {t("results.whyThisIsAsked")}
+                          </label>
+                          <p style={{ margin: 0, fontSize: "14px", lineHeight: "1.5", color: "var(--ink)", opacity: 0.9 }}>{q.why}</p>
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", color: "var(--accent)", marginBottom: "6px", letterSpacing: "0.05em" }}>
+                            {t("results.howToAnswer")}
+                          </label>
+                          <p style={{ margin: 0, fontSize: "14px", lineHeight: "1.5", color: "var(--ink)", opacity: 0.9 }}>{q.tips}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
             <div className="history-actions">
