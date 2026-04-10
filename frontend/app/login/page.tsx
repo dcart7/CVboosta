@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -43,21 +45,18 @@ export default function LoginPage() {
       <div className="shell">
         <section className="split fade-up">
           <div>
-            <h1 className="hero-title">Welcome back.</h1>
+            <h1 className="hero-title">{t("auth.welcomeBack")}</h1>
             <p className="hero-subtitle">
-              Log in to continue your CV projects, drafts, and history.
+              {t("auth.loginSubtitle")}
             </p>
             <div className="card">
-              <h3>What&apos;s new</h3>
-              <p>
-                Faster parsing, clearer recommendations, and organized history
-                for every role.
-              </p>
+              <h3>{t("auth.whatsNew")}</h3>
+              <p>{t("auth.whatsNewDesc")}</p>
             </div>
           </div>
           <form className="form-card form-grid">
             <div>
-              <div className="label">Email</div>
+              <div className="label">{t("auth.email")}</div>
               <input
                 className="input"
                 placeholder="you@domain.com"
@@ -66,7 +65,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <div className="label">Password</div>
+              <div className="label">{t("auth.password")}</div>
               <input
                 className="input"
                 placeholder="••••••••"
@@ -77,10 +76,10 @@ export default function LoginPage() {
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             <button className="btn primary" type="button" onClick={submit}>
-              {loading ? "Signing in..." : "Log in"}
+              {loading ? t("auth.signingIn") : t("auth.logIn")}
             </button>
             <Link className="btn ghost" href="/register">
-              Create a new account
+              {t("auth.createAccount")}
             </Link>
           </form>
         </section>

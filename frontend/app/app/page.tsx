@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 export default function WorkspacePage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
   const [optimizeStatus, setOptimizeStatus] = useState("");
@@ -336,9 +338,9 @@ export default function WorkspacePage() {
       <div className="shell">
         <section className="split fade-up">
           <div className="form-card form-grid">
-            <div className="pill">Dashboard — all steps in one place</div>
+            <div className="pill">{t("dashboard.pill")}</div>
             <div>
-              <h2 className="section-title">1. Upload CV</h2>
+              <h2 className="section-title">{t("dashboard.uploadCv")}</h2>
               <div
                 className={`upload${isDragging ? " is-dragging" : ""}`}
                 onDragOver={(event) => {
@@ -348,8 +350,8 @@ export default function WorkspacePage() {
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
               >
-                <strong>Drop your CV file</strong>
-                <span>PDF or TXT. Max 12,000 characters.</span>
+                <strong>{t("dashboard.dropCv")}</strong>
+                <span>{t("dashboard.dropHint")}</span>
                 <input
                   className="input"
                   type="file"
@@ -358,57 +360,57 @@ export default function WorkspacePage() {
                     handleFileSelect(event.target.files?.[0] || null)
                   }
                 />
-                {file && <span>Selected: {file.name}</span>}
+                {file && <span>{t("dashboard.selected")} {file.name}</span>}
                 <button className="btn" type="button" onClick={() => upload()}>
-                  Upload & parse
+                  {t("dashboard.uploadParse")}
                 </button>
               </div>
             </div>
             {status && <p>{status}</p>}
             {parsed?.skills && (
               <div className="card">
-                <h3>Detected skills</h3>
+                <h3>{t("dashboard.detectedSkills")}</h3>
                 <p>{parsed.skills.join(", ") || "—"}</p>
               </div>
             )}
             <div>
-              <div className="label">2. Target role</div>
+              <div className="label">{t("dashboard.targetRole")}</div>
               <input
                 className="input"
-                placeholder="Senior Product Designer"
+                placeholder={t("dashboard.targetRolePlaceholder")}
                 value={targetRole}
                 onChange={(event) => setTargetRole(event.target.value)}
               />
             </div>
             <div>
-              <div className="label">Company</div>
+              <div className="label">{t("dashboard.company")}</div>
               <input
                 className="input"
-                placeholder="Fintech Labs"
+                placeholder={t("dashboard.companyPlaceholder")}
                 value={targetCompany}
                 onChange={(event) => setTargetCompany(event.target.value)}
               />
             </div>
             <div>
-              <div className="label">3. Job description</div>
+              <div className="label">{t("dashboard.jobDescription")}</div>
               <textarea
                 className="textarea"
-                placeholder="Paste the vacancy description here..."
+                placeholder={t("dashboard.jobPlaceholder")}
                 value={jobText}
                 onChange={(event) => setJobText(event.target.value)}
               />
             </div>
             <div className="card">
-              <h3>Keywords (editable)</h3>
+              <h3>{t("dashboard.keywords")}</h3>
               {keywordSource && <p className="muted">{keywordSource}</p>}
               <div className="keyword-actions">
-                <span className="muted">Total: {keywordCache.length}</span>
+                <span className="muted">{t("dashboard.total")} {keywordCache.length}</span>
                 <div className="keyword-buttons">
                   <button className="btn ghost" type="button" onClick={extractKeywords}>
-                    {isExtracting ? "Extracting..." : "Extract keywords"}
+                    {isExtracting ? t("dashboard.extracting") : t("dashboard.extractKeywords")}
                   </button>
                   <button className="btn ghost" type="button" onClick={clearKeywords}>
-                    Clear
+                    {t("dashboard.clear")}
                   </button>
                 </div>
               </div>
@@ -430,7 +432,7 @@ export default function WorkspacePage() {
               <div className="keyword-row">
                 <input
                   className="input"
-                  placeholder="Add keyword"
+                  placeholder={t("dashboard.addKeyword")}
                   value={keywordInput}
                   onChange={(event) => setKeywordInput(event.target.value)}
                   onKeyDown={(event) => {
@@ -441,7 +443,7 @@ export default function WorkspacePage() {
                   }}
                 />
                 <button className="btn" type="button" onClick={addKeyword}>
-                  Add
+                  {t("dashboard.add")}
                 </button>
               </div>
             </div>
@@ -452,19 +454,18 @@ export default function WorkspacePage() {
                 onClick={runAnalysis}
                 disabled={isAnalyzing}
               >
-                {isAnalyzing ? "Analyzing..." : "Run analysis"}
+                {isAnalyzing ? t("dashboard.analyzing") : t("dashboard.runAnalysis")}
               </button>
               <Link className="btn ghost" href="/history">
-                View history
+                {t("dashboard.viewHistory")}
               </Link>
             </div>
             {analysisStatus && <p>{analysisStatus}</p>}
             <div className="card">
-              <h3>Analysis snapshot</h3>
+              <h3>{t("dashboard.analysisSnapshot")}</h3>
               <p>
-                Match score:{" "}
-                {matchPercent !== null ? `${matchPercent}%` : "—"} · Missing
-                keywords: {missingKeywords.length}
+                {t("dashboard.matchScore")}{" "}
+                {matchPercent !== null ? `${matchPercent}%` : "—"} · {t("dashboard.missingKeywords")} {missingKeywords.length}
               </p>
             </div>
             <div className="nav-actions">
@@ -477,7 +478,7 @@ export default function WorkspacePage() {
                 Generate optimized CV
               </button>
               <Link className="btn ghost" href="/results">
-                View latest results
+                {t("dashboard.viewResults")}
               </Link>
             </div>
             {optimizeStatus && <p>{optimizeStatus}</p>}
@@ -489,15 +490,15 @@ export default function WorkspacePage() {
           </div>
 
           <div className="hero-card">
-            <h2 className="section-title">Session preview</h2>
+            <h2 className="section-title">{t("dashboard.sessionPreview")}</h2>
             <div className="kpi">
               <h3>
-                Match {matchPercent !== null ? `${matchPercent}%` : "—"}
+                {t("dashboard.match")} {matchPercent !== null ? `${matchPercent}%` : "—"}
               </h3>
-              <p>Based on the current session</p>
+              <p>{t("dashboard.basedOnSession")}</p>
             </div>
             <div className="section">
-              <h3 className="section-title">Quick insights</h3>
+              <h3 className="section-title">{t("dashboard.quickInsights")}</h3>
               <div className="tag-list">
                 {missingKeywords.length === 0 && <span className="tag">—</span>}
                 {missingKeywords.map((item) => (
@@ -508,27 +509,27 @@ export default function WorkspacePage() {
               </div>
             </div>
             <div className="section">
-              <h3 className="section-title">Next steps</h3>
+              <h3 className="section-title">{t("dashboard.nextSteps")}</h3>
               <div className="steps">
                 <div className="step">
                   <span>1</span>
-                  <p>Run analysis after uploading CV + job description.</p>
+                  <p>{t("dashboard.step1")}</p>
                 </div>
                 <div className="step">
                   <span>2</span>
-                  <p>Generate optimized CV and review results.</p>
+                  <p>{t("dashboard.step2")}</p>
                 </div>
               </div>
             </div>
             {optimizedSummary && (
               <div className="card">
-                <h3>Latest optimized summary</h3>
+                <h3>{t("dashboard.latestSummary")}</h3>
                 <p>{optimizedSummary}</p>
               </div>
             )}
             {recommendations.length > 0 && (
               <div className="card">
-                <h3>Top recommendations</h3>
+                <h3>{t("dashboard.topRecommendations")}</h3>
                 <p>{recommendations.slice(0, 2).join(" · ")}</p>
               </div>
             )}

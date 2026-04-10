@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 type ParsedCv = {
   raw_text: string;
@@ -15,6 +16,7 @@ type ParsedCv = {
 
 export default function AnalyzePage() {
   const apiBase = getApiBase();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [parsed, setParsed] = useState<ParsedCv | null>(null);
@@ -88,7 +90,7 @@ export default function AnalyzePage() {
       setUploadStatus("Please choose a CV file.");
       return;
     }
-    setUploadStatus("Uploading...");
+    setUploadStatus(t("common.loading"));
     const formData = new FormData();
     formData.append("file", file);
     try {
@@ -129,22 +131,17 @@ export default function AnalyzePage() {
       <div className="shell">
         <section className="split fade-up">
           <div className="form-card">
-            <h2 className="section-title">Analysis overview</h2>
-            <p className="hero-subtitle">
-              We’ve extracted key signals from your CV and compared them to the
-              role. Review gaps before optimization.
-            </p>
-            {loading && <p>Running analysis...</p>}
+            <h2 className="section-title">{t("analyze.title")}</h2>
+            <p className="hero-subtitle">{t("analyze.subtitle")}</p>
+            {loading && <p>{t("common.loading")}</p>}
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             {!loading && (!jobText || !parsed?.raw_text) && (
               <div className="section">
-                <h3 className="section-title">Finish setup</h3>
-                <p className="hero-subtitle">
-                  We need both a CV and a job description to run the analysis.
-                </p>
+                <h3 className="section-title">{t("analyze.finishSetup")}</h3>
+                <p className="hero-subtitle">{t("analyze.setupDesc")}</p>
                 <div className="form-grid">
                   <div>
-                    <div className="label">CV FILE</div>
+                    <div className="label">{t("analyze.cvFile")}</div>
                     <input
                       className="input"
                       type="file"
@@ -154,15 +151,15 @@ export default function AnalyzePage() {
                       }
                     />
                     <button className="btn" type="button" onClick={uploadCv}>
-                      Upload CV
+                      {t("common.uploadCv")}
                     </button>
                     {uploadStatus && <p>{uploadStatus}</p>}
                   </div>
                   <div>
-                    <div className="label">Job description</div>
+                    <div className="label">{t("common.jobDescription")}</div>
                     <textarea
                       className="textarea"
-                      placeholder="Paste the vacancy description here..."
+                      placeholder={t("analyze.placeholder")}
                       value={jobText}
                       onChange={(event) => setJobText(event.target.value)}
                     />
@@ -184,7 +181,7 @@ export default function AnalyzePage() {
                       runAnalysis(parsed.raw_text || "", jobText);
                     }}
                   >
-                    Run analysis
+                    {t("common.runAnalysis")}
                   </button>
                 </div>
               </div>
@@ -193,23 +190,22 @@ export default function AnalyzePage() {
               <>
                 <div className="grid">
                   <div className="card">
-                    <h3>Match score</h3>
+                    <h3>{t("analyze.matchScore")}</h3>
                     <p>
-                      {matchPercent !== null ? `${matchPercent}%` : "—"} vs
-                      target role
+                      {matchPercent !== null ? `${matchPercent}%` : "—"} {t("analyze.vsTarget")}
                     </p>
                   </div>
                   <div className="card">
-                    <h3>Missing keywords</h3>
+                    <h3>{t("analyze.missingKeywords")}</h3>
                     <p>{missingKeywords.join(", ") || "—"}</p>
                   </div>
                   <div className="card">
-                    <h3>Strengths</h3>
+                    <h3>{t("analyze.strengths")}</h3>
                     <p>{strengths}</p>
                   </div>
                 </div>
                 <div className="section">
-                  <h3 className="section-title">Job summary</h3>
+                  <h3 className="section-title">{t("analyze.jobSummary")}</h3>
                   <div className="card">
                     <p>{jobAnalysis || "—"}</p>
                   </div>
@@ -218,26 +214,26 @@ export default function AnalyzePage() {
             )}
             <div className="nav-actions">
               <Link className="btn primary" href="/optimize">
-                Continue to optimize
+                {t("common.continue")}
               </Link>
               <Link className="btn ghost" href="/app">
-                Back to upload
+                {t("common.back")}
               </Link>
             </div>
           </div>
 
           <div className="hero-card">
-            <h2 className="section-title">Parsed CV snapshot</h2>
+            <h2 className="section-title">{t("analyze.parsedSnapshot")}</h2>
             <div className="card">
-              <h3>Headline</h3>
+              <h3>{t("analyze.headline")}</h3>
               <p>{headline}</p>
             </div>
             <div className="card">
-              <h3>Top skills</h3>
+              <h3>{t("analyze.topSkills")}</h3>
               <p>{parsed?.skills?.join(", ") || "—"}</p>
             </div>
             <div className="card">
-              <h3>Experience signals</h3>
+              <h3>{t("analyze.experienceSignals")}</h3>
               <p>{parsed?.work_experience?.slice(0, 3).join(", ") || "—"}</p>
             </div>
           </div>

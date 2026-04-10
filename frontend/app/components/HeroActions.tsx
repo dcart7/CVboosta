@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslation } from "../lib/LanguageContext";
 
 export default function HeroActions() {
   const [isAuthed, setIsAuthed] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsAuthed(Boolean(localStorage.getItem("auth_token")));
@@ -13,11 +15,11 @@ export default function HeroActions() {
   return (
     <div className="nav-actions">
       <Link className="btn primary" href="/app">
-        Start with a CV
+        {t("hero.startWithCv")}
       </Link>
       {!isAuthed && (
         <Link className="btn secondary" href="/register">
-          Create account
+          {t("hero.createAccount")}
         </Link>
       )}
     </div>

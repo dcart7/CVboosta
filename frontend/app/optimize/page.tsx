@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 export default function OptimizePage() {
   const apiBase = getApiBase();
+  const { t } = useTranslation();
   const [targetRole, setTargetRole] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
   const [status, setStatus] = useState("");
@@ -53,7 +55,7 @@ export default function OptimizePage() {
       setStatus("Upload CV and job description first.");
       return;
     }
-    setStatus("Optimizing...");
+    setStatus(t("common.loading"));
     try {
       const response = await fetch(`${apiBase}/optimize`, {
         method: "POST",
@@ -108,68 +110,69 @@ export default function OptimizePage() {
       <div className="shell">
         <section className="split fade-up">
           <div className="form-card">
-            <h2 className="section-title">Optimization controls</h2>
+            <h2 className="section-title">{t("optimize.title")}</h2>
             <div className="form-grid">
               <div>
-                <div className="label">Tone</div>
+                <div className="label">{t("optimize.tone")}</div>
                 <select className="select">
-                  <option>Professional</option>
-                  <option>Executive</option>
-                  <option>Creative</option>
+                  <option>{t("optimize.professional")}</option>
+                  <option>{t("optimize.executive")}</option>
+                  <option>{t("optimize.creative")}</option>
                 </select>
               </div>
               <div>
-                <div className="label">Focus areas</div>
+                <div className="label">{t("optimize.focusAreas")}</div>
                 <input
                   className="input"
-                  placeholder="Leadership, Strategy, Metrics"
+                  placeholder={t("optimize.focusPlaceholder")}
                 />
               </div>
               <div>
-                <div className="label">Include keywords</div>
+                <div className="label">{t("optimize.includeKeywords")}</div>
                 <input
                   className="input"
-                  placeholder="Analytics, Roadmap, GTM"
+                  placeholder={t("optimize.keywordsPlaceholder")}
                 />
               </div>
             </div>
             <div className="nav-actions">
               <button className="btn primary" type="button" onClick={runOptimization}>
-                Run optimization
+                {t("optimize.runOptimization")}
               </button>
               <Link className="btn ghost" href="/analyze">
-                Back to analysis
+                {t("optimize.backToAnalysis")}
               </Link>
             </div>
             {status && <p>{status}</p>}
           </div>
 
           <div className="hero-card">
-            <h2 className="section-title">Draft preview</h2>
+            <h2 className="section-title">{t("optimize.draftPreview")}</h2>
             <div className="result-box">
-              <h3>Optimized summary</h3>
+              <h3>{t("optimize.optimizedSummary")}</h3>
               <p>{previewSummary || "—"}</p>
             </div>
             <div className="section">
-              <h3 className="section-title">Confidence signals</h3>
+              <h3 className="section-title">{t("optimize.confidenceSignals")}</h3>
               <div className="grid">
                 <div className="card">
-                  <h3>Keyword alignment</h3>
+                  <h3>{t("optimize.keywordAlignment")}</h3>
                   <p>
-                    {matchPercent !== null ? `${matchPercent}%` : "—"} match to
-                    target posting
+                    {matchPercent !== null ? `${matchPercent}%` : "—"} {t("optimize.matchToTarget")}
                   </p>
                 </div>
                 <div className="card">
-                  <h3>Impact clarity</h3>
-                  <p>{missingCount} missing keywords detected</p>
+                  <h3>{t("optimize.impactClarity")}</h3>
+                  <p>{missingCount} {t("optimize.missingDetected")}</p>
                 </div>
               </div>
             </div>
             <div className="section">
-              <h3 className="section-title">Target</h3>
+              <h3 className="section-title">{t("optimize.target")}</h3>
               <div className="card">
-                <p>{targetRole || "Role not set"} · {targetCompany || "Company not set"}</p>
+                <p>
+                  {targetRole || t("optimize.roleNotSet")} · {targetCompany || t("optimize.companyNotSet")}
+                </p>
               </div>
             </div>
           </div>

@@ -1,70 +1,68 @@
+"use client";
+
 import TopNav from "../components/TopNav";
+import { useTranslation } from "../lib/LanguageContext";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   return (
     <main className="page">
       <TopNav />
       <div className="shell">
         <section className="hero fade-up">
           <div>
-            <p className="pill">About Us</p>
-            <h1 className="hero-title">About Us</h1>
-            <p className="hero-subtitle">
-              Smart CV Optimizer turns real experience into a CV that hiring
-              teams can scan fast. You upload a CV, paste a vacancy, and get an
-              ATS-friendly rewrite with missing keywords, recommendations, and a
-              clean export flow.
-            </p>
+            <p className="pill">{t("about.pill")}</p>
+            <h1 className="hero-title">{t("about.title")}</h1>
+            <p className="hero-subtitle">{t("about.subtitle")}</p>
           </div>
 
           <div className="hero-card">
-            <h2 className="section-title">What we focus on</h2>
+            <h2 className="section-title">{t("about.whatWeFocus")}</h2>
             <div className="grid">
               <div className="card">
-                <h3>Clarity</h3>
-                <p>Readable structure, measurable impact, and sharp bullets.</p>
+                <h3>{t("about.clarity")}</h3>
+                <p>{t("about.clarityDesc")}</p>
               </div>
               <div className="card">
-                <h3>Relevance</h3>
-                <p>Keyword alignment and role-specific framing that fits ATS.</p>
+                <h3>{t("about.relevance")}</h3>
+                <p>{t("about.relevanceDesc")}</p>
               </div>
               <div className="card">
-                <h3>Control</h3>
-                <p>
-                  You see what’s missing and what to change before you apply.
-                </p>
+                <h3>{t("about.control")}</h3>
+                <p>{t("about.controlDesc")}</p>
               </div>
             </div>
           </div>
         </section>
 
         <section className="section fade-up">
-          <h2 className="section-title">Principles</h2>
+          <h2 className="section-title">{t("about.principles")}</h2>
           <div className="grid">
             <div className="hero-card">
               <p className="quote">
-                “Careers belong to those who measure outcomes.”
+                &ldquo;Careers belong to those who measure outcomes.&rdquo;
               </p>
               <p className="quote-sub">
                 Great work is not enough if impact is invisible.
               </p>
             </div>
             <div className="hero-card">
-              <p className="quote">“HR doesn’t read between the lines.”</p>
+              <p className="quote">&ldquo;HR doesn&apos;t read between the lines.&rdquo;</p>
               <p className="quote-sub">
-                If you don’t say it clearly, it doesn’t count.
+                If you don&apos;t say it clearly, it doesn&apos;t count.
               </p>
             </div>
             <div className="hero-card">
               <p className="quote">
-                “Careers aren’t made by the best, but by the clear.”
+                &ldquo;Careers aren&apos;t made by the best, but by the clear.&rdquo;
               </p>
               <p className="quote-sub">
                 Make the signal obvious: skills, scope, results.
               </p>
             </div>
             <div className="hero-card">
-              <p className="quote">“You’re a fit — it just doesn’t show.”</p>
+              <p className="quote">&ldquo;You&apos;re a fit — it just doesn&apos;t show.&rdquo;</p>
               <p className="quote-sub">
                 The goal is not to exaggerate. The goal is to be seen.
               </p>
@@ -73,38 +71,27 @@ export default function AboutPage() {
         </section>
 
         <section className="section fade-up">
-          <h2 className="section-title">How it works</h2>
+          <h2 className="section-title">{t("about.howItWorks")}</h2>
           <div className="grid">
             <div className="card">
-              <h3>1) Parse</h3>
-              <p>
-                We extract clean text and structure so you can iterate fast.
-              </p>
+              <h3>{t("about.parse")}</h3>
+              <p>{t("about.parseDesc")}</p>
             </div>
             <div className="card">
-              <h3>2) Match</h3>
-              <p>
-                We surface the missing keywords and quantify alignment.
-              </p>
+              <h3>{t("about.match")}</h3>
+              <p>{t("about.matchDesc")}</p>
             </div>
             <div className="card">
-              <h3>3) Rewrite</h3>
-              <p>
-                We rewrite for ATS and humans, keeping claims grounded in your
-                actual experience.
-              </p>
+              <h3>{t("about.rewrite")}</h3>
+              <p>{t("about.rewriteDesc")}</p>
             </div>
           </div>
         </section>
 
         <section className="section fade-up">
-          <h2 className="section-title">Privacy</h2>
+          <h2 className="section-title">{t("about.privacy")}</h2>
           <div className="card">
-            <p>
-              Your CV and job descriptions are used only to generate your
-              results. If you are logged in, we store history so you can reopen
-              previous versions and export them later.
-            </p>
+            <p>{t("about.privacyDesc")}</p>
           </div>
         </section>
       </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 type MeResponse = {
   email: string;
@@ -17,6 +18,7 @@ type ActivityItem = {
 
 export default function AccountPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [user, setUser] = useState<MeResponse | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
@@ -91,7 +93,7 @@ export default function AccountPage() {
   };
 
   const formatDate = (value: string) =>
-    new Date(value).toLocaleString("ru-RU", {
+    new Date(value).toLocaleString(undefined, {
       day: "2-digit",
       month: "short",
       hour: "2-digit",
@@ -103,49 +105,49 @@ export default function AccountPage() {
       <TopNav />
       <div className="shell">
         <section className="form-card fade-up">
-          <h1 className="hero-title">Account</h1>
-          {loading && <p className="hero-subtitle">Loading profile...</p>}
+          <h1 className="hero-title">{t("account.title")}</h1>
+          {loading && <p className="hero-subtitle">{t("account.loadingProfile")}</p>}
           {user && (
             <>
               <div className="grid">
                 <div className="card">
-                  <h3>Signed in as</h3>
+                  <h3>{t("account.signedInAs")}</h3>
                   <p>{user.email}</p>
                 </div>
                 <div className="card">
-                  <h3>Active workspace</h3>
-                  <p>Smart CV Optimizer · Personal</p>
+                  <h3>{t("account.activeWorkspace")}</h3>
+                  <p>{t("account.activeWorkspaceValue")}</p>
                 </div>
                 <div className="card">
-                  <h3>Plan</h3>
-                  <p>Early Access · Free</p>
+                  <h3>{t("account.plan")}</h3>
+                  <p>{t("account.planValue")}</p>
                 </div>
               </div>
 
               <div className="section">
-                <h2 className="section-title">Your focus this week</h2>
+                <h2 className="section-title">{t("account.focusThisWeek")}</h2>
                 <div className="steps">
                   <div className="step">
                     <span>1</span>
-                    <p>Complete one CV refresh for your top target role.</p>
+                    <p>{t("account.focus1")}</p>
                   </div>
                   <div className="step">
                     <span>2</span>
-                    <p>Add two impact metrics to recent experience.</p>
+                    <p>{t("account.focus2")}</p>
                   </div>
                   <div className="step">
                     <span>3</span>
-                    <p>Save a reusable “core” version in History.</p>
+                    <p>{t("account.focus3")}</p>
                   </div>
                 </div>
               </div>
 
               <div className="section">
-                <h2 className="section-title">Recent activity</h2>
+                <h2 className="section-title">{t("account.recentActivity")}</h2>
                 <div className="card">
-                  {activityLoading && <p>Loading activity...</p>}
+                  {activityLoading && <p>{t("account.loadingActivity")}</p>}
                   {!activityLoading && activity.length === 0 && (
-                    <p>No activity yet. Run an analysis to see it here.</p>
+                    <p>{t("account.noActivity")}</p>
                   )}
                   {activity.map((item, index) => (
                     <div className="history-row" key={`${item.action}-${index}`}>
@@ -161,13 +163,13 @@ export default function AccountPage() {
           )}
 
           <div className="section">
-            <h2 className="section-title">Security</h2>
+            <h2 className="section-title">{t("account.security")}</h2>
             <button
               className="btn primary"
               type="button"
               onClick={() => setShowPasswordModal(true)}
             >
-              Change password
+              {t("account.changePassword")}
             </button>
           </div>
         </section>
@@ -177,42 +179,27 @@ export default function AccountPage() {
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h2 className="section-title">Change password</h2>
+              <h2 className="section-title">{t("account.changePasswordTitle")}</h2>
               <button
                 className="btn ghost"
                 type="button"
                 onClick={() => setShowPasswordModal(false)}
               >
-                Close
+                {t("account.close")}
               </button>
             </div>
             <form className="form-grid" onSubmit={changePassword}>
               <div>
-                <div className="label">CURRENT PASSWORD</div>
-                <input
-                  className="input"
-                  name="current_password"
-                  type="password"
-                  required
-                />
+                <div className="label">{t("account.currentPassword")}</div>
+                <input className="input" name="current_password" type="password" required />
               </div>
               <div>
-                <div className="label">NEW PASSWORD</div>
-                <input
-                  className="input"
-                  name="new_password"
-                  type="password"
-                  required
-                />
+                <div className="label">{t("account.newPassword")}</div>
+                <input className="input" name="new_password" type="password" required />
               </div>
               <div>
-                <div className="label">CONFIRM NEW PASSWORD</div>
-                <input
-                  className="input"
-                  name="confirm_password"
-                  type="password"
-                  required
-                />
+                <div className="label">{t("account.confirmPassword")}</div>
+                <input className="input" name="confirm_password" type="password" required />
               </div>
               {message && (
                 <p style={{ color: messageTone === "ok" ? "#0f766e" : "#b42318" }}>
@@ -221,14 +208,14 @@ export default function AccountPage() {
               )}
               <div className="nav-actions">
                 <button className="btn primary" type="submit">
-                  Update password
+                  {t("account.updatePassword")}
                 </button>
                 <button
                   className="btn ghost"
                   type="button"
                   onClick={() => setShowPasswordModal(false)}
                 >
-                  Cancel
+                  {t("account.cancel")}
                 </button>
               </div>
             </form>

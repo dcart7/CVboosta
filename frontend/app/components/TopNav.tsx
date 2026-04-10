@@ -4,10 +4,21 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getApiBase } from "../lib/apiBase";
 import ThemeToggle from "./ThemeToggle";
+import { useTranslation } from "../lib/LanguageContext";
+import { Language } from "../lib/translations";
 
 export default function TopNav() {
   const [email, setEmail] = useState<string | null>(null);
   const apiBase = getApiBase();
+  const { t, language, setLanguage } = useTranslation();
+
+  const languages: { code: Language; flag: string }[] = [
+    { code: "en", flag: "🇺🇸" },
+    { code: "uk", flag: "🇺🇦" },
+    { code: "pl", flag: "🇵🇱" },
+    { code: "sk", flag: "🇸🇰" },
+    { code: "es", flag: "🇪🇸" },
+  ];
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -42,12 +53,24 @@ export default function TopNav() {
           <span>Smart CV Optimizer</span>
         </Link>
         <nav className="nav-links">
-          <Link href="/app">Dashboard</Link>
-          <Link href="/results">Results</Link>
-          <Link href="/history">History</Link>
-          <Link href="/about">About</Link>
+          <Link href="/app">{t("nav.dashboard")}</Link>
+          <Link href="/results">{t("nav.results")}</Link>
+          <Link href="/history">{t("nav.history")}</Link>
+          <Link href="/about">{t("nav.about")}</Link>
         </nav>
         <div className="nav-actions">
+          <div className="lang-switcher">
+            {languages.map((l) => (
+              <button
+                key={l.code}
+                className={`lang-btn ${language === l.code ? "active" : ""}`}
+                onClick={() => setLanguage(l.code)}
+                title={l.code.toUpperCase()}
+              >
+                {l.flag}
+              </button>
+            ))}
+          </div>
           <ThemeToggle />
           {email ? (
             <>
@@ -55,16 +78,16 @@ export default function TopNav() {
                 {email}
               </Link>
               <button className="btn" onClick={logout} type="button">
-                Log out
+                {t("nav.logout")}
               </button>
             </>
           ) : (
             <>
               <Link className="btn ghost" href="/login">
-                Log in
+                {t("nav.login")}
               </Link>
               <Link className="btn primary" href="/register">
-                Get started
+                {t("nav.register")}
               </Link>
             </>
           )}

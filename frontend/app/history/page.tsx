@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 type HistoryItem = {
   id: number;
@@ -15,6 +16,7 @@ type HistoryItem = {
 
 export default function HistoryPage() {
   const apiBase = getApiBase();
+  const { t } = useTranslation();
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -22,7 +24,7 @@ export default function HistoryPage() {
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
-      setError("Please log in to view history.");
+      setError(t("history.loginRequired"));
       setLoading(false);
       return;
     }
@@ -31,12 +33,12 @@ export default function HistoryPage() {
     })
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => setItems(data.items || []))
-      .catch(() => setError("Failed to load history."))
+      .catch(() => setError(t("history.failed")))
       .finally(() => setLoading(false));
-  }, [apiBase]);
+  }, [apiBase, t]);
 
   const formatDate = (value: string) =>
-    new Date(value).toLocaleString("ru-RU", {
+    new Date(value).toLocaleString(undefined, {
       day: "2-digit",
       month: "short",
       hour: "2-digit",
@@ -52,27 +54,25 @@ export default function HistoryPage() {
         <section className="form-card fade-up">
           <div className="nav-actions">
             <div>
-              <h1 className="hero-title">History</h1>
-              <p className="hero-subtitle">
-                Every optimized CV version, ready to open or export.
-              </p>
+              <h1 className="hero-title">{t("history.title")}</h1>
+              <p className="hero-subtitle">{t("history.subtitle")}</p>
             </div>
             <Link className="btn primary" href="/app">
-              New session
+              {t("history.newSession")}
             </Link>
           </div>
 
           <div className="section">
             <div className="history-row">
-              <strong>Role</strong>
-              <strong>Company</strong>
-              <strong>Score</strong>
-              <strong>Date</strong>
+              <strong>{t("history.role")}</strong>
+              <strong>{t("history.company")}</strong>
+              <strong>{t("history.score")}</strong>
+              <strong>{t("history.date")}</strong>
             </div>
-            {loading && <p>Loading history...</p>}
+            {loading && <p>{t("history.loading")}</p>}
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             {!loading && !error && items.length === 0 && (
-              <p>No optimized CVs yet. Run optimization to see history.</p>
+              <p>{t("history.empty")}</p>
             )}
             {items.map((item) => (
               <div className="history-row" key={item.id}>

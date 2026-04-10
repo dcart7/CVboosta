@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,35 +46,35 @@ export default function RegisterPage() {
       <div className="shell">
         <section className="split fade-up">
           <div>
-            <h1 className="hero-title">Create your workspace.</h1>
+            <h1 className="hero-title">{t("auth.createWorkspace")}</h1>
             <p className="hero-subtitle">
-              One account, all your job-specific CV versions in one place.
+              {t("auth.registerSubtitle")}
             </p>
             <div className="steps">
               <div className="step">
                 <span>1</span>
-                <h3>Set up profile</h3>
-                <p>Use your name and target role to personalize outputs.</p>
+                <h3>{t("auth.setupProfile")}</h3>
+                <p>{t("auth.setupProfileDesc")}</p>
               </div>
               <div className="step">
                 <span>2</span>
-                <h3>Upload your CV</h3>
-                <p>We will store and version it for every job.</p>
+                <h3>{t("auth.uploadCv")}</h3>
+                <p>{t("auth.uploadCvDesc")}</p>
               </div>
             </div>
           </div>
           <form className="form-card form-grid">
             <div>
-              <div className="label">Full name</div>
+              <div className="label">{t("auth.fullName")}</div>
               <input
                 className="input"
-                placeholder="Alex Morgan"
+                placeholder={t("auth.fullNamePlaceholder")}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
               />
             </div>
             <div>
-              <div className="label">Email</div>
+              <div className="label">{t("auth.email")}</div>
               <input
                 className="input"
                 placeholder="you@domain.com"
@@ -81,10 +83,10 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <div className="label">Password</div>
+              <div className="label">{t("auth.password")}</div>
               <input
                 className="input"
-                placeholder="Create a secure password"
+                placeholder={t("auth.passwordPlaceholder")}
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -92,10 +94,10 @@ export default function RegisterPage() {
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             <button className="btn secondary" type="button" onClick={submit}>
-              {loading ? "Creating..." : "Create account"}
+              {loading ? t("auth.creating") : t("auth.createBtn")}
             </button>
             <Link className="btn ghost" href="/login">
-              I already have an account
+              {t("auth.alreadyHaveAccount")}
             </Link>
           </form>
         </section>

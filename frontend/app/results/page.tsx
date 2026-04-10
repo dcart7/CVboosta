@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { useTranslation } from "../lib/LanguageContext";
 
 type PdfTemplateId =
   | "classic"
@@ -296,6 +297,7 @@ function extractSections(cleanedCv: string): { title: string; sections: CvSectio
 
 export default function ResultsPage() {
   const apiBase = getApiBase();
+  const { t } = useTranslation();
   const [optimizedCv, setOptimizedCv] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -574,7 +576,6 @@ export default function ResultsPage() {
         const leftSections = sections.filter((s) => inSidebar(s.heading));
         const rightSections = sections.filter((s) => !inSidebar(s.heading));
 
-        // Sidebar background
         doc.setFillColor(245, 247, 252);
         doc.rect(marginX - 10, cursorY - 6, sidebarWidth + 20, pageHeight - cursorY - marginY + 12, "F");
         doc.setDrawColor(220, 227, 240);
@@ -594,7 +595,6 @@ export default function ResultsPage() {
           return cy;
         };
 
-        // Left column
         let leftY = cursorY;
         for (const sec of leftSections) {
           doc.setTextColor(accent.r, accent.g, accent.b);
@@ -603,10 +603,7 @@ export default function ResultsPage() {
           leftY += 6;
           for (const raw of sec.lines) {
             const trimmed = raw.trim();
-            if (!trimmed) {
-              leftY += 6;
-              continue;
-            }
+            if (!trimmed) { leftY += 6; continue; }
             const bullet = normalizeBulletLine(trimmed);
             if (bullet.isBullet) {
               doc.setTextColor(accent.r, accent.g, accent.b);
@@ -620,12 +617,10 @@ export default function ResultsPage() {
           leftY += 12;
         }
 
-        // Right column (with pagination)
         let rightY = cursorY;
         const ensureRightSpace = (y: number, needed: number) => {
           if (y + needed <= pageHeight - marginY) return y;
           doc.addPage();
-          // redraw sidebar on new page (light)
           doc.setFillColor(245, 247, 252);
           doc.rect(marginX - 10, marginY - 6, sidebarWidth + 20, pageHeight - marginY - marginY + 12, "F");
           doc.setDrawColor(220, 227, 240);
@@ -660,11 +655,7 @@ export default function ResultsPage() {
 
           for (const raw of sec.lines) {
             const trimmed = raw.trim();
-            if (!trimmed) {
-              rightY = ensureRightSpace(rightY, 10);
-              rightY += 8;
-              continue;
-            }
+            if (!trimmed) { rightY = ensureRightSpace(rightY, 10); rightY += 8; continue; }
             const bullet = normalizeBulletLine(trimmed);
             if (bullet.isBullet) {
               const lh = fontBody + lineGap;
@@ -690,7 +681,6 @@ export default function ResultsPage() {
         }
       } else {
         if (template.layout === "timeline") {
-          // vertical accent line at left for bullets
           doc.setDrawColor(accent.r, accent.g, accent.b);
           doc.setLineWidth(2);
           doc.line(marginX - 8, cursorY, marginX - 8, pageHeight - marginY);
@@ -708,10 +698,7 @@ export default function ResultsPage() {
               continue;
             }
             const bullet = normalizeBulletLine(line);
-            if (bullet.isBullet) {
-              drawBullet(bullet.text);
-              continue;
-            }
+            if (bullet.isBullet) { drawBullet(bullet.text); continue; }
             drawText(bullet.text);
           }
         }
@@ -740,6 +727,9 @@ export default function ResultsPage() {
     }
   };
 
+  // suppress unused warning
+  void activeTemplate;
+
   return (
     <main className="page">
       <TopNav />
@@ -758,27 +748,27 @@ export default function ResultsPage() {
       <div className="shell hide-print">
         <section className="split fade-up">
           <div className="hero-card">
-            <h2 className="section-title">Optimized CV</h2>
+            <h2 className="section-title">{t("results.optimizedCv")}</h2>
             <div className="grid">
               <div className="kpi">
                 <h3>{matchBefore !== null ? `${matchBefore}%` : "—"}</h3>
-                <p>fit before edit</p>
+                <p>{t("results.fitBefore")}</p>
               </div>
               <div className="kpi">
                 <h3>{matchAfter !== null ? `${matchAfter}%` : "—"}</h3>
-                <p>fit after edit</p>
+                <p>{t("results.fitAfter")}</p>
               </div>
             </div>
             <div className={`result-box${showFullCv ? " is-expanded" : ""}`}>
               <div className="result-box-head">
-                <h3>Summary</h3>
+                <h3>{t("results.summary")}</h3>
                 <button
                   className="mini-btn"
                   type="button"
                   onClick={() => setShowFullCv((value) => !value)}
                   disabled={!cleanedCv}
                 >
-                  {showFullCv ? "Collapse" : "Expand"}
+                  {showFullCv ? t("results.collapse") : t("results.expand")}
                 </button>
               </div>
               <p className="summary-snippet">{compactSummary || "—"}</p>
@@ -791,12 +781,8 @@ export default function ResultsPage() {
               )}
             </div>
             <div className="section">
-              <h3 className="section-title">PDF template</h3>
-              <div
-                className="template-picker"
-                role="group"
-                aria-label="PDF template"
-              >
+              <h3 className="section-title">{t("results.pdfTemplate")}</h3>
+              <div className="template-picker" role="group" aria-label="PDF template">
                 {PDF_TEMPLATES.map((item) => (
                   <button
                     key={item.id}
@@ -808,10 +794,7 @@ export default function ResultsPage() {
                   </button>
                 ))}
               </div>
-              <div
-                className={`pdf-preview template-${pdfTemplate}`}
-                aria-label="PDF preview"
-              >
+              <div className={`pdf-preview template-${pdfTemplate}`} aria-label="PDF preview">
                 {previewBlocks.length === 0 && (
                   <div className="pdf-preview-empty">—</div>
                 )}
@@ -858,82 +841,57 @@ export default function ResultsPage() {
                   </>
                 ) : (
                   previewBlocks.slice(0, 28).map((block, idx) => {
-                    if (block.type === "spacer") {
-                      return <div className="pdf-spacer" key={`s-${idx}`} />;
-                    }
-                    if (block.type === "title") {
-                      return (
-                        <div className="pdf-title" key={`t-${idx}`}>
-                          {block.text}
-                        </div>
-                      );
-                    }
-                    if (block.type === "heading") {
-                      return (
-                        <div className="pdf-heading" key={`h-${idx}`}>
-                          {block.text}
-                        </div>
-                      );
-                    }
-                    if (block.type === "bullet") {
-                      return (
-                        <div className="pdf-bullet" key={`b-${idx}`}>
-                          <span className="pdf-bullet-dot">•</span>
-                          <span>{block.text}</span>
-                        </div>
-                      );
-                    }
-                    return (
-                      <div className="pdf-text" key={`p-${idx}`}>
-                        {block.text}
+                    if (block.type === "spacer") return <div className="pdf-spacer" key={`s-${idx}`} />;
+                    if (block.type === "title") return <div className="pdf-title" key={`t-${idx}`}>{block.text}</div>;
+                    if (block.type === "heading") return <div className="pdf-heading" key={`h-${idx}`}>{block.text}</div>;
+                    if (block.type === "bullet") return (
+                      <div className="pdf-bullet" key={`b-${idx}`}>
+                        <span className="pdf-bullet-dot">•</span>
+                        <span>{block.text}</span>
                       </div>
                     );
+                    return <div className="pdf-text" key={`p-${idx}`}>{block.text}</div>;
                   })
                 )}
               </div>
             </div>
             <div className="nav-actions">
               <button className="btn primary" onClick={copyCv}>
-                Copy full CV
+                {t("results.copyFullCv")}
               </button>
               <button className="btn ghost" onClick={downloadPdf}>
-                Download PDF
+                {t("results.downloadPdf")}
               </button>
             </div>
             {status && <p>{status}</p>}
           </div>
 
           <div className="form-card">
-            <h2 className="section-title">Result metrics</h2>
+            <h2 className="section-title">{t("results.resultMetrics")}</h2>
             <div className="grid">
               <div className="kpi">
                 <h3>{missing.length}</h3>
-                <p>missing keywords</p>
+                <p>{t("results.missingKeywords")}</p>
               </div>
               <div className="kpi">
                 <h3>{recommendations.length}</h3>
-                <p>recommendations</p>
+                <p>{t("results.recommendations")}</p>
               </div>
             </div>
             <div className="section">
-              <h3 className="section-title">Missing keywords</h3>
+              <h3 className="section-title">{t("results.missingKeywordsTitle")}</h3>
               <div className="tag-list">
                 {missing.length === 0 && <span className="tag">—</span>}
                 {missing.map((item) => (
-                  <span className="tag" key={item}>
-                    {item}
-                  </span>
+                  <span className="tag" key={item}>{item}</span>
                 ))}
               </div>
             </div>
             <div className="section">
-              <h3 className="section-title">Recommendations</h3>
+              <h3 className="section-title">{t("results.recommendationsTitle")}</h3>
               <div className="steps">
                 {recommendations.length === 0 && (
-                  <div className="step">
-                    <span>1</span>
-                    <p>—</p>
-                  </div>
+                  <div className="step"><span>1</span><p>—</p></div>
                 )}
                 {recommendations.map((item, index) => (
                   <div className="step" key={item}>
@@ -944,28 +902,26 @@ export default function ResultsPage() {
               </div>
             </div>
             <div className="section">
-              <h3 className="section-title">Applied changes</h3>
+              <h3 className="section-title">{t("results.appliedChanges")}</h3>
               <div className="steps">
                 <div className="step">
                   <span>1</span>
                   <p>
-                    Added keywords:{" "}
+                    {t("results.addedKeywords")}{" "}
                     {addedKeywords.length > 0 ? addedKeywords.join(" · ") : "—"}
                   </p>
                 </div>
                 <div className="step">
                   <span>2</span>
                   <p>
-                    Still missing:{" "}
-                    {remainingKeywords.length > 0
-                      ? remainingKeywords.join(" · ")
-                      : "—"}
+                    {t("results.stillMissing")}{" "}
+                    {remainingKeywords.length > 0 ? remainingKeywords.join(" · ") : "—"}
                   </p>
                 </div>
               </div>
             </div>
             <Link className="btn secondary" href="/history">
-              Save to history
+              {t("results.saveToHistory")}
             </Link>
           </div>
         </section>
