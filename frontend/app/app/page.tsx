@@ -318,6 +318,9 @@ export default function WorkspacePage() {
       setRecommendations(data.recommendations || []);
       setStatus("Optimization complete.");
       router.push("/results");
+    } catch (err) {
+      console.error("Optimization error:", err);
+      setStatus("Optimization failed. Please try again or check your internet connection.");
     } finally {
       setIsOptimizing(false);
     }
@@ -352,7 +355,7 @@ export default function WorkspacePage() {
                   }
                 />
                 {file && <span>Selected: {file.name}</span>}
-                <button className="btn" type="button" onClick={upload}>
+                <button className="btn" type="button" onClick={() => upload()}>
                   Upload & parse
                 </button>
               </div>

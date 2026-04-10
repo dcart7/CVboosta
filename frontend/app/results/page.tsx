@@ -16,8 +16,14 @@ export default function ResultsPage() {
 
   useEffect(() => {
     const storedCv = localStorage.getItem("optimized_cv") || "";
-    const storedMissing = JSON.parse(localStorage.getItem("missing_skills") || "[]");
-    const storedRecs = JSON.parse(localStorage.getItem("recommendations") || "[]");
+    let storedMissing: string[] = [];
+    let storedRecs: string[] = [];
+    try {
+      storedMissing = JSON.parse(localStorage.getItem("missing_skills") || "[]");
+      storedRecs = JSON.parse(localStorage.getItem("recommendations") || "[]");
+    } catch (e) {
+      console.error("Failed to parse storage:", e);
+    }
     const storedBefore = localStorage.getItem("match_before");
     const storedAfter = localStorage.getItem("match_after");
     setOptimizedCv(storedCv);

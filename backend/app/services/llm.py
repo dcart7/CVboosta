@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 import json
 import logging
+import typing
+import tenacity
 
 from google import genai
 from google.genai import errors as genai_errors
@@ -9,7 +11,27 @@ from google.genai import errors as genai_errors
 from app.core.config import settings
 from app.schemas.keywords import KeywordExtractionResult
 
+
 logger = logging.getLogger(__name__)
+
+
+def _is_retryable_error(exception: Exception) -> bool:
+    if isinstance(exception, genai_errors.ServerError):
+        return True
+    return False
+
+
+@tenacity.retry(
+    retry=tenacity.retry_if_exception(_is_retryable_error),
+    stop=tenacity.stop_after_attempt(3),
+    wait=tenacity.wait_exponential(multiplier=1, min=2, max=10),
+    before_sleep=tenacity.before_sleep_log(logger, logging.WARNING),
+)
+def _safe_generate_content(client: genai.Client, model: str, contents: str) -> typing.Any:
+    return client.models.generate_content(
+        model=model,
+        contents=contents,
+    )
 
 
 @dataclass
@@ -133,7 +155,8 @@ def _generate_with_gemini(
     )
 
     try:
-        response = client.models.generate_content(
+        response = _safe_generate_content(
+            client=client,
             model=settings.gemini_model,
             contents=prompt,
         )
@@ -161,7 +184,8 @@ def _generate_text_with_gemini(prompt: str) -> str:
 
     client = _get_gemini_client()
     try:
-        response = client.models.generate_content(
+        response = _safe_generate_content(
+            client=client,
             model=settings.gemini_model,
             contents=prompt,
         )
@@ -187,7 +211,8 @@ def _generate_json_with_gemini(prompt: str) -> dict:
 
     client = _get_gemini_client()
     try:
-        response = client.models.generate_content(
+        response = _safe_generate_content(
+            client=client,
             model=settings.gemini_model,
             contents=prompt,
         )
@@ -213,8 +238,12 @@ def _extract_json(raw_text: str) -> dict:
     end = text.rfind("}")
     if start == -1 or end == -1 or end < start:
         raise LLMServiceError("GEMINI_ERROR: invalid JSON response", status_code=502)
+    
+    start_idx: int = start
+    end_idx: int = end + 1
+    content = typing.cast(str, text)[start_idx : end_idx]
     try:
-        return json.loads(text[start : end + 1])
+        return json.loads(content)
     except json.JSONDecodeError as exc:
         raise LLMServiceError("GEMINI_ERROR: invalid JSON response", status_code=502) from exc
 
@@ -224,7 +253,7 @@ def _truncate(value: str, limit: int) -> str:
         return ""
     if len(value) <= limit:
         return value
-    return value[:limit].rstrip()
+    return typing.cast(str, value)[:limit].rstrip()
 
 
 @lru_cache(maxsize=1)

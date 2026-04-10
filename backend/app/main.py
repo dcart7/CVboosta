@@ -2,6 +2,7 @@ import time
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api.routes.analyze import router as analyze_router
 from app.api.routes.auth import router as auth_router
@@ -12,11 +13,20 @@ from app.core.api_key import api_key_middleware
 from app.core.rate_limit import rate_limit_middleware
 from app.db.init_db import init_db
 from app.services.request_logger import capture_response_body, log_request_response
+from app.services.llm import LLMServiceError
 
 app = FastAPI(title="Smart CV Optimizer API")
 
 app.middleware("http")(rate_limit_middleware)
 app.middleware("http")(api_key_middleware)
+
+
+@app.exception_handler(LLMServiceError)
+async def llm_service_error_handler(request: Request, exc: LLMServiceError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": str(exc)},
+    )
 
 
 @app.middleware("http")

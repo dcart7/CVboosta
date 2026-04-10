@@ -1,6 +1,7 @@
 import io
 import re
 from dataclasses import dataclass
+import typing
 
 import pdfplumber
 
@@ -139,8 +140,8 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
                     current = k
                     break
             continue
-        if current:
-            sections[current].append(line)
+        if current is not None:
+            sections[typing.cast(str, current)].append(line)
     return sections
 
 
