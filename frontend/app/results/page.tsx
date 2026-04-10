@@ -737,11 +737,11 @@ export default function ResultsPage() {
         <div className="print-only">
           {cleanedCv.split(/\r?\n/).map((line, idx) => {
             const isHeading = line === line.toUpperCase() && line.length > 2 && line.length < 50 && !line.startsWith("-");
-            if (idx === 0) return <h1 key={idx} style={{ fontSize: "24pt", margin: "0 0 16pt", borderBottom: "2px solid #333", paddingBottom: "8pt" }}>{line}</h1>;
-            if (isHeading) return <h2 key={idx} style={{ fontSize: "12pt", color: "#1e3a8a", margin: "16pt 0 4pt", textTransform: "uppercase", borderBottom: "1px solid #ccc", paddingBottom: "2pt" }}>{line}</h2>;
-            if (!line.trim()) return <div key={idx} style={{ height: "8pt" }} />;
-            if (line.startsWith("-") || line.startsWith("•")) return <p key={idx} style={{ margin: "2pt 0 2pt 16pt", textIndent: "-8pt" }}>• {line.substring(1).trim()}</p>;
-            return <p key={idx} style={{ margin: "2pt 0" }}>{line}</p>;
+            if (idx === 0) return <h1 key={`line-${idx}`} style={{ fontSize: "24pt", margin: "0 0 16pt", borderBottom: "2px solid #333", paddingBottom: "8pt" }}>{line}</h1>;
+            if (isHeading) return <h2 key={`line-${idx}`} style={{ fontSize: "12pt", color: "#1e3a8a", margin: "16pt 0 4pt", textTransform: "uppercase", borderBottom: "1px solid #ccc", paddingBottom: "2pt" }}>{line}</h2>;
+            if (!line.trim()) return <div key={`line-${idx}`} style={{ height: "8pt" }} />;
+            if (line.startsWith("-") || line.startsWith("•")) return <p key={`line-${idx}`} style={{ margin: "2pt 0 2pt 16pt", textIndent: "-8pt" }}>• {line.substring(1).trim()}</p>;
+            return <p key={`line-${idx}`} style={{ margin: "2pt 0" }}>{line}</p>;
           })}
         </div>
       )}
@@ -775,7 +775,7 @@ export default function ResultsPage() {
               {showFullCv && (
                 <div className="cv-full" aria-label="Full optimized CV">
                   {cleanedCv.split(/\r?\n/).map((line, idx) => (
-                    <div key={`${idx}-${line.slice(0, 16)}`}>{line}</div>
+                    <div key={`cv-${idx}`}>{line}</div>
                   ))}
                 </div>
               )}
@@ -882,8 +882,8 @@ export default function ResultsPage() {
               <h3 className="section-title">{t("results.missingKeywordsTitle")}</h3>
               <div className="tag-list">
                 {missing.length === 0 && <span className="tag">—</span>}
-                {missing.map((item) => (
-                  <span className="tag" key={item}>{item}</span>
+                {missing.map((item, idx) => (
+                  <span className="tag" key={`miss-${idx}`}>{item}</span>
                 ))}
               </div>
             </div>
@@ -894,7 +894,7 @@ export default function ResultsPage() {
                   <div className="step"><span>1</span><p>—</p></div>
                 )}
                 {recommendations.map((item, index) => (
-                  <div className="step" key={item}>
+                  <div className="step" key={`rec-${index}`}>
                     <span>{index + 1}</span>
                     <p>{item}</p>
                   </div>
