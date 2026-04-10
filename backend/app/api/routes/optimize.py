@@ -13,6 +13,7 @@ from app.services.keyword_clean import (
     normalize_keywords,
     extract_whitelist_keywords,
 )
+from app.core.config import settings
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
 from app.db.session import get_db
@@ -34,45 +35,45 @@ def optimize_cv(
         if cached:
             keyword_result = cached
             ats_keywords = normalize_keywords(
-                extract_whitelist_keywords(cleaned_text, limit=200)
+                extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                 + keyword_result.skills
                 + keyword_result.requirements,
-                limit=200,
+                limit=settings.max_ats_keywords,
             )
         else:
             try:
                 keyword_result = extract_job_keywords(cleaned_text)
                 ats_keywords = normalize_keywords(
-                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                     + keyword_result.skills
                     + keyword_result.requirements,
-                    limit=200,
+                    limit=settings.max_ats_keywords,
                 )
             except LLMServiceError:
                 keyword_result = extract_keywords_transformer(cleaned_text)
                 if keyword_result and keyword_result.skills:
                     ats_keywords = normalize_keywords(
-                        extract_whitelist_keywords(cleaned_text, limit=200)
+                        extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                         + keyword_result.skills
                         + keyword_result.requirements,
-                        limit=200,
+                        limit=settings.max_ats_keywords,
                     )
                 else:
                     keyword_result = extract_keywords_crf(cleaned_text)
                     if keyword_result and keyword_result.skills:
                         ats_keywords = normalize_keywords(
-                            extract_whitelist_keywords(cleaned_text, limit=200)
+                            extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                             + keyword_result.skills
                             + keyword_result.requirements,
-                            limit=200,
+                            limit=settings.max_ats_keywords,
                         )
                     else:
                         keyword_result = extract_keywords_fallback(cleaned_text)
                         ats_keywords = normalize_keywords(
-                            extract_whitelist_keywords(cleaned_text, limit=200)
+                            extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                             + keyword_result.skills
                             + keyword_result.requirements,
-                            limit=200,
+                            limit=settings.max_ats_keywords,
                         )
             save_keyword_list(
                 db=db,

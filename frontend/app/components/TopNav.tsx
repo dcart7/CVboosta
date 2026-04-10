@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getApiBase } from "../lib/apiBase";
+import ThemeToggle from "./ThemeToggle";
 
 export default function TopNav() {
   const [email, setEmail] = useState<string | null>(null);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+  const apiBase = getApiBase();
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -43,8 +45,10 @@ export default function TopNav() {
           <Link href="/app">Dashboard</Link>
           <Link href="/results">Results</Link>
           <Link href="/history">History</Link>
+          <Link href="/about">About</Link>
         </nav>
         <div className="nav-actions">
+          <ThemeToggle />
           {email ? (
             <>
               <Link className="btn ghost" href="/account">

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TopNav from "../components/TopNav";
+import { getApiBase } from "../lib/apiBase";
 
 type HistoryItem = {
   id: number;
@@ -13,7 +14,7 @@ type HistoryItem = {
 };
 
 export default function HistoryPage() {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+  const apiBase = getApiBase();
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

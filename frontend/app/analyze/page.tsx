@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import TopNav from "../components/TopNav";
+import { getApiBase } from "../lib/apiBase";
 
 type ParsedCv = {
   raw_text: string;
@@ -13,7 +14,7 @@ type ParsedCv = {
 };
 
 export default function AnalyzePage() {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+  const apiBase = getApiBase();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [parsed, setParsed] = useState<ParsedCv | null>(null);

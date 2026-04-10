@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
+import { getApiBase } from "../lib/apiBase";
 
 export default function WorkspacePage() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
+  const [optimizeStatus, setOptimizeStatus] = useState("");
   const [parsed, setParsed] = useState<{
     raw_text: string;
     skills: string[];
@@ -16,7 +18,7 @@ export default function WorkspacePage() {
     education: string[];
     achievements: string[];
   } | null>(null);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+  const apiBase = getApiBase();
   const [targetRole, setTargetRole] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
   const [jobText, setJobText] = useState("");
@@ -271,31 +273,31 @@ export default function WorkspacePage() {
 
   const runOptimization = async () => {
     if (!parsed?.raw_text || !jobText.trim()) {
-      setStatus("Upload CV and paste job description first.");
+      setOptimizeStatus("Upload CV and paste job description first.");
       return;
     }
     const token = localStorage.getItem("auth_token") || "";
-    setStatus("Optimizing...");
+    setOptimizeStatus("Optimizing...");
     setIsOptimizing(true);
-    const response = await fetch(`${apiBase}/optimize`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        cv_text: parsed.raw_text || "",
-        job_text: jobText,
-        cv_analysis: "",
-        job_analysis: "",
-        target_role: targetRole,
-        target_company: targetCompany,
-      }),
-    });
     try {
+      const response = await fetch(`${apiBase}/optimize`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          cv_text: parsed.raw_text || "",
+          job_text: jobText,
+          cv_analysis: "",
+          job_analysis: "",
+          target_role: targetRole,
+          target_company: targetCompany,
+        }),
+      });
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        setStatus(payload.detail || "Optimization failed.");
+        setOptimizeStatus(payload.detail || "Optimization failed.");
         return;
       }
       const data = await response.json();
@@ -316,11 +318,13 @@ export default function WorkspacePage() {
       }
       setOptimizedSummary((data.optimized_cv || "").split("\n")[0] || "—");
       setRecommendations(data.recommendations || []);
-      setStatus("Optimization complete.");
+      setOptimizeStatus("Optimization complete.");
       router.push("/results");
     } catch (err) {
       console.error("Optimization error:", err);
-      setStatus("Optimization failed. Please try again or check your internet connection.");
+      setOptimizeStatus(
+        "Optimization failed. Check that backend is running and reachable.",
+      );
     } finally {
       setIsOptimizing(false);
     }
@@ -476,6 +480,7 @@ export default function WorkspacePage() {
                 View latest results
               </Link>
             </div>
+            {optimizeStatus && <p>{optimizeStatus}</p>}
             {isOptimizing && (
               <div className="progress" role="status" aria-live="polite">
                 <span className="progress-bar" />

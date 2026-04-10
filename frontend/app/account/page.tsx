@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
+import { getApiBase } from "../lib/apiBase";
 
 type MeResponse = {
   email: string;
@@ -23,7 +24,7 @@ export default function AccountPage() {
   const [messageTone, setMessageTone] = useState<"ok" | "error">("ok");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+  const apiBase = getApiBase();
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");

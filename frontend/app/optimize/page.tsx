@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TopNav from "../components/TopNav";
+import { getApiBase } from "../lib/apiBase";
 
 export default function OptimizePage() {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+  const apiBase = getApiBase();
   const [targetRole, setTargetRole] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
   const [status, setStatus] = useState("");
@@ -53,38 +54,52 @@ export default function OptimizePage() {
       return;
     }
     setStatus("Optimizing...");
-    const response = await fetch(`${apiBase}/optimize`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        cv_text: cvText,
-        job_text: jobText,
-        cv_analysis: "",
-        job_analysis: "",
-        target_role: targetRole,
-        target_company: targetCompany,
-      }),
-    });
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({}));
-      setStatus(payload.detail || "Optimization failed.");
-      return;
+    try {
+      const response = await fetch(`${apiBase}/optimize`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          cv_text: cvText,
+          job_text: jobText,
+          cv_analysis: "",
+          job_analysis: "",
+          target_role: targetRole,
+          target_company: targetCompany,
+        }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        setStatus(payload.detail || "Optimization failed.");
+        return;
+      }
+      const data = await response.json();
+      localStorage.setItem("optimized_cv", data.optimized_cv || "");
+      localStorage.setItem(
+        "missing_skills",
+        JSON.stringify(data.missing_skills || []),
+      );
+      localStorage.setItem(
+        "recommendations",
+        JSON.stringify(data.recommendations || []),
+      );
+      if (typeof data.match_before === "number") {
+        localStorage.setItem("match_before", String(data.match_before));
+      }
+      if (typeof data.match_after === "number") {
+        localStorage.setItem("match_after", String(data.match_after));
+      }
+      setStatus("Done. Opening results...");
+      window.location.href = "/results";
+    } catch (err) {
+      setStatus(
+        err instanceof Error
+          ? err.message
+          : "Cannot reach backend. Check that it is running.",
+      );
     }
-    const data = await response.json();
-    localStorage.setItem("optimized_cv", data.optimized_cv || "");
-    localStorage.setItem(
-      "missing_skills",
-      JSON.stringify(data.missing_skills || []),
-    );
-    localStorage.setItem(
-      "recommendations",
-      JSON.stringify(data.recommendations || []),
-    );
-    setStatus("Done. Opening results...");
-    window.location.href = "/results";
   };
 
   return (

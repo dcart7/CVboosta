@@ -32,6 +32,7 @@ from app.services.llm import (
     analyze_job_text,
     extract_job_keywords,
 )
+from app.core.config import settings
 from app.services.matching import compute_match_score
 from app.db.session import get_db
 from app.api.routes.auth import get_current_user_optional
@@ -165,7 +166,7 @@ def extract_keywords(
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Unexpected server error") from exc
 
-    whitelist_hits = extract_whitelist_keywords(cleaned_text, limit=200)
+    whitelist_hits = extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
     result.skills = normalize_keywords(whitelist_hits + result.skills)
     result.requirements = normalize_keywords(result.requirements)
 
@@ -197,7 +198,7 @@ def match_cv_job(
     feedback = "Match score computed from extracted keywords."
 
     if payload.keywords:
-        keywords = normalize_keywords(payload.keywords, limit=200)
+        keywords = normalize_keywords(payload.keywords, limit=settings.max_ats_keywords)
         feedback = "Match score computed from provided keywords."
     else:
         try:
@@ -205,49 +206,49 @@ def match_cv_job(
             keyword_result = extract_keywords_transformer(cleaned_text)
             if keyword_result and keyword_result.skills:
                 keywords = normalize_keywords(
-                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                     + keyword_result.skills
                     + keyword_result.requirements,
-                    limit=200,
+                    limit=settings.max_ats_keywords,
                 )
                 feedback = "Match score computed from transformer keywords."
             else:
                 keyword_result = extract_keywords_crf(cleaned_text)
                 if keyword_result and keyword_result.skills:
                     keywords = normalize_keywords(
-                        extract_whitelist_keywords(cleaned_text, limit=200)
+                        extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                         + keyword_result.skills
                         + keyword_result.requirements,
-                        limit=200,
+                        limit=settings.max_ats_keywords,
                     )
                     feedback = "Match score computed from CRF keywords."
                 else:
                     keyword_result = extract_job_keywords(cleaned_text)
                     keywords = normalize_keywords(
-                        extract_whitelist_keywords(cleaned_text, limit=200)
+                        extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                         + keyword_result.skills
                         + keyword_result.requirements,
-                        limit=200,
+                        limit=settings.max_ats_keywords,
                     )
                     feedback = "Match score computed from LLM keywords."
         except LLMServiceError:
             cached = get_keyword_list_by_source_text(db, payload.job_text)
             if cached:
                 keywords = normalize_keywords(
-                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                     + cached.skills
                     + cached.requirements,
-                    limit=200,
+                    limit=settings.max_ats_keywords,
                 )
                 feedback = "Match score computed from cached keywords."
                 keyword_result = cached
             else:
                 keyword_result = extract_keywords_fallback(cleaned_text)
                 keywords = normalize_keywords(
-                    extract_whitelist_keywords(cleaned_text, limit=200)
+                    extract_whitelist_keywords(cleaned_text, limit=settings.max_ats_keywords)
                     + keyword_result.skills
                     + keyword_result.requirements,
-                    limit=200,
+                    limit=settings.max_ats_keywords,
                 )
                 feedback = "Match score computed from fallback keywords."
         except Exception as exc:
