@@ -105,7 +105,110 @@ export default function ResultsPage() {
       setStatus("No optimized CV found yet.");
       return;
     }
-    window.print();
+    try {
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 48;
+      const marginY = 56;
+      const contentWidth = pageWidth - marginX * 2;
+
+      const fontBody = 10.5;
+      const fontHeader = 12.5;
+      const lineGap = 3;
+
+      const looksLikeHeader = (line: string) => {
+        const trimmed = line.trim();
+        if (!trimmed) return false;
+        if (trimmed.length > 48) return false;
+        if (trimmed.endsWith(":")) return true;
+        const letters = trimmed.replace(/[^A-Za-z]/g, "");
+        if (letters.length < 4) return false;
+        const upperLetters = letters.replace(/[^A-Z]/g, "");
+        return upperLetters.length / letters.length > 0.85;
+      };
+
+      const normalizeBulletLine = (line: string) => {
+        const trimmed = line.trim();
+        if (!trimmed) return { isBullet: false, text: "" };
+        if (trimmed.startsWith("•")) return { isBullet: true, text: trimmed.slice(1).trim() };
+        if (trimmed.startsWith("-")) return { isBullet: true, text: trimmed.slice(1).trim() };
+        return { isBullet: false, text: trimmed };
+      };
+
+      const ensureSpace = (y: number, neededHeight: number) => {
+        if (y + neededHeight <= pageHeight - marginY) return y;
+        doc.addPage();
+        return marginY;
+      };
+
+      const renderWrapped = (text: string, x: number, y: number, fontSize: number) => {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(fontSize);
+        const lines = doc.splitTextToSize(text, contentWidth - (x - marginX));
+        const lineHeight = fontSize + lineGap;
+        let cursorY = y;
+        for (const chunk of lines) {
+          cursorY = ensureSpace(cursorY, lineHeight);
+          doc.text(chunk, x, cursorY);
+          cursorY += lineHeight;
+        }
+        return cursorY;
+      };
+
+      let cursorY = marginY;
+      const lines = optimizedCv.replace(/\r\n/g, "\n").split("\n");
+
+      for (const rawLine of lines) {
+        const line = rawLine.trimEnd();
+        if (!line.trim()) {
+          cursorY = ensureSpace(cursorY, fontBody + 8);
+          cursorY += 8;
+          continue;
+        }
+
+        if (looksLikeHeader(line)) {
+          cursorY = ensureSpace(cursorY, fontHeader + 14);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(fontHeader);
+          doc.setTextColor(30, 58, 138);
+          const headerText = line.trim().replace(/:$/, "").toUpperCase();
+          cursorY = renderWrapped(headerText, marginX, cursorY, fontHeader);
+          doc.setDrawColor(210, 210, 210);
+          doc.line(marginX, cursorY + 4, pageWidth - marginX, cursorY + 4);
+          doc.setTextColor(0, 0, 0);
+          cursorY += 10;
+          continue;
+        }
+
+        const bullet = normalizeBulletLine(line);
+        if (bullet.isBullet) {
+          const indent = 16;
+          const bulletGap = 10;
+          const lineHeight = fontBody + lineGap;
+          cursorY = ensureSpace(cursorY, lineHeight);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(fontBody);
+          doc.text("•", marginX, cursorY);
+          const wrapped = doc.splitTextToSize(bullet.text, contentWidth - indent - bulletGap);
+          let localY = cursorY;
+          for (const chunk of wrapped) {
+            localY = ensureSpace(localY, lineHeight);
+            doc.text(chunk, marginX + indent, localY);
+            localY += lineHeight;
+          }
+          cursorY = localY;
+          continue;
+        }
+
+        cursorY = renderWrapped(bullet.text, marginX, cursorY, fontBody);
+      }
+
+      doc.save("optimized_cv.pdf");
+      setStatus("PDF downloaded.");
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Failed to generate PDF.");
+    }
   };
 
   return (
