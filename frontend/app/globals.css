@@ -184,6 +184,13 @@ a {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+/* Nav bar actions — no extra top margin */
+.nav-inner .nav-actions {
+  margin-top: 0;
 }
 
 .lang-switcher {
@@ -535,7 +542,7 @@ a {
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--ink);
-  padding: 10px 18px;
+  padding: 12px 22px;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
