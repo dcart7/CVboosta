@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 
 type MeResponse = {
@@ -26,35 +28,77 @@ export default function AccountPage() {
   const [messageTone, setMessageTone] = useState<"ok" | "error">("ok");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [profileError, setProfileError] = useState<"unauthorized" | "offline" | null>(
+    null,
+  );
   const apiBase = getApiBase();
 
-  useEffect(() => {
+  const loadAccount = useCallback(async () => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
       router.push("/login");
       return;
     }
-    fetch(`${apiBase}/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.email) {
-          setUser({ email: data.email });
-        } else {
-          router.push("/login");
-        }
-      })
-      .catch(() => router.push("/login"))
-      .finally(() => setLoading(false));
+    setLoading(true);
+    setProfileError(null);
+    setActivityLoading(true);
+    try {
+      const meRes = await fetchWithRetry(
+        `${apiBase}/auth/me`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
+      );
+      if (meRes.status === 401) {
+        localStorage.removeItem("auth_token");
+        setUser(null);
+        setProfileError("unauthorized");
+        setLoading(false);
+        setActivityLoading(false);
+        return;
+      }
+      if (!meRes.ok) {
+        setUser(null);
+        setProfileError("offline");
+        setLoading(false);
+        setActivityLoading(false);
+        return;
+      }
+      const meData = await meRes.json();
+      if (!meData?.email) {
+        setUser(null);
+        setProfileError("offline");
+        setLoading(false);
+        setActivityLoading(false);
+        return;
+      }
+      setUser({ email: meData.email });
+      setProfileError(null);
+      setLoading(false);
 
-    fetch(`${apiBase}/auth/activity`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : { items: [] }))
-      .then((data) => setActivity(data.items || []))
-      .finally(() => setActivityLoading(false));
+      try {
+        const actRes = await fetchWithRetry(
+          `${apiBase}/auth/activity`,
+          { headers: { Authorization: `Bearer ${token}` } },
+          { attempts: 4, baseDelayMs: 350, timeoutMs: 20_000 },
+        );
+        const actData = actRes.ok ? await actRes.json() : { items: [] };
+        setActivity(actData.items || []);
+      } catch {
+        setActivity([]);
+      } finally {
+        setActivityLoading(false);
+      }
+    } catch {
+      setUser(null);
+      setProfileError("offline");
+      setLoading(false);
+      setActivityLoading(false);
+    }
   }, [apiBase, router]);
+
+  useEffect(() => {
+    void loadAccount();
+  }, [loadAccount]);
 
   const changePassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -107,6 +151,26 @@ export default function AccountPage() {
         <section className="form-card fade-up">
           <h1 className="hero-title">{t("account.title")}</h1>
           {loading && <p className="hero-subtitle">{t("account.loadingProfile")}</p>}
+          {!loading && profileError === "unauthorized" && (
+            <div className="section">
+              <p className="hero-subtitle" style={{ color: "#b42318" }}>
+                {t("account.sessionExpiredReload")}
+              </p>
+              <Link className="btn primary" href="/login">
+                {t("nav.login")}
+              </Link>
+            </div>
+          )}
+          {!loading && profileError === "offline" && (
+            <div className="section">
+              <p className="hero-subtitle" style={{ color: "#b42318" }}>
+                {t("account.profileUnreachable")}
+              </p>
+              <button className="btn primary" type="button" onClick={() => void loadAccount()}>
+                {t("account.retryLoad")}
+              </button>
+            </div>
+          )}
           {user && (
             <>
               <div className="grid">

@@ -5,9 +5,9 @@ export function getApiBase(): string {
   }
 
   if (typeof window !== "undefined") {
+    // Same hostname as the UI (localhost vs 127.0.0.1) to avoid flaky cross-host requests.
     const hostname = window.location.hostname;
-    const safeHost = hostname === "localhost" ? "127.0.0.1" : hostname;
-    return `http://${safeHost}:8000`;
+    return `http://${hostname}:8000`;
   }
 
   return "http://127.0.0.1:8000";

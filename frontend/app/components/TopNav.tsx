@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getApiBase } from "../lib/apiBase";
+import { fetchWithRetry } from "../lib/fetchRetry";
 import ThemeToggle from "./ThemeToggle";
 import { useTranslation } from "../lib/LanguageContext";
 import { Language } from "../lib/translations";
@@ -42,23 +43,34 @@ export default function TopNav() {
       setEmail(null);
       return;
     }
-    fetch(`${apiBase}/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.email) {
-          setEmail(data.email);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetchWithRetry(
+          `${apiBase}/auth/me`,
+          { headers: { Authorization: `Bearer ${token}` } },
+          { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
+        );
+        if (cancelled) return;
+        if (res.ok) {
+          const data = await res.json();
+          setEmail(data?.email ?? null);
         } else {
           setEmail(null);
         }
-      })
-      .catch(() => setEmail(null));
+      } catch {
+        if (!cancelled) setEmail(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [apiBase]);
 
   const logout = () => {
     localStorage.removeItem("auth_token");
     setEmail(null);
+    window.dispatchEvent(new Event("auth-change"));
   };
 
   return (

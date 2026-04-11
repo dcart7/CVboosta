@@ -5,6 +5,12 @@ import { useEffect, useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { useTranslation } from "../lib/LanguageContext";
+import {
+  fetchWorkspaceEmail,
+  migrateLegacyGuestWorkspace,
+  workspaceIdFromEmail,
+  wsFieldKey,
+} from "../lib/workspaceStorage";
 
 export default function OptimizePage() {
   const apiBase = getApiBase();
@@ -17,39 +23,58 @@ export default function OptimizePage() {
   const [missingCount, setMissingCount] = useState<number>(0);
 
   useEffect(() => {
-    setTargetRole(localStorage.getItem("target_role") || "");
-    setTargetCompany(localStorage.getItem("target_company") || "");
-    const optimized = localStorage.getItem("optimized_cv") || "";
-    if (optimized) {
-      setPreviewSummary(optimized.split("\n")[0] || optimized);
-    } else {
-      const cvText = localStorage.getItem("cv_text") || "";
-      setPreviewSummary(cvText.split(".")[0] || "—");
-    }
+    let cancelled = false;
+    (async () => {
+      const email = await fetchWorkspaceEmail(apiBase);
+      if (cancelled) return;
+      const wid = workspaceIdFromEmail(email);
+      migrateLegacyGuestWorkspace(wid);
+      setTargetRole(localStorage.getItem(wsFieldKey(wid, "target_role")) || "");
+      setTargetCompany(
+        localStorage.getItem(wsFieldKey(wid, "target_company")) || "",
+      );
+      const optimized = localStorage.getItem("optimized_cv") || "";
+      if (optimized) {
+        setPreviewSummary(optimized.split("\n")[0] || optimized);
+      } else {
+        const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
+        setPreviewSummary(cvText.split(".")[0] || "—");
+      }
 
-    const cvText = localStorage.getItem("cv_text") || "";
-    const jobText = localStorage.getItem("job_text") || "";
-    if (cvText && jobText) {
-      fetch(`${apiBase}/analyze/match`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv_text: cvText, job_text: jobText }),
-      })
-        .then((res) => (res.ok ? res.json() : Promise.reject()))
-        .then((data) => {
-          setMatchPercent(data.match_percent ?? null);
-          setMissingCount((data.missing_keywords || []).length);
+      const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
+      const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
+      if (cvText && jobText) {
+        fetch(`${apiBase}/analyze/match`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cv_text: cvText, job_text: jobText }),
         })
-        .catch(() => {
-          setMatchPercent(null);
-          setMissingCount(0);
-        });
-    }
-  }, []);
+          .then((res) => (res.ok ? res.json() : Promise.reject()))
+          .then((data) => {
+            if (!cancelled) {
+              setMatchPercent(data.match_percent ?? null);
+              setMissingCount((data.missing_keywords || []).length);
+            }
+          })
+          .catch(() => {
+            if (!cancelled) {
+              setMatchPercent(null);
+              setMissingCount(0);
+            }
+          });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiBase]);
 
   const runOptimization = async () => {
-    const cvText = localStorage.getItem("cv_text") || "";
-    const jobText = localStorage.getItem("job_text") || "";
+    const email = await fetchWorkspaceEmail(apiBase);
+    const wid = workspaceIdFromEmail(email);
+    migrateLegacyGuestWorkspace(wid);
+    const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
+    const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
     const token = localStorage.getItem("auth_token") || "";
     if (!cvText || !jobText) {
       setStatus("Upload CV and job description first.");

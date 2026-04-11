@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { useTranslation } from "../lib/LanguageContext";
+import {
+  fetchWorkspaceEmail,
+  GUEST_WORKSPACE_ID,
+  migrateLegacyGuestWorkspace,
+  parsedCvStorageKey,
+  sessionCvParsedKey,
+  workspaceIdFromEmail,
+  wsFieldKey,
+} from "../lib/workspaceStorage";
 
 export default function WorkspacePage() {
   const router = useRouter();
@@ -30,6 +39,12 @@ export default function WorkspacePage() {
   const [optimizedSummary, setOptimizedSummary] = useState("");
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  /** Resolved workspace (email or __guest__); null until first auth/workspace load. */
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
+  const [workspaceReady, setWorkspaceReady] = useState(false);
+  /** Detected skills UI only after Upload & parse in this tab (not from cold LS). */
+  const [showDetectedSkillsSession, setShowDetectedSkillsSession] =
+    useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [keywordCache, setKeywordCache] = useState<string[]>([]);
@@ -66,10 +81,18 @@ export default function WorkspacePage() {
       }
       const data = await response.json();
       setParsed(data);
-      if (userEmail) {
-        localStorage.setItem(`parsed_cv:${userEmail}`, JSON.stringify(data));
+      const email = userEmail ?? (await fetchWorkspaceEmail(apiBase));
+      const wid = workspaceIdFromEmail(email);
+      if (userEmail === null && email) setUserEmail(email);
+      if (workspaceId === null) setWorkspaceId(wid);
+      localStorage.setItem(parsedCvStorageKey(email), JSON.stringify(data));
+      localStorage.setItem(wsFieldKey(wid, "cv_text"), data.raw_text || "");
+      try {
+        sessionStorage.setItem(sessionCvParsedKey(wid), "1");
+      } catch {
+        /* private mode */
       }
-      localStorage.setItem("cv_text", data.raw_text || "");
+      setShowDetectedSkillsSession(true);
       setStatus("CV parsed successfully.");
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Upload failed");
@@ -80,11 +103,20 @@ export default function WorkspacePage() {
     if (!selected) return;
     setFile(selected);
     setStatus("");
+    setParsed(null);
+    const wid = workspaceId ?? GUEST_WORKSPACE_ID;
+    try {
+      sessionStorage.removeItem(sessionCvParsedKey(wid));
+    } catch {
+      /* ignore */
+    }
+    setShowDetectedSkillsSession(false);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragging(false);
+    if (!workspaceReady) return;
     const dropped = event.dataTransfer.files?.[0] || null;
     handleFileSelect(dropped);
     if (dropped) {
@@ -92,30 +124,29 @@ export default function WorkspacePage() {
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    const load = async () => {
-      if (token) {
+  const loadWorkspace = useCallback(async () => {
+    setWorkspaceReady(false);
+    let wid = GUEST_WORKSPACE_ID;
+    try {
+      const token = localStorage.getItem("auth_token");
+      const email = token ? await fetchWorkspaceEmail(apiBase) : null;
+      wid = workspaceIdFromEmail(email);
+      migrateLegacyGuestWorkspace(wid);
+      setUserEmail(email);
+      setWorkspaceId(wid);
+
+      let storedParsed = localStorage.getItem(parsedCvStorageKey(email));
+      if (!storedParsed && wid === GUEST_WORKSPACE_ID) {
+        const legacy = localStorage.getItem("parsed_cv");
+        if (legacy) {
+          localStorage.setItem(parsedCvStorageKey(null), legacy);
+          localStorage.removeItem("parsed_cv");
+          storedParsed = legacy;
+        }
+      }
+      if (storedParsed) {
         try {
-          const response = await fetch(`${apiBase}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            if (data?.email) {
-              setUserEmail(data.email);
-              const storedParsed = localStorage.getItem(
-                `parsed_cv:${data.email}`,
-              );
-              if (storedParsed) {
-                setParsed(JSON.parse(storedParsed));
-              } else {
-                setParsed(null);
-              }
-            }
-          } else {
-            setParsed(null);
-          }
+          setParsed(JSON.parse(storedParsed));
         } catch {
           setParsed(null);
         }
@@ -123,43 +154,88 @@ export default function WorkspacePage() {
         setParsed(null);
       }
 
-      setTargetRole(localStorage.getItem("target_role") || "");
-      setTargetCompany(localStorage.getItem("target_company") || "");
-      setJobText(localStorage.getItem("job_text") || "");
-    };
-
-    load();
+      setTargetRole(localStorage.getItem(wsFieldKey(wid, "target_role")) || "");
+      setTargetCompany(
+        localStorage.getItem(wsFieldKey(wid, "target_company")) || "",
+      );
+      setJobText(localStorage.getItem(wsFieldKey(wid, "job_text")) || "");
+      try {
+        setShowDetectedSkillsSession(
+          typeof sessionStorage !== "undefined" &&
+            sessionStorage.getItem(sessionCvParsedKey(wid)) === "1",
+        );
+      } catch {
+        setShowDetectedSkillsSession(false);
+      }
+    } catch {
+      setUserEmail(null);
+      setWorkspaceId(GUEST_WORKSPACE_ID);
+      setParsed(null);
+      setTargetRole("");
+      setTargetCompany("");
+      setJobText("");
+      setShowDetectedSkillsSession(false);
+    } finally {
+      setWorkspaceReady(true);
+    }
   }, [apiBase]);
 
   useEffect(() => {
+    void loadWorkspace();
+  }, [loadWorkspace]);
+
+  useEffect(() => {
+    const onAuth = () => void loadWorkspace();
+    window.addEventListener("auth-change", onAuth);
+    return () => window.removeEventListener("auth-change", onAuth);
+  }, [loadWorkspace]);
+
+  useEffect(() => {
+    if (!workspaceReady || workspaceId === null) return;
+    localStorage.setItem(wsFieldKey(workspaceId, "target_role"), targetRole);
+    localStorage.setItem(
+      wsFieldKey(workspaceId, "target_company"),
+      targetCompany,
+    );
+    localStorage.setItem(wsFieldKey(workspaceId, "job_text"), jobText);
+  }, [workspaceReady, workspaceId, targetRole, targetCompany, jobText]);
+
+  useEffect(() => {
+    if (!workspaceReady || workspaceId === null) return;
     const text = jobText.trim();
+    const hashKey = wsFieldKey(workspaceId, "job_keywords_hash");
+    const kwKey = wsFieldKey(workspaceId, "job_keywords");
+    const srcKey = wsFieldKey(workspaceId, "job_keywords_source");
     if (!text) {
       setKeywordCache([]);
       setKeywordSource("");
-      localStorage.removeItem("job_keywords");
-      localStorage.removeItem("job_keywords_hash");
-      localStorage.removeItem("job_keywords_source");
+      localStorage.removeItem(kwKey);
+      localStorage.removeItem(hashKey);
+      localStorage.removeItem(srcKey);
       return;
     }
     const currentHash = hashText(text);
-    const storedHash = localStorage.getItem("job_keywords_hash");
+    const storedHash = localStorage.getItem(hashKey);
     if (storedHash === currentHash) {
-      const cached = JSON.parse(localStorage.getItem("job_keywords") || "[]");
+      const cached = JSON.parse(localStorage.getItem(kwKey) || "[]");
       setKeywordCache(Array.isArray(cached) ? cached : []);
-      const cachedSource = localStorage.getItem("job_keywords_source") || "";
-      setKeywordSource(cachedSource);
+      setKeywordSource(localStorage.getItem(srcKey) || "");
     } else {
       setKeywordCache([]);
       setKeywordSource("");
-      localStorage.removeItem("job_keywords");
-      localStorage.removeItem("job_keywords_hash");
-      localStorage.removeItem("job_keywords_source");
+      localStorage.removeItem(kwKey);
+      localStorage.removeItem(hashKey);
+      localStorage.removeItem(srcKey);
     }
-  }, [jobText]);
+  }, [jobText, workspaceId, workspaceReady]);
 
   const extractKeywords = async () => {
     if (!jobText.trim()) {
       setAnalysisStatus("Paste a job description first.");
+      return;
+    }
+    if (workspaceId === null) {
+      setAnalysisStatus("Loading workspace…");
       return;
     }
     setAnalysisStatus("Extracting keywords...");
@@ -182,11 +258,14 @@ export default function WorkspacePage() {
         (item) => item.length > 0,
       );
       setKeywordCache(unique);
-      localStorage.setItem("job_keywords", JSON.stringify(unique));
-      localStorage.setItem("job_keywords_hash", hashText(jobText.trim()));
+      const kwKey = wsFieldKey(workspaceId, "job_keywords");
+      const hashKey = wsFieldKey(workspaceId, "job_keywords_hash");
+      const srcKey = wsFieldKey(workspaceId, "job_keywords_source");
+      localStorage.setItem(kwKey, JSON.stringify(unique));
+      localStorage.setItem(hashKey, hashText(jobText.trim()));
       const sourceText = data.feedback || "Keywords extracted.";
       setKeywordSource(sourceText);
-      localStorage.setItem("job_keywords_source", sourceText);
+      localStorage.setItem(srcKey, sourceText);
       setAnalysisStatus(sourceText);
     } catch (err) {
       setAnalysisStatus(
@@ -198,15 +277,23 @@ export default function WorkspacePage() {
   };
 
   const removeKeyword = (value: string) => {
+    if (workspaceId === null) return;
     const next = keywordCache.filter((item) => item !== value);
     setKeywordCache(next);
-    localStorage.setItem("job_keywords", JSON.stringify(next));
+    localStorage.setItem(
+      wsFieldKey(workspaceId, "job_keywords"),
+      JSON.stringify(next),
+    );
     if (jobText.trim()) {
-      localStorage.setItem("job_keywords_hash", hashText(jobText.trim()));
+      localStorage.setItem(
+        wsFieldKey(workspaceId, "job_keywords_hash"),
+        hashText(jobText.trim()),
+      );
     }
   };
 
   const addKeyword = () => {
+    if (workspaceId === null) return;
     const cleaned = keywordInput.trim();
     if (!cleaned) return;
     const exists = keywordCache.some(
@@ -214,9 +301,15 @@ export default function WorkspacePage() {
     );
     const next = exists ? keywordCache : [...keywordCache, cleaned];
     setKeywordCache(next);
-    localStorage.setItem("job_keywords", JSON.stringify(next));
+    localStorage.setItem(
+      wsFieldKey(workspaceId, "job_keywords"),
+      JSON.stringify(next),
+    );
     if (jobText.trim()) {
-      localStorage.setItem("job_keywords_hash", hashText(jobText.trim()));
+      localStorage.setItem(
+        wsFieldKey(workspaceId, "job_keywords_hash"),
+        hashText(jobText.trim()),
+      );
     }
     setKeywordInput("");
   };
@@ -224,9 +317,11 @@ export default function WorkspacePage() {
   const clearKeywords = () => {
     setKeywordCache([]);
     setKeywordSource("");
-    localStorage.removeItem("job_keywords");
-    localStorage.removeItem("job_keywords_hash");
-    localStorage.removeItem("job_keywords_source");
+    if (workspaceId !== null) {
+      localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords"));
+      localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_hash"));
+      localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_source"));
+    }
     setAnalysisStatus("Keywords cleared.");
   };
 
@@ -243,10 +338,20 @@ export default function WorkspacePage() {
       setAnalysisStatus("Extract keywords first.");
       return;
     }
-    localStorage.setItem("target_role", targetRole);
-    localStorage.setItem("target_company", targetCompany);
-    localStorage.setItem("job_text", jobText);
-    localStorage.setItem("cv_text", parsed.raw_text || "");
+    if (workspaceId === null) {
+      setAnalysisStatus("Loading workspace…");
+      return;
+    }
+    localStorage.setItem(wsFieldKey(workspaceId, "target_role"), targetRole);
+    localStorage.setItem(
+      wsFieldKey(workspaceId, "target_company"),
+      targetCompany,
+    );
+    localStorage.setItem(wsFieldKey(workspaceId, "job_text"), jobText);
+    localStorage.setItem(
+      wsFieldKey(workspaceId, "cv_text"),
+      parsed.raw_text || "",
+    );
     setAnalysisStatus("Analyzing...");
     setIsAnalyzing(true);
     try {
@@ -278,6 +383,20 @@ export default function WorkspacePage() {
       setOptimizeStatus("Upload CV and paste job description first.");
       return;
     }
+    if (workspaceId === null) {
+      setOptimizeStatus("Loading workspace…");
+      return;
+    }
+    localStorage.setItem(wsFieldKey(workspaceId, "target_role"), targetRole);
+    localStorage.setItem(
+      wsFieldKey(workspaceId, "target_company"),
+      targetCompany,
+    );
+    localStorage.setItem(wsFieldKey(workspaceId, "job_text"), jobText);
+    localStorage.setItem(
+      wsFieldKey(workspaceId, "cv_text"),
+      parsed.raw_text || "",
+    );
     const token = localStorage.getItem("auth_token") || "";
     setOptimizeStatus("Optimizing...");
     setIsOptimizing(true);
@@ -361,16 +480,24 @@ export default function WorkspacePage() {
                   }
                 />
                 {file && <span>{t("dashboard.selected")} {file.name}</span>}
-                <button className="btn" type="button" onClick={() => upload()}>
+                <button
+                  className="btn"
+                  type="button"
+                  disabled={!workspaceReady}
+                  onClick={() => upload()}
+                >
                   {t("dashboard.uploadParse")}
                 </button>
               </div>
             </div>
             {status && <p>{status}</p>}
-            {parsed?.skills && (
+            {showDetectedSkillsSession &&
+              parsed &&
+              Array.isArray(parsed.skills) &&
+              parsed.skills.length > 0 && (
               <div className="card">
                 <h3>{t("dashboard.detectedSkills")}</h3>
-                <p>{parsed.skills.join(", ") || "—"}</p>
+                <p>{parsed.skills.join(", ")}</p>
               </div>
             )}
             <div>

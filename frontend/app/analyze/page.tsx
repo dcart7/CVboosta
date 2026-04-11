@@ -5,6 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { useTranslation } from "../lib/LanguageContext";
+import {
+  fetchWorkspaceEmail,
+  GUEST_WORKSPACE_ID,
+  migrateLegacyGuestWorkspace,
+  parsedCvStorageKey,
+  workspaceIdFromEmail,
+  wsFieldKey,
+} from "../lib/workspaceStorage";
 
 type ParsedCv = {
   raw_text: string;
@@ -67,22 +75,43 @@ export default function AnalyzePage() {
   };
 
   useEffect(() => {
-    const storedParsed = localStorage.getItem("parsed_cv");
-    const storedCvText = localStorage.getItem("cv_text") || "";
-    const storedJobText = localStorage.getItem("job_text") || "";
-    if (storedJobText) {
-      setJobText(storedJobText);
-    }
-    if (storedParsed) {
-      const parsedValue: ParsedCv = JSON.parse(storedParsed);
-      setParsed(parsedValue);
-      const cvText = storedCvText || parsedValue.raw_text || "";
-      if (cvText && storedJobText) {
-        runAnalysis(cvText, storedJobText);
-        return;
+    let cancelled = false;
+    (async () => {
+      const email = await fetchWorkspaceEmail(apiBase);
+      if (cancelled) return;
+      const wid = workspaceIdFromEmail(email);
+      migrateLegacyGuestWorkspace(wid);
+
+      let storedParsed = localStorage.getItem(parsedCvStorageKey(email));
+      if (!storedParsed && wid === GUEST_WORKSPACE_ID) {
+        const legacy = localStorage.getItem("parsed_cv");
+        if (legacy) {
+          localStorage.setItem(parsedCvStorageKey(null), legacy);
+          localStorage.removeItem("parsed_cv");
+          storedParsed = legacy;
+        }
       }
-    }
-    setLoading(false);
+      const storedCvText =
+        localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
+      const storedJobText =
+        localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
+      if (storedJobText) {
+        setJobText(storedJobText);
+      }
+      if (storedParsed) {
+        const parsedValue: ParsedCv = JSON.parse(storedParsed);
+        setParsed(parsedValue);
+        const cvText = storedCvText || parsedValue.raw_text || "";
+        if (cvText && storedJobText) {
+          runAnalysis(cvText, storedJobText);
+          return;
+        }
+      }
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [apiBase]);
 
   const uploadCv = async () => {
@@ -103,8 +132,11 @@ export default function AnalyzePage() {
         throw new Error(payload.detail || "Upload failed");
       }
       const data = await response.json();
-      localStorage.setItem("parsed_cv", JSON.stringify(data));
-      localStorage.setItem("cv_text", data.raw_text || "");
+      const email = await fetchWorkspaceEmail(apiBase);
+      const wid = workspaceIdFromEmail(email);
+      migrateLegacyGuestWorkspace(wid);
+      localStorage.setItem(parsedCvStorageKey(email), JSON.stringify(data));
+      localStorage.setItem(wsFieldKey(wid, "cv_text"), data.raw_text || "");
       setParsed(data);
       setUploadStatus("CV uploaded.");
       if (jobText.trim()) {
@@ -176,9 +208,20 @@ export default function AnalyzePage() {
                         setError("Please paste a job description.");
                         return;
                       }
-                      localStorage.setItem("job_text", jobText);
-                      localStorage.setItem("cv_text", parsed.raw_text || "");
-                      runAnalysis(parsed.raw_text || "", jobText);
+                      void (async () => {
+                        const email = await fetchWorkspaceEmail(apiBase);
+                        const wid = workspaceIdFromEmail(email);
+                        migrateLegacyGuestWorkspace(wid);
+                        localStorage.setItem(
+                          wsFieldKey(wid, "job_text"),
+                          jobText,
+                        );
+                        localStorage.setItem(
+                          wsFieldKey(wid, "cv_text"),
+                          parsed.raw_text || "",
+                        );
+                        runAnalysis(parsed.raw_text || "", jobText);
+                      })();
                     }}
                   >
                     {t("common.runAnalysis")}

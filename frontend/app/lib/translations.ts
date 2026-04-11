@@ -134,6 +134,11 @@ export const translations = {
       error503: "AI service limit reached. Please wait a minute and try again.",
       genericError: "Something went wrong. Check your connection.",
       loadingSession: "Loading session data...",
+      sessionLoadFailed:
+        "Could not load this saved result. Check that the API is running and try again.",
+      sessionRetry: "Try again",
+      sessionLoginRequired: "Please sign in again to open this result.",
+      sessionNotFound: "This result was not found or you no longer have access.",
     },
     dashboard: {
       pill: "Dashboard — all steps in one place",
@@ -197,6 +202,10 @@ export const translations = {
       creating: "Creating...",
       createBtn: "Create account",
       alreadyHaveAccount: "I already have an account",
+      networkError:
+        "Could not reach the API after several tries. Start the backend on port 8000 and check your connection.",
+      loginFailed: "Login failed.",
+      registerFailed: "Could not create account.",
     },
     account: {
       title: "Account",
@@ -222,6 +231,10 @@ export const translations = {
       confirmPassword: "CONFIRM NEW PASSWORD",
       updatePassword: "Update password",
       cancel: "Cancel",
+      profileUnreachable:
+        "We couldn’t load your profile after several tries. The API may still be starting, or your network dropped.",
+      retryLoad: "Try again",
+      sessionExpiredReload: "Your session expired. Please sign in again.",
     },
     history: {
       title: "History",
@@ -235,6 +248,9 @@ export const translations = {
       empty: "No optimized CVs yet. Run optimization to see history.",
       loginRequired: "Please log in to view history.",
       failed: "Failed to load history.",
+      retry: "Try again",
+      offlineDetail:
+        "Could not load history. Check that the backend is running and your connection is stable, then try again.",
       view: "View Results",
     },
     hero: {
@@ -394,6 +410,11 @@ export const translations = {
       error503: "Ліміт AI-сервісу вичерпано. Зачекайте хвилину і спробуйте знову.",
       genericError: "Щось пішло не так. Перевірте з'єднання.",
       loadingSession: "Завантаження даних сесії...",
+      sessionLoadFailed:
+        "Не вдалося завантажити збережений результат. Перевірте, що API запущено, і спробуйте знову.",
+      sessionRetry: "Спробувати знову",
+      sessionLoginRequired: "Увійдіть знову, щоб відкрити цей результат.",
+      sessionNotFound: "Результат не знайдено або у вас більше немає доступу.",
     },
     dashboard: {
       pill: "Панель — всі кроки в одному місці",
@@ -456,6 +477,10 @@ export const translations = {
       creating: "Створення...",
       createBtn: "Створити акаунт",
       alreadyHaveAccount: "У мене вже є акаунт",
+      networkError:
+        "Не вдалося зв’язатися з API після кількох спроб. Запустіть бекенд на порту 8000 і перевірте з’єднання.",
+      loginFailed: "Не вдалося увійти.",
+      registerFailed: "Не вдалося створити акаунт.",
     },
     account: {
       title: "Акаунт",
@@ -481,6 +506,10 @@ export const translations = {
       confirmPassword: "ПІДТВЕРДІТЬ НОВИЙ ПАРОЛЬ",
       updatePassword: "Оновити пароль",
       cancel: "Скасувати",
+      profileUnreachable:
+        "Не вдалося завантажити профіль після кількох спроб. API може ще стартувати або зникло з’єднання.",
+      retryLoad: "Спробувати знову",
+      sessionExpiredReload: "Сесію завершено. Увійдіть знову.",
     },
     history: {
       title: "Історія",
@@ -494,6 +523,9 @@ export const translations = {
       empty: "Оптимізованих резюме ще немає. Запустіть оптимізацію, щоб побачити історію.",
       loginRequired: "Увійдіть, щоб переглянути історію.",
       failed: "Не вдалося завантажити історію.",
+      retry: "Спробувати знову",
+      offlineDetail:
+        "Не вдалося завантажити історію. Перевірте, що бекенд запущений і з’єднання стабільне, і спробуйте знову.",
       view: "Переглянути",
     },
     hero: {
@@ -647,6 +679,11 @@ export const translations = {
       whyThisIsAsked: "Dlaczego o то pytają",
       howToAnswer: "Jak відповідzieć",
       loadingPrep: "Generowanie pytań...",
+      sessionLoadFailed:
+        "Nie udało się wczytać zapisanego wyniku. Sprawdź, czy API działa, i spróbuj ponownie.",
+      sessionRetry: "Spróbuj ponownie",
+      sessionLoginRequired: "Zaloguj się ponownie, aby otworzyć ten wynik.",
+      sessionNotFound: "Nie znaleziono wyniku lub nie masz już dostępu.",
     },
     dashboard: {
       pill: "Panel — wszystkie kroki w jednym miejscu",
@@ -709,6 +746,10 @@ export const translations = {
       creating: "Tworzenie...",
       createBtn: "Utwórz konto",
       alreadyHaveAccount: "Mam już konto",
+      networkError:
+        "Nie udało się połączyć z API po kilku próbach. Uruchom backend na porcie 8000 i sprawdź połączenie.",
+      loginFailed: "Logowanie nie powiodło się.",
+      registerFailed: "Nie udało się utworzyć konta.",
     },
     account: {
       title: "Konto",
@@ -734,6 +775,10 @@ export const translations = {
       confirmPassword: "POTWIERDŹ NOWE HASŁO",
       updatePassword: "Zaktualizuj hasło",
       cancel: "Anuluj",
+      profileUnreachable:
+        "Nie udało się wczytać profilu po kilku próbach. API może się jeszcze uruchamiać lub połączenie zostało przerwane.",
+      retryLoad: "Spróbuj ponownie",
+      sessionExpiredReload: "Sesja wygasła. Zaloguj się ponownie.",
     },
     history: {
       title: "Historia",
@@ -747,6 +792,10 @@ export const translations = {
       empty: "Brak zoptymalizowanych CV. Uruchom optymalizację, aby zobaczyć historię.",
       loginRequired: "Zaloguj się, aby wyświetlić historię.",
       failed: "Nie udało się załadować historii.",
+      retry: "Spróbuj ponownie",
+      offlineDetail:
+        "Nie udało się wczytać historii. Sprawdź, czy backend działa i połączenie jest stabilne, i spróbuj ponownie.",
+      view: "Wyniki",
     },
     hero: {
       startWithCv: "Zacznij od CV",
@@ -896,6 +945,11 @@ export const translations = {
       whyThisIsAsked: "Prečo sa to pýtajú",
       howToAnswer: "Ako odpovedať",
       loadingPrep: "Generovanie otázok...",
+      sessionLoadFailed:
+        "Nepodarilo sa načítať uložený výsledok. Skontrolujte, či API beží, a skúste znova.",
+      sessionRetry: "Skúsiť znova",
+      sessionLoginRequired: "Prihláste sa znova, aby ste otvorili tento výsledok.",
+      sessionNotFound: "Výsledok sa nenašiel alebo k nemu už nemáte prístup.",
     },
     dashboard: {
       pill: "Panel — všetky kroky na jednom mieste",
@@ -958,6 +1012,10 @@ export const translations = {
       creating: "Vytváranie...",
       createBtn: "Vytvoriť účet",
       alreadyHaveAccount: "Už mám účet",
+      networkError:
+        "Po niekoľkých pokusoch sa nepodarilo spojiť s API. Spustite backend na porte 8000 a skontrolujte pripojenie.",
+      loginFailed: "Prihlásenie zlyhalo.",
+      registerFailed: "Účet sa nepodarilo vytvoriť.",
     },
     account: {
       title: "Účet",
@@ -983,6 +1041,10 @@ export const translations = {
       confirmPassword: "POTVRĎTE NOVÉ HESLO",
       updatePassword: "Aktualizovať heslo",
       cancel: "Zrušiť",
+      profileUnreachable:
+        "Profil sa nepodarilo načítať po niekoľkých pokusoch. API sa ešte môže spúšťať alebo spadlo pripojenie.",
+      retryLoad: "Skúsiť znova",
+      sessionExpiredReload: "Relácia vypršala. Prihláste sa znova.",
     },
     history: {
       title: "História",
@@ -996,6 +1058,10 @@ export const translations = {
       empty: "Zatiaľ žiadne optimalizované CV. Spustite optimalizáciu, aby ste videli históriu.",
       loginRequired: "Prihláste sa, aby ste videli históriu.",
       failed: "Nepodarilo sa načítať históriu.",
+      retry: "Skúsiť znova",
+      offlineDetail:
+        "Históriu sa nepodarilo načítať. Skontrolujte, či backend beží a pripojenie je stabilné, a skúste znova.",
+      view: "Výsledky",
     },
     hero: {
       startWithCv: "Začať s CV",
@@ -1148,6 +1214,11 @@ export const translations = {
       whyThisIsAsked: "Por qué se pregunta esto",
       howToAnswer: "Cómo responder",
       loadingPrep: "Generando preguntas...",
+      sessionLoadFailed:
+        "No se pudo cargar este resultado guardado. Comprueba que la API esté en marcha e inténtalo de nuevo.",
+      sessionRetry: "Intentar de nuevo",
+      sessionLoginRequired: "Inicia sesión de nuevo para abrir este resultado.",
+      sessionNotFound: "No se encontró el resultado o ya no tienes acceso.",
     },
     dashboard: {
       pill: "Panel — todos los pasos en un solo lugar",
@@ -1211,6 +1282,10 @@ export const translations = {
       creating: "Creando...",
       createBtn: "Crear cuenta",
       alreadyHaveAccount: "Ya tengo una cuenta",
+      networkError:
+        "No se pudo conectar con la API tras varios intentos. Inicia el backend en el puerto 8000 y comprueba la conexión.",
+      loginFailed: "No se pudo iniciar sesión.",
+      registerFailed: "No se pudo crear la cuenta.",
     },
     account: {
       title: "Cuenta",
@@ -1236,6 +1311,10 @@ export const translations = {
       confirmPassword: "CONFIRMAR NUEVA CONTRASEÑA",
       updatePassword: "Actualizar contraseña",
       cancel: "Cancelar",
+      profileUnreachable:
+        "No pudimos cargar tu perfil tras varios intentos. La API puede estar arrancando o se perdió la conexión.",
+      retryLoad: "Intentar de nuevo",
+      sessionExpiredReload: "Tu sesión expiró. Inicia sesión otra vez.",
     },
     history: {
       title: "Historial",
@@ -1249,6 +1328,10 @@ export const translations = {
       empty: "Aún no hay CVs optimizados. Ejecuta la optimización para ver el historial.",
       loginRequired: "Por favor inicia sesión para ver el historial.",
       failed: "No se pudo cargar el historial.",
+      retry: "Intentar de nuevo",
+      offlineDetail:
+        "No se pudo cargar el historial. Comprueba que el backend esté en marcha y la conexión sea estable, e inténtalo de nuevo.",
+      view: "Ver resultados",
     },
     hero: {
       startWithCv: "Empezar con un CV",

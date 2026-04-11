@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 
 type HistoryItem = {
@@ -20,22 +21,52 @@ export default function HistoryPage() {
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  /** loginRequired | offline — only offline is retryable */
+  const [errorKind, setErrorKind] = useState<"login" | "offline" | null>(null);
 
-  useEffect(() => {
+  const loadHistory = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    setErrorKind(null);
     const token = localStorage.getItem("auth_token");
     if (!token) {
       setError(t("history.loginRequired"));
+      setErrorKind("login");
       setLoading(false);
       return;
     }
-    fetch(`${apiBase}/history`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => setItems(data.items || []))
-      .catch(() => setError(t("history.failed")))
-      .finally(() => setLoading(false));
+    try {
+      const res = await fetchWithRetry(
+        `${apiBase}/history`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
+      );
+      if (res.status === 401) {
+        setError(t("history.loginRequired"));
+        setErrorKind("login");
+        setItems([]);
+        return;
+      }
+      if (!res.ok) {
+        setError(t("history.offlineDetail"));
+        setErrorKind("offline");
+        setItems([]);
+        return;
+      }
+      const data = await res.json();
+      setItems(data.items || []);
+    } catch {
+      setError(t("history.offlineDetail"));
+      setErrorKind("offline");
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
   }, [apiBase, t]);
+
+  useEffect(() => {
+    void loadHistory();
+  }, [loadHistory]);
 
   const formatDate = (value: string) =>
     new Date(value).toLocaleString(undefined, {
@@ -71,7 +102,16 @@ export default function HistoryPage() {
               <strong></strong>
             </div>
             {loading && <p>{t("history.loading")}</p>}
-            {error && <p style={{ color: "#b42318" }}>{error}</p>}
+            {error && (
+              <div className="section">
+                <p style={{ color: "#b42318" }}>{error}</p>
+                {errorKind === "offline" && (
+                  <button className="btn primary" type="button" onClick={() => void loadHistory()}>
+                    {t("history.retry")}
+                  </button>
+                )}
+              </div>
+            )}
             {!loading && !error && items.length === 0 && (
               <p>{t("history.empty")}</p>
             )}

@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
+import {
+  fetchWorkspaceEmail,
+  migrateLegacyGuestWorkspace,
+  workspaceIdFromEmail,
+  wsFieldKey,
+} from "../lib/workspaceStorage";
 
 type PdfTemplateId =
   | "classic"
@@ -328,127 +335,161 @@ function ResultsContent() {
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
   const [prepError, setPrepError] = useState<string | null>(null);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
+  const [sessionLoadError, setSessionLoadError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const id = searchParams.get("id");
-    if (!id) return;
+  const sessionId = searchParams.get("id");
 
+  const loadHistorySession = useCallback(async () => {
+    if (!sessionId) return;
     const token = localStorage.getItem("auth_token");
-    if (!token) return;
-
+    if (!token) {
+      setSessionLoadError(t("results.sessionLoginRequired"));
+      return;
+    }
     setIsLoadingSession(true);
-    fetch(`${apiBase}/history/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Failed to load session (Status: ${res.status})`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setOptimizedCv(data.optimized_cv || "");
-        setMissing(data.missing_skills || []);
-        setRecommendations(data.recommendations || []);
-        setMatchBefore(data.match_before || 0);
-        setMatchAfter(data.match_after || 0);
-        
-        // Save to localStorage so it persists on refresh
-        localStorage.setItem("optimized_cv", data.optimized_cv || "");
-        localStorage.setItem("missing_keywords", JSON.stringify(data.missing_skills || []));
-        localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
-        localStorage.setItem("match_before", (data.match_before || 0).toString());
-        localStorage.setItem("match_after", (data.match_after || 0).toString());
-        localStorage.setItem("job_text", data.job_description || "");
-      })
-      .catch((err) => {
-        console.error("Failed to load session:", err.message || err);
-      })
-      .finally(() => setIsLoadingSession(false));
-  }, [searchParams, apiBase]);
+    setSessionLoadError(null);
+    try {
+      const res = await fetchWithRetry(
+        `${apiBase}/history/${sessionId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
+      );
+      if (res.status === 401) {
+        setSessionLoadError(t("results.sessionLoginRequired"));
+        return;
+      }
+      if (res.status === 404) {
+        setSessionLoadError(t("results.sessionNotFound"));
+        return;
+      }
+      if (!res.ok) {
+        setSessionLoadError(t("results.sessionLoadFailed"));
+        return;
+      }
+      const data = await res.json();
+      setOptimizedCv(data.optimized_cv || "");
+      setMissing(data.missing_skills || []);
+      setRecommendations(data.recommendations || []);
+      setMatchBefore(data.match_before || 0);
+      setMatchAfter(data.match_after || 0);
+
+      const email = await fetchWorkspaceEmail(apiBase);
+      const wid = workspaceIdFromEmail(email);
+      migrateLegacyGuestWorkspace(wid);
+
+      localStorage.setItem("optimized_cv", data.optimized_cv || "");
+      localStorage.setItem("missing_keywords", JSON.stringify(data.missing_skills || []));
+      localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
+      localStorage.setItem("match_before", (data.match_before || 0).toString());
+      localStorage.setItem("match_after", (data.match_after || 0).toString());
+      localStorage.setItem(
+        wsFieldKey(wid, "job_text"),
+        data.job_description || "",
+      );
+    } catch {
+      setSessionLoadError(t("results.sessionLoadFailed"));
+    } finally {
+      setIsLoadingSession(false);
+    }
+  }, [apiBase, sessionId, t]);
 
   useEffect(() => {
-    const storedTemplate = localStorage.getItem("pdf_template");
-    if (
-      storedTemplate === "classic" ||
-      storedTemplate === "modern" ||
-      storedTemplate === "executive" ||
-      storedTemplate === "minimal" ||
-      storedTemplate === "compact" ||
-      storedTemplate === "noir" ||
-      storedTemplate === "sidebar" ||
-      storedTemplate === "serif" ||
-      storedTemplate === "timeline"
-    ) {
-      setPdfTemplate(storedTemplate);
-    }
+    if (sessionId) void loadHistorySession();
+  }, [sessionId, loadHistorySession]);
 
-    const storedCv = localStorage.getItem("optimized_cv") || "";
-    let storedMissing: string[] = [];
-    let storedRecs: string[] = [];
-    try {
-      storedMissing = JSON.parse(localStorage.getItem("missing_skills") || "[]");
-      storedRecs = JSON.parse(localStorage.getItem("recommendations") || "[]");
-    } catch (e) {
-      console.error("Failed to parse storage:", e);
-    }
-    const storedBefore = localStorage.getItem("match_before");
-    const storedAfter = localStorage.getItem("match_after");
-    setOptimizedCv(storedCv);
-    setMissing(storedMissing);
-    setRecommendations(storedRecs);
-    if (storedBefore !== null && !Number.isNaN(Number(storedBefore))) {
-      setMatchBefore(Number(storedBefore));
-    }
-    if (storedAfter !== null && !Number.isNaN(Number(storedAfter))) {
-      setMatchAfter(Number(storedAfter));
-    }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const email = await fetchWorkspaceEmail(apiBase);
+      if (cancelled) return;
+      const wid = workspaceIdFromEmail(email);
+      migrateLegacyGuestWorkspace(wid);
 
-    const cvText = localStorage.getItem("cv_text") || "";
-    const jobText = localStorage.getItem("job_text") || "";
-    if (!cvText || !jobText) {
-      setStatus("Missing CV or job description. Run optimization first.");
-      return;
-    }
-    if (storedBefore !== null && storedAfter !== null) {
-      return;
-    }
-    const loadScores = async () => {
+      const storedTemplate = localStorage.getItem("pdf_template");
+      if (
+        storedTemplate === "classic" ||
+        storedTemplate === "modern" ||
+        storedTemplate === "executive" ||
+        storedTemplate === "minimal" ||
+        storedTemplate === "compact" ||
+        storedTemplate === "noir" ||
+        storedTemplate === "sidebar" ||
+        storedTemplate === "serif" ||
+        storedTemplate === "timeline"
+      ) {
+        setPdfTemplate(storedTemplate);
+      }
+
+      const storedCv = localStorage.getItem("optimized_cv") || "";
+      let storedMissing: string[] = [];
+      let storedRecs: string[] = [];
       try {
-        const beforeRes = await fetch(`${apiBase}/analyze/match`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cv_text: cvText, job_text: jobText }),
-        });
-        if (!beforeRes.ok) throw new Error("before");
-        const beforeData = await beforeRes.json();
-        const beforeValue = beforeData.match_percent ?? null;
-        setMatchBefore(beforeValue);
-        if (typeof beforeValue === "number") {
-          localStorage.setItem("match_before", String(beforeValue));
-        }
+        storedMissing = JSON.parse(localStorage.getItem("missing_skills") || "[]");
+        storedRecs = JSON.parse(localStorage.getItem("recommendations") || "[]");
+      } catch (e) {
+        console.error("Failed to parse storage:", e);
+      }
+      const storedBefore = localStorage.getItem("match_before");
+      const storedAfter = localStorage.getItem("match_after");
+      setOptimizedCv(storedCv);
+      setMissing(storedMissing);
+      setRecommendations(storedRecs);
+      if (storedBefore !== null && !Number.isNaN(Number(storedBefore))) {
+        setMatchBefore(Number(storedBefore));
+      }
+      if (storedAfter !== null && !Number.isNaN(Number(storedAfter))) {
+        setMatchAfter(Number(storedAfter));
+      }
 
-        if (storedCv) {
-          const afterRes = await fetch(`${apiBase}/analyze/match`, {
+      const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
+      const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
+      if (!cvText || !jobText) {
+        setStatus("Missing CV or job description. Run optimization first.");
+        return;
+      }
+      if (storedBefore !== null && storedAfter !== null) {
+        return;
+      }
+      const loadScores = async () => {
+        try {
+          const beforeRes = await fetch(`${apiBase}/analyze/match`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cv_text: storedCv, job_text: jobText }),
+            body: JSON.stringify({ cv_text: cvText, job_text: jobText }),
           });
-          if (!afterRes.ok) throw new Error("after");
-          const afterData = await afterRes.json();
-          const afterValue = afterData.match_percent ?? null;
-          setMatchAfter(afterValue);
-          if (typeof afterValue === "number") {
-            localStorage.setItem("match_after", String(afterValue));
+          if (!beforeRes.ok) throw new Error("before");
+          const beforeData = await beforeRes.json();
+          const beforeValue = beforeData.match_percent ?? null;
+          setMatchBefore(beforeValue);
+          if (typeof beforeValue === "number") {
+            localStorage.setItem("match_before", String(beforeValue));
           }
-        } else {
-          setMatchAfter(null);
+
+          if (storedCv) {
+            const afterRes = await fetch(`${apiBase}/analyze/match`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ cv_text: storedCv, job_text: jobText }),
+            });
+            if (!afterRes.ok) throw new Error("after");
+            const afterData = await afterRes.json();
+            const afterValue = afterData.match_percent ?? null;
+            setMatchAfter(afterValue);
+            if (typeof afterValue === "number") {
+              localStorage.setItem("match_after", String(afterValue));
+            }
+          } else {
+            setMatchAfter(null);
+          }
+        } catch {
+          setStatus("Failed to load match scores.");
         }
-      } catch {
-        setStatus("Failed to load match scores.");
-      }
+      };
+      void loadScores();
+    })();
+    return () => {
+      cancelled = true;
     };
-    loadScores();
   }, [apiBase]);
 
   const activeTemplate =
@@ -496,7 +537,10 @@ function ResultsContent() {
   };
 
   const fetchInterviewPrep = async () => {
-    const jobText = localStorage.getItem("job_text") || "";
+    const email = await fetchWorkspaceEmail(apiBase);
+    const wid = workspaceIdFromEmail(email);
+    migrateLegacyGuestWorkspace(wid);
+    const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
     if (!jobText) {
       console.warn("No job_text found in localStorage");
       return;
@@ -835,6 +879,34 @@ function ResultsContent() {
   return (
     <main className="page">
       <TopNav />
+      {sessionId && sessionLoadError && !isLoadingSession && (
+        <div className="shell" style={{ paddingTop: "1rem" }}>
+          <div
+            className="card"
+            style={{
+              borderColor: "#b42318",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "12px",
+              alignItems: "center",
+            }}
+          >
+            <p style={{ color: "#b42318", margin: 0, flex: "1 1 200px" }}>
+              {sessionLoadError}
+            </p>
+            <button
+              className="btn primary"
+              type="button"
+              onClick={() => void loadHistorySession()}
+            >
+              {t("results.sessionRetry")}
+            </button>
+            <Link className="btn ghost" href="/login">
+              {t("nav.login")}
+            </Link>
+          </div>
+        </div>
+      )}
       {isLoadingSession && (
         <div className="modal-backdrop" style={{ zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(9, 12, 18, 0.8)' }}>
           <div className="spinner" style={{ marginBottom: '16px' }}></div>

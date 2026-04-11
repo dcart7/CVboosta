@@ -121,6 +121,23 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
     header_lookup = {alias: key for key, aliases in headings.items() for alias in aliases}
     all_headers = set(header_lookup.keys())
 
+    def _is_section_heading(normalized: str) -> bool:
+        """True only for real section titles, not bullets ending with e.g. 'skills'."""
+        core = normalized.rstrip(":").strip()
+        if core in all_headers:
+            return True
+        for h in all_headers:
+            if normalized.startswith(f"{h}:") or core.startswith(f"{h}:"):
+                return True
+        return False
+
+    def _heading_category(normalized: str) -> str | None:
+        core = normalized.rstrip(":").strip()
+        for h, k in header_lookup.items():
+            if core == h or normalized.startswith(f"{h}:") or core.startswith(f"{h}:"):
+                return k
+        return None
+
     sections: dict[str, list[str]] = {key: [] for key in headings.keys()}
     current: str | None = None
 
@@ -129,16 +146,10 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
         if not line:
             continue
         normalized = _normalize_heading(line)
-        # Check exact match or suffix match for headings like "TECHNICAL SKILLS:"
-        matched = normalized in all_headers or any(
-            normalized.startswith(h) or normalized.endswith(h)
-            for h in all_headers
-        )
-        if matched:
-            for h, k in header_lookup.items():
-                if h in normalized:
-                    current = k
-                    break
+        if _is_section_heading(normalized):
+            cat = _heading_category(normalized)
+            if cat is not None:
+                current = cat
             continue
         if current is not None:
             sections[typing.cast(str, current)].append(line)
@@ -151,7 +162,15 @@ def _extract_skills(text: str) -> list[str]:
     if skills_lines:
         joined = " ".join(skills_lines)
         parts = [p.strip("•- \t").strip() for p in re.split(r"[,;|\n]", joined)]
-        return [p for p in parts if p and len(p) > 1]
+        # Drop paragraph-sized blobs mistaken for skills; keep short tokens only
+        out: list[str] = []
+        for p in parts:
+            if not p or len(p) < 2:
+                continue
+            if len(p) > 80 or p.count(" ") > 8:
+                continue
+            out.append(p)
+        return out[:40]
     return []
 
 
