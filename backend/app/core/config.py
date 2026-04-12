@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     max_ats_keywords: int = 80
     keyword_crf_model_path: str = "ml/models/skill_crf.joblib"
     keyword_transformer_model_path: str = "ml/models/skill_bert"
-    jwt_secret: str = "dev_secret_key_change_me_in_prod"
+    jwt_secret: str
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
     cors_origins: list[str] = ["http://localhost:3000"]

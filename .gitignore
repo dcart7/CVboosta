@@ -17,6 +17,9 @@ build/
 *.db
 *.sqlite
 setup_pg_auto.py
+migrate_sqlite_to_pg.py
+migration.log
+*.log
 
 # ML & Data
 ml/models/

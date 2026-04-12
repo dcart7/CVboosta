@@ -49,7 +49,10 @@ async def analyze_cv(
     file: UploadFile = File(...),
     job_description: str = Form(...),
 ) -> AnalysisResponse:
-    file_bytes = await file.read()
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+    file_bytes = await file.read(MAX_FILE_SIZE + 1)
+    if len(file_bytes) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=413, detail="File too large. Maximum size is 5MB.")
     parsed = parse_cv(file_bytes=file_bytes, filename=file.filename or "")
     return AnalysisResponse(
         score=0,
@@ -61,11 +64,15 @@ async def analyze_cv(
 
 @router.post("/upload", response_model=ParsedCvResponse)
 async def upload_cv(file: UploadFile = File(...)) -> ParsedCvResponse:
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+    file_bytes = await file.read(MAX_FILE_SIZE + 1)
+    if len(file_bytes) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=413, detail="File too large. Maximum size is 5MB.")
     try:
-        file_bytes = await file.read()
         parsed = parse_cv(file_bytes=file_bytes, filename=file.filename or "")
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Failed to parse CV file") from exc
+
 
     structured_payload = {
         "skills": parsed.skills,

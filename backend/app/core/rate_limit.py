@@ -44,9 +44,19 @@ _rate_limiter = RateLimiter(
 
 
 def _client_ip(request: Request) -> str:
+    # Prefer secure headers populated by reverse proxies like Nginx/Cloudflare
+    for header in ["cf-connecting-ip", "x-real-ip", "true-client-ip"]:
+        val = request.headers.get(header)
+        if val:
+            return val.strip()
+
     forwarded_for = request.headers.get("x-forwarded-for")
     if forwarded_for:
-        return forwarded_for.split(",")[0].strip()
+        ips = [ip.strip() for ip in forwarded_for.split(",") if ip.strip()]
+        if ips:
+            # Taking the rightmost IP as it is the one appended by the proxy closest to our server
+            return ips[-1]
+
     if request.client and request.client.host:
         return request.client.host
     return "unknown"
