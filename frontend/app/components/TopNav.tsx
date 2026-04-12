@@ -95,6 +95,7 @@ export default function TopNav() {
           <Link href="/app">{t("nav.dashboard")}</Link>
           <Link href="/results">{t("nav.results")}</Link>
           <Link href="/history">{t("nav.history")}</Link>
+          <Link href="/pricing">{t("pricing.title")}</Link>
           <Link href="/about">{t("nav.about")}</Link>
         </nav>
         <div className="nav-actions">

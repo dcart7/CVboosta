@@ -381,6 +381,9 @@ function ResultsContent() {
       setRecommendations(data.recommendations || []);
       setMatchBefore(data.match_before || 0);
       setMatchAfter(data.match_after || 0);
+      setCoverLetter(data.cover_letter || "");
+      setInterviewQuestions(data.interview_questions || []);
+
 
       const email = await fetchWorkspaceEmail(apiBase);
       const wid = workspaceIdFromEmail(email);
@@ -565,6 +568,7 @@ function ResultsContent() {
           job_text: jobText,
           missing_keywords: missing,
           ui_language: language,
+          analysis_id: sessionId ? parseInt(sessionId, 10) : null,
         }),
       });
 
@@ -607,6 +611,7 @@ function ResultsContent() {
           cv_text: cvText,
           job_text: jobText,
           ui_language: language,
+          analysis_id: sessionId ? parseInt(sessionId, 10) : null,
         }),
       });
 

@@ -10,6 +10,7 @@ from app.api.routes.auth import router as auth_router
 from app.api.routes.history import router as history_router
 from app.api.routes.logs import router as logs_router
 from app.api.routes.optimize import router as optimize_router
+from app.api.routes.billing import router as billing_router
 from app.core.api_key import api_key_middleware
 from app.core.rate_limit import rate_limit_middleware
 from app.db.init_db import init_db
@@ -63,6 +64,7 @@ app.include_router(optimize_router, tags=["optimize"])
 app.include_router(logs_router, tags=["logs"])
 app.include_router(auth_router, tags=["auth"])
 app.include_router(history_router, tags=["history"])
+app.include_router(billing_router, prefix="/billing", tags=["billing"])
 
 
 @app.on_event("startup")

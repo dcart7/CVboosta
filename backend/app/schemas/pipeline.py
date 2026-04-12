@@ -46,6 +46,7 @@ class InterviewPrepRequest(BaseModel):
     job_text: str
     missing_keywords: list[str]
     ui_language: str = "en"
+    analysis_id: int | None = None
 
     @field_validator("ui_language", mode="before")
     @classmethod

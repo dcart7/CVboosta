@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
     cors_origins: list[str] = ["http://localhost:3000"]
+    paddle_webhook_secret: str | None = None
 
     @field_validator("cors_origins", mode="before")
     @classmethod

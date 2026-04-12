@@ -233,17 +233,104 @@ _WHITELIST = {
 }
 
 _WHITELIST_NORMALIZE = {
-    "restful api": "REST API",
-    "rest api": "REST API",
+    # APIs & Specs
+    "api": "API",
+    "apis": "APIs",
     "rest": "REST",
-    "django rest framework": "DRF",
+    "restful": "RESTful",
+    "rest api": "REST API",
+    "restful api": "REST API",
+    "graphql": "GraphQL",
+    "grpc": "gRPC",
+    "oauth": "OAuth",
+    "oauth2": "OAuth2",
+    "jwt": "JWT",
+    "openid": "OpenID",
+    "saml": "SAML",
+    "protobuf": "Protobuf",
+    
+    # Python ecosystem
+    "django": "Django",
+    "python": "Python",
+    "fastapi": "FastAPI",
+    "flask": "Flask",
+    "celery": "Celery",
+    "sqlalchemy": "SQLAlchemy",
+    "pydantic": "Pydantic",
+    "pytest": "Pytest",
+    "asyncio": "asyncio",
     "drf": "DRF",
-    "api gateways": "API Gateway",
-    "api gateway": "API Gateway",
+    "django rest framework": "DRF",
+    
+    # Databases
+    "sql": "SQL",
+    "postgresql": "PostgreSQL",
+    "postgres": "PostgreSQL",
+    "mysql": "MySQL",
+    "mariadb": "MariaDB",
+    "mongodb": "MongoDB",
+    "redis": "Redis",
+    "elasticsearch": "Elasticsearch",
+    "opensearch": "OpenSearch",
+    "dynamodb": "DynamoDB",
+    "bigquery": "BigQuery",
+    "snowflake": "Snowflake",
+    "sqlite": "SQLite",
+    "nosql": "NoSQL",
+    
+    # Infrastructure & DevOps
+    "aws": "AWS",
+    "ec2": "EC2",
+    "s3": "S3",
+    "rds": "RDS",
+    "lambda": "Lambda",
+    "eks": "EKS",
     "sqs": "SQS",
     "sns": "SNS",
-    "ec2": "EC2",
-    "aws": "AWS",
+    "gcp": "GCP",
+    "gke": "GKE",
+    "azure": "Azure",
+    "docker": "Docker",
+    "kubernetes": "Kubernetes",
+    "helm": "Helm",
+    "terraform": "Terraform",
+    "ansible": "Ansible",
+    "nginx": "Nginx",
+    "apache": "Apache",
+    "ci/cd": "CI/CD",
+    "ci": "CI",
+    "cd": "CD",
+    "github": "GitHub",
+    "gitlab": "GitLab",
+    
+    # Frontend & Languages
+    "typescript": "TypeScript",
+    "javascript": "JavaScript",
+    "node.js": "Node.js",
+    "react": "React",
+    "next.js": "Next.js",
+    "vite": "Vite",
+    "webpack": "Webpack",
+    "css": "CSS",
+    "html": "HTML",
+    "java": "Java",
+    "kotlin": "Kotlin",
+    "golang": "Go",
+    "go": "Go",
+    "rust": "Rust",
+    "c#": "C#",
+    "c++": "C++",
+    ".net": ".NET",
+    ".net core": ".NET Core",
+    
+    # Tools & Misc
+    "tdd": "TDD",
+    "ruff": "Ruff",
+    "black": "Black",
+    "monitoring": "Monitoring",
+    "logging": "Logging",
+    "billing": "Billing",
+    "subscriptions": "Subscriptions",
     "stripe": "Stripe",
     "paypal": "PayPal",
     "braintree": "Braintree",
@@ -252,13 +339,10 @@ _WHITELIST_NORMALIZE = {
     "ethoca": "Ethoca",
     "cdrn": "CDRN",
     "rdr": "RDR",
-    "django": "Django",
-    "python": "Python",
-    "celery": "Celery",
-    "sql": "SQL",
-    "redis": "Redis",
-    "elasticsearch": "Elasticsearch",
-    "nosql": "NoSQL",
+    "owasp": "OWASP",
+    "sre": "SRE",
+    "slo": "SLO",
+    "sla": "SLA",
 }
 
 
@@ -333,41 +417,81 @@ def normalize_keywords(skills: list[str], limit: int = 30) -> list[str]:
             continue
         for phrase in _split_phrases(str(item)):
             cleaned = phrase.strip()
-            cleaned = re.sub(r"^[^A-Za-z0-9\\+\\#\\.]+|[^A-Za-z0-9\\+\\#\\.]+$", "", cleaned)
-            cleaned = re.sub(r"\s+", " ", cleaned)
+            
+            # Step 1: Check if it's a known tech term (Whitelist) before aggressive cleaning
+            key = cleaned.lower()
+            if key in _WHITELIST:
+                normalized = _WHITELIST_NORMALIZE.get(key, cleaned)
+                norm_key = normalized.lower()
+                if norm_key not in seen:
+                    seen.add(norm_key)
+                    unique.append(normalized)
+                    if len(unique) >= limit:
+                        break
+                continue
+
+            # Step 2: Aggressive cleaning for non-whitelist terms
+            # Remove start/end junk but keep important tech suffixes
+            cleaned = re.sub(r"^[^A-Za-z0-9\\.]+|[^A-Za-z0-9\\+\\.\\#]+$", "", cleaned)
+            
+            # Remove absolute forbidden symbols
+            cleaned = re.sub(r"[\$\%\^\!]", "", cleaned)
+            
+            # Prune repetitive symbols (##tation -> #tation, ++++ -> +)
+            cleaned = re.sub(r"\+{2,}", "+", cleaned)
+            cleaned = re.sub(r"\#{2,}", "#", cleaned)
+            
+            # If a word starts with a symbol, it's likely corruption (e.g., #tation)
+            if cleaned.startswith(("#", "+", "&")):
+                cleaned = cleaned.lstrip("#+&").strip()
+            
+            # Handle '&' - only keep if between words
+            cleaned = re.sub(r"^\s*&\s*", "", cleaned)
+            cleaned = re.sub(r"\s*&\s*$", "", cleaned)
+            
+            cleaned = re.sub(r"\s+", " ", cleaned).strip()
+            
             if not cleaned:
                 continue
+            
+            # Quality checks
             if _is_verb_phrase(cleaned):
                 cleaned = _strip_verb_prefix(cleaned)
+            
             if not re.search(r"[A-Za-z]", cleaned):
                 continue
+                
             if len(cleaned) < 2 and cleaned.lower() not in _ALLOWED_SINGLE:
                 continue
+                
             if len(cleaned.split()) > 5:
                 continue
+                
             if len(cleaned) > 40:
                 continue
+
             key = cleaned.lower()
-            if key in _PHRASE_BLACKLIST:
+            if key in _PHRASE_BLACKLIST or key in STOPWORDS:
                 continue
-            if key not in _WHITELIST:
-                words = re.findall(r"[A-Za-z]+", key)
-                if any(word in _VERB_WORDS for word in words):
-                    continue
-                if len(key) <= 4:
-                    continue
-            if key in STOPWORDS:
-                continue
-            if key in seen:
-                continue
-            if key not in _WHITELIST and _is_verb_phrase(cleaned):
-                continue
-            normalized = _WHITELIST_NORMALIZE.get(key, cleaned)
-            norm_key = normalized.lower()
+            
+            # Final check against whitelist after cleaning
+            if key in _WHITELIST:
+                cleaned = _WHITELIST_NORMALIZE.get(key, cleaned)
+
+            norm_key = cleaned.lower()
             if norm_key in seen:
                 continue
+            
+            # Filter out non-whitelist words that contain verbs or are too short
+            if norm_key not in _WHITELIST:
+                words = re.findall(r"[A-Za-z]+", norm_key)
+                if any(word in _VERB_WORDS for word in words):
+                    continue
+                if len(norm_key) <= 3: # Stricter for non-tech words
+                    continue
+
             seen.add(norm_key)
-            unique.append(normalized)
+            unique.append(cleaned)
             if len(unique) >= limit:
                 break
         if len(unique) >= limit:

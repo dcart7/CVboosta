@@ -1,27 +1,45 @@
-# Python
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+desktop.ini
+
+# Python / Environment
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 .venv/
-workspace.code-workspace
+venv/
+env/
+.env
+.env.*
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
-# Node
+# Node / Frontend
 node_modules/
 .next/
 dist/
 build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Env & Secrets 
-.env
-.env.local
-.env.*.local
+# Database & Migration
 *.db
 *.sqlite
+smart_cv.db
+dev.db
+migration.log
 setup_pg_auto.py
 migrate_sqlite_to_pg.py
-migration.log
-*.log
 
-# ML & Data
+# ML & Models
 ml/models/
 ml/data/
 ml/runs/
@@ -31,9 +49,16 @@ ml/**/*.log
 lightning_logs/
 .ipynb_checkpoints/
 
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
+# IDE / Project
+.idea/
+.vscode/
+*.swp
+*.swo
+workspace.code-workspace
+
+# Temporary / Dummies
 dummy_cv.txt
 backend/dummy_cv.pdf
+temp_cv_*.pdf
+*.webp
+*.png

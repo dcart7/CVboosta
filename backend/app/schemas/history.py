@@ -27,3 +27,5 @@ class HistoryDetailResponse(BaseModel):
     recommendations: list[str]
     match_before: int | None
     match_after: int | None
+    cover_letter: str | None = None
+    interview_questions: list[dict] | None = None

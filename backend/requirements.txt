@@ -12,3 +12,4 @@ python-jose[cryptography]
 email-validator
 joblib
 sklearn-crfsuite
+paddle-sdk

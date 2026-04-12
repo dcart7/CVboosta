@@ -53,6 +53,7 @@ export default function RootLayout({
               "(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.dataset.theme=t;}catch(e){}})();",
           }}
         />
+        <script src="https://cdn.paddle.com/paddle/v2/paddle.js" async></script>
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <LanguageProvider>

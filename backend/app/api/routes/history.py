@@ -66,4 +66,6 @@ def get_history_item(
         recommendations=result.get("recommendations", []),
         match_before=result.get("match_before"),
         match_after=result.get("match_after"),
+        cover_letter=result.get("cover_letter"),
+        interview_questions=result.get("interview_questions"),
     )

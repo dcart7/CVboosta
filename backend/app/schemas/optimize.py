@@ -40,6 +40,7 @@ class CoverLetterRequest(BaseModel):
     cv_text: str = Field(min_length=1, max_length=12000)
     job_text: str = Field(min_length=1, max_length=12000)
     ui_language: str = Field(default="en", max_length=10)
+    analysis_id: int | None = None
 
 
 class CoverLetterResponse(BaseModel):

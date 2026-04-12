@@ -39,6 +39,15 @@ def optimize_cv(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user_optional),
 ) -> OptimizeResponse:
+    if current_user:
+        if not current_user.can_use("scan"):
+            raise HTTPException(status_code=402, detail="Daily scan limit reached. Please upgrade your plan.")
+    else:
+        # For guests, we could either block or allow 1 based on IP, 
+        # but for now let's require login for optimization or treat as free with 0 scans allowed if not logged in.
+        # Actually, let's just enforce that optimization requires login for tracking.
+        raise HTTPException(status_code=401, detail="Authentication required to optimize CV.")
+
     try:
         cleaned_text = clean_job_text(payload.job_text)
         cached = get_keyword_list_by_source_text(db, payload.job_text)
@@ -127,6 +136,8 @@ def optimize_cv(
                 "match_after": match_after,
             },
         )
+        current_user.daily_scans_count += 1
+        db.add(current_user)
         db.add(analysis)
         db.commit()
         record_activity(db, user_id=current_user.id, action="CV optimized", meta={})
@@ -142,10 +153,16 @@ def optimize_cv(
 
 @router.post("/cover-letter", response_model=CoverLetterResponse)
 def optimize_cover_letter(
-    payload: CoverLetterRequest,
+    payload: OptimizeRequest,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user_optional),
 ) -> CoverLetterResponse:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Authentication required.")
+    
+    if not current_user.can_use("cl"):
+        raise HTTPException(status_code=402, detail="Daily Cover Letter limit reached. Please upgrade your plan.")
+
     try:
         content = generate_cover_letter(
             cv_text=payload.cv_text,
@@ -158,6 +175,23 @@ def optimize_cover_letter(
         raise HTTPException(status_code=500, detail="Failed to generate cover letter") from exc
 
     if current_user:
-        record_activity(db, user_id=current_user.id, action="Cover letter generated", meta={})
+        if payload.analysis_id:
+            from sqlalchemy import copy
+            # Update the analysis record with the cover letter
+            analysis = db.query(Analysis).filter(
+                Analysis.id == payload.analysis_id, 
+                Analysis.user_id == current_user.id
+            ).first()
+            if analysis:
+                new_result = dict(analysis.result_json or {})
+                new_result["cover_letter"] = content
+                analysis.result_json = new_result
+                db.add(analysis)
+                db.commit()
+        
+        current_user.daily_cl_count += 1
+        db.add(current_user)
+        db.commit()
+        record_activity(db, user_id=current_user.id, action="Cover letter generated", meta={"analysis_id": payload.analysis_id})
 
     return CoverLetterResponse(content=content)
