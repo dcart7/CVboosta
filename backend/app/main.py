@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.core.config import settings
 from app.api.routes.analyze import router as analyze_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.history import router as history_router
