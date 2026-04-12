@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
+import TopNav from "./components/TopNav";
 
 export default function Error({
   error,
@@ -11,25 +11,30 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    console.error("Global Error Boundary:", error);
   }, [error]);
 
   return (
-    <main className="page" style={{ padding: "2rem", maxWidth: 520, margin: "0 auto" }}>
-      <h1 className="hero-title" style={{ fontSize: "1.5rem" }}>
-        Something went wrong
-      </h1>
-      <p className="hero-subtitle" style={{ marginTop: "0.75rem" }}>
-        The page hit an unexpected error. You can retry, or go back to the dashboard. If the API was
-        starting up, wait a few seconds and try again.
-      </p>
-      <div className="nav-actions" style={{ marginTop: "1.5rem" }}>
-        <button className="btn primary" type="button" onClick={() => reset()}>
-          Try again
-        </button>
-        <Link className="btn ghost" href="/app">
-          Dashboard
-        </Link>
+    <main className="page">
+      <TopNav />
+      <div className="shell" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh" }}>
+        <div className="fade-up" style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "64px", marginBottom: "24px" }}>⚠️</div>
+          <h2 style={{ fontSize: "24px", color: "var(--ink)", marginBottom: "16px" }}>
+            Something went wrong
+          </h2>
+          <p style={{ color: "var(--muted)", marginBottom: "32px", maxWidth: "450px", margin: "0 auto 32px" }}>
+            An unexpected error occurred. We've been notified and are looking into it.
+          </p>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+            <button className="btn primary" onClick={() => reset()}>
+              Try again
+            </button>
+            <a href="/" className="btn ghost">
+              Home
+            </a>
+          </div>
+        </div>
       </div>
     </main>
   );

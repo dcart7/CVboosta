@@ -3,7 +3,7 @@ uvicorn
 pydantic
 pydantic-settings
 sqlalchemy
-psycopg
+psycopg[binary]
 python-multipart
 google-genai
 pdfplumber

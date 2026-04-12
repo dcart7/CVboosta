@@ -16,6 +16,7 @@ build/
 .env.*.local
 *.db
 *.sqlite
+setup_pg_auto.py
 
 # ML & Data
 ml/models/
