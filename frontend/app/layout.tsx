@@ -2,7 +2,7 @@ import { LanguageProvider } from "./lib/LanguageContext";
 import "./globals.css";
 
 export const metadata = {
-  title: "Smart CV Optimizer",
+  title: "CVboosta",
   description: "ATS-friendly CV optimization and honest feedback",
 };
 

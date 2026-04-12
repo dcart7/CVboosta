@@ -68,17 +68,28 @@ export default function TopNav() {
   }, [apiBase]);
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
+    // Clear only CV-related data, keep theme and language
+    const keysToKeep = ["theme", "app_lang"];
+    const allKeys = Object.keys(localStorage);
+    
+    allKeys.forEach((key) => {
+      if (!keysToKeep.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+
     setEmail(null);
     window.dispatchEvent(new Event("auth-change"));
+    // Redirect to home or refresh to clear state
+    window.location.href = "/";
   };
 
   return (
     <header className="nav">
       <div className="nav-inner">
         <Link className="brand" href="/">
-          <span className="brand-mark">CV</span>
-          <span>Smart CV Optimizer</span>
+          <img src="/logo.png" alt="Logo" width={40} height={40} className="brand-logo" />
+          <span>CVboosta</span>
         </Link>
         <nav className="nav-links">
           <Link href="/app">{t("nav.dashboard")}</Link>

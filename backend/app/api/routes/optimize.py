@@ -1,7 +1,17 @@
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.schemas.optimize import OptimizeRequest, OptimizeResponse
-from app.services.llm import LLMServiceError, extract_job_keywords, generate_optimized_cv
+from app.schemas.optimize import (
+    CoverLetterRequest,
+    CoverLetterResponse,
+    OptimizeRequest,
+    OptimizeResponse,
+)
+from app.services.llm import (
+    LLMServiceError,
+    extract_job_keywords,
+    generate_cover_letter,
+    generate_optimized_cv,
+)
 from app.services.matching import compute_match_score
 from app.services.recommendations import build_recommendations
 from app.services.keyword_store import get_keyword_list_by_source_text, save_keyword_list
@@ -128,3 +138,26 @@ def optimize_cv(
         match_before=match_before,
         match_after=match_after,
     )
+
+
+@router.post("/cover-letter", response_model=CoverLetterResponse)
+def optimize_cover_letter(
+    payload: CoverLetterRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user_optional),
+) -> CoverLetterResponse:
+    try:
+        content = generate_cover_letter(
+            cv_text=payload.cv_text,
+            job_text=payload.job_text,
+            ui_language=payload.ui_language,
+        )
+    except LLMServiceError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="Failed to generate cover letter") from exc
+
+    if current_user:
+        record_activity(db, user_id=current_user.id, action="Cover letter generated", meta={})
+
+    return CoverLetterResponse(content=content)

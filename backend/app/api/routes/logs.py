@@ -8,6 +8,8 @@ from app.db.session import get_db
 from app.models.request_log import RequestLog
 from app.schemas.logging import LogSummaryResponse, PathCount, StatusCount
 
+from app.api.routes.auth import get_current_user
+
 router = APIRouter()
 
 
@@ -24,7 +26,10 @@ def _status_class(code: int) -> str:
 
 
 @router.get("/logs/summary", response_model=LogSummaryResponse)
-def logs_summary(db: Session = Depends(get_db)) -> LogSummaryResponse:
+def logs_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> LogSummaryResponse:
     total_requests = db.query(func.count(RequestLog.id)).scalar() or 0
     unique_paths = db.query(func.count(func.distinct(RequestLog.path))).scalar() or 0
     avg_duration = db.query(func.avg(RequestLog.duration_ms)).scalar()

@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev_secret_key_change_me_in_prod"
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
+    cors_origins: list[str] = ["http://localhost:3000"]
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[3] / ".env",

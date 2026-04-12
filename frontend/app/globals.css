@@ -161,16 +161,17 @@ a {
   letter-spacing: -0.02em;
 }
 
-.brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #0a84ff, #6fb3ff);
-  display: grid;
-  place-items: center;
-  color: white;
-  font-weight: 700;
-  box-shadow: 0 8px 20px rgba(10, 132, 255, 0.25);
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+  filter: drop-shadow(0 4px 12px rgba(10, 132, 255, 0.2));
+  transition: transform 0.3s ease;
+}
+
+.brand:hover .brand-logo {
+  transform: scale(1.05) rotate(-2deg);
 }
 
 .nav-links {
@@ -322,11 +323,9 @@ a {
   height: 44px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
-  background: linear-gradient(
-    135deg,
-    var(--glass-hi),
-    var(--surface-2)
-  );
+  background: linear-gradient(135deg,
+      var(--glass-hi),
+      var(--surface-2));
   color: var(--ink);
   cursor: pointer;
   display: inline-flex;
@@ -335,7 +334,7 @@ a {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.05),
     inset 0 1px 1px rgba(255, 255, 255, 0.4);
   position: relative;
@@ -344,7 +343,7 @@ a {
 
 .theme-toggle:hover {
   transform: scale(1.08) rotate(8deg);
-  box-shadow: 
+  box-shadow:
     0 8px 20px rgba(0, 0, 0, 0.1),
     0 0 15px var(--accent-soft);
   border-color: var(--accent);
@@ -359,19 +358,17 @@ a {
 }
 
 [data-theme="dark"] .theme-toggle {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.08),
-    rgba(255, 255, 255, 0.03)
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03));
   border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.3),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .theme-toggle:hover {
-  box-shadow: 
+  box-shadow:
     0 8px 25px rgba(0, 0, 0, 0.4),
     0 0 20px rgba(99, 166, 255, 0.25);
   border-color: rgba(99, 166, 255, 0.5);
@@ -379,9 +376,17 @@ a {
 
 /* Subtle glow pulse for light mode */
 @keyframes sun-glow {
-  0% { box-shadow: 0 0 0 0 rgba(255, 170, 0, 0.2); }
-  70% { box-shadow: 0 0 0 10px rgba(255, 170, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 170, 0, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 170, 0, 0.2);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 170, 0, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 170, 0, 0);
+  }
 }
 
 [data-theme="light"] .theme-toggle:hover {
@@ -530,14 +535,29 @@ a {
   background: var(--pdf-bar-line);
 }
 
+.pdf-preview.template-classic {
+  font-family: "Playfair Display", "Times New Roman", serif;
+}
 .pdf-preview.template-classic .pdf-heading,
 .pdf-preview.template-classic .pdf-bullet-dot {
   --pdf-accent: #111111;
   color: #111111;
 }
+.pdf-preview.template-classic .pdf-title {
+  text-align: center;
+  border-bottom: 2px solid #111111;
+}
 
 .pdf-preview.template-minimal {
   --pdf-accent: #111111;
+}
+.pdf-preview.template-minimal .pdf-heading {
+  border-bottom: none;
+  font-size: 11px;
+}
+.pdf-preview.template-minimal .pdf-title {
+  border-bottom: none;
+  padding-bottom: 0px;
 }
 
 .pdf-preview.template-compact {
@@ -738,11 +758,9 @@ a {
 
 .hero-card {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--glass-hi) 90%, transparent),
-    var(--glass)
-  );
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--glass-hi) 90%, transparent),
+      var(--glass));
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 36px 32px;
@@ -777,11 +795,9 @@ a {
 
 .kpi {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--glass-hi) 86%, transparent),
-    var(--surface)
-  );
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--glass-hi) 86%, transparent),
+      var(--surface));
   border: 1px solid var(--glass-border);
   border-radius: 18px;
   padding: 24px 22px;
@@ -851,11 +867,9 @@ a {
 
 .card {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--glass-hi) 86%, transparent),
-    var(--surface)
-  );
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--glass-hi) 86%, transparent),
+      var(--surface));
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   padding: 26px 24px;
@@ -919,11 +933,9 @@ a {
 
 .form-card {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--glass-hi) 88%, transparent),
-    var(--glass)
-  );
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--glass-hi) 88%, transparent),
+      var(--glass));
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 36px 32px;
@@ -1270,7 +1282,9 @@ a {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner {
@@ -1283,8 +1297,15 @@ a {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fade-in {

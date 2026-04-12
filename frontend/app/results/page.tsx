@@ -51,14 +51,14 @@ type InterviewQuestion = {
 const PDF_TEMPLATES: PdfTemplate[] = [
   {
     id: "modern",
-    name: "Modern",
+    name: "Modern Blue",
     accent: { r: 30, g: 58, b: 138 },
-    marginX: 48,
-    marginY: 56,
-    fontBody: 11,
-    fontHeader: 14,
-    fontTitle: 22,
-    lineGap: 3,
+    marginX: 44,
+    marginY: 54,
+    fontBody: 10.5,
+    fontHeader: 13,
+    fontTitle: 24,
+    lineGap: 3.5,
     titleBar: false,
     footer: true,
     layout: "single",
@@ -66,44 +66,44 @@ const PDF_TEMPLATES: PdfTemplate[] = [
   },
   {
     id: "executive",
-    name: "Executive",
-    accent: { r: 10, g: 132, b: 255 },
+    name: "Executive Gold",
+    accent: { r: 184, g: 134, b: 11 },
     marginX: 50,
     marginY: 64,
     fontBody: 11,
     fontHeader: 13.5,
-    fontTitle: 20,
-    lineGap: 3,
+    fontTitle: 22,
+    lineGap: 3.2,
     titleBar: true,
     footer: true,
     layout: "single",
-    fontFamily: "helvetica",
+    fontFamily: "times",
   },
   {
     id: "classic",
-    name: "Classic",
+    name: "Classic Noir",
     accent: { r: 17, g: 17, b: 17 },
     marginX: 54,
     marginY: 64,
     fontBody: 11,
     fontHeader: 14,
-    fontTitle: 20,
-    lineGap: 3,
+    fontTitle: 22,
+    lineGap: 3.5,
     titleBar: false,
     footer: false,
     layout: "single",
-    fontFamily: "helvetica",
+    fontFamily: "times",
   },
   {
     id: "minimal",
-    name: "Minimal",
-    accent: { r: 17, g: 17, b: 17 },
-    marginX: 62,
-    marginY: 72,
-    fontBody: 11,
-    fontHeader: 13.5,
+    name: "Pure Minimal",
+    accent: { r: 10, g: 132, b: 255 },
+    marginX: 68,
+    marginY: 78,
+    fontBody: 10.5,
+    fontHeader: 12.5,
     fontTitle: 20,
-    lineGap: 3,
+    lineGap: 4,
     titleBar: false,
     footer: false,
     layout: "single",
@@ -111,14 +111,14 @@ const PDF_TEMPLATES: PdfTemplate[] = [
   },
   {
     id: "compact",
-    name: "Compact",
-    accent: { r: 30, g: 58, b: 138 },
-    marginX: 38,
-    marginY: 46,
-    fontBody: 10.25,
-    fontHeader: 12.5,
-    fontTitle: 19,
-    lineGap: 2.5,
+    name: "Compact Pro",
+    accent: { r: 64, g: 64, b: 64 },
+    marginX: 34,
+    marginY: 40,
+    fontBody: 9.75,
+    fontHeader: 11.5,
+    fontTitle: 18,
+    lineGap: 2.2,
     titleBar: false,
     footer: true,
     layout: "single",
@@ -126,14 +126,14 @@ const PDF_TEMPLATES: PdfTemplate[] = [
   },
   {
     id: "noir",
-    name: "Noir",
+    name: "Noir Slate",
     accent: { r: 99, g: 166, b: 255 },
     marginX: 48,
-    marginY: 62,
+    marginY: 60,
     fontBody: 11,
     fontHeader: 13,
-    fontTitle: 20,
-    lineGap: 3,
+    fontTitle: 21,
+    lineGap: 3.5,
     titleBar: true,
     footer: true,
     layout: "single",
@@ -141,11 +141,11 @@ const PDF_TEMPLATES: PdfTemplate[] = [
   },
   {
     id: "sidebar",
-    name: "Sidebar",
-    accent: { r: 10, g: 132, b: 255 },
-    marginX: 46,
-    marginY: 58,
-    fontBody: 10.5,
+    name: "Dual Column",
+    accent: { r: 26, g: 115, b: 232 },
+    marginX: 40,
+    marginY: 50,
+    fontBody: 10.2,
     fontHeader: 12.5,
     fontTitle: 20,
     lineGap: 3,
@@ -156,14 +156,14 @@ const PDF_TEMPLATES: PdfTemplate[] = [
   },
   {
     id: "serif",
-    name: "Serif",
-    accent: { r: 30, g: 58, b: 138 },
+    name: "Serif Elegant",
+    accent: { r: 127, g: 29, b: 29 },
     marginX: 54,
     marginY: 64,
-    fontBody: 11,
-    fontHeader: 13,
-    fontTitle: 22,
-    lineGap: 3,
+    fontBody: 10.5,
+    fontHeader: 12.5,
+    fontTitle: 24,
+    lineGap: 4,
     titleBar: false,
     footer: true,
     layout: "single",
@@ -171,14 +171,14 @@ const PDF_TEMPLATES: PdfTemplate[] = [
   },
   {
     id: "timeline",
-    name: "Timeline",
-    accent: { r: 30, g: 58, b: 138 },
+    name: "Chronological",
+    accent: { r: 8, g: 145, b: 178 },
     marginX: 54,
     marginY: 64,
-    fontBody: 10.75,
+    fontBody: 10.5,
     fontHeader: 13,
     fontTitle: 20,
-    lineGap: 3,
+    lineGap: 3.5,
     titleBar: false,
     footer: true,
     layout: "timeline",
@@ -202,8 +202,8 @@ function sanitizeCvText(input: string): string {
       .replace(/\r\n/g, "\n")
       .replace(/[\x00-\x08\x0B-\x1F\x7F]/g, "")
       .replace(/\*\*(.*?)\*\*/g, "$1")
-      .replace(/^Smart CV Optimizer\s*•\s*Page.*$/gim, "")
-      .replace(/^Smart CV Optimizer\s*•\s*P.*$/gim, "")
+      .replace(/^CVboosta\s*•\s*Page.*$/gim, "")
+      .replace(/^CVboosta\s*•\s*P.*$/gim, "")
       .replace(/[ \t]+/g, " ")
       .replace(/\n{3,}/g, "\n\n")
       .trim()
@@ -229,13 +229,19 @@ function isSectionHeading(line: string): boolean {
     "languages",
     "volunteering",
     "interests",
+    "technical skills",
+    "hard skills",
+    "soft skills",
+    "contact",
   ]);
   if (known.has(key)) return true;
-  if (trimmed.length > 42) return false;
-  const letters = trimmed.replace(/[^A-Za-z]/g, "");
+  if (trimmed.length > 48) return false;
+  
+  // Case-based heuristic for custom headings
+  const letters = trimmed.replace(/[^A-Za-zА-Яа-яЁёІіЇїЄє]/g, "");
   if (letters.length >= 4) {
-    const upperLetters = letters.replace(/[^A-Z]/g, "");
-    if (upperLetters.length / letters.length > 0.85) return true;
+    const upperLetters = letters.replace(/[^A-ZА-ЯЁІЇЄ]/g, "");
+    if (upperLetters.length / letters.length > 0.8) return true;
   }
   return false;
 }
@@ -336,6 +342,9 @@ function ResultsContent() {
   const [prepError, setPrepError] = useState<string | null>(null);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [sessionLoadError, setSessionLoadError] = useState<string | null>(null);
+  const [coverLetter, setCoverLetter] = useState("");
+  const [isLoadingCL, setIsLoadingCL] = useState(false);
+  const [clError, setClError] = useState<string | null>(null);
 
   const sessionId = searchParams.get("id");
 
@@ -577,6 +586,76 @@ function ResultsContent() {
     }
   };
 
+  const fetchCoverLetter = async () => {
+    const email = await fetchWorkspaceEmail(apiBase);
+    const wid = workspaceIdFromEmail(email);
+    const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
+    const cvText = optimizedCv || localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
+    
+    if (!jobText || !cvText) {
+      console.warn("Required text not found for cover letter");
+      return;
+    }
+
+    setIsLoadingCL(true);
+    setClError(null);
+    try {
+      const response = await fetch(`${apiBase}/optimize/cover-letter`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cv_text: cvText,
+          job_text: jobText,
+          ui_language: language,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("genericError");
+      }
+      
+      const data = await response.json();
+      setCoverLetter(data.content || "");
+    } catch (err: any) {
+      console.error("Cover letter error:", err);
+      setClError(err.message || "genericError");
+    } finally {
+      setIsLoadingCL(false);
+    }
+  };
+
+  const downloadCoverLetterPdf = () => {
+    if (!coverLetter) return;
+    try {
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+
+      const margin = 50;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const contentWidth = pageWidth - margin * 2;
+      
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text(t("results.coverLetterTitle"), margin, 60);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      const lines = doc.splitTextToSize(coverLetter, contentWidth);
+      doc.text(lines, margin, 90);
+
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text("Generated by CVboosta", margin, doc.internal.pageSize.getHeight() - 30);
+
+      doc.save(`Cover_Letter_CVboosta.pdf`);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const updateTemplate = (value: PdfTemplateId) => {
     setPdfTemplate(value);
     try {
@@ -623,253 +702,184 @@ function ResultsContent() {
       const ensureSpace = (y: number, neededHeight: number) => {
         if (y + neededHeight <= pageHeight - marginY) return y;
         doc.addPage();
+        // If sidebar, redraw sidebar background
+        if (template.layout === "sidebar") {
+          drawSidebarBg();
+        }
         return marginY;
       };
 
-      const renderWrapped = (text: string, x: number, y: number, fontSize: number) => {
-        doc.setFont(fontFamily, "normal");
+      const drawSidebarBg = () => {
+        if (template.layout !== "sidebar") return;
+        doc.setFillColor(248, 250, 252); // Slate-50
+        doc.rect(0, 0, 180, pageHeight, "F");
+        doc.setDrawColor(226, 232, 240); // Slate-200
+        doc.setLineWidth(0.5);
+        doc.line(180, 0, 180, pageHeight);
+      };
+
+      const renderWrapped = (text: string, x: number, y: number, width: number, fontSize: number, bold = false) => {
+        doc.setFont(fontFamily, bold ? "bold" : "normal");
         doc.setFontSize(fontSize);
-        const lines = doc.splitTextToSize(text, contentWidth - (x - marginX));
+        const wrapped = doc.splitTextToSize(text, width);
         const lineHeight = fontSize + lineGap;
-        let cursorY = y;
-        for (const chunk of lines) {
-          cursorY = ensureSpace(cursorY, lineHeight);
-          doc.text(chunk, x, cursorY);
-          cursorY += lineHeight;
+        let cy = y;
+        for (const chunk of wrapped) {
+          cy = ensureSpace(cy, lineHeight);
+          doc.text(chunk, x, cy);
+          cy += lineHeight;
         }
-        return cursorY;
+        return cy;
       };
 
       const { title: titleLine, sections } = parsedCv;
       let cursorY = marginY;
 
-      if (template.titleBar) {
-        doc.setFillColor(8, 11, 18);
-        doc.rect(0, 0, pageWidth, 86, "F");
-        doc.setFont(fontFamily, "bold");
-        doc.setFontSize(fontTitle);
-        doc.setTextColor(255, 255, 255);
-        doc.text(titleLine.trim().slice(0, 80), marginX, 54);
-        doc.setDrawColor(accent.r, accent.g, accent.b);
-        doc.setLineWidth(2);
-        doc.line(marginX, 66, marginX + 140, 66);
-        doc.setLineWidth(1);
-        doc.setTextColor(0, 0, 0);
-        cursorY = 120;
-      } else {
-        doc.setFont(fontFamily, "bold");
-        doc.setFontSize(fontTitle);
-        doc.setTextColor(17, 17, 17);
-        cursorY = renderWrapped(titleLine.trim().slice(0, 120), marginX, cursorY, fontTitle);
-        cursorY += 8;
-      }
-
-      const drawSection = (heading: string) => {
-        cursorY = ensureSpace(cursorY, fontHeader + 14);
-        doc.setFont(fontFamily, "bold");
-        doc.setFontSize(fontHeader);
-        doc.setTextColor(accent.r, accent.g, accent.b);
-        const headerText = heading.trim().toUpperCase();
-        cursorY = renderWrapped(headerText, marginX, cursorY, fontHeader);
-        doc.setDrawColor(210, 210, 210);
-        doc.line(marginX, cursorY + 4, pageWidth - marginX, cursorY + 4);
-        doc.setTextColor(0, 0, 0);
-        cursorY += 10;
-      };
-
-      const drawBullet = (text: string) => {
-        const indent = 16;
-        const bulletGap = 10;
-        const lineHeight = fontBody + lineGap;
-        cursorY = ensureSpace(cursorY, lineHeight);
-        doc.setFont(fontFamily, "normal");
-        doc.setFontSize(fontBody);
-        doc.setTextColor(accent.r, accent.g, accent.b);
-        doc.text("•", marginX, cursorY);
-        doc.setTextColor(0, 0, 0);
-        const wrapped = doc.splitTextToSize(text, contentWidth - indent - bulletGap);
-        let localY = cursorY;
-        for (const chunk of wrapped) {
-          localY = ensureSpace(localY, lineHeight);
-          doc.text(chunk, marginX + indent, localY);
-          localY += lineHeight;
-        }
-        cursorY = localY;
-      };
-
-      const drawText = (text: string) => {
-        cursorY = renderWrapped(text, marginX, cursorY, fontBody);
-      };
-
+      // START RENDERING
       if (template.layout === "sidebar") {
-        const sidebarWidth = 170;
-        const colGap = 18;
+        drawSidebarBg();
+        const sidebarWidth = 140;
         const leftX = marginX;
-        const rightX = marginX + sidebarWidth + colGap;
-        const rightWidth = pageWidth - marginX - rightX;
+        const mainX = 200 + marginX;
+        const mainWidth = pageWidth - mainX - marginX;
 
-        const inSidebar = (heading: string) => {
-          const key = heading.toLowerCase();
-          return (
-            key.includes("skill") ||
-            key.includes("language") ||
-            key.includes("cert") ||
-            key.includes("award") ||
-            key.includes("contact")
-          );
-        };
+        // Header in main column or top? Let's put header across the top or in main
+        doc.setFont(fontFamily, "bold");
+        doc.setFontSize(fontTitle);
+        doc.setTextColor(30, 41, 59);
+        cursorY = renderWrapped(titleLine.trim(), mainX, cursorY, mainWidth, fontTitle, true);
+        cursorY += 20;
 
-        const leftSections = sections.filter((s) => inSidebar(s.heading));
-        const rightSections = sections.filter((s) => !inSidebar(s.heading));
+        const sidebarSections = sections.filter(s => /skills|lang|contact|cert|award/i.test(s.heading));
+        const mainSections = sections.filter(s => !/skills|lang|contact|cert|award/i.test(s.heading));
 
-        doc.setFillColor(245, 247, 252);
-        doc.rect(marginX - 10, cursorY - 6, sidebarWidth + 20, pageHeight - cursorY - marginY + 12, "F");
-        doc.setDrawColor(220, 227, 240);
-        doc.line(rightX - 9, cursorY - 6, rightX - 9, pageHeight - marginY + 6);
-
-        const renderWrappedCol = (text: string, x: number, y: number, width: number, size: number, bold = false) => {
-          doc.setFont(fontFamily, bold ? "bold" : "normal");
-          doc.setFontSize(size);
-          const lines = doc.splitTextToSize(text, width);
-          const lh = size + lineGap;
-          let cy = y;
-          for (const chunk of lines) {
-            cy = ensureSpace(cy, lh);
-            doc.text(chunk, x, cy);
-            cy += lh;
-          }
-          return cy;
-        };
-
-        let leftY = cursorY;
-        for (const sec of leftSections) {
+        // Let's render sidebar
+        let sy = marginY + 20;
+        for (const sec of sidebarSections) {
           doc.setTextColor(accent.r, accent.g, accent.b);
-          leftY = renderWrappedCol(sec.heading.toUpperCase(), leftX, leftY, sidebarWidth, 10.5, true);
-          doc.setTextColor(0, 0, 0);
-          leftY += 6;
-          for (const raw of sec.lines) {
-            const trimmed = raw.trim();
-            if (!trimmed) { leftY += 6; continue; }
-            const bullet = normalizeBulletLine(trimmed);
-            if (bullet.isBullet) {
-              doc.setTextColor(accent.r, accent.g, accent.b);
-              doc.text("•", leftX, leftY);
-              doc.setTextColor(0, 0, 0);
-              leftY = renderWrappedCol(bullet.text, leftX + 12, leftY, sidebarWidth - 12, 9.75, false);
-            } else {
-              leftY = renderWrappedCol(bullet.text, leftX, leftY, sidebarWidth, 9.75, false);
-            }
+          sy = renderWrapped(sec.heading.toUpperCase(), leftX, sy, sidebarWidth, 10, true);
+          doc.setTextColor(51, 65, 85);
+          sy += 4;
+          for (const line of sec.lines) {
+            if (!line.trim()) { sy += 4; continue; }
+            sy = renderWrapped(line.trim(), leftX, sy, sidebarWidth, 9, false);
+            sy += 2;
           }
-          leftY += 12;
+          sy += 16;
         }
 
-        let rightY = cursorY;
-        const ensureRightSpace = (y: number, needed: number) => {
-          if (y + needed <= pageHeight - marginY) return y;
-          doc.addPage();
-          doc.setFillColor(245, 247, 252);
-          doc.rect(marginX - 10, marginY - 6, sidebarWidth + 20, pageHeight - marginY - marginY + 12, "F");
-          doc.setDrawColor(220, 227, 240);
-          doc.line(rightX - 9, marginY - 6, rightX - 9, pageHeight - marginY + 6);
-          return marginY;
-        };
-
-        const renderWrappedRight = (text: string, x: number, y: number, size: number, bold = false) => {
-          doc.setFont(fontFamily, bold ? "bold" : "normal");
-          doc.setFontSize(size);
-          const lines = doc.splitTextToSize(text, rightWidth);
-          const lh = size + lineGap;
-          let cy = y;
-          for (const chunk of lines) {
-            cy = ensureRightSpace(cy, lh);
-            doc.text(chunk, x, cy);
-            cy += lh;
-          }
-          return cy;
-        };
-
-        for (const sec of rightSections) {
-          rightY = ensureRightSpace(rightY, fontHeader + 14);
-          doc.setFont(fontFamily, "bold");
-          doc.setFontSize(fontHeader);
+        // Main column
+        for (const sec of mainSections) {
           doc.setTextColor(accent.r, accent.g, accent.b);
-          rightY = renderWrappedRight(sec.heading.toUpperCase(), rightX, rightY, fontHeader, true);
-          doc.setTextColor(0, 0, 0);
-          doc.setDrawColor(210, 210, 210);
-          doc.line(rightX, rightY + 4, pageWidth - marginX, rightY + 4);
-          rightY += 12;
+          cursorY = renderWrapped(sec.heading.toUpperCase(), mainX, cursorY, mainWidth, fontHeader, true);
+          doc.setDrawColor(accent.r, accent.g, accent.b);
+          doc.setLineWidth(1);
+          doc.line(mainX, cursorY - 2, mainX + 40, cursorY - 2);
+          cursorY += 10;
+          doc.setTextColor(51, 65, 85);
 
           for (const raw of sec.lines) {
-            const trimmed = raw.trim();
-            if (!trimmed) { rightY = ensureRightSpace(rightY, 10); rightY += 8; continue; }
-            const bullet = normalizeBulletLine(trimmed);
+            const line = raw.trim();
+            if (!line) { cursorY += 6; continue; }
+            const bullet = normalizeBulletLine(line);
             if (bullet.isBullet) {
-              const lh = fontBody + lineGap;
-              rightY = ensureRightSpace(rightY, lh);
-              doc.setFont(fontFamily, "normal");
-              doc.setFontSize(fontBody);
               doc.setTextColor(accent.r, accent.g, accent.b);
-              doc.text("•", rightX, rightY);
-              doc.setTextColor(0, 0, 0);
-              const wrapped = doc.splitTextToSize(bullet.text, rightWidth - 18);
-              let localY = rightY;
-              for (const chunk of wrapped) {
-                localY = ensureRightSpace(localY, lh);
-                doc.text(chunk, rightX + 14, localY);
-                localY += lh;
-              }
-              rightY = localY;
+              doc.text("•", mainX, cursorY + fontBody);
+              doc.setTextColor(51, 65, 85);
+              cursorY = renderWrapped(bullet.text, mainX + 12, cursorY, mainWidth - 12, fontBody, false);
             } else {
-              rightY = renderWrappedRight(bullet.text, rightX, rightY, fontBody, false);
+              cursorY = renderWrapped(line, mainX, cursorY, mainWidth, fontBody, false);
             }
           }
-          rightY += 10;
+          cursorY += 18;
         }
       } else {
-        if (template.layout === "timeline") {
-          doc.setDrawColor(accent.r, accent.g, accent.b);
-          doc.setLineWidth(2);
-          doc.line(marginX - 8, cursorY, marginX - 8, pageHeight - marginY);
-          doc.setLineWidth(1);
-          doc.setDrawColor(0, 0, 0);
+        // Standard Layouts
+        if (template.titleBar) {
+          doc.setFillColor(accent.r, accent.g, accent.b);
+          doc.rect(0, 0, pageWidth, 100, "F");
+          doc.setTextColor(255, 255, 255);
+          doc.setFont(fontFamily, "bold");
+          doc.setFontSize(fontTitle);
+          doc.text(titleLine.trim().slice(0, 50), marginX, 60);
+          cursorY = 130;
+        } else {
+          doc.setTextColor(accent.r, accent.g, accent.b);
+          cursorY = renderWrapped(titleLine.trim(), marginX, cursorY, contentWidth, fontTitle, true);
+          cursorY += 12;
         }
 
         for (const sec of sections) {
-          drawSection(sec.heading);
-          for (const raw of sec.lines) {
-            const line = raw.trimEnd();
-            if (!line.trim()) {
-              cursorY = ensureSpace(cursorY, fontBody + 8);
-              cursorY += 8;
-              continue;
-            }
-            const bullet = normalizeBulletLine(line);
-            if (bullet.isBullet) { drawBullet(bullet.text); continue; }
-            drawText(bullet.text);
+          // Section Heading
+          cursorY = ensureSpace(cursorY, fontHeader + 20);
+          doc.setFont(fontFamily, "bold");
+          doc.setFontSize(fontHeader);
+          doc.setTextColor(accent.r, accent.g, accent.b);
+          
+          if (template.id === "timeline") {
+             doc.setFillColor(accent.r, accent.g, accent.b);
+             doc.circle(marginX - 20, cursorY - 4, 3, "F");
           }
+
+          doc.text(sec.heading.toUpperCase(), marginX, cursorY);
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.5);
+          doc.line(marginX, cursorY + 4, pageWidth - marginX, cursorY + 4);
+          cursorY += 20;
+
+          // Lines
+          doc.setTextColor(30, 41, 59);
+          for (const raw of sec.lines) {
+            const line = raw.trim();
+            if (!line) { cursorY += 8; continue; }
+            
+            const bullet = normalizeBulletLine(line);
+            if (bullet.isBullet) {
+              doc.setTextColor(accent.r, accent.g, accent.b);
+              doc.text("•", marginX + 4, cursorY + fontBody);
+              doc.setTextColor(30, 41, 59);
+              cursorY = renderWrapped(bullet.text, marginX + 18, cursorY, contentWidth - 18, fontBody, false);
+            } else {
+              cursorY = renderWrapped(line, marginX, cursorY, contentWidth, fontBody, false);
+            }
+          }
+          cursorY += 12;
         }
       }
 
+      // Timeline vertical line
+      if (template.id === "timeline") {
+        const pageCount = doc.getNumberOfPages();
+        for (let p = 1; p <= pageCount; p++) {
+          doc.setPage(p);
+          doc.setDrawColor(accent.r, accent.g, accent.b);
+          doc.setLineWidth(1);
+          doc.line(marginX - 20, marginY, marginX - 20, pageHeight - marginY);
+        }
+      }
+
+      // Footer
       if (template.footer) {
         const pageCount = doc.getNumberOfPages();
         for (let page = 1; page <= pageCount; page += 1) {
           doc.setPage(page);
           doc.setFont("helvetica", "normal");
-          doc.setFontSize(9);
-          doc.setTextColor(140, 140, 140);
+          doc.setFontSize(8);
+          doc.setTextColor(148, 163, 184); // Slate-400
           doc.text(
-            `Smart CV Optimizer • Page ${page} / ${pageCount}`,
+            `CVboosta • Page ${page} / ${pageCount}`,
             marginX,
-            pageHeight - marginY + 28,
+            pageHeight - 20,
           );
+          doc.text("Generated by cvboosta.app", pageWidth - marginX - 100, pageHeight - 20);
         }
-        doc.setTextColor(0, 0, 0);
       }
 
-      doc.save(`optimized_cv_${template.id}.pdf`);
+      doc.save(`${titleLine.replace(/\s+/g, "_")}_CVboosta_${template.id}.pdf`);
       setStatus("PDF downloaded.");
     } catch (err) {
-      setStatus(err instanceof Error ? err.message : "Failed to generate PDF.");
+      console.error(err);
+      setStatus("Failed to generate PDF.");
     }
   };
 
@@ -985,8 +995,8 @@ function ResultsContent() {
                       {(parsedCv.sections
                         .filter((s) => /skills|languages|cert|award|contact/i.test(s.heading))
                         .slice(0, 2)
-                      ).map((sec) => (
-                        <div key={`left-${sec.heading}`}>
+                      ).map((sec, idx) => (
+                        <div key={`left-${sec.heading}-${idx}`}>
                           <div className="pdf-heading">{sec.heading}</div>
                           {sec.lines
                             .filter((l) => l.trim())
@@ -1004,8 +1014,8 @@ function ResultsContent() {
                       {(parsedCv.sections
                         .filter((s) => !/skills|languages|cert|award|contact/i.test(s.heading))
                         .slice(0, 3)
-                      ).map((sec) => (
-                        <div key={`right-${sec.heading}`}>
+                      ).map((sec, idx) => (
+                        <div key={`right-${sec.heading}-${idx}`}>
                           <div className="pdf-heading">{sec.heading}</div>
                           {sec.lines
                             .filter((l) => l.trim())
@@ -1100,6 +1110,65 @@ function ResultsContent() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="form-card" style={{ marginTop: "24px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <div style={{ flex: 1 }}>
+                  <h2 className="section-title" style={{ marginBottom: "4px" }}>
+                    {t("results.coverLetterTitle")}
+                  </h2>
+                  <p className="hero-subtitle" style={{ fontSize: "14px", margin: 0, opacity: 0.8 }}>
+                    {t("results.coverLetterSubtitle")}
+                  </p>
+                </div>
+                {!coverLetter && (
+                  <button
+                    className="btn secondary"
+                    onClick={fetchCoverLetter}
+                    disabled={isLoadingCL}
+                    style={{ marginLeft: "16px" }}
+                  >
+                    {isLoadingCL ? t("results.loadingCoverLetter") : t("results.generateCoverLetter")}
+                  </button>
+                )}
+              </div>
+
+              {isLoadingCL && (
+                <div style={{ padding: "30px 0", textAlign: "center" }}>
+                  <div className="spinner" style={{ margin: "0 auto 12px" }}></div>
+                  <p style={{ color: "var(--muted)" }}>{t("results.loadingCoverLetter")}</p>
+                </div>
+              )}
+
+              {coverLetter && (
+                <div className="fade-in">
+                  <div style={{ 
+                    background: "rgba(255, 255, 255, 0.03)", 
+                    border: "1px solid var(--glass-border)", 
+                    padding: "24px", 
+                    borderRadius: "16px",
+                    fontFamily: "var(--font-serif, serif)",
+                    lineHeight: "1.6",
+                    fontSize: "15px",
+                    whiteSpace: "pre-wrap",
+                    color: "var(--ink)"
+                  }}>
+                    {coverLetter}
+                  </div>
+                  <div className="nav-actions" style={{ marginTop: "16px" }}>
+                    <button className="btn ghost" onClick={async () => {
+                      await navigator.clipboard.writeText(coverLetter);
+                      setStatus(t("results.copiedToClipboard") || "Copied");
+                    }}>
+                      {t("results.copyCoverLetter")}
+                    </button>
+                    <button className="btn ghost" onClick={downloadCoverLetterPdf}>
+                      {t("results.downloadCoverLetterPdf")}
+                    </button>
+                  </div>
+                </div>
+              )}
           </div>
 
           <div id="interview-prep-section" className="form-card" style={{ marginTop: "24px" }}>

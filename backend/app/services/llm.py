@@ -236,6 +236,36 @@ def generate_interview_prep(
     return data.get("questions", [])
 
 
+def generate_cover_letter(
+    cv_text: str,
+    job_text: str,
+    ui_language: str = "en",
+) -> str:
+    cv_text = _truncate(cv_text, settings.max_cv_chars)
+    job_text = _truncate(job_text, settings.max_job_chars)
+    lang_key = (ui_language or "en").strip().lower()
+    output_language = _UI_LANGUAGE_NAMES.get(lang_key, "English")
+
+    prompt = (
+        "You are a professional Career Coach and expert Cover Letter Writer.\n\n"
+        "GOAL:\n"
+        "Write a concise, compelling, and highly targeted cover letter (max 250 words) "
+        "based on the candidate's CV and the specific job description.\n\n"
+        "INSTRUCTIONS:\n"
+        "1. Highlight 2-3 specific achievements from the CV that directly solve the pain points in the job description.\n"
+        "2. Match the tone of the company if possible (professional but modern).\n"
+        "3. Ensure the structure includes: Opening Hook, Value Proposition, and Call to Action.\n"
+        f"4. WRITE THE ENTIRE LETTER IN {output_language}.\n\n"
+        "CV:\n"
+        f"{cv_text}\n\n"
+        "JOB DESCRIPTION:\n"
+        f"{job_text}\n\n"
+        "COVER LETTER:"
+    )
+
+    return _generate_text_with_gemini(prompt)
+
+
 def _generate_with_gemini(
     cv_text: str,
     job_text: str,
