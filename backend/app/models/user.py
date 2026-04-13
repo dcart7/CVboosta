@@ -38,6 +38,9 @@ class User(Base):
         return False
 
     def get_limits(self) -> dict:
+        if self.email == "dcartheartist@gmail.com":
+            return {"scans": 999999, "cl": 999999, "prep": 999999}
+            
         # Tiers: free, single, go, pro, lifetime
         # Go: 15 per day
         # Single: 1 scan/cl/prep total (enforced by status/one-time logic)

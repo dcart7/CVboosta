@@ -15,7 +15,12 @@ queries = [
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_tier VARCHAR DEFAULT 'free';",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS paddle_customer_id VARCHAR;",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS paddle_subscription_id VARCHAR;",
-    "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_active_until TIMESTAMP WITH TIME ZONE;"
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_active_until TIMESTAMP WITH TIME ZONE;",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS daily_scans_count INTEGER DEFAULT 0;",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS daily_cl_count INTEGER DEFAULT 0;",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS daily_prep_count INTEGER DEFAULT 0;",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR;",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_usage_reset TIMESTAMP WITH TIME ZONE;"
 ]
 
 with engine.begin() as conn:

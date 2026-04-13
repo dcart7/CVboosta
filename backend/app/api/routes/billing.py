@@ -76,9 +76,13 @@ async def paddle_webhook(
 
 @router.get("/status")
 def get_subscription_status(current_user: User = Depends(get_current_user)):
+    tier = current_user.subscription_tier
+    if current_user.email == "dcartheartist@gmail.com":
+        tier = "lifetime"
+
     # Simple endpoint to return tier and limits
     return {
-        "tier": current_user.subscription_tier,
+        "tier": tier,
         "limits": current_user.get_limits(),
         "usage": {
             "scans": current_user.daily_scans_count,

@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    database_url: str = "sqlite:///./smart_cv.db"
+    database_url: str
     llm_provider: str = "gemini"
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-2.5-flash"

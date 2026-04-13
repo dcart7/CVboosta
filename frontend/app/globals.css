@@ -133,38 +133,32 @@ a {
 }
 
 .nav {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 72px;
-  background: rgba(10, 13, 20, 0.7);
-  backdrop-filter: blur(20px) saturate(160%);
-  border-bottom: 1px solid var(--glass-border);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
+  backdrop-filter: blur(18px) saturate(160%);
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--glass-hi) 85%, transparent),
+      var(--nav-bg));
+  border-bottom: 1px solid var(--line);
+  z-index: 20;
 }
 
 .nav-inner {
   width: min(1200px, 100%);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 800;
-  font-size: 20px;
-  color: var(--ink);
-  text-decoration: none;
-  flex-shrink: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .brand-logo {
@@ -182,63 +176,30 @@ a {
 
 .nav-links {
   display: flex;
-  gap: 24px;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: var(--ink);
-  opacity: 0.6;
-  font-weight: 500;
+  gap: 20px;
   font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.nav-links a:hover {
-  opacity: 1;
-  color: var(--accent);
+  color: var(--muted);
 }
 
 .nav-actions {
   display: flex;
-  align-items: center;
   gap: 12px;
-  flex-shrink: 1;
-  min-width: 0;
-  flex-wrap: nowrap;
-}
-
-.user-nav, .auth-btns {
-  display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 1;
-  min-width: 0;
-}
-
-.user-identity {
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid var(--glass-border) !important;
-  padding: 6px 12px !important;
-  border-radius: 10px !important;
-}
-
-.logout-btn {
-  padding: 6px 12px !important;
-  font-size: 13px !important;
-  flex-shrink: 0;
-}
-
-.nav-actions.main-actions,
-.history-actions {
-  margin-top: 20px;
   flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.nav-actions.main-actions {
+  margin-top: 10px;
+}
+
+.history-actions {
+  margin-top: 32px;
+}
+
+/* Nav bar actions — no extra top margin */
+.nav-inner .nav-actions {
+  margin-top: 0;
 }
 
 .lang-switcher {
