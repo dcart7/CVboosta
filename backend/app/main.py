@@ -85,9 +85,9 @@ app.include_router(billing_router, prefix="/billing", tags=["billing"])
 
 @app.on_event("startup")
 def on_startup() -> None:
-    import threading
-    # Run DB init in a background thread to prevent blocking port binding during deployment
-    threading.Thread(target=init_db, daemon=True).start()
+    # We no longer run init_db here to ensure fastest possible port binding for Cloud Run health checks.
+    # DB initialization is handled lazily in get_db().
+    pass
 
 
 @app.get("/health")
