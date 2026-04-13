@@ -54,7 +54,6 @@ class Settings(BaseSettings):
         return [i.strip() for i in v.split(",") if i.strip()]
 
     model_config = SettingsConfigDict(
-        env_file=Path(__file__).resolve().parents[3] / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
