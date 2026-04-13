@@ -1,3 +1,4 @@
+from typing import Any
 from pathlib import Path
 
 from pydantic import field_validator
@@ -32,7 +33,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "temporary_secret_for_deployment_change_me"
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
-    cors_origins: list[str] = ["*"]
+    cors_origins: Any = ["*"]
     paddle_webhook_secret: str | None = None
 
     @field_validator("cors_origins", mode="before")
