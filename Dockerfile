@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     libgomp1 \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Since context is mapped to root (.), we must copy from the nested backend folder
