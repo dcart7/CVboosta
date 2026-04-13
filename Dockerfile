@@ -30,4 +30,5 @@ EXPOSE 8000
 
 # Cloud Run requires the server to listen on $PORT
 # We use a shell-exec form to ensure $PORT is expanded
-CMD exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 2 --proxy-headers
+# Run uvicorn with a single worker for better stability in Cloud Run (constrained memory)
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --proxy-headers"]
