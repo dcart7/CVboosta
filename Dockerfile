@@ -5,6 +5,8 @@ WORKDIR /app
 # Ensure tzdata and basic compiling tools are available if needed
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    libpq-dev \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Since context is mapped to root (.), we must copy from the nested backend folder
