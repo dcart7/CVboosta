@@ -85,11 +85,15 @@ app.include_router(billing_router, prefix="/billing", tags=["billing"])
 
 @app.on_event("startup")
 def on_startup() -> None:
+    print("STARTUP: Application is booting...")
+    print(f"STARTUP: Database URL present: {settings.database_url is not None}")
+    print(f"STARTUP: CORS Origins: {settings.get_cors_origins()}")
     # We no longer run init_db here to ensure fastest possible port binding for Cloud Run health checks.
     # DB initialization is handled lazily in get_db().
+    print("STARTUP: Boot process complete. Ready for requests.")
     pass
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "environment": "production"}

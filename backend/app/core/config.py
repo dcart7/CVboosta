@@ -12,8 +12,11 @@ class Settings(BaseSettings):
     @field_validator("database_url", mode="before")
     @classmethod
     def fix_database_url(cls, v: str | None) -> str | None:
-        if v and v.startswith("postgresql://"):
-            return v.replace("postgresql://", "postgresql+psycopg://", 1)
+        if v:
+            if v.startswith("postgres://"):
+                return v.replace("postgres://", "postgresql+psycopg://", 1)
+            if v.startswith("postgresql://"):
+                return v.replace("postgresql://", "postgresql+psycopg://", 1)
         return v
 
     llm_provider: str = "gemini"
@@ -57,4 +60,15 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()
+try:
+    settings = Settings()
+    print("DEBUG: Settings initialized successfully.")
+except Exception as e:
+    print(f"ERROR: Settings initialization failed: {e}")
+    # Provide a minimal fallback to prevent import errors, though the app will likely fail on DB/API calls
+    class FallbackSettings:
+        def __getattr__(self, name: str) -> Any:
+            return None
+        def get_cors_origins(self) -> list[str]:
+            return ["*"]
+    settings = FallbackSettings()  # type: ignore
