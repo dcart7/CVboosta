@@ -1,7 +1,8 @@
+import os
 from typing import Any
 from pathlib import Path
 
-from pydantic import field_validator
+from pydantic import field_validator, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -33,24 +34,21 @@ class Settings(BaseSettings):
     jwt_secret: str = "temporary_secret_for_deployment_change_me"
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
-    cors_origins: Any = "*"
+    # Use manual env loading for CORS to bypass Pydantic-settings JSON issues
+    cors_origins_raw: str = os.getenv("CORS_ORIGINS", "*")
     paddle_webhook_secret: str | None = None
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def assemble_cors_origins(cls, v: Any) -> list[str] | str:
-        print(f"DEBUG: assemble_cors_origins received value: {v} (type: {type(v)})")
-        if isinstance(v, str):
-            if v.strip() == "*":
-                return ["*"]
-            if v.startswith("[") and v.endswith("]"):
-                import json
-                try:
-                    return json.loads(v)
-                except:
-                    pass
-            return [i.strip() for i in v.split(",") if i.strip()]
-        return v
+    def get_cors_origins(self) -> list[str]:
+        v = self.cors_origins_raw
+        if not v or v.strip() == "*":
+            return ["*"]
+        if v.startswith("[") and v.endswith("]"):
+            import json
+            try:
+                return json.loads(v)
+            except:
+                pass
+        return [i.strip() for i in v.split(",") if i.strip()]
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[3] / ".env",
