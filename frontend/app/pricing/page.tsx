@@ -20,18 +20,36 @@ const CheckIcon = ({ className }: { className?: string }) => (
 export default function PricingPage() {
   const { t } = useTranslation();
   const [billingCycle, setBillingCycle] = useState<"week" | "month">("month");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== "undefined" && (window as any).Paddle) {
-      (window as any).Paddle.Setup({ vendor: 12345 });
+      const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "test_74843068e2f89ca230553bb1802";
+      
+      // Set environment if it's a test token
+      if (paddleToken.startsWith('test_')) {
+        (window as any).Paddle.Environment.set('sandbox');
+      }
+      
+      (window as any).Paddle.Initialize({ 
+        token: paddleToken
+      });
     }
   }, []);
 
   const openCheckout = (priceId: string) => {
     if (typeof window !== "undefined" && (window as any).Paddle) {
       (window as any).Paddle.Checkout.open({
-        product: priceId,
-        email: localStorage.getItem("user_email") || undefined,
+        items: [
+          {
+            priceId: priceId,
+            quantity: 1,
+          },
+        ],
+        customer: {
+          email: localStorage.getItem("user_email") || undefined,
+        },
       });
     } else {
       alert("Paddle billing service is loading. Please try again in a moment.");
@@ -67,6 +85,7 @@ export default function PricingPage() {
       ],
       cta: t("pricing.ctaUpgrade"),
       badge: t("pricing.mostPopular"),
+      discount: billingCycle === "month" ? t("pricing.savePercent").replace("{{percent}}", "33") : null,
       highlight: true,
       style: "hunted",
     },
@@ -82,6 +101,7 @@ export default function PricingPage() {
       ],
       cta: t("pricing.ctaUpgrade"),
       badge: t("pricing.bestValue"),
+      discount: billingCycle === "month" ? t("pricing.savePercent").replace("{{percent}}", "50") : null,
       style: "pro",
     },
     {
@@ -110,20 +130,24 @@ export default function PricingPage() {
           <h1 className="gradient-text">{t("pricing.title")}</h1>
           <p className="pricing-subtitle">{t("pricing.subtitle")}</p>
 
-          <div className="billing-switch">
-             <button 
-               onClick={() => setBillingCycle("week")}
-               className={billingCycle === "week" ? "active" : ""}
-             >
-               Weekly
-             </button>
-             <button 
-               onClick={() => setBillingCycle("month")}
-               className={billingCycle === "month" ? "active" : ""}
-             >
-               Monthly
-             </button>
-          </div>
+          {!mounted ? (
+            <div style={{ height: "64px" }} />
+          ) : (
+            <div className="billing-switch">
+               <button 
+                 onClick={() => setBillingCycle("week")}
+                 className={billingCycle === "week" ? "active" : ""}
+               >
+                 Weekly
+               </button>
+               <button 
+                 onClick={() => setBillingCycle("month")}
+                 className={billingCycle === "month" ? "active" : ""}
+               >
+                 Monthly
+               </button>
+            </div>
+          )}
         </header>
 
         <div className="pricing-grid">
@@ -138,6 +162,9 @@ export default function PricingPage() {
 
               <div className="card-top">
                 <h3 className="tier-name">{tier.name}</h3>
+                {mounted && tier.discount && (
+                  <div className="discount-badge">{tier.discount}</div>
+                )}
                 <div className="price-block">
                   <span className="currency">$</span>
                   <span className="amount">{tier.price.replace("$", "")}</span>
@@ -167,10 +194,10 @@ export default function PricingPage() {
         </div>
 
         <section className="enterprise-box">
-           <h2>Enterprise / Teams?</h2>
-           <p>Looking for custom limits or volume licenses for your organization?</p>
-           <button className="contact-link">
-             Contact Sales →
+           <h2>{t("pricing.enterpriseTitle")}</h2>
+           <p>{t("pricing.enterpriseSubtitle")}</p>
+           <button className="contact-link" onClick={() => window.location.href = "mailto:sales@cvboosta.com"}>
+             {t("pricing.contactSales")}
            </button>
         </section>
       </div>
@@ -178,8 +205,9 @@ export default function PricingPage() {
       <style jsx>{`
         .pricing-container {
           min-height: 100vh;
-          background: #ffffff;
-          color: #111;
+          background: radial-gradient(circle at 15% 10%, var(--bg-page-spot-a), var(--bg-page-base) 40%),
+                      radial-gradient(circle at 85% 10%, var(--bg-page-spot-b), transparent 40%);
+          color: var(--ink);
           position: relative;
         }
 
@@ -199,11 +227,11 @@ export default function PricingPage() {
           font-weight: 900;
           margin-bottom: 16px;
           letter-spacing: -2px;
-          color: #000;
+          color: var(--ink);
         }
         .pricing-subtitle {
           font-size: 1.2rem;
-          color: #666;
+          color: var(--muted);
           max-width: 600px;
           margin: 0 auto;
           line-height: 1.5;
@@ -211,11 +239,12 @@ export default function PricingPage() {
 
         .billing-switch {
           display: inline-flex;
-          background: #f4f4f7;
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(12px);
           padding: 4px;
           border-radius: 100px;
           margin-top: 32px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--line);
         }
         .billing-switch button {
           padding: 10px 28px;
@@ -225,13 +254,13 @@ export default function PricingPage() {
           cursor: pointer;
           transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           background: transparent;
-          color: #666;
+          color: var(--muted);
           border: none;
         }
         .billing-switch button.active {
-          background: #ffffff;
-          color: #000;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          background: var(--glass-hi);
+          color: var(--ink);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
 
         .pricing-grid {
@@ -242,29 +271,34 @@ export default function PricingPage() {
         }
 
         .pricing-card {
-          background: #ffffff;
-          border: 1px solid #eef2f6;
+          background: linear-gradient(135deg, 
+                      color-mix(in srgb, var(--glass-hi) 86%, transparent), 
+                      var(--surface));
+          backdrop-filter: blur(18px) saturate(140%);
+          border: 1px solid var(--glass-border);
           border-radius: 24px;
           padding: 40px 30px;
           display: flex;
           flex-direction: column;
           position: relative;
           transition: 0.3s cubic-bezier(0.2, 0, 0, 1);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+          box-shadow: var(--card-shadow);
         }
         .pricing-card:hover {
           transform: translateY(-8px);
-          border-color: #3b82f6;
-          box-shadow: 0 30px 60px rgba(59, 130, 246, 0.12);
+          border-color: var(--accent);
+          box-shadow: var(--shadow-hover);
         }
 
         .pricing-card.highlight {
-          border-color: #3b82f6;
-          background: #f8fbff;
+          border-color: var(--accent);
+          background: linear-gradient(135deg, 
+                      color-mix(in srgb, var(--accent-soft) 20%, var(--glass-hi)), 
+                      var(--surface));
         }
         
         .pricing-card.pro {
-          background: #fff;
+           /* specialized look if needed, otherwise stays glass */
         }
 
         .badge-tag {
@@ -272,7 +306,7 @@ export default function PricingPage() {
           top: -12px;
           left: 50%;
           transform: translateX(-50%);
-          background: #3b82f6;
+          background: var(--accent);
           color: #fff;
           padding: 6px 16px;
           border-radius: 100px;
@@ -280,14 +314,14 @@ export default function PricingPage() {
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 1px;
-          box-shadow: 0 8px 16px rgba(59, 130, 246, 0.25);
+          box-shadow: var(--primary-shadow);
           white-space: nowrap;
+          z-index: 2;
         }
 
         .pro .badge-tag {
-          background: #000;
-          color: #fff;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+          background: var(--ink);
+          color: var(--paper);
         }
         
         .premium .badge-tag {
@@ -301,8 +335,18 @@ export default function PricingPage() {
         .tier-name {
           font-size: 1.4rem;
           font-weight: 800;
-          margin-bottom: 12px;
-          color: #000;
+          margin-bottom: 8px;
+          color: var(--ink);
+        }
+        .discount-badge {
+          display: inline-block;
+          background: var(--accent-soft);
+          color: var(--accent);
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          margin-bottom: 16px;
         }
         .price-block {
           display: flex;
@@ -312,17 +356,17 @@ export default function PricingPage() {
         .currency {
           font-size: 1.2rem;
           font-weight: 600;
-          color: #000;
+          color: var(--ink);
         }
         .amount {
           font-size: 3.5rem;
           font-weight: 900;
           letter-spacing: -2px;
-          color: #000;
+          color: var(--ink);
         }
         .cycle {
           font-size: 0.9rem;
-          color: #666;
+          color: var(--muted);
         }
 
         .feature-list {
@@ -337,14 +381,14 @@ export default function PricingPage() {
           gap: 12px;
           margin-bottom: 14px;
           font-size: 0.85rem;
-          color: #444;
+          color: var(--muted);
           line-height: 1.4;
         }
         .check-wrapper {
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: rgba(59, 130, 246, 0.1);
+          background: var(--accent-soft);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -353,7 +397,7 @@ export default function PricingPage() {
         .check-icon {
           width: 12px;
           height: 12px;
-          color: #3b82f6;
+          color: var(--accent);
         }
 
         .cta-button {
@@ -368,16 +412,16 @@ export default function PricingPage() {
         }
         
         .basic .cta-button {
-          background: #f4f4f7;
-          color: #000;
+          background: var(--surface-2);
+          color: var(--ink);
         }
         .hunted .cta-button {
-          background: #3b82f6;
+          background: var(--accent);
           color: #fff;
         }
         .pro .cta-button {
-          background: #000;
-          color: #fff;
+          background: var(--ink);
+          color: var(--paper);
         }
         .premium .cta-button {
           background: #eab308;
@@ -390,7 +434,7 @@ export default function PricingPage() {
 
         .premium {
           border-color: #fef08a;
-          background: #fffdf5;
+          background: var(--warm);
         }
         .premium .check-wrapper { background: rgba(234, 179, 8, 0.15); }
         .premium .check-icon { color: #eab308; }
@@ -398,23 +442,27 @@ export default function PricingPage() {
         .enterprise-box {
           margin-top: 80px;
           padding: 60px;
-          background: #f9fafb;
+          background: linear-gradient(135deg, 
+                      color-mix(in srgb, var(--glass-hi) 80%, transparent), 
+                      var(--glass));
+          backdrop-filter: blur(20px) saturate(150%);
           border-radius: 32px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--glass-border);
           text-align: center;
         }
         .enterprise-box h2 {
           font-size: 2rem;
           font-weight: 800;
           margin-bottom: 12px;
+          color: var(--ink);
         }
         .enterprise-box p {
-          color: #666;
+          color: var(--muted);
           margin-bottom: 32px;
         }
         .contact-link {
           background: transparent;
-          color: #3b82f6;
+          color: var(--accent);
           font-weight: 800;
           font-size: 1.1rem;
           cursor: pointer;
