@@ -326,6 +326,7 @@ def interview_prep_route(
     if current_user:
         if payload.analysis_id:
             from app.models.analysis import Analysis
+            from sqlalchemy.orm.attributes import flag_modified
             analysis = db.query(Analysis).filter(
                 Analysis.id == payload.analysis_id,
                 Analysis.user_id == current_user.id
@@ -334,6 +335,7 @@ def interview_prep_route(
                 new_result = dict(analysis.result_json or {})
                 new_result["interview_questions"] = questions
                 analysis.result_json = new_result
+                flag_modified(analysis, "result_json")
                 db.add(analysis)
                 db.commit()
                 

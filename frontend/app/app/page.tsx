@@ -48,6 +48,18 @@ export default function WorkspacePage() {
     useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  
+  useEffect(() => {
+    if (!isOptimizing) {
+      setLoadingStep(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setLoadingStep((prev) => Math.min(prev + 1, 3)); // stay at step 3 until finished
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [isOptimizing]);
   const [keywordCache, setKeywordCache] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState("");
   const [keywordSource, setKeywordSource] = useState("");
@@ -449,6 +461,10 @@ export default function WorkspacePage() {
         "recommendations",
         JSON.stringify(data.recommendations || []),
       );
+      localStorage.setItem(
+        "added_keywords",
+        JSON.stringify(data.added_keywords || []),
+      );
       if (typeof data.match_before === "number") {
         localStorage.setItem("match_before", String(data.match_before));
       }
@@ -458,7 +474,13 @@ export default function WorkspacePage() {
       setOptimizedSummary((data.optimized_cv || "").split("\n")[0] || "—");
       setRecommendations(data.recommendations || []);
       setOptimizeStatus("Optimization complete.");
-      router.push("/results");
+      if (data.analysis_id) {
+        // Automatically inject the ID into localStorage so when /results mounts, it has a fallback if search params fail
+        localStorage.setItem("current_analysis_id", String(data.analysis_id));
+        router.push(`/results?id=${data.analysis_id}`);
+      } else {
+        router.push("/results");
+      }
     } catch (err) {
       console.error("Optimization error:", err);
       setOptimizeStatus(
@@ -628,8 +650,23 @@ export default function WorkspacePage() {
             </div>
             {optimizeStatus && <p>{optimizeStatus}</p>}
             {isOptimizing && (
-              <div className="progress" role="status" aria-live="polite">
-                <span className="progress-bar" />
+              <div className="progress-container" style={{ marginTop: "15px" }}>
+                <div className="progress" role="status" aria-live="polite">
+                  <span className="progress-bar" />
+                </div>
+                <p className="loading-step-text" style={{ textAlign: "center", marginTop: "12px", fontSize: "14px", fontWeight: "500", color: "var(--accent-color)", animation: "pulse 2s infinite" }}>
+                  {loadingStep === 0 && t("dashboard.loadingStep1")}
+                  {loadingStep === 1 && t("dashboard.loadingStep2")}
+                  {loadingStep === 2 && t("dashboard.loadingStep3")}
+                  {loadingStep >= 3 && t("dashboard.loadingStep4")}
+                </p>
+                <style jsx>{`
+                  @keyframes pulse {
+                    0% { opacity: 0.6; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.6; }
+                  }
+                `}</style>
               </div>
             )}
           </div>
@@ -675,9 +712,45 @@ export default function WorkspacePage() {
             {recommendations.length > 0 && (
               <div className="card">
                 <h3>{t("dashboard.topRecommendations")}</h3>
-                <p>{recommendations.slice(0, 2).join(" · ")}</p>
+                <p>{recommendations.slice(0, 2).map(item => {
+                  let translatedItem = item;
+                  if (item.includes("Tighten bullet points")) translatedItem = t("dashboard.rec1");
+                  else if (item.includes("Align the Summary")) translatedItem = t("dashboard.rec2");
+                  else if (item.includes("Ensure Skills section mirrors")) translatedItem = t("dashboard.rec3");
+                  else if (item.includes("Highlight your strongest")) translatedItem = t("dashboard.rec4");
+                  else if (item.startsWith("Add a bullet that demonstrates hands-on experience with ")) {
+                    const skill = item.replace("Add a bullet that demonstrates hands-on experience with ", "").replace(".", "");
+                    translatedItem = t("dashboard.recSkill").replace("{skill}", skill);
+                  }
+                  return translatedItem;
+                }).join(" · ")}</p>
               </div>
             )}
+          </div>
+        </section>
+
+        <section className="testimonials-section fade-up" style={{ marginTop: "4rem", marginBottom: "2rem" }}>
+          <h2 className="section-title" style={{ textAlign: "center", marginBottom: "2rem" }}>
+            {t("testimonials.title")}
+          </h2>
+          <div className="marquee-wrapper">
+            <div className="marquee-track">
+              {[1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6].map((num, idx) => (
+                <div key={`${num}-${idx}`} className="card testi-card">
+                  <p style={{ fontStyle: "italic", opacity: 0.9, marginBottom: "1.5rem" }}>
+                     "{t(`testimonials.quote${num}`)}"
+                  </p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: "12px", color: "white" }}>
+                      {t(`testimonials.author${num}`)[0]}
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: "600", opacity: 0.8 }}>
+                      {t(`testimonials.author${num}`)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </div>

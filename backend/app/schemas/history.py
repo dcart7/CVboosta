@@ -24,6 +24,7 @@ class HistoryDetailResponse(BaseModel):
     optimized_cv: str
     job_description: str
     missing_skills: list[str]
+    added_keywords: list[str] = []
     recommendations: list[str]
     match_before: int | None
     match_after: int | None

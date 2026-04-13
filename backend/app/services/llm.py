@@ -14,7 +14,7 @@ from app.schemas.keywords import KeywordExtractionResult
 
 logger = logging.getLogger(__name__)
 
-_GEMINI_FALLBACK_MODELS = ("gemini-2.5-flash",)
+_GEMINI_FALLBACK_MODELS = ("gemini-2.0-flash", "gemini-flash-latest")
 
 # BCP-47-style codes from the frontend LanguageContext
 _UI_LANGUAGE_NAMES: dict[str, str] = {
@@ -54,7 +54,7 @@ def _generate_content_with_fallback(
     model: str,
     contents: str,
 ) -> typing.Any:
-    last_error: genai_errors.ClientError | None = None
+    last_error: Exception | None = None
     for candidate in _candidate_models(model):
         try:
             return _safe_generate_content(
@@ -62,6 +62,13 @@ def _generate_content_with_fallback(
                 model=candidate,
                 contents=contents,
             )
+        except tenacity.RetryError as exc:
+            last_error = exc
+            logger.warning(
+                "Gemini model retries exhausted (%s). Trying fallback if available.",
+                candidate,
+            )
+            continue
         except genai_errors.ClientError as exc:
             message = str(exc)
             last_error = exc
@@ -72,6 +79,7 @@ def _generate_content_with_fallback(
                 )
                 continue
             raise
+    
     if last_error is not None:
         raise last_error
     raise genai_errors.ClientError("Gemini model selection failed")
@@ -99,8 +107,8 @@ def _is_retryable_error(exception: Exception) -> bool:
 
 @tenacity.retry(
     retry=tenacity.retry_if_exception(_is_retryable_error),
-    stop=tenacity.stop_after_attempt(3),
-    wait=tenacity.wait_exponential(multiplier=1, min=2, max=10),
+    stop=tenacity.stop_after_attempt(5),
+    wait=tenacity.wait_exponential(multiplier=1.5, min=2, max=20),
     before_sleep=tenacity.before_sleep_log(logger, logging.WARNING),
 )
 def _safe_generate_content(client: genai.Client, model: str, contents: str) -> typing.Any:
@@ -130,6 +138,7 @@ def generate_optimized_cv(
     ats_keywords: list[str] | None = None,
     target_role: str | None = None,
     target_company: str | None = None,
+    forced_keywords: list[str] | None = None,
 ) -> LLMResult:
     cv_text = _truncate(cv_text, settings.max_cv_chars)
     job_text = _truncate(job_text, settings.max_job_chars)
@@ -145,6 +154,7 @@ def generate_optimized_cv(
         ats_keywords=ats_keywords,
         target_role=target_role,
         target_company=target_company,
+        forced_keywords=forced_keywords,
     )
 
 
@@ -256,7 +266,8 @@ def generate_cover_letter(
         "2. Match the tone of the company if possible (professional but modern).\n"
         "3. Ensure the structure includes: Opening Hook, Value Proposition, and Call to Action.\n"
         "4. LANGUAGE REQUIREMENT: Detect the primary language of the JOB DESCRIPTION provided below. "
-        "WRITE THE ENTIRE COVER LETTER IN THAT SAME LANGUAGE.\n\n"
+        "WRITE THE ENTIRE COVER LETTER IN THAT SAME LANGUAGE.\n"
+        "5. NO MARKDOWN: Output strictly as plain text. Do not use asterisks (**) or bolding.\n\n"
         "CV:\n"
         f"{cv_text}\n\n"
         "JOB DESCRIPTION:\n"
@@ -275,6 +286,7 @@ def _generate_with_gemini(
     ats_keywords: list[str] | None,
     target_role: str | None,
     target_company: str | None,
+    forced_keywords: list[str] | None = None,
 ) -> LLMResult:
     if not settings.gemini_api_key:
         raise LLMServiceError("GEMINI_API_KEY is not set", status_code=500)
@@ -299,6 +311,19 @@ def _generate_with_gemini(
         company = (target_company or "").strip() or "—"
         target_block = f"Target role: {role}\nTarget company: {company}\n\n"
 
+    forced_block = ""
+    if forced_keywords:
+        f_cleaned = [kw.strip() for kw in forced_keywords if kw.strip()]
+        if f_cleaned:
+            forced_block = (
+                "CRITICAL MISSING KEYWORDS (MUST INCLUDE):\n"
+                + " · ".join(f_cleaned)
+                + "\n\n"
+                "WARNING: The previous generation failed to include the above keywords. "
+                "You MUST figure out a way to weave them naturally into the CV text without hallucinating new jobs. "
+                "If it's a technical skill, add it to the Skills section if nowhere else fits.\n\n"
+            )
+
     prompt = (
         "You are an expert CV optimization assistant. Your goal is to rewrite the input CV to achieve a MANDATORY >90% ATS match score with the provided Job Description.\n\n"
         "GOAL: Ensure the final CV is mathematically optimized for ATS keyword scanners while remaining professional for human recruiters.\n\n"
@@ -310,6 +335,7 @@ def _generate_with_gemini(
         "5. OUTPUT ONLY the final optimized CV text. No intro, no summary, no closing.\n\n"
         f"{target_block}"
         f"{keyword_block}"
+        f"{forced_block}"
         f"INPUT CV:\n{cv_text}\n\n"
         f"JOB DESCRIPTION:\n{job_text}\n\n"
         "OPTIMIZED CV (TARGET >95% FOR GUARANTEED 90%+ SCORE):"

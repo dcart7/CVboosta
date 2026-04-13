@@ -20,6 +20,17 @@ export default function RegisterPage() {
 
   const submit = async () => {
     setError("");
+    
+    // Password security validation
+    const hasNumber = /\d/.test(password);
+    const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const isLongEnough = password.length >= 10;
+
+    if (!isLongEnough || !hasNumber || !hasSymbol) {
+      setError("Password is too weak. Must be at least 10 characters and include a number and a symbol.");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetchWithRetry(

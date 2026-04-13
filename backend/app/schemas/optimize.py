@@ -31,9 +31,11 @@ class OptimizeResponse(BaseModel):
     optimized_cv: str
     feedback: str
     missing_skills: list[str]
+    added_keywords: list[str] = []
     recommendations: list[str]
     match_before: int | None = None
     match_after: int | None = None
+    analysis_id: int | None = None
 
 
 class CoverLetterRequest(BaseModel):

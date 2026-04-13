@@ -132,6 +132,12 @@ a {
   padding: 32px 24px 80px;
 }
 
+@media (max-width: 768px) {
+  .shell {
+    padding: 16px 16px 60px;
+  }
+}
+
 .nav {
   position: sticky;
   top: 0;
@@ -183,10 +189,20 @@ a {
 
 .nav-actions {
   display: flex;
-  gap: 12px;
   align-items: center;
-  flex-wrap: wrap;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+@media (max-width: 640px) {
+  .nav-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .nav-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .nav-actions.main-actions {
@@ -732,9 +748,18 @@ a {
 
 .hero {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 32px;
-  padding: 64px 0 40px;
+  padding: 80px 0 48px;
   align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 32px;
+    gap: 40px;
+  }
 }
 
 .hero-title {
@@ -749,11 +774,38 @@ a {
   color: rgba(242, 244, 248, 0.97);
 }
 
+.pricing-subtitle {
+  font-size: 1.1rem;
+  color: var(--muted);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .hero-title, .gradient-text {
+    font-size: 2.2rem !important;
+    letter-spacing: -1px;
+  }
+  .hero-subtitle, .pricing-subtitle {
+    font-size: 1rem !important;
+  }
+}
+
 .hero-subtitle {
   font-size: 18px;
   color: var(--muted);
   margin: 0 0 28px;
-  max-width: 560px;
+  max-width: 900px;
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .hero-subtitle {
+    font-size: 16px;
+  }
 }
 
 .hero-card {
@@ -878,6 +930,13 @@ a {
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .card, .form-card, .hero-card {
+    padding: 20px 16px !important;
+    border-radius: 16px;
+  }
+}
+
 .card h3 {
   margin: 0 0 8px;
 }
@@ -967,6 +1026,14 @@ a {
   font-family: inherit;
   background: var(--input-bg);
   color: var(--ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 48px;
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.1);
 }
 
 .textarea {
@@ -981,6 +1048,10 @@ a {
   display: grid;
   gap: 8px;
   background: var(--upload-bg);
+  cursor: pointer;
+  min-height: 120px;
+  align-content: center;
+  text-align: center;
 }
 
 .upload.is-dragging {
@@ -1025,18 +1096,26 @@ a {
   gap: 24px;
 }
 
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 999px;
-  background: rgba(10, 132, 255, 0.10);
-  border: 1px solid rgba(10, 132, 255, 0.20);
-  color: #0a57cc;
-  font-size: 13px;
-  font-weight: 700;
+  background: #eef3ff;
+  border: 1px solid rgba(10, 132, 255, 0.15);
+  color: #0a84ff;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: 0.01em;
+  margin-bottom: 24px;
 }
 
 [data-theme="dark"] .pill {
@@ -1098,6 +1177,38 @@ a {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease,
     border-color 0.2s ease, background-color 0.2s ease;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 132, 255, 0.08);
+  border: 1px solid rgba(10, 132, 255, 0.15);
+  color: var(--accent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .tag {
+    padding: 8px 14px;
+    font-size: 14px;
+  }
 }
 
 .mini-btn:hover {
@@ -1141,10 +1252,18 @@ a {
   cursor: pointer;
   padding: 0;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
 .tag-remove:hover {
   color: var(--tag-remove-hover);
+  background: rgba(100, 116, 139, 0.1);
 }
 
 .tag-remove::before {
@@ -1193,6 +1312,33 @@ a {
 
 .history-row:last-child {
   border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .history-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--glass-border);
+  }
+  .history-row strong {
+    display: none; /* Hide header row on mobile */
+  }
+  .history-row > div {
+    display: flex;
+    justify-content: space-between;
+    text-align: left !important;
+  }
+  .history-row > div:before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
 }
 
 .modal-backdrop {
@@ -1321,4 +1467,92 @@ a {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: var(--accent) !important;
   transform: translateY(-2px);
+}
+
+/* MARQUEE TESTIMONIALS */
+.marquee-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: marquee 45s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.testi-card {
+  width: 400px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem !important;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 10px)); }
+}
+
+/* On mobile, disable animation and enable manual touch scrolling */
+@media (max-width: 768px) {
+  .marquee-wrapper {
+    overflow-x: auto;
+    mask-image: none;
+    -webkit-mask-image: none;
+    scroll-snap-type: x mandatory;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .marquee-track {
+    animation: none;
+    width: auto;
+  }
+  .testi-card {
+    width: 280px;
+    scroll-snap-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title, .gradient-text {
+    font-size: 1.8rem !important;
+  }
+  .shell {
+    padding: 0 16px;
+  }
+  .form-card {
+    padding: 24px 16px !important;
+  }
+}
+
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-only {
+  /* No display: contents here! It was breaking the button styles. */
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: initial !important;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+  
+  .section {
+    margin-top: 32px;
+  }
 }

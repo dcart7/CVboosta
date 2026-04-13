@@ -339,6 +339,7 @@ function ResultsContent() {
   const { t, language } = useTranslation();
   const [optimizedCv, setOptimizedCv] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
+  const [addedKeywords, setAddedKeywords] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [matchBefore, setMatchBefore] = useState<number | null>(null);
   const [matchAfter, setMatchAfter] = useState<number | null>(null);
@@ -356,6 +357,7 @@ function ResultsContent() {
   const [isLoadingCL, setIsLoadingCL] = useState(false);
   const [clError, setClError] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<"document" | "metrics">("document");
 
   const sessionId = searchParams.get("id");
 
@@ -389,12 +391,12 @@ function ResultsContent() {
       const data = await res.json();
       setOptimizedCv(data.optimized_cv || "");
       setMissing(data.missing_skills || []);
+      setAddedKeywords(data.added_keywords || []);
       setRecommendations(data.recommendations || []);
       setMatchBefore(data.match_before || 0);
       setMatchAfter(data.match_after || 0);
       setCoverLetter(data.cover_letter || "");
       setInterviewQuestions(data.interview_questions || []);
-
 
       const email = await fetchWorkspaceEmail(apiBase);
       const wid = workspaceIdFromEmail(email);
@@ -402,6 +404,7 @@ function ResultsContent() {
 
       localStorage.setItem("optimized_cv", data.optimized_cv || "");
       localStorage.setItem("missing_skills", JSON.stringify(data.missing_skills || []));
+      localStorage.setItem("added_keywords", JSON.stringify(data.added_keywords || []));
       localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
       localStorage.setItem("match_before", (data.match_before || 0).toString());
       localStorage.setItem("match_after", (data.match_after || 0).toString());
@@ -445,9 +448,11 @@ function ResultsContent() {
 
       const storedCv = localStorage.getItem("optimized_cv") || "";
       let storedMissing: string[] = [];
+      let storedAdded: string[] = [];
       let storedRecs: string[] = [];
       try {
         storedMissing = JSON.parse(localStorage.getItem("missing_skills") || "[]");
+        storedAdded = JSON.parse(localStorage.getItem("added_keywords") || "[]");
         storedRecs = JSON.parse(localStorage.getItem("recommendations") || "[]");
       } catch (e) {
         console.error("Failed to parse storage:", e);
@@ -456,6 +461,7 @@ function ResultsContent() {
       const storedAfter = localStorage.getItem("match_after");
       setOptimizedCv(storedCv);
       setMissing(storedMissing);
+      setAddedKeywords(storedAdded);
       setRecommendations(storedRecs);
       if (storedBefore !== null && !Number.isNaN(Number(storedBefore))) {
         setMatchBefore(Number(storedBefore));
@@ -537,13 +543,7 @@ function ResultsContent() {
     return `${joined.slice(0, limit).trim()}…`;
   }, [previewBlocks]);
 
-  const normalizedOptimized = optimizedCv.toLowerCase();
-  const addedKeywords = missing.filter((skill) =>
-    normalizedOptimized.includes(skill.toLowerCase()),
-  );
-  const remainingKeywords = missing.filter(
-    (skill) => !normalizedOptimized.includes(skill.toLowerCase()),
-  );
+  const remainingKeywords = missing;
 
   const copyCv = async () => {
     if (!optimizedCv) {
@@ -741,7 +741,6 @@ function ResultsContent() {
         if (!trimmed) return { isBullet: false, text: "" };
         const match = trimmed.match(/^([•\-\*●○■□])\s+(.*)$/);
         if (match) return { isBullet: true, text: match[2].trim() };
-        // Handle cases where there's no space after bullet
         const matchNoSpace = trimmed.match(/^([•\-\*●○■□])(.*)$/);
         if (matchNoSpace) return { isBullet: true, text: matchNoSpace[2].trim() };
         return { isBullet: false, text: trimmed };
@@ -750,7 +749,6 @@ function ResultsContent() {
       const ensureSpace = (y: number, neededHeight: number) => {
         if (y + neededHeight <= pageHeight - marginY) return y;
         doc.addPage();
-        // If sidebar, redraw sidebar background
         if (template.layout === "sidebar") {
           drawSidebarBg();
         }
@@ -759,9 +757,9 @@ function ResultsContent() {
 
       const drawSidebarBg = () => {
         if (template.layout !== "sidebar") return;
-        doc.setFillColor(248, 250, 252); // Slate-50
+        doc.setFillColor(248, 250, 252); 
         doc.rect(0, 0, 180, pageHeight, "F");
-        doc.setDrawColor(226, 232, 240); // Slate-200
+        doc.setDrawColor(226, 232, 240); 
         doc.setLineWidth(0.5);
         doc.line(180, 0, 180, pageHeight);
       };
@@ -783,7 +781,6 @@ function ResultsContent() {
       const { title: titleLine, sections } = parsedCv;
       let cursorY = marginY;
 
-      // START RENDERING
       if (template.layout === "sidebar") {
         drawSidebarBg();
         const sidebarWidth = 140;
@@ -791,7 +788,6 @@ function ResultsContent() {
         const mainX = 200 + marginX;
         const mainWidth = pageWidth - mainX - marginX;
 
-        // Header in main column or top? Let's put header across the top or in main
         doc.setFont(fontFamily, "bold");
         doc.setFontSize(fontTitle);
         doc.setTextColor(30, 41, 59);
@@ -801,7 +797,6 @@ function ResultsContent() {
         const sidebarSections = sections.filter(s => /skills|lang|contact|cert|award/i.test(s.heading));
         const mainSections = sections.filter(s => !/skills|lang|contact|cert|award/i.test(s.heading));
 
-        // Let's render sidebar
         let sy = marginY + 20;
         for (const sec of sidebarSections) {
           doc.setTextColor(accent.r, accent.g, accent.b);
@@ -816,7 +811,6 @@ function ResultsContent() {
           sy += 16;
         }
 
-        // Main column
         for (const sec of mainSections) {
           doc.setTextColor(accent.r, accent.g, accent.b);
           cursorY = renderWrapped(sec.heading.toUpperCase(), mainX, cursorY, mainWidth, fontHeader, true);
@@ -842,7 +836,6 @@ function ResultsContent() {
           cursorY += 18;
         }
       } else {
-        // Standard Layouts
         if (template.titleBar) {
           doc.setFillColor(accent.r, accent.g, accent.b);
           doc.rect(0, 0, pageWidth, 100, "F");
@@ -859,7 +852,6 @@ function ResultsContent() {
         }
 
         for (const sec of sections) {
-          // Section Heading
           cursorY = ensureSpace(cursorY, fontHeader + 20);
           doc.setFont(fontFamily, "bold");
           doc.setFontSize(fontHeader);
@@ -876,7 +868,6 @@ function ResultsContent() {
           doc.line(marginX, cursorY + 4, pageWidth - marginX, cursorY + 4);
           cursorY += 20;
 
-          // Lines
           doc.setTextColor(30, 41, 59);
           for (const raw of sec.lines) {
             const line = raw.trim();
@@ -896,7 +887,6 @@ function ResultsContent() {
         }
       }
 
-      // Timeline vertical line
       if (template.id === "timeline") {
         const pageCount = doc.getNumberOfPages();
         for (let p = 1; p <= pageCount; p++) {
@@ -907,14 +897,13 @@ function ResultsContent() {
         }
       }
 
-      // Footer
       if (template.footer) {
         const pageCount = doc.getNumberOfPages();
         for (let page = 1; page <= pageCount; page += 1) {
           doc.setPage(page);
           doc.setFont("helvetica", "normal");
           doc.setFontSize(8);
-          doc.setTextColor(148, 163, 184); // Slate-400
+          doc.setTextColor(148, 163, 184); 
           doc.text(
             `CVboosta • Page ${page} / ${pageCount}`,
             marginX,
@@ -932,7 +921,6 @@ function ResultsContent() {
     }
   };
 
-  // suppress unused warning
   void activeTemplate;
 
   return (
@@ -985,183 +973,211 @@ function ResultsContent() {
         </div>
       )}
       <div className="shell hide-print">
+        <div className="mobile-only" style={{ marginBottom: "20px" }}>
+           <div style={{ display: "flex", background: "var(--surface-2)", padding: "4px", borderRadius: "12px", gap: "4px" }}>
+              <button 
+                className="btn" 
+                style={{ flex: 1, padding: "8px", borderRadius: "8px", background: activeTab === 'document' ? 'var(--accent)' : 'transparent', color: activeTab === 'document' ? 'white' : 'var(--muted)', border: 'none' }}
+                onClick={() => setActiveTab('document')}
+              >
+                {t("results.optimizedCv")}
+              </button>
+              <button 
+                className="btn" 
+                style={{ flex: 1, padding: "8px", borderRadius: "8px", background: activeTab === 'metrics' ? 'var(--accent)' : 'transparent', color: activeTab === 'metrics' ? 'white' : 'var(--muted)', border: 'none' }}
+                onClick={() => setActiveTab('metrics')}
+              >
+                {t("results.resultMetrics")}
+              </button>
+           </div>
+        </div>
+
         <section className="split fade-up">
-          <div className="hero-card">
+          <div className={`hero-card ${activeTab === 'document' ? "" : "desktop-only"}`}>
             <h2 className="section-title">{t("results.optimizedCv")}</h2>
-            <div className="grid">
-              <div className="kpi">
-                <h3>{matchBefore !== null ? `${matchBefore}%` : "—"}</h3>
-                <p>{t("results.fitBefore")}</p>
+              <div className="grid">
+                <div className="kpi">
+                  <h3>{matchBefore !== null ? `${matchBefore}%` : "—"}</h3>
+                  <p>{t("results.fitBefore")}</p>
+                </div>
+                <div className="kpi">
+                  <h3>{matchAfter !== null ? `${matchAfter}%` : "—"}</h3>
+                  <p>{t("results.fitAfter")}</p>
+                </div>
               </div>
-              <div className="kpi">
-                <h3>{matchAfter !== null ? `${matchAfter}%` : "—"}</h3>
-                <p>{t("results.fitAfter")}</p>
+              <div className={`result-box${showFullCv ? " is-expanded" : ""}`}>
+                <div className="result-box-head">
+                  <h3>{t("results.summary")}</h3>
+                  <button
+                    className="mini-btn"
+                    type="button"
+                    onClick={() => setShowFullCv((value) => !value)}
+                    disabled={!cleanedCv}
+                  >
+                    {showFullCv ? t("results.collapse") : t("results.expand")}
+                  </button>
+                </div>
+                <p className="summary-snippet">{compactSummary || "—"}</p>
+                {showFullCv && (
+                  <div className="cv-full" aria-label="Full optimized CV">
+                    {cleanedCv.split(/\r?\n/).map((line, idx) => (
+                      <div key={`cv-${idx}`}>{line}</div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-            <div className={`result-box${showFullCv ? " is-expanded" : ""}`}>
-              <div className="result-box-head">
-                <h3>{t("results.summary")}</h3>
-                <button
-                  className="mini-btn"
-                  type="button"
-                  onClick={() => setShowFullCv((value) => !value)}
-                  disabled={!cleanedCv}
-                >
-                  {showFullCv ? t("results.collapse") : t("results.expand")}
-                </button>
-              </div>
-              <p className="summary-snippet">{compactSummary || "—"}</p>
-              {showFullCv && (
-                <div className="cv-full" aria-label="Full optimized CV">
-                  {cleanedCv.split(/\r?\n/).map((line, idx) => (
-                    <div key={`cv-${idx}`}>{line}</div>
+              <div className="section">
+                <h3 className="section-title">{t("results.pdfTemplate")}</h3>
+                <div className="template-picker" role="group" aria-label="PDF template">
+                  {PDF_TEMPLATES.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`chip${item.id === pdfTemplate ? " is-active" : ""}`}
+                      onClick={() => updateTemplate(item.id)}
+                    >
+                      {item.name}
+                    </button>
                   ))}
                 </div>
-              )}
-            </div>
-            <div className="section">
-              <h3 className="section-title">{t("results.pdfTemplate")}</h3>
-              <div className="template-picker" role="group" aria-label="PDF template">
-                {PDF_TEMPLATES.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className={`chip${item.id === pdfTemplate ? " is-active" : ""}`}
-                    onClick={() => updateTemplate(item.id)}
-                  >
-                    {item.name}
-                  </button>
-                ))}
+                <div className={`pdf-preview template-${pdfTemplate}`} aria-label="PDF preview">
+                  {pdfTemplate === "sidebar" ? (
+                    <>
+                      <div className="pdf-col sidebar">
+                        <div className="pdf-title">{parsedCv.title}</div>
+                        {(parsedCv.sections
+                          .filter((s) => /skills|languages|cert|award|contact/i.test(s.heading))
+                          .slice(0, 2)
+                        ).map((sec, idx) => (
+                          <div key={`left-${sec.heading}-${idx}`}>
+                            <div className="pdf-heading">{sec.heading}</div>
+                            {sec.lines
+                              .filter((l) => l.trim())
+                              .slice(0, 6)
+                              .map((line, idx) => (
+                                <div className="pdf-bullet" key={`lb-${idx}`}>
+                                  <span className="pdf-bullet-dot">•</span>
+                                  <span>{line.replace(/^(?:[•\-\*]+)\s+/, "")}</span>
+                                </div>
+                              ))}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="pdf-col">
+                        {(parsedCv.sections
+                          .filter((s) => !/skills|languages|cert|award|contact/i.test(s.heading))
+                          .slice(0, 3)
+                        ).map((sec, idx) => (
+                          <div key={`right-${sec.heading}-${idx}`}>
+                            <div className="pdf-heading">{sec.heading}</div>
+                            {sec.lines
+                              .filter((l) => l.trim())
+                              .slice(0, 8)
+                              .map((line, idx) => (
+                                <div className="pdf-text" key={`rt-${idx}`}>
+                                  {line.replace(/^(?:[•\-\*]+)\s+/, "")}
+                                </div>
+                              ))}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    previewBlocks.slice(0, 28).map((block, idx) => {
+                      if (block.type === "spacer") return <div className="pdf-spacer" key={`s-${idx}`} />;
+                      if (block.type === "title") return <div className="pdf-title" key={`t-${idx}`}>{block.text}</div>;
+                      if (block.type === "heading") return <div className="pdf-heading" key={`h-${idx}`}>{block.text}</div>;
+                      if (block.type === "bullet") return (
+                        <div className="pdf-bullet" key={`b-${idx}`}>
+                          <span className="pdf-bullet-dot">•</span>
+                          <span>{block.text}</span>
+                        </div>
+                      );
+                      return <div className="pdf-text" key={`p-${idx}`}>{block.text}</div>;
+                    })
+                  )}
+                </div>
               </div>
-              <div className={`pdf-preview template-${pdfTemplate}`} aria-label="PDF preview">
-                {previewBlocks.length === 0 && (
-                  <div className="pdf-preview-empty">—</div>
-                )}
-                {pdfTemplate === "sidebar" ? (
-                  <>
-                    <div className="pdf-col sidebar">
-                      <div className="pdf-title">{parsedCv.title}</div>
-                      {(parsedCv.sections
-                        .filter((s) => /skills|languages|cert|award|contact/i.test(s.heading))
-                        .slice(0, 2)
-                      ).map((sec, idx) => (
-                        <div key={`left-${sec.heading}-${idx}`}>
-                          <div className="pdf-heading">{sec.heading}</div>
-                          {sec.lines
-                            .filter((l) => l.trim())
-                            .slice(0, 6)
-                            .map((line, idx) => (
-                              <div className="pdf-bullet" key={`lb-${idx}`}>
-                                <span className="pdf-bullet-dot">•</span>
-                                <span>{line.replace(/^(?:[•\-\*]+)\s+/, "")}</span>
-                              </div>
-                            ))}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="pdf-col">
-                      {(parsedCv.sections
-                        .filter((s) => !/skills|languages|cert|award|contact/i.test(s.heading))
-                        .slice(0, 3)
-                      ).map((sec, idx) => (
-                        <div key={`right-${sec.heading}-${idx}`}>
-                          <div className="pdf-heading">{sec.heading}</div>
-                          {sec.lines
-                            .filter((l) => l.trim())
-                            .slice(0, 8)
-                            .map((line, idx) => (
-                              <div className="pdf-text" key={`rt-${idx}`}>
-                                {line.replace(/^(?:[•\-\*]+)\s+/, "")}
-                              </div>
-                            ))}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  previewBlocks.slice(0, 28).map((block, idx) => {
-                    if (block.type === "spacer") return <div className="pdf-spacer" key={`s-${idx}`} />;
-                    if (block.type === "title") return <div className="pdf-title" key={`t-${idx}`}>{block.text}</div>;
-                    if (block.type === "heading") return <div className="pdf-heading" key={`h-${idx}`}>{block.text}</div>;
-                    if (block.type === "bullet") return (
-                      <div className="pdf-bullet" key={`b-${idx}`}>
-                        <span className="pdf-bullet-dot">•</span>
-                        <span>{block.text}</span>
+              <div className="nav-actions main-actions">
+                <button className="btn primary" onClick={copyCv}>
+                  {t("results.copyFullCv")}
+                </button>
+                <button className="btn secondary" onClick={downloadPdf}>
+                  {t("results.downloadPdf")}
+                </button>
+              </div>
+              {status && <p>{status}</p>}
+            </div>
+
+          <div className={`metrics-column ${activeTab === 'metrics' ? "" : "desktop-only"}`}>
+            <div className="form-card">
+              <h2 className="section-title">{t("results.resultMetrics")}</h2>
+              <div className="grid">
+                <div className="kpi">
+                  <h3>{missing.length}</h3>
+                  <p>{t("results.missingKeywords")}</p>
+                </div>
+                <div className="kpi">
+                  <h3>{recommendations.length}</h3>
+                  <p>{t("results.recommendations")}</p>
+                </div>
+              </div>
+              <div className="section">
+                <h3 className="section-title">{t("results.missingKeywordsTitle")}</h3>
+                <div className="tag-list">
+                  {missing.length === 0 && <span className="tag">—</span>}
+                  {missing.map((item, idx) => (
+                    <span className="tag" key={`miss-${idx}`}>{item}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="section">
+                <h3 className="section-title">{t("results.recommendationsTitle")}</h3>
+                <div className="steps">
+                  {recommendations.length === 0 && (
+                    <div className="step"><span>1</span><p>—</p></div>
+                  )}
+                  {recommendations.map((item, index) => {
+                    let translatedItem = item;
+                    if (item.includes("Tighten bullet points")) translatedItem = t("dashboard.rec1");
+                    else if (item.includes("Align the Summary")) translatedItem = t("dashboard.rec2");
+                    else if (item.includes("Ensure Skills section mirrors")) translatedItem = t("dashboard.rec3");
+                    else if (item.includes("Highlight your strongest")) translatedItem = t("dashboard.rec4");
+                    else if (item.startsWith("Add a bullet that demonstrates hands-on experience with ")) {
+                      const skill = item.replace("Add a bullet that demonstrates hands-on experience with ", "").replace(".", "");
+                      translatedItem = t("dashboard.recSkill").replace("{skill}", skill);
+                    }
+                    return (
+                      <div className="step" key={`rec-${index}`}>
+                        <span>{index + 1}</span>
+                        <p>{translatedItem}</p>
                       </div>
                     );
-                    return <div className="pdf-text" key={`p-${idx}`}>{block.text}</div>;
-                  })
-                )}
+                  })}
+                </div>
               </div>
-            </div>
-            <div className="nav-actions main-actions">
-              <button className="btn primary" onClick={copyCv}>
-                {t("results.copyFullCv")}
-              </button>
-              <button className="btn ghost" onClick={downloadPdf}>
-                {t("results.downloadPdf")}
-              </button>
-            </div>
-            {status && <p>{status}</p>}
-          </div>
-
-          <div className="form-card">
-            <h2 className="section-title">{t("results.resultMetrics")}</h2>
-            <div className="grid">
-              <div className="kpi">
-                <h3>{missing.length}</h3>
-                <p>{t("results.missingKeywords")}</p>
-              </div>
-              <div className="kpi">
-                <h3>{recommendations.length}</h3>
-                <p>{t("results.recommendations")}</p>
-              </div>
-            </div>
-            <div className="section">
-              <h3 className="section-title">{t("results.missingKeywordsTitle")}</h3>
-              <div className="tag-list">
-                {missing.length === 0 && <span className="tag">—</span>}
-                {missing.map((item, idx) => (
-                  <span className="tag" key={`miss-${idx}`}>{item}</span>
-                ))}
-              </div>
-            </div>
-            <div className="section">
-              <h3 className="section-title">{t("results.recommendationsTitle")}</h3>
-              <div className="steps">
-                {recommendations.length === 0 && (
-                  <div className="step"><span>1</span><p>—</p></div>
-                )}
-                {recommendations.map((item, index) => (
-                  <div className="step" key={`rec-${index}`}>
-                    <span>{index + 1}</span>
-                    <p>{item}</p>
+              <div className="section">
+                <h3 className="section-title">{t("results.appliedChanges")}</h3>
+                <div className="steps">
+                  <div className="step">
+                    <span>1</span>
+                    <p>
+                      {t("results.addedKeywords")}{" "}
+                      {addedKeywords.length > 0 ? addedKeywords.join(" · ") : "—"}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="section">
-              <h3 className="section-title">{t("results.appliedChanges")}</h3>
-              <div className="steps">
-                <div className="step">
-                  <span>1</span>
-                  <p>
-                    {t("results.addedKeywords")}{" "}
-                    {addedKeywords.length > 0 ? addedKeywords.join(" · ") : "—"}
-                  </p>
-                </div>
-                <div className="step">
-                  <span>2</span>
-                  <p>
-                    {t("results.stillMissing")}{" "}
-                    {remainingKeywords.length > 0 ? remainingKeywords.join(" · ") : "—"}
-                  </p>
+                  <div className="step">
+                    <span>2</span>
+                    <p>
+                      {t("results.stillMissing")}{" "}
+                      {remainingKeywords.length > 0 ? remainingKeywords.join(" · ") : "—"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="form-card" style={{ marginTop: "24px" }}>
+            <div className="form-card" style={{ marginTop: "24px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                 <div style={{ flex: 1 }}>
                   <h2 className="section-title" style={{ marginBottom: "4px" }}>
@@ -1182,14 +1198,12 @@ function ResultsContent() {
                   </button>
                 )}
               </div>
-
               {isLoadingCL && (
                 <div style={{ padding: "30px 0", textAlign: "center" }}>
                   <div className="spinner" style={{ margin: "0 auto 12px" }}></div>
                   <p style={{ color: "var(--muted)" }}>{t("results.loadingCoverLetter")}</p>
                 </div>
               )}
-
               {coverLetter && (
                 <div className="fade-in">
                   <div style={{ 
@@ -1218,17 +1232,10 @@ function ResultsContent() {
                   </div>
                 </div>
               )}
-          </div>
+            </div>
 
-          <div id="interview-prep-section" className="form-card" style={{ marginTop: "24px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "20px",
-                }}
-              >
+            <div id="interview-prep-section" className="form-card" style={{ marginTop: "24px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                 <div style={{ flex: 1 }}>
                   <h2 className="section-title" style={{ marginBottom: "4px" }}>
                     {t("results.interviewPrepTitle")}
@@ -1237,36 +1244,33 @@ function ResultsContent() {
                     {t("results.interviewPrepSubtitle")}
                   </p>
                 </div>
-              {interviewQuestions.length === 0 && (
-                <button
-                  className="btn secondary"
-                  onClick={async () => {
-                    await fetchInterviewPrep();
-                    setTimeout(() => {
-                      document.getElementById("interview-prep-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }, 800);
-                  }}
-                  disabled={isLoadingPrep}
-                  style={{ marginLeft: "16px" }}
-                >
-                  {isLoadingPrep ? t("results.loadingPrep") : t("results.generateInterviewPrep")}
-                </button>
-              )}
+                {interviewQuestions.length === 0 && (
+                  <button
+                    className="btn secondary"
+                    onClick={async () => {
+                      await fetchInterviewPrep();
+                      setTimeout(() => {
+                        document.getElementById("interview-prep-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }, 800);
+                    }}
+                    disabled={isLoadingPrep}
+                    style={{ marginLeft: "16px" }}
+                  >
+                    {isLoadingPrep ? t("results.loadingPrep") : t("results.generateInterviewPrep")}
+                  </button>
+                )}
               </div>
-
               {prepError && (
                 <div style={{ marginBottom: "16px", padding: "12px", background: "rgba(180, 35, 24, 0.1)", border: "1px solid rgba(180, 35, 24, 0.2)", borderRadius: "12px", color: "#f04438", fontSize: "14px" }}>
                   {t(`results.${prepError}`)}
                 </div>
               )}
-
               {isLoadingPrep && (
                 <div style={{ padding: "40px 0", textAlign: "center" }}>
                   <div className="spinner" style={{ margin: "0 auto 12px" }}></div>
                   <p style={{ color: "var(--muted)" }}>{t("results.loadingPrep")}</p>
                 </div>
               )}
-
               <div className="questions-list" style={{ display: "grid", gap: "12px" }}>
                 {interviewQuestions.map((q, idx) => (
                   <div
@@ -1282,28 +1286,8 @@ function ResultsContent() {
                       transition: "all 0.2s ease",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "12px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: "24px",
-                          height: "24px",
-                          borderRadius: "50%",
-                          background: "var(--accent)",
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                          flexShrink: 0,
-                        }}
-                      >
+                    <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                      <span style={{ width: "24px", height: "24px", borderRadius: "50%", background: "var(--accent)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "bold", flexShrink: 0 }}>
                         {idx + 1}
                       </span>
                       <p style={{ margin: 0, fontWeight: 600, flexGrow: 1, fontSize: "15px" }}>
@@ -1332,14 +1316,15 @@ function ResultsContent() {
                   </div>
                 ))}
               </div>
-          </div>
-
-          <div className="history-actions">
-            <Link className="btn secondary" href="/history">
-              {t("results.saveToHistory")}
-            </Link>
+            </div>
           </div>
         </section>
+
+        <div className="history-actions">
+          <Link className="btn secondary" href="/history">
+            {t("results.saveToHistory")}
+          </Link>
+        </div>
       </div>
       <PremiumModal 
         isOpen={showUpgradeModal} 

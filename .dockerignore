@@ -1,0 +1,11 @@
+.git
+.venv
+venv
+__pycache__
+.pytest_cache
+node_modules
+.next
+*.log
+.DS_Store
+scratch/
+ml/models/tmp/

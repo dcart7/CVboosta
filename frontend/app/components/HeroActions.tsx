@@ -18,8 +18,8 @@ export default function HeroActions() {
         {t("hero.startWithCv")}
       </Link>
       {!isAuthed && (
-        <Link className="btn secondary" href="/register">
-          {t("hero.createAccount")}
+        <Link className="btn primary" href="/register">
+          {t("nav.register")}
         </Link>
       )}
     </div>

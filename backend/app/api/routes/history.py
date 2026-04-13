@@ -63,6 +63,7 @@ def get_history_item(
         optimized_cv=result.get("optimized_cv", ""),
         job_description=row.job_description or "",
         missing_skills=result.get("missing_skills", []),
+        added_keywords=result.get("added_keywords", []),
         recommendations=result.get("recommendations", []),
         match_before=result.get("match_before"),
         match_after=result.get("match_after"),

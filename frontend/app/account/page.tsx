@@ -215,10 +215,10 @@ export default function AccountPage() {
                   )}
                   {activity.map((item, index) => (
                     <div className="history-row" key={`${item.action}-${index}`}>
-                      <div>{item.action}</div>
-                      <div>{item.meta?.role || "—"}</div>
-                      <div>{item.meta?.score || "—"}</div>
-                      <div>{formatDate(item.created_at)}</div>
+                      <div data-label="Action">{item.action}</div>
+                      <div data-label="Role">{item.meta?.role || "—"}</div>
+                      <div data-label="Score">{item.meta?.score || "—"}</div>
+                      <div data-label="Date">{formatDate(item.created_at)}</div>
                     </div>
                   ))}
                 </div>

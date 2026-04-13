@@ -122,10 +122,10 @@ export default function HistoryPage() {
                 className="history-row" 
                 style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <div>{item.role || "—"}</div>
-                <div>{item.company || "—"}</div>
-                <div>{scoreToLabel(item.score)}</div>
-                <div>{formatDate(item.created_at)}</div>
+                <div data-label={t("history.role")}>{item.role || "—"}</div>
+                <div data-label={t("history.company")}>{item.company || "—"}</div>
+                <div data-label={t("history.score")}>{scoreToLabel(item.score)}</div>
+                <div data-label={t("history.date")}>{formatDate(item.created_at)}</div>
                 <div style={{ textAlign: 'right' }}>
                   <span className="btn secondary" style={{ padding: '4px 12px', fontSize: '12px' }}>
                     {t("history.view")}

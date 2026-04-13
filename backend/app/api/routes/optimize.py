@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
+from starlette.concurrency import run_in_threadpool
 
 from app.schemas.optimize import (
     CoverLetterRequest,
@@ -35,7 +36,7 @@ router = APIRouter()
 
 
 @router.post("", response_model=OptimizeResponse)
-def optimize_cv(
+async def optimize_cv(
     payload: OptimizeRequest,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user_optional),
@@ -101,21 +102,26 @@ def optimize_cv(
                 skills=normalize_keywords(keyword_result.skills),
                 requirements=normalize_keywords(keyword_result.requirements),
             )
-        result = generate_optimized_cv(
-            cv_text=payload.cv_text,
-            job_text=payload.job_text,
-            cv_analysis=payload.cv_analysis,
-            job_analysis=payload.job_analysis,
-            ats_keywords=ats_keywords,
-            target_role=payload.target_role,
-            target_company=payload.target_company,
+        result = await run_in_threadpool(
+            generate_optimized_cv,
+            payload.cv_text,
+            payload.job_text,
+            payload.cv_analysis,
+            payload.job_analysis,
+            ats_keywords,
+            payload.target_role,
+            payload.target_company,
+            None  # initial forced_keywords
         )
-        _, _, missing_skills = compute_match_score(payload.cv_text, ats_keywords)
-        recommendations = build_recommendations(missing_skills)
-        match_before, _, _ = compute_match_score(payload.cv_text, ats_keywords)
-        match_after, _, _ = compute_match_score(result.optimized_cv, ats_keywords)
-    except LLMServiceError as exc:
-        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+        match_before, _, original_missing = await run_in_threadpool(compute_match_score, payload.cv_text, ats_keywords)
+        match_after, _, missing_skills = await run_in_threadpool(compute_match_score, result.optimized_cv, ats_keywords)
+        
+        added_keywords = list(set(original_missing) - set(missing_skills))
+
+
+        recommendations = await run_in_threadpool(build_recommendations, missing_skills)
+    except LLMServiceError:
+        raise
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     except Exception as exc:
@@ -130,6 +136,7 @@ def optimize_cv(
             result_json={
                 "optimized_cv": result.optimized_cv,
                 "missing_skills": missing_skills,
+                "added_keywords": added_keywords,
                 "recommendations": recommendations,
                 "role": payload.target_role or None,
                 "company": payload.target_company or None,
@@ -146,9 +153,11 @@ def optimize_cv(
         optimized_cv=result.optimized_cv,
         feedback=result.feedback,
         missing_skills=missing_skills,
+        added_keywords=added_keywords,
         recommendations=recommendations,
         match_before=match_before,
         match_after=match_after,
+        analysis_id=analysis.id if current_user else None,
     )
 
 
@@ -170,14 +179,14 @@ def optimize_cover_letter(
             job_text=payload.job_text,
             ui_language=payload.ui_language,
         )
-    except LLMServiceError as exc:
-        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    except LLMServiceError:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Failed to generate cover letter") from exc
 
     if current_user:
         if payload.analysis_id:
-            from sqlalchemy import copy
+            from sqlalchemy.orm.attributes import flag_modified
             # Update the analysis record with the cover letter
             analysis = db.query(Analysis).filter(
                 Analysis.id == payload.analysis_id, 
@@ -187,6 +196,7 @@ def optimize_cover_letter(
                 new_result = dict(analysis.result_json or {})
                 new_result["cover_letter"] = content
                 analysis.result_json = new_result
+                flag_modified(analysis, "result_json")
                 db.add(analysis)
                 db.commit()
         

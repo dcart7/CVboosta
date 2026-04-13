@@ -62,3 +62,11 @@ backend/dummy_cv.pdf
 temp_cv_*.pdf
 *.webp
 *.png
+
+# Vercel & Production
+.vercel
+frontend/out/
+build/
+dist/
+.next/
+*.log

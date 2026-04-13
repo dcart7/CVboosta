@@ -25,9 +25,20 @@ app.middleware("http")(api_key_middleware)
 
 @app.exception_handler(LLMServiceError)
 async def llm_service_error_handler(request: Request, exc: LLMServiceError):
+    # Hide raw internal Gemini error messages
+    detail_str = str(exc)
+    if "GEMINI_ERROR" in detail_str:
+        detail_str = "AI Generation Service is currently unavailable. Please try again."
     return JSONResponse(
         status_code=exc.status_code,
-        content={"detail": str(exc)},
+        content={"detail": detail_str},
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected server error occurred. We are looking into it."},
     )
 
 
@@ -41,6 +52,11 @@ async def request_logger_middleware(request: Request, call_next):  # type: ignor
         body = await request.body()
         request._body = body
     response = await call_next(request)
+    # Add Security Headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+
     response, response_body = await capture_response_body(response)
     await log_request_response(
         request,
