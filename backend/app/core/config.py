@@ -33,12 +33,13 @@ class Settings(BaseSettings):
     jwt_secret: str = "temporary_secret_for_deployment_change_me"
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
-    cors_origins: str | list[str] = "*"
+    cors_origins: Any = "*"
     paddle_webhook_secret: str | None = None
 
     @field_validator("cors_origins", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> list[str] | str:
+        print(f"DEBUG: assemble_cors_origins received value: {v} (type: {type(v)})")
         if isinstance(v, str):
             if v.strip() == "*":
                 return ["*"]
