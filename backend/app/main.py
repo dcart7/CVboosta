@@ -60,7 +60,7 @@ app.add_middleware(
 )
 
 app.include_router(analyze_router, prefix="/analyze", tags=["analyze"])
-app.include_router(optimize_router, tags=["optimize"])
+app.include_router(optimize_router, prefix="/optimize", tags=["optimize"])
 app.include_router(logs_router, tags=["logs"])
 app.include_router(auth_router, tags=["auth"])
 app.include_router(history_router, tags=["history"])

@@ -332,7 +332,7 @@ def interview_prep_route(
             ).first()
             if analysis:
                 new_result = dict(analysis.result_json or {})
-                new_result["interview_questions"] = [q.model_dump() for q in questions]
+                new_result["interview_questions"] = questions
                 analysis.result_json = new_result
                 db.add(analysis)
                 db.commit()

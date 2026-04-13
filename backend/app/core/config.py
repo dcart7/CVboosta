@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     api_key: str | None = None
     request_logging_enabled: bool = True
     request_log_max_chars: int = 4000
-    max_ats_keywords: int = 80
+    max_ats_keywords: int = 45
     keyword_crf_model_path: str = "ml/models/skill_crf.joblib"
     keyword_transformer_model_path: str = "ml/models/skill_bert"
     jwt_secret: str

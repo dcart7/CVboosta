@@ -29,11 +29,12 @@ from app.services.activity_logger import record_activity
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.models.analysis import Analysis
+from app.models.user import User
 
 router = APIRouter()
 
 
-@router.post("/optimize", response_model=OptimizeResponse)
+@router.post("", response_model=OptimizeResponse)
 def optimize_cv(
     payload: OptimizeRequest,
     db: Session = Depends(get_db),

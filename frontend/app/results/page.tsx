@@ -558,12 +558,21 @@ function ResultsContent() {
       return;
     }
 
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    if (!token) {
+      console.warn("No auth token found for interview prep");
+      return;
+    }
+
     setIsLoadingPrep(true);
     setPrepError(null);
     try {
       const response = await fetch(`${apiBase}/analyze/interview-prep`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           job_text: jobText,
           missing_keywords: missing,
@@ -601,12 +610,21 @@ function ResultsContent() {
       return;
     }
 
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    if (!token) {
+      console.warn("No auth token found for cover letter");
+      return;
+    }
+
     setIsLoadingCL(true);
     setClError(null);
     try {
       const response = await fetch(`${apiBase}/optimize/cover-letter`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           cv_text: cvText,
           job_text: jobText,

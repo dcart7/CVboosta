@@ -300,17 +300,19 @@ def _generate_with_gemini(
         target_block = f"Target role: {role}\nTarget company: {company}\n\n"
 
     prompt = (
-        "You are an expert CV optimization assistant. Your goal is to rewrite the input CV to maximize its match with the provided Job Description.\n\n"
+        "You are an expert CV optimization assistant. Your goal is to rewrite the input CV to achieve a MANDATORY >90% ATS match score with the provided Job Description.\n\n"
+        "GOAL: Ensure the final CV is mathematically optimized for ATS keyword scanners while remaining professional for human recruiters.\n\n"
         "RULES:\n"
-        "1. KEYWORD INJECTION: You MUST identify and seamlessly inject ALL relevant skills and keywords from the Job Description into the CV. Reword existing accomplishments to include these keywords naturally.\n"
-        "2. NO HALLUCINATION: You are STRICTLY FORBIDDEN from inventing fake job titles, companies, dates, or prior experience that isn't in the original CV. Only rephrase existing factual information.\n"
-        "3. PROFESSIONAL TONE: Use active verbs, remove fluff, and ensure the formatting is clean.\n"
-        "4. OUTPUT ONLY the final optimized CV text. No intro, no summary of changes, no explanations.\n\n"
+        "1. KEYWORD MAXIMIZATION (CRITICAL): You MUST identify and integrate EVERY relevant keyword from the provided list. Rephrase your accomplishments to 'swallow' these keywords. For example, if 'Database Management' is a keyword and you have 'worked with SQL', change it to 'Managed high-scale SQL databases'.\n"
+        "2. NO HALLUCINATION: Only rephrase EXISTING factual achievements. Use transferable skills to bridge gaps, but NEVER invent companies, dates, or degrees.\n"
+        "3. PROFESSIONAL IMPACT: Use high-impact action verbs (e.g., 'Spearheaded', 'Engineered', 'Revolutionized'). Quantify data (e.g., '+20% efficiency').\n"
+        "4. VERIFICATION: Before finalizing, perform a mental 'Keyword Scan'. If you haven't included at least 95% of the requested keywords, go back and rephrase more bullets.\n"
+        "5. OUTPUT ONLY the final optimized CV text. No intro, no summary, no closing.\n\n"
         f"{target_block}"
         f"{keyword_block}"
         f"INPUT CV:\n{cv_text}\n\n"
         f"JOB DESCRIPTION:\n{job_text}\n\n"
-        "OPTIMIZED CV:"
+        "OPTIMIZED CV (TARGET >95% FOR GUARANTEED 90%+ SCORE):"
     )
 
     try:
