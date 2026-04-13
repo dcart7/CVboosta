@@ -31,7 +31,11 @@ optional_bearer = HTTPBearer(auto_error=False)
 
 @router.post("/auth/register", response_model=AuthResponse)
 def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> AuthResponse:
-    user = User(email=payload.email.lower().strip(), password_hash=hash_password(payload.password))
+    user = User(
+        email=payload.email.lower().strip(), 
+        password_hash=hash_password(payload.password),
+        full_name=payload.full_name
+    )
     try:
         db.add(user)
         db.commit()
@@ -91,6 +95,7 @@ def me(current_user: User = Depends(get_current_user)) -> UserResponse:
     return UserResponse(
         id=current_user.id,
         email=current_user.email,
+        full_name=current_user.full_name,
         created_at=current_user.created_at,
     )
 

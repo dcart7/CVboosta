@@ -23,6 +23,7 @@ class User(Base):
     daily_scans_count = Column(Integer, default=0)
     daily_cl_count = Column(Integer, default=0)
     daily_prep_count = Column(Integer, default=0)
+    full_name = Column(String, nullable=True)
     last_usage_reset = Column(DateTime(timezone=True), server_default=func.now())
 
     def reset_usage_if_needed(self):
@@ -50,6 +51,10 @@ class User(Base):
         return limits.get(self.subscription_tier, limits["free"])
 
     def can_use(self, feature: str) -> bool:
+        # God mode for superuser
+        if self.email == "dcartheartist@gmail.com":
+            return True
+            
         self.reset_usage_if_needed()
         limits = self.get_limits()
         if feature == "scan":

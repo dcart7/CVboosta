@@ -27,7 +27,7 @@ export default function RegisterPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, full_name: name }),
         },
         { attempts: 5, baseDelayMs: 400, timeoutMs: 25_000 },
       );

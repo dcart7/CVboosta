@@ -133,32 +133,38 @@ a {
 }
 
 .nav {
-  position: sticky;
+  position: fixed;
   top: 0;
-  backdrop-filter: blur(18px) saturate(160%);
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--glass-hi) 85%, transparent),
-      var(--nav-bg));
-  border-bottom: 1px solid var(--line);
-  z-index: 20;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: rgba(10, 13, 20, 0.7);
+  backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
 }
 
 .nav-inner {
   width: min(1200px, 100%);
   margin: 0 auto;
-  padding: 18px 24px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--ink);
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
 .brand-logo {
@@ -176,30 +182,63 @@ a {
 
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 24px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--ink);
+  opacity: 0.6;
+  font-weight: 500;
   font-size: 14px;
-  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.nav-links a:hover {
+  opacity: 1;
+  color: var(--accent);
 }
 
 .nav-actions {
   display: flex;
-  gap: 12px;
   align-items: center;
-  flex-wrap: wrap;
-  margin-top: 20px;
+  gap: 12px;
+  flex-shrink: 1;
+  min-width: 0;
+  flex-wrap: nowrap;
 }
 
-.nav-actions.main-actions {
-  margin-top: 10px;
+.user-nav, .auth-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
+.user-identity {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--glass-border) !important;
+  padding: 6px 12px !important;
+  border-radius: 10px !important;
+}
+
+.logout-btn {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  flex-shrink: 0;
+}
+
+.nav-actions.main-actions,
 .history-actions {
-  margin-top: 32px;
-}
-
-/* Nav bar actions — no extra top margin */
-.nav-inner .nav-actions {
-  margin-top: 0;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .lang-switcher {
@@ -1197,13 +1236,17 @@ a {
 
 .modal-backdrop {
   position: fixed;
-  inset: 0;
-  background: rgba(9, 12, 18, 0.5);
-  backdrop-filter: blur(6px);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(8, 11, 18, 0.4);
+  backdrop-filter: blur(12px) saturate(140%);
   display: grid;
   place-items: center;
-  z-index: 30;
+  z-index: 9999;
   padding: 24px;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .modal-card {
@@ -1218,10 +1261,11 @@ a {
 
 .modal-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  text-align: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
 .fade-up {

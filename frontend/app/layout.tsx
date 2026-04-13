@@ -1,5 +1,6 @@
 import { LanguageProvider } from "./lib/LanguageContext";
 import Footer from "./components/Footer";
+import CookieBanner from "./components/CookieBanner";
 import "./globals.css";
 
 export const metadata = {
@@ -61,6 +62,7 @@ export default function RootLayout({
             {children}
           </div>
           <Footer />
+          <CookieBanner />
         </LanguageProvider>
       </body>
     </html>

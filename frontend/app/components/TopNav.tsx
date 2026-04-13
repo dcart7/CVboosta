@@ -10,6 +10,7 @@ import { Language } from "../lib/translations";
 
 export default function TopNav() {
   const [email, setEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const apiBase = getApiBase();
   const { t, language, setLanguage } = useTranslation();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -55,8 +56,10 @@ export default function TopNav() {
         if (res.ok) {
           const data = await res.json();
           setEmail(data?.email ?? null);
+          setUserName(data?.full_name ?? null);
         } else {
           setEmail(null);
+          setUserName(null);
         }
       } catch {
         if (!cancelled) setEmail(null);
@@ -79,6 +82,7 @@ export default function TopNav() {
     });
 
     setEmail(null);
+    setUserName(null);
     window.dispatchEvent(new Event("auth-change"));
     // Redirect to home or refresh to clear state
     window.location.href = "/";
@@ -101,7 +105,6 @@ export default function TopNav() {
         <div className="nav-actions">
           <div className="lang-switcher">
             <div className="lang-slider-track" ref={trackRef}>
-              {/* Sliding glass pill */}
               <span className="lang-slider-pill" style={pillStyle} aria-hidden="true" />
               {languages.map((l) => (
                 <button
@@ -118,23 +121,23 @@ export default function TopNav() {
           </div>
           <ThemeToggle />
           {email ? (
-            <>
-              <Link className="btn ghost" href="/account">
-                {email}
+            <div className="user-nav">
+              <Link className="btn ghost user-identity" href="/account" title={userName || email || ""}>
+                {userName || email}
               </Link>
-              <button className="btn" onClick={logout} type="button">
+              <button className="btn secondary logout-btn" onClick={logout} type="button">
                 {t("nav.logout")}
               </button>
-            </>
+            </div>
           ) : (
-            <>
+            <div className="auth-btns">
               <Link className="btn ghost" href="/login">
                 {t("nav.login")}
               </Link>
               <Link className="btn primary" href="/register">
                 {t("nav.register")}
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>

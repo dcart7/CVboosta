@@ -154,7 +154,7 @@ def optimize_cv(
 
 @router.post("/cover-letter", response_model=CoverLetterResponse)
 def optimize_cover_letter(
-    payload: OptimizeRequest,
+    payload: CoverLetterRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user_optional),
 ) -> CoverLetterResponse:

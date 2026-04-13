@@ -61,6 +61,8 @@ export const translations = {
       back: "Back",
       continue: "Continue",
       optimize: "Optimize",
+      dismiss: "Dismiss",
+      acceptAll: "Accept All",
     },
     optimize: {
       title: "Optimization controls",
@@ -293,6 +295,7 @@ export const translations = {
       rights: "© 2026 CVboosta. All rights reserved.",
       privacy: "Privacy Policy",
       terms: "Terms of Service",
+      cookieNotice: "Our website uses cookies to improve your experience and analyze usage limits.",
     },
     legal: {
       privacyTitle: "Privacy Policy",
@@ -302,7 +305,7 @@ export const translations = {
       privacyRetentionTitle: "Retention Policy",
       privacyRetention: "Guest data is cleared upon logout or session expiry. Registered users' data is stored securely in your history until you choose to delete it.",
       privacyAiTitle: "AI Transparency",
-      privacyAiDesc: "CVboosta uses large language models (LLMs) to analyze and generate text. Your data is sent to AI endpoints securely and is not used for training general-purpose public models.",
+      privacyAiDesc: "CVboosta uses large language models (LLM) to analyze and generate text. Your data is sent to AI endpoints securely and is not used for training general-purpose public models.",
       termsTitle: "Terms of Service",
       termsIntro: "Legal framework for using the CVboosta optimization platform.",
       termsUsageTitle: "Service Usage",
@@ -338,6 +341,16 @@ export const translations = {
       enterpriseTitle: "Enterprise / Teams?",
       enterpriseSubtitle: "Looking for custom limits or volume licenses for your organization?",
       contactSales: "Contact Sales →",
+      },
+      premiumModal: {
+        title: "Daily Limit Reached",
+        description: "You've reached your daily limit for this feature. Upgrade to Pro for unlimited scans, cover letters, and premium history storage.",
+        cta: "Upgrade Plan",
+        features: {
+          scans: "Unlimited CV Optimizations",
+          cl: "Unlimited Cover Letters",
+          prep: "Unlimited Interview Prep",
+        }
       },
   },
   uk: {
@@ -394,6 +407,8 @@ export const translations = {
       back: "Назад",
       continue: "Продовжити",
       optimize: "Оптимізувати",
+      dismiss: "Відхилити",
+      acceptAll: "Прийняти все",
     },
     optimize: {
       title: "Налаштування оптимізації",
@@ -625,6 +640,7 @@ export const translations = {
       rights: "© 2026 CVboosta. Усі права захищені.",
       privacy: "Конфіденційність",
       terms: "Умови використання",
+      cookieNotice: "Наш сайт використовує файли cookie для покращення вашого досвіду та аналізу лімітів використання.",
     },
     legal: {
       privacyTitle: "Політика конфіденційності",
@@ -670,6 +686,16 @@ export const translations = {
       enterpriseTitle: "Для компаній та команд?",
       enterpriseSubtitle: "Шукаєте індивідуальні ліміти або групові ліцензії для вашої організації?",
       contactSales: "Зв’язатися з відділом продажів →",
+      },
+      premiumModal: {
+        title: "Денний ліміт вичерпано",
+        description: "Ви досягли ліміту запитів на сьогодні. Оновіть план до Pro для безлімітних сканувань, листів та вічного зберігання історії.",
+        cta: "Оновити план",
+        features: {
+          scans: "Безлімітна оптимізація резюме",
+          cl: "Безлімітні супровідні листи",
+          prep: "Безлімітний тренажер співбесіди",
+        }
       },
   },
   pl: {
@@ -726,6 +752,8 @@ export const translations = {
       back: "Wstecz",
       continue: "Kontynuuj",
       optimize: "Optymalizuj",
+      dismiss: "Odrzuć",
+      acceptAll: "Zaakceptuj wszystko",
     },
     optimize: {
       title: "Ustawienia optymalizacji",
@@ -951,6 +979,7 @@ export const translations = {
       rights: "© 2026 CVboosta. Wszelkie prawa zastrzeżone.",
       privacy: "Prywatność",
       terms: "Regulamin",
+      cookieNotice: "Nasza strona korzysta z plików cookie, aby poprawić wrażenia użytkownika i analizować limity użycia.",
     },
     legal: {
       privacyTitle: "Polityka prywatności",
@@ -996,6 +1025,16 @@ export const translations = {
       enterpriseTitle: "Enterprise / Zespoły?",
       enterpriseSubtitle: "Szukasz niestandardowych limitów lub licencji wolumenowych dla swojej organizacji?",
       contactSales: "Skontaktuj się z działem sprzedaży →",
+      },
+      premiumModal: {
+        title: "Dzienny limit wyczerpany",
+        description: "Osiągnąłeś dzienny limit dla tej funkcji. Ulepsz do wersji Pro, aby uzyskać nieograniczone skany, listy motywacyjne i stałą historię.",
+        cta: "Ulepsz plan",
+        features: {
+          scans: "Nielimitowana optymalizacja CV",
+          cl: "Nielimitowane listy motywacyjne",
+          prep: "Nielimitowany asystent rozmowy",
+        }
       },
   },
   sk: {
@@ -1049,6 +1088,8 @@ export const translations = {
       back: "Späť",
       continue: "Pokračovať",
       optimize: "Optimalizovať",
+      dismiss: "Zrušiť",
+      acceptAll: "Prijať všetko",
     },
     optimize: {
       title: "Nastavenia optimalizácie",
@@ -1272,8 +1313,12 @@ export const translations = {
       rights: "© 2026 CVboosta. Všetky práva vyhradené.",
       privacy: "Súkromie",
       terms: "Podmienky",
+      cookieNotice: "Naša webová stránka používa súbory cookie na zlepšenie vášho zážitku a analýzu limitov používania.",
     },
     legal: {
+      privacyPolicy: "Zásady ochrany osobných údajov",
+      termsOfService: "Zmluvné podmienky",
+      cookieNotice: "Naša webová stránka používa súbory cookie na zlepšenie vášho zážitku a analýzu limitov používania.",
       privacyTitle: "Zásady ochrany súkromia",
       privacyIntro: "V CVboosta berieme vaše súkromie vážne. Tieto zásady vysvetľujú, ako spracúvame vaše údaje zo životopisu a osobné informácie.",
       privacyDataTitle: "Zber a spracovanie údajov",
@@ -1317,6 +1362,16 @@ export const translations = {
       enterpriseTitle: "Pre firmy a tímy?",
       enterpriseSubtitle: "Hľadáte vlastné limity alebo hromadné licencie pre vašu organizáciu?",
       contactSales: "Kontaktovať obchodné oddelenie →",
+      },
+      premiumModal: {
+        title: "Denný limit vyčerpaný",
+        description: "Dosiahli ste svoj denný limit pre túto funkciu. Prejdite na Pro pre neobmedzené skenovanie, sprievodné listy a prémiové ukladanie histórie.",
+        cta: "Vylepšiť plán",
+        features: {
+          scans: "Neobmedzená optimalizácia CV",
+          cl: "Neobmedzené sprievodné listy",
+          prep: "Neobmedzený asistent na pohovor",
+        }
       },
   },
   es: {
@@ -1373,6 +1428,8 @@ export const translations = {
       back: "Volver",
       continue: "Continuar",
       optimize: "Optimizar",
+      dismiss: "Descartar",
+      acceptAll: "Aceptar todo",
     },
     optimize: {
       title: "Controles de optimización",
@@ -1598,8 +1655,12 @@ export const translations = {
       rights: "© 2026 CVboosta. Todos los derechos reservados.",
       privacy: "Privacidad",
       terms: "Términos",
+      cookieNotice: "Nuestro sitio web utiliza cookies para mejorar su experiencia y analizar los límites de uso.",
     },
     legal: {
+      privacyPolicy: "Política de privacidad",
+      termsOfService: "Términos de servicio",
+      cookieNotice: "Nuestro sitio web utiliza cookies para mejorar su experiencia y analizar los límites de uso.",
       privacyTitle: "Política de Privacidad",
       privacyIntro: "En CVboosta, nos tomamos en serio tu privacidad. Esta política explica cómo manejamos tus datos de CV e información personal.",
       privacyDataTitle: "Recopilación y procesamiento de datos",
@@ -1643,6 +1704,16 @@ export const translations = {
       enterpriseTitle: "¿Empresas / Equipos?",
       enterpriseSubtitle: "¿Buscas límites personalizados o licencias por volumen para tu organización?",
       contactSales: "Contactar con ventas →",
+      },
+      premiumModal: {
+        title: "Límite diario alcanzado",
+        description: "Has alcanzado tu límite diario para esta función. Actualiza a Pro para obtener optimizaciones ilimitadas, cartas de presentación y almacenamiento de historial premium.",
+        cta: "Actualizar plan",
+        features: {
+          scans: "Optimización de CV ilimitada",
+          cl: "Cartas de presentación ilimitadas",
+          prep: "Preparación de entrevistas ilimitada",
+        }
       },
   },
 };

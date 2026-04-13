@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
+import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { useTranslation } from "../lib/LanguageContext";
 import {
@@ -52,6 +53,7 @@ export default function WorkspacePage() {
   const [keywordSource, setKeywordSource] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const hashText = (value: string) => {
     let hash = 0;
@@ -246,10 +248,15 @@ export default function WorkspacePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ job_text: jobText }),
       });
+      const data = await response.json();
+      if (response.status === 402) {
+        setShowUpgradeModal(true);
+        setIsExtracting(false);
+        return;
+      }
       if (!response.ok) {
         throw new Error("Keyword extraction failed.");
       }
-      const data = await response.json();
       const combined = [
         ...(data.skills || []),
         ...(data.requirements || []),
@@ -364,10 +371,16 @@ export default function WorkspacePage() {
           keywords: keywordCache,
         }),
       });
+      const data = await response.json();
+      if (response.status === 402) {
+        setShowUpgradeModal(true);
+        setAnalysisStatus("");
+        setIsAnalyzing(false);
+        return;
+      }
       if (!response.ok) {
         throw new Error("Analysis failed.");
       }
-      const data = await response.json();
       setMatchPercent(data.match_percent ?? null);
       setMissingKeywords(data.missing_keywords || []);
       setAnalysisStatus("Analysis complete.");
@@ -416,12 +429,17 @@ export default function WorkspacePage() {
           target_company: targetCompany,
         }),
       });
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        setOptimizeStatus(payload.detail || "Optimization failed.");
+      const data = await response.json();
+      if (response.status === 402) {
+        setShowUpgradeModal(true);
+        setOptimizeStatus("");
+        setIsOptimizing(false);
         return;
       }
-      const data = await response.json();
+      if (!response.ok) {
+        setOptimizeStatus(data.detail || "Optimization failed.");
+        return;
+      }
       localStorage.setItem("optimized_cv", data.optimized_cv || "");
       localStorage.setItem(
         "missing_skills",
@@ -663,6 +681,10 @@ export default function WorkspacePage() {
           </div>
         </section>
       </div>
+      <PremiumModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
     </main>
   );
 }

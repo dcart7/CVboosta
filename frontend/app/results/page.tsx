@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
 import TopNav from "../components/TopNav";
+import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
@@ -233,6 +234,15 @@ function isSectionHeading(line: string): boolean {
     "hard skills",
     "soft skills",
     "contact",
+    "контакти",
+    "досвід",
+    "досвід роботи",
+    "освіта",
+    "навички",
+    "курси",
+    "сертифікати",
+    "проекти",
+    "професійний досвід",
   ]);
   if (known.has(key)) return true;
   if (trimmed.length > 48) return false;
@@ -345,6 +355,7 @@ function ResultsContent() {
   const [coverLetter, setCoverLetter] = useState("");
   const [isLoadingCL, setIsLoadingCL] = useState(false);
   const [clError, setClError] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const sessionId = searchParams.get("id");
 
@@ -390,7 +401,7 @@ function ResultsContent() {
       migrateLegacyGuestWorkspace(wid);
 
       localStorage.setItem("optimized_cv", data.optimized_cv || "");
-      localStorage.setItem("missing_keywords", JSON.stringify(data.missing_skills || []));
+      localStorage.setItem("missing_skills", JSON.stringify(data.missing_skills || []));
       localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
       localStorage.setItem("match_before", (data.match_before || 0).toString());
       localStorage.setItem("match_after", (data.match_after || 0).toString());
@@ -581,6 +592,12 @@ function ResultsContent() {
         }),
       });
 
+      if (response.status === 402) {
+        setShowUpgradeModal(true);
+        setIsLoadingPrep(false);
+        return;
+      }
+
       if (!response.ok) {
         if (response.status === 404) throw new Error("error404");
         if (response.status === 503) throw new Error("error503");
@@ -632,6 +649,12 @@ function ResultsContent() {
           analysis_id: sessionId ? parseInt(sessionId, 10) : null,
         }),
       });
+
+      if (response.status === 402) {
+        setShowUpgradeModal(true);
+        setIsLoadingCL(false);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("genericError");
@@ -716,9 +739,11 @@ function ResultsContent() {
       const normalizeBulletLine = (line: string) => {
         const trimmed = line.trim();
         if (!trimmed) return { isBullet: false, text: "" };
-        if (trimmed.startsWith("•")) return { isBullet: true, text: trimmed.slice(1).trim() };
-        if (trimmed.startsWith("-")) return { isBullet: true, text: trimmed.slice(1).trim() };
-        if (trimmed.startsWith("*")) return { isBullet: true, text: trimmed.slice(1).trim() };
+        const match = trimmed.match(/^([•\-\*●○■□])\s+(.*)$/);
+        if (match) return { isBullet: true, text: match[2].trim() };
+        // Handle cases where there's no space after bullet
+        const matchNoSpace = trimmed.match(/^([•\-\*●○■□])(.*)$/);
+        if (matchNoSpace) return { isBullet: true, text: matchNoSpace[2].trim() };
         return { isBullet: false, text: trimmed };
       };
 
@@ -807,7 +832,7 @@ function ResultsContent() {
             const bullet = normalizeBulletLine(line);
             if (bullet.isBullet) {
               doc.setTextColor(accent.r, accent.g, accent.b);
-              doc.text("•", mainX, cursorY + fontBody);
+              doc.text("•", mainX, cursorY + (fontBody * 0.85));
               doc.setTextColor(51, 65, 85);
               cursorY = renderWrapped(bullet.text, mainX + 12, cursorY, mainWidth - 12, fontBody, false);
             } else {
@@ -824,7 +849,8 @@ function ResultsContent() {
           doc.setTextColor(255, 255, 255);
           doc.setFont(fontFamily, "bold");
           doc.setFontSize(fontTitle);
-          doc.text(titleLine.trim().slice(0, 50), marginX, 60);
+          const titleWrapped = doc.splitTextToSize(titleLine.trim(), contentWidth);
+          doc.text(titleWrapped, marginX, 60);
           cursorY = 130;
         } else {
           doc.setTextColor(accent.r, accent.g, accent.b);
@@ -1315,6 +1341,10 @@ function ResultsContent() {
           </div>
         </section>
       </div>
+      <PremiumModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
     </main>
   );
 }
