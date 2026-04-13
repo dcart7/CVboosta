@@ -33,19 +33,23 @@ class Settings(BaseSettings):
     jwt_secret: str = "temporary_secret_for_deployment_change_me"
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
-    cors_origins: Any = ["*"]
+    cors_origins: str | list[str] = "*"
     paddle_webhook_secret: str | None = None
 
     @field_validator("cors_origins", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: str | list[str]) -> list[str]:
-        if isinstance(v, str) and not v.startswith("["):
+    def assemble_cors_origins(cls, v: Any) -> list[str] | str:
+        if isinstance(v, str):
             if v.strip() == "*":
                 return ["*"]
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, list):
-            return v
-        return ["*"]
+            if v.startswith("[") and v.endswith("]"):
+                import json
+                try:
+                    return json.loads(v)
+                except:
+                    pass
+            return [i.strip() for i in v.split(",") if i.strip()]
+        return v
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[3] / ".env",
