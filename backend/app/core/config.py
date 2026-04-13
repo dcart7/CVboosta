@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     rate_limit_window_seconds: int = 60
     api_key_enabled: bool = True
     api_key: str | None = None
-    request_logging_enabled: bool = True
+    request_logging_enabled: bool = False
     request_log_max_chars: int = 4000
     max_ats_keywords: int = 45
     keyword_crf_model_path: str = "ml/models/skill_crf.joblib"
