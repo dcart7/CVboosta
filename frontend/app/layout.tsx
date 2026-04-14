@@ -54,6 +54,12 @@ export default function RootLayout({
               "(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.dataset.theme=t;}catch(e){}})();",
           }}
         />
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+        `}} />
         <script src="https://cdn.paddle.com/paddle/v2/paddle.js" async></script>
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
