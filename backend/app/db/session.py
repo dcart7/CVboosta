@@ -13,6 +13,11 @@ _engine = None
 _SessionLocal = None
 _db_initialized = False
 
+# Export these for other modules to use (e.g., init_db)
+# We initialize them as calls to ensure they are created on import if needed
+engine = _get_engine()
+SessionLocal = _get_sessionlocal()
+
 def _get_engine():
     global _engine
     if _engine is None:
