@@ -2,6 +2,10 @@ FROM python:3.11
 
 WORKDIR /app
 
+# Ensure logs are sent straight to terminal without buffering
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
+
 # Ensure tzdata and basic compiling tools are available if needed
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
