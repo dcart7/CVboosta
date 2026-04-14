@@ -325,20 +325,21 @@ def _generate_with_gemini(
             )
 
     prompt = (
-        "You are an expert CV optimization assistant. Your goal is to rewrite the input CV to achieve a MANDATORY >90% ATS match score with the provided Job Description.\n\n"
-        "GOAL: Ensure the final CV is mathematically optimized for ATS keyword scanners while remaining professional for human recruiters.\n\n"
-        "RULES:\n"
-        "1. KEYWORD MAXIMIZATION (CRITICAL): You MUST identify and integrate EVERY relevant keyword from the provided list. Rephrase your accomplishments to 'swallow' these keywords. For example, if 'Database Management' is a keyword and you have 'worked with SQL', change it to 'Managed high-scale SQL databases'.\n"
-        "2. NO HALLUCINATION: Only rephrase EXISTING factual achievements. Use transferable skills to bridge gaps, but NEVER invent companies, dates, or degrees.\n"
-        "3. PROFESSIONAL IMPACT: Use high-impact action verbs (e.g., 'Spearheaded', 'Engineered', 'Revolutionized'). Quantify data (e.g., '+20% efficiency').\n"
-        "4. VERIFICATION: Before finalizing, perform a mental 'Keyword Scan'. If you haven't included at least 95% of the requested keywords, go back and rephrase more bullets.\n"
-        "5. OUTPUT ONLY the final optimized CV text. No intro, no summary, no closing.\n\n"
+        "You are an elite ATS (Applicant Tracking System) CV optimization assistant.\n"
+        "Your ONLY goal is to rewrite the input CV so that it achieves a guaranteed >90% match score against the ATS KEYWORDS.\n\n"
+        "CRITICAL INSTRUCTIONS:\n"
+        "1. EXACT KEYWORD MATCHING (NON-NEGOTIABLE): You MUST insert 100% of the provided ATS KEYWORDS into the CV.\n"
+        "2. DO NOT PARAPHRASE KEYWORDS: The ATS scanner uses exact string matching. If a keyword is 'Agile Methodologies', do NOT write 'Agile methods'. Use the EXACT phrase.\n"
+        "3. NATURAL WEAVING: Integrate these exact phrases gracefully into bullet points, summary, or an expanded 'Skills' section. If a keyword doesn't fit in a sentence, add it to a comma-separated skills list.\n"
+        "4. NO HALLUCINATION: Only use keywords if they can reasonably relate to the candidate's existing experience. Do not invent new degrees or fictional companies.\n"
+        "5. PROFESSIONAL TONE: Use strong action verbs and maintain a high-impact professional style.\n"
+        "6. FORMAT: Output ONLY the final optimized CV text. Do not provide commentary, intro, or markdown blocks. Just the CV text.\n\n"
         f"{target_block}"
         f"{keyword_block}"
         f"{forced_block}"
         f"INPUT CV:\n{cv_text}\n\n"
         f"JOB DESCRIPTION:\n{job_text}\n\n"
-        "OPTIMIZED CV (TARGET >95% FOR GUARANTEED 90%+ SCORE):"
+        "OPTIMIZED CV (MUST CONTAIN ALL EXACT ATS KEYWORDS):"
     )
 
     try:
