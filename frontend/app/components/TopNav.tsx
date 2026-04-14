@@ -90,9 +90,10 @@ export default function TopNav() {
   };
 
   return (
-    <header className="nav">
-      <div className="nav-inner">
-        <Link className="brand" href="/">
+    <>
+      <header className="nav">
+        <div className="nav-inner">
+          <Link className="brand" href="/">
           <img src="/logo.png" alt="Logo" width={40} height={40} className="brand-logo" />
           <span>CVboosta</span>
         </Link>
@@ -126,8 +127,9 @@ export default function TopNav() {
           <ThemeToggle />
           {email ? (
             <>
-              <Link className="btn ghost" href="/account" title={userName || email || ""}>
-                {userName || email}
+              <Link className="btn ghost cv-user-pill" href="/account" title={userName || email || ""}>
+                <span className="cv-desktop-only">{userName || email}</span>
+                <span className="cv-mobile-only">{userName ? userName.charAt(0).toUpperCase() : (email ? email.charAt(0).toUpperCase() : "U")}</span>
               </Link>
               <button className="btn primary cv-desktop-only" style={{ display: "inline-flex" }} onClick={logout} type="button">
                 {t("nav.logout")}
@@ -153,7 +155,7 @@ export default function TopNav() {
              {isMenuOpen ? "✕" : "☰"}
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Mobile Menu Overlay — Glass Shutter */}
       {isMenuOpen && (
@@ -213,6 +215,6 @@ export default function TopNav() {
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }
