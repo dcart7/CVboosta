@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     rate_limit_enabled: bool = True
     rate_limit_requests: int = 60
     rate_limit_window_seconds: int = 60
-    api_key_enabled: bool = True
+    api_key_enabled: bool = False
     api_key: str | None = None
     request_logging_enabled: bool = False
     request_log_max_chars: int = 4000
