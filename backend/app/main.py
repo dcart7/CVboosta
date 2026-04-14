@@ -66,12 +66,10 @@ async def request_logger_middleware(request: Request, call_next):  # type: ignor
     return response
 
 origins = get_cors_origins()
-allow_all_origins = "*" in origins
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[] if allow_all_origins else origins,
-    allow_origin_regex=".*" if allow_all_origins else None,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

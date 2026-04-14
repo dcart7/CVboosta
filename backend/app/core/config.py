@@ -54,8 +54,16 @@ def get_cors_origins() -> list[str]:
     import json
     v = os.getenv("CORS_ORIGINS", "*")
     
+    # Explicitly include the user's current Vercel frontend in the allowed list
+    default_allowed = [
+        "https://cv-ai-optimizer-eta.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000"
+    ]
+
     if not v or v.strip() == "*":
-        return ["*"]
+        return default_allowed
         
     # Handle both comma-separated strings and JSON arrays
     if v.startswith("[") and v.endswith("]"):
