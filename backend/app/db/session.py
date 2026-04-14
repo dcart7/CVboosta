@@ -11,6 +11,9 @@ if settings.database_url and settings.database_url.startswith("sqlite"):
 
 # No module-level engine/SessionLocal to avoid circular imports and startup hangs.
 # Other modules should use get_engine() and get_sessionlocal()
+_engine = None
+_SessionLocal = None
+_db_initialized = False
 
 def get_engine():
     global _engine
