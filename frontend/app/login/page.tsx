@@ -54,7 +54,7 @@ export default function LoginPage() {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <section className="auth-centered fade-up">
+        <section className="split auth-split fade-up">
           <div className="auth-header">
             <h1 className="hero-title">{t("auth.welcomeBack")}</h1>
             <p className="hero-subtitle">
