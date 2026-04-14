@@ -88,6 +88,14 @@ def on_startup() -> None:
     print("STARTUP: Application is booting...")
     print(f"STARTUP: Database URL present: {settings.database_url is not None}")
     print(f"STARTUP: CORS Origins: {get_cors_origins()}")
+    
+    # Verify model files
+    from pathlib import Path
+    crf_path = Path("/app") / settings.keyword_crf_model_path
+    transformer_path = Path("/app") / settings.keyword_transformer_model_path
+    print(f"STARTUP: CRF Model file exists at {crf_path}: {crf_path.exists()}")
+    print(f"STARTUP: Transformer Model dir exists at {transformer_path}: {transformer_path.exists()}")
+
     # We no longer run init_db here to ensure fastest possible port binding for Cloud Run health checks.
     # DB initialization is handled lazily in get_db().
     print("STARTUP: Boot process complete. Ready for requests.")

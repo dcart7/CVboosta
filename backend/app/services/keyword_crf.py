@@ -111,11 +111,26 @@ def _extract_spans(tokens: list[str], tags: list[str], label: str = "Skill") -> 
 def _load_model():
     if joblib is None:
         return None
-    model_path = Path(settings.keyword_crf_model_path)
+    model_path_str = settings.keyword_crf_model_path
+    model_path = Path(model_path_str)
+    
     if not model_path.is_absolute():
-        model_path = Path(__file__).resolve().parents[3] / model_path
+        # Try local dev path first
+        paths_to_try = [
+            Path(__file__).resolve().parents[3] / model_path_str,  # Local dev
+            Path("/app") / model_path_str,                        # Container standard
+            Path(os.getcwd()) / model_path_str                    # Current dir
+        ]
+        for p in paths_to_try:
+            if p.exists():
+                model_path = p
+                break
+                
     if not model_path.exists():
+        print(f"CRF_SERVICE: Model not found at {model_path}")
         return None
+        
+    print(f"CRF_SERVICE: Loading model from {model_path}")
     return joblib.load(model_path)
 
 

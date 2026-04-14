@@ -18,11 +18,25 @@ except Exception:  # pragma: no cover
 def _load_pipeline():
     if AutoTokenizer is None or AutoModelForTokenClassification is None or pipeline is None:
         return None
-    model_path = Path(settings.keyword_transformer_model_path)
+    model_path_str = settings.keyword_transformer_model_path
+    model_path = Path(model_path_str)
+    
     if not model_path.is_absolute():
-        model_path = Path(__file__).resolve().parents[3] / model_path
+        paths_to_try = [
+            Path(__file__).resolve().parents[3] / model_path_str,  # Local dev
+            Path("/app") / model_path_str,                        # Container standard
+            Path(os.getcwd()) / model_path_str                    # Current dir
+        ]
+        for p in paths_to_try:
+            if p.exists():
+                model_path = p
+                break
+                
     if not model_path.exists():
+        print(f"TRANSFORMER_SERVICE: Model not found at {model_path}")
         return None
+        
+    print(f"TRANSFORMER_SERVICE: Loading model from {model_path}")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForTokenClassification.from_pretrained(model_path)
     return pipeline(
