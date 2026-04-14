@@ -2,6 +2,8 @@ import time
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import traceback
+import sys
 
 from app.core.config import settings, get_cors_origins
 from app.api.routes.analyze import router as analyze_router
@@ -39,6 +41,20 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An unexpected server error occurred. We are looking into it."},
     )
 
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    print(f"GLOBAL ERROR: {exc}")
+    trace = traceback.format_exc()
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": str(exc),
+            "type": type(exc).__name__,
+            "traceback": trace,
+            "info": "Diagnostic mode enabled. Please check the error details."
+        }
+    )
 
 @app.middleware("http")
 async def request_logger_middleware(request: Request, call_next):  # type: ignore[no-untyped-def]
