@@ -155,6 +155,7 @@ export default function TopNav() {
              {isMenuOpen ? "✕" : "☰"}
           </button>
         </div>
+      </div>
       </header>
 
       {/* Mobile Menu Overlay — Glass Shutter */}
