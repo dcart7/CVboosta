@@ -152,7 +152,7 @@ a {
 .nav-inner {
   width: min(1200px, 100%);
   margin: 0 auto;
-  padding: 14px 24px; /* Slightly tighter nav */
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;

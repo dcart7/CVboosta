@@ -126,7 +126,7 @@ export default function TopNav() {
           <ThemeToggle />
           {email ? (
             <>
-              <Link className="btn ghost cv-user-pill" href="/account" title={userName || email || ""}>
+              <Link className="btn ghost cv-user-pill cv-hide-on-mobile" href="/account" title={userName || email || ""}>
                 <span className="cv-desktop-only">{userName || email}</span>
                 <span className="cv-mobile-only">{userName ? userName.charAt(0).toUpperCase() : (email ? email.charAt(0).toUpperCase() : "U")}</span>
               </Link>
@@ -135,14 +135,14 @@ export default function TopNav() {
               </button>
             </>
           ) : (
-            <div className="cv-desktop-only" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <Link className="btn ghost" href="/login">
+            <>
+              <Link className="btn ghost cv-desktop-only" href="/login">
                 {t("nav.login")}
               </Link>
-              <Link className="btn primary" href="/register">
+              <Link className="btn primary cv-desktop-only" href="/register">
                 {t("nav.register")}
               </Link>
-            </div>
+            </>
           )}
 
           {/* Mobile Menu Toggle */}
