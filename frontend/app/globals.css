@@ -1812,6 +1812,10 @@ a {
     display: none !important;
   }
   
+  .nav-inner {
+    padding: 12px 16px !important;
+  }
+  
   .hero-title, .gradient-text {
     font-size: 2.1rem !important;
     text-align: center;
@@ -1819,7 +1823,7 @@ a {
   }
   
   .shell {
-    padding: 0 24px 60px !important;
+    padding: 0 16px 60px !important;
   }
 }
 
@@ -1876,39 +1880,32 @@ a {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   flex-direction: column;
-  animation: fadeInMobile 0.3s ease-out forwards;
+  background: rgba(250, 250, 250, 0.85);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  animation: fadeInMobile 0.25s ease-out forwards;
+}
+
+[data-theme="dark"] .mobile-shutter {
+  background: rgba(15, 20, 28, 0.85);
 }
 
 @keyframes fadeInMobile {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.mobile-shutter::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--surface);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  z-index: -1;
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .mobile-shutter-content {
   position: relative;
-  z-index: 1;
-  padding: 100px 24px 40px;
+  z-index: 100000;
+  padding: 80px 24px 40px;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
-  animation: slideDownContent 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes slideDownContent {
