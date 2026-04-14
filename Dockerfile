@@ -40,5 +40,4 @@ ENV PYTHONPATH=/app
 EXPOSE 8080
 
 # Cloud Run requires the server to listen on $PORT
-# We keep diagnostics for now to monitor the full app startup
-CMD ["sh", "-c", "echo 'DEBUG: Filesystem structure:' && ls -R /app && echo 'DEBUG: Starting Full Application...' && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --proxy-headers"]
