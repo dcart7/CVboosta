@@ -157,67 +157,33 @@ export default function TopNav() {
 
       {/* Mobile Menu Overlay — Glass Shutter */}
       {isMenuOpen && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(248, 248, 250, 0.55)",
-          backdropFilter: "blur(36px) saturate(200%)",
-          WebkitBackdropFilter: "blur(36px) saturate(200%)",
-          zIndex: 9999,
-          display: "flex",
-          flexDirection: "column",
-          borderBottom: "1px solid rgba(255,255,255,0.4)",
-          animation: "slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}>
-          <div style={{
-            padding: "88px 28px 40px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            height: "100%",
-            overflowY: "auto",
-          }}>
+        <div className="mobile-shutter">
+          <div className="mobile-shutter-content">
             {/* Navigation links */}
-            <nav style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-              {[
-                { href: "/app", label: t("nav.dashboard") },
-                { href: "/results", label: t("nav.results") },
-                { href: "/history", label: t("nav.history") },
-                { href: "/pricing", label: t("nav.pricing") },
-                { href: "/about", label: t("nav.about") },
-              ].map(({ href, label }) => (
-                <Link key={href} href={href} onClick={() => setIsMenuOpen(false)} style={{
-                  display: "block",
-                  fontSize: "1.6rem",
-                  fontWeight: 800,
-                  color: "var(--ink)",
-                  padding: "14px 0",
-                  borderBottom: "1px solid var(--line)",
-                  letterSpacing: "-0.02em",
-                  textDecoration: "none",
-                }}>
-                  {label}
-                </Link>
-              ))}
+            <nav style={{ display: "flex", flexDirection: "column" }}>
+              <Link href="/app" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
+              <Link href="/results" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.results")}</Link>
+              <Link href="/history" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.history")}</Link>
+              <Link href="/pricing" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.pricing")}</Link>
+              <Link href="/about" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.about")}</Link>
             </nav>
 
             {/* Language switcher */}
-            <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--muted)" }}>Language</span>
-              <div className="lang-slider-track" ref={undefined} style={{ position: "relative" }}>
-                {languages.map((l) => (
-                  <button
-                    key={l.code}
-                    className={`lang-btn${language === l.code ? " active" : ""}`}
-                    onClick={() => { setLanguage(l.code); setIsMenuOpen(false); }}
-                    type="button"
-                  >
-                    {l.flag}
-                  </button>
-                ))}
+            <div style={{ marginTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--muted)" }}>Language</span>
+              <div className="lang-switcher">
+                <div className="lang-slider-track" style={{ position: "relative" }}>
+                  {languages.map((l) => (
+                    <button
+                      key={l.code}
+                      className={`lang-btn${language === l.code ? " active" : ""}`}
+                      onClick={() => { setLanguage(l.code); setIsMenuOpen(false); }}
+                      type="button"
+                    >
+                      {l.flag}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -227,7 +193,6 @@ export default function TopNav() {
               display: "flex",
               flexDirection: "column",
               gap: "12px",
-              paddingBottom: "40px",
               paddingTop: "24px",
             }}>
               {email ? (

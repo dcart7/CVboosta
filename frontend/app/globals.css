@@ -1868,3 +1868,48 @@ a {
   font-size: 15px;
   box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
 }
+
+/* --- CLEAN MOBILE SHUTTER --- */
+.mobile-shutter {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: var(--nav-bg);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  display: flex;
+  flex-direction: column;
+  animation: slideDownMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownMobile {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mobile-shutter-content {
+  padding: 100px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.mobile-shutter-link {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+}
