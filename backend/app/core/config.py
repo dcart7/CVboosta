@@ -13,10 +13,12 @@ class Settings(BaseSettings):
     @classmethod
     def fix_database_url(cls, v: str | None) -> str | None:
         if v:
+            # Handle legacy Heroku-style URLs and ensure we use the standard driver
             if v.startswith("postgres://"):
-                return v.replace("postgres://", "postgresql+psycopg://", 1)
-            if v.startswith("postgresql://"):
-                return v.replace("postgresql://", "postgresql+psycopg://", 1)
+                return v.replace("postgres://", "postgresql://", 1)
+            # Remove +psycopg if it was accidentally added or provided
+            if "postgresql+psycopg://" in v:
+                return v.replace("postgresql+psycopg://", "postgresql://", 1)
         return v
 
     llm_provider: str = "gemini"
