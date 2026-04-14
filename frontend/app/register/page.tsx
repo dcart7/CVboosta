@@ -68,24 +68,12 @@ export default function RegisterPage() {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <section className="split auth-split fade-up">
-          <div className="auth-text">
+        <section className="auth-centered fade-up">
+          <div className="auth-header">
             <h1 className="hero-title">{t("auth.createWorkspace")}</h1>
             <p className="hero-subtitle">
               {t("auth.registerSubtitle")}
             </p>
-            <div className="steps">
-              <div className="step">
-                <span>1</span>
-                <h3>{t("auth.setupProfile")}</h3>
-                <p>{t("auth.setupProfileDesc")}</p>
-              </div>
-              <div className="step">
-                <span>2</span>
-                <h3>{t("auth.uploadCv")}</h3>
-                <p>{t("auth.uploadCvDesc")}</p>
-              </div>
-            </div>
           </div>
           <form className="form-card form-grid auth-form">
             <div>
@@ -124,6 +112,19 @@ export default function RegisterPage() {
               {t("auth.alreadyHaveAccount")}
             </Link>
           </form>
+
+          <div className="steps auth-footer-card">
+            <div className="step">
+              <span>1</span>
+              <h3>{t("auth.setupProfile")}</h3>
+              <p>{t("auth.setupProfileDesc")}</p>
+            </div>
+            <div className="step">
+              <span>2</span>
+              <h3>{t("auth.uploadCv")}</h3>
+              <p>{t("auth.uploadCvDesc")}</p>
+            </div>
+          </div>
         </section>
       </div>
     </main>

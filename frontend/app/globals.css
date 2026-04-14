@@ -1101,16 +1101,32 @@ a {
   gap: 24px;
 }
 
+.auth-centered {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.auth-header .hero-title {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.auth-footer-card {
+  margin-top: 8px;
+}
+
 @media (max-width: 900px) {
   .split {
     grid-template-columns: 1fr;
     gap: 32px;
-  }
-  .auth-split .auth-text {
-    order: 2;
-  }
-  .auth-split .auth-form {
-    order: 1;
   }
 }
 
