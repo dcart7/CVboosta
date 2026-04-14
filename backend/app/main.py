@@ -42,17 +42,39 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 @app.exception_handler(Exception)
+@app.exception_handler(StarletteHTTPException)
 async def global_exception_handler(request: Request, exc: Exception):
-    print(f"GLOBAL ERROR: {exc}")
+    status_code = 500
+    detail = str(exc)
+    
+    if isinstance(exc, StarletteHTTPException):
+        status_code = exc.status_code
+        detail = str(exc.detail)
+
+    print(f"GLOBAL ERROR ({status_code}): {detail}")
     trace = traceback.format_exc()
+    
+    # Manually add CORS headers
+    origin = request.headers.get("origin", "*")
+    headers = {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*"
+    }
+    
     return JSONResponse(
-        status_code=500,
+        status_code=status_code,
+        headers=headers,
         content={
-            "detail": str(exc),
+            "status_code": status_code,
+            "detail": detail,
             "type": type(exc).__name__,
             "traceback": trace,
-            "info": "Diagnostic mode enabled. Please check the error details."
+            "info": "Diagnostic mode enabled. All errors intercepted."
         }
     )
 
