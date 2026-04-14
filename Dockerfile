@@ -10,10 +10,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     python3-dev \
+    gcc \
+    g++ \
+    cmake \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 # Since context is mapped to root (.), we must copy from the nested backend folder
 COPY backend/requirements.txt .
+
+# Upgrade pip and build tools
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 RUN pip install --no-cache-dir -r requirements.txt
 
