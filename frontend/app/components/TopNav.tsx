@@ -98,7 +98,7 @@ export default function TopNav() {
         </Link>
 
         {/* Desktop Links */}
-        <nav className="nav-links desktop-only">
+        <nav className="nav-links cv-desktop-only" style={{ display: "flex", gap: "20px", fontSize: "14px" }}>
           <Link href="/app">{t("nav.dashboard")}</Link>
           <Link href="/results">{t("nav.results")}</Link>
           <Link href="/history">{t("nav.history")}</Link>
@@ -107,7 +107,7 @@ export default function TopNav() {
         </nav>
 
         <div className="nav-actions">
-          <div className="lang-switcher desktop-only">
+          <div className="lang-switcher cv-desktop-only" style={{ display: "flex" }}>
             <div className="lang-slider-track" ref={trackRef}>
               <span className="lang-slider-pill" style={pillStyle} aria-hidden="true" />
               {languages.map((l) => (
@@ -126,20 +126,19 @@ export default function TopNav() {
           <ThemeToggle />
           {email ? (
             <>
-              <Link className="btn ghost cv-user-pill cv-hide-on-mobile" href="/account" title={userName || email || ""}>
-                <span className="cv-desktop-only">{userName || email}</span>
-                <span className="cv-mobile-only">{userName ? userName.charAt(0).toUpperCase() : (email ? email.charAt(0).toUpperCase() : "U")}</span>
+              <Link className="btn ghost" href="/account" title={userName || email || ""}>
+                {userName || email}
               </Link>
-              <button className="btn primary cv-desktop-only" onClick={logout} type="button">
+              <button className="btn primary cv-desktop-only" style={{ display: "inline-flex" }} onClick={logout} type="button">
                 {t("nav.logout")}
               </button>
             </>
           ) : (
             <>
-              <Link className="btn ghost cv-desktop-only" href="/login">
+              <Link className="btn ghost cv-desktop-only" style={{ display: "inline-flex" }} href="/login">
                 {t("nav.login")}
               </Link>
-              <Link className="btn primary cv-desktop-only" href="/register">
+              <Link className="btn primary cv-desktop-only" style={{ display: "inline-flex" }} href="/register">
                 {t("nav.register")}
               </Link>
             </>

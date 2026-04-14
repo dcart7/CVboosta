@@ -1799,8 +1799,9 @@ a {
 .cv-mobile-only {
   display: none !important;
 }
+/* cv-desktop-only: visible by default, hidden on mobile via media query below */
 .cv-desktop-only {
-  display: initial !important;
+  /* do not force display here — elements keep their natural display (flex, inline-flex, etc.) */
 }
 
 @media (max-width: 768px) {
