@@ -1877,17 +1877,43 @@ a {
   right: 0;
   bottom: 0;
   z-index: 9999;
-  background: var(--nav-bg);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
   display: flex;
   flex-direction: column;
-  animation: slideDownMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInMobile 0.3s ease-out forwards;
 }
 
-@keyframes slideDownMobile {
+@keyframes fadeInMobile {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mobile-shutter::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  z-index: -1;
+}
+
+.mobile-shutter-content {
+  position: relative;
+  z-index: 1;
+  padding: 100px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  animation: slideDownContent 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownContent {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-40px);
     opacity: 0;
   }
   to {
@@ -1896,13 +1922,6 @@ a {
   }
 }
 
-.mobile-shutter-content {
-  padding: 100px 24px 40px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-}
 
 .mobile-shutter-link {
   display: block;
