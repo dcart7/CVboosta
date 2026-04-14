@@ -12,7 +12,8 @@
     "jspdf": "^2.5.2",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "@vercel/analytics": "latest"
   },
   "devDependencies": {
     "@types/node": "25.5.2",
