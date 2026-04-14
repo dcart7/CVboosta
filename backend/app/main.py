@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.core.config import settings
+from app.core.config import settings, get_cors_origins
 from app.api.routes.analyze import router as analyze_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.history import router as history_router
@@ -69,7 +69,7 @@ async def request_logger_middleware(request: Request, call_next):  # type: ignor
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.get_cors_origins(),
+    allow_origins=get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -87,7 +87,7 @@ app.include_router(billing_router, prefix="/billing", tags=["billing"])
 def on_startup() -> None:
     print("STARTUP: Application is booting...")
     print(f"STARTUP: Database URL present: {settings.database_url is not None}")
-    print(f"STARTUP: CORS Origins: {settings.get_cors_origins()}")
+    print(f"STARTUP: CORS Origins: {get_cors_origins()}")
     # We no longer run init_db here to ensure fastest possible port binding for Cloud Run health checks.
     # DB initialization is handled lazily in get_db().
     print("STARTUP: Boot process complete. Ready for requests.")

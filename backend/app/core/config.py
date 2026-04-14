@@ -37,26 +37,34 @@ class Settings(BaseSettings):
     jwt_secret: str = "temporary_secret_for_deployment_change_me"
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
-    # Use manual env loading for CORS to bypass Pydantic-settings JSON issues
-    cors_origins_raw: str = os.getenv("CORS_ORIGINS", "*")
     paddle_webhook_secret: str | None = None
-
-    def get_cors_origins(self) -> list[str]:
-        v = self.cors_origins_raw
-        if not v or v.strip() == "*":
-            return ["*"]
-        if v.startswith("[") and v.endswith("]"):
-            import json
-            try:
-                return json.loads(v)
-            except:
-                pass
-        return [i.strip() for i in v.split(",") if i.strip()]
 
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+
+def get_cors_origins() -> list[str]:
+    """
+    Safely load CORS origins directly from environment variables,
+    bypassing Pydantic's aggressive JSON parsing.
+    """
+    import os
+    import json
+    v = os.getenv("CORS_ORIGINS", "*")
+    
+    if not v or v.strip() == "*":
+        return ["*"]
+        
+    # Handle both comma-separated strings and JSON arrays
+    if v.startswith("[") and v.endswith("]"):
+        try:
+            return json.loads(v)
+        except Exception:
+            pass
+            
+    return [i.strip() for i in v.split(",") if i.strip()]
 
 
 try:
