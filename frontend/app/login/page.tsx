@@ -54,8 +54,8 @@ export default function LoginPage() {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <section className="split fade-up">
-          <div>
+        <section className="split auth-split fade-up">
+          <div className="auth-text">
             <h1 className="hero-title">{t("auth.welcomeBack")}</h1>
             <p className="hero-subtitle">
               {t("auth.loginSubtitle")}
@@ -65,7 +65,7 @@ export default function LoginPage() {
               <p>{t("auth.whatsNewDesc")}</p>
             </div>
           </div>
-          <form className="form-card form-grid">
+          <form className="form-card form-grid auth-form">
             <div>
               <div className="label">{t("auth.email")}</div>
               <input

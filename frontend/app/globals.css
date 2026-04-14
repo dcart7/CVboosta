@@ -1106,6 +1106,12 @@ a {
     grid-template-columns: 1fr;
     gap: 32px;
   }
+  .auth-split .auth-text {
+    order: 2;
+  }
+  .auth-split .auth-form {
+    order: 1;
+  }
 }
 
 .pill {

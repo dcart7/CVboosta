@@ -68,8 +68,8 @@ export default function RegisterPage() {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <section className="split fade-up">
-          <div>
+        <section className="split auth-split fade-up">
+          <div className="auth-text">
             <h1 className="hero-title">{t("auth.createWorkspace")}</h1>
             <p className="hero-subtitle">
               {t("auth.registerSubtitle")}
@@ -87,7 +87,7 @@ export default function RegisterPage() {
               </div>
             </div>
           </div>
-          <form className="form-card form-grid">
+          <form className="form-card form-grid auth-form">
             <div>
               <div className="label">{t("auth.fullName")}</div>
               <input
