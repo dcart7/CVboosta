@@ -1790,7 +1790,12 @@ a {
   border: 1px solid var(--glass-stroke);
 }
 
-/* --- INDESTRUCTIBLE MOBILE SYSTEM --- */
+/* --- TRUE GLASS SHUTTER SYSTEM --- */
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0.1; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 .cv-mobile-only {
   display: none !important;
 }
@@ -1807,12 +1812,13 @@ a {
   }
   
   .hero-title, .gradient-text {
-    font-size: 2rem !important;
+    font-size: 2.1rem !important;
     text-align: center;
+    letter-spacing: -0.02em;
   }
   
   .shell {
-    padding: 0 20px 60px !important;
+    padding: 0 24px 60px !important;
   }
 }
 
@@ -1822,22 +1828,25 @@ a {
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  background: rgba(246, 246, 244, 0.98) !important;
-  backdrop-filter: blur(25px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-  z-index: 99999 !important; /* COVERS EVERYTHING EXCEPT NAV CONTENT */
+  background: rgba(255, 255, 255, 0.3) !important; /* ULTRA GLASS */
+  backdrop-filter: blur(40px) saturate(220%) brightness(1.1) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(220%) brightness(1.1) !important;
+  z-index: 99999 !important;
   display: flex;
   flex-direction: column;
-  animation: fadeIn 0.3s ease-out forwards;
+  animation: slideDown 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 [data-theme="dark"] .mobile-menu-overlay {
-  background: rgba(11, 14, 20, 0.98) !important;
+  background: rgba(11, 14, 20, 0.4) !important;
+  backdrop-filter: blur(40px) saturate(200%) brightness(0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-inner {
   position: relative !important;
-  z-index: 100000 !important; /* STAY ABOVE OVERLAY */
+  z-index: 100000 !important; 
 }
 
 .cv-user-pill {
@@ -1847,13 +1856,14 @@ a {
 
 .cv-user-pill .cv-mobile-only {
   display: flex !important;
-  width: 36px;
-  height: 36px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  color: white;
+  border-radius: 12px;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 15px;
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
 }
