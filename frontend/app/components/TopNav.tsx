@@ -126,30 +126,30 @@ export default function TopNav() {
           <ThemeToggle />
           {email ? (
             <>
-              <Link className="btn ghost" href="/account" title={userName || email || ""}>
-                <span className="desktop-only">{userName || email}</span>
-                <span className="mobile-only">{userName ? userName.charAt(0).toUpperCase() : (email ? email.charAt(0).toUpperCase() : "U")}</span>
+              <Link className="btn ghost cv-user-pill" href="/account" title={userName || email || ""}>
+                <span className="cv-desktop-only">{userName || email}</span>
+                <span className="cv-mobile-only">{userName ? userName.charAt(0).toUpperCase() : (email ? email.charAt(0).toUpperCase() : "U")}</span>
               </Link>
-              <button className="btn primary desktop-only" onClick={logout} type="button">
+              <button className="btn primary cv-desktop-only" onClick={logout} type="button">
                 {t("nav.logout")}
               </button>
             </>
           ) : (
-            <>
+            <div className="cv-desktop-only" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
               <Link className="btn ghost" href="/login">
                 {t("nav.login")}
               </Link>
               <Link className="btn primary" href="/register">
                 {t("nav.register")}
               </Link>
-            </>
+            </div>
           )}
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="btn ghost mobile-only" 
+            className="btn ghost cv-mobile-only" 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            style={{ padding: "8px 12px" }}
+            style={{ padding: "8px 12px", fontSize: "20px" }}
           >
              {isMenuOpen ? "✕" : "☰"}
           </button>
@@ -158,56 +158,53 @@ export default function TopNav() {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="mobile-menu-overlay" style={{
-          position: "fixed",
-          top: "76px",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "var(--paper)",
-          zIndex: 100,
-          padding: "24px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px"
-        }}>
-          <Link href="/app" onClick={() => setIsMenuOpen(false)} style={{ fontSize: "1.2rem", fontWeight: "600" }}>{t("nav.dashboard")}</Link>
-          <Link href="/results" onClick={() => setIsMenuOpen(false)} style={{ fontSize: "1.2rem", fontWeight: "600" }}>{t("nav.results")}</Link>
-          <Link href="/history" onClick={() => setIsMenuOpen(false)} style={{ fontSize: "1.2rem", fontWeight: "600" }}>{t("nav.history")}</Link>
-          <Link href="/pricing" onClick={() => setIsMenuOpen(false)} style={{ fontSize: "1.2rem", fontWeight: "600" }}>{t("nav.pricing")}</Link>
-          <Link href="/about" onClick={() => setIsMenuOpen(false)} style={{ fontSize: "1.2rem", fontWeight: "600" }}>{t("nav.about")}</Link>
-          <hr style={{ border: "none", borderTop: "1px solid var(--line)", width: "100%" }} />
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-             <span>Language</span>
-             <div className="lang-switcher">
-                <div className="lang-slider-track">
-                  {languages.map((l) => (
-                    <button
-                      key={l.code}
-                      className={`lang-btn${language === l.code ? " active" : ""}`}
-                      onClick={() => { setLanguage(l.code); setIsMenuOpen(false); }}
-                      type="button"
-                    >
-                      {l.flag}
-                    </button>
-                  ))}
-                </div>
-             </div>
-          </div>
-          {email ? (
-             <button className="btn primary" onClick={logout} style={{ marginTop: "auto" }}>
-                {t("nav.logout")}
-             </button>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "auto" }}>
-               <Link className="btn primary" href="/register" onClick={() => setIsMenuOpen(false)}>
-                  {t("nav.register")}
-               </Link>
-               <Link className="btn ghost" href="/login" onClick={() => setIsMenuOpen(false)}>
-                  {t("nav.login")}
-               </Link>
+        <div className="mobile-menu-overlay">
+          <div className="mobile-menu-content">
+            <nav className="mobile-nav-links">
+              <Link href="/app" onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
+              <Link href="/results" onClick={() => setIsMenuOpen(false)}>{t("nav.results")}</Link>
+              <Link href="/history" onClick={() => setIsMenuOpen(false)}>{t("nav.history")}</Link>
+              <Link href="/pricing" onClick={() => setIsMenuOpen(false)}>{t("nav.pricing")}</Link>
+              <Link href="/about" onClick={() => setIsMenuOpen(false)}>{t("nav.about")}</Link>
+            </nav>
+            
+            <hr className="mobile-divider" />
+            
+            <div className="mobile-lang-row">
+               <span>Language</span>
+               <div className="lang-switcher">
+                  <div className="lang-slider-track">
+                    {languages.map((l) => (
+                      <button
+                        key={l.code}
+                        className={`lang-btn${language === l.code ? " active" : ""}`}
+                        onClick={() => { setLanguage(l.code); setIsMenuOpen(false); }}
+                        type="button"
+                      >
+                        {l.flag}
+                      </button>
+                    ))}
+                  </div>
+               </div>
             </div>
-          )}
+
+            <div className="mobile-auth-actions">
+              {email ? (
+                 <button className="btn primary" onClick={logout}>
+                    {t("nav.logout")}
+                 </button>
+              ) : (
+                <>
+                   <Link className="btn primary" href="/register" onClick={() => setIsMenuOpen(false)}>
+                      {t("nav.register")}
+                   </Link>
+                   <Link className="btn ghost" href="/login" onClick={() => setIsMenuOpen(false)}>
+                      {t("nav.login")}
+                   </Link>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </header>
