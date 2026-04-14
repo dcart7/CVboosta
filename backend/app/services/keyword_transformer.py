@@ -7,17 +7,15 @@ from pathlib import Path
 from app.core.config import settings
 from app.schemas.keywords import KeywordExtractionResult
 
-try:
-    from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
-except Exception:  # pragma: no cover
-    AutoModelForTokenClassification = None  # type: ignore[assignment]
-    AutoTokenizer = None  # type: ignore[assignment]
-    pipeline = None  # type: ignore[assignment]
+# transformers removed from top level for faster startup
 
 
 @lru_cache(maxsize=1)
 def _load_pipeline():
-    if AutoTokenizer is None or AutoModelForTokenClassification is None or pipeline is None:
+    try:
+        from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
+    except ImportError:
+        print("TRANSFORMER_SERVICE: transformers not installed")
         return None
     model_path_str = settings.keyword_transformer_model_path
     model_path = Path(model_path_str)

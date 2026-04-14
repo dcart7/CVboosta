@@ -8,10 +8,7 @@ from pathlib import Path
 from app.core.config import settings
 from app.schemas.keywords import KeywordExtractionResult
 
-try:
-    import joblib
-except Exception:  # pragma: no cover
-    joblib = None  # type: ignore[assignment]
+# joblib removed from top level for faster startup
 
 
 def _tokenize(text: str) -> list[str]:
@@ -110,7 +107,10 @@ def _extract_spans(tokens: list[str], tags: list[str], label: str = "Skill") -> 
 
 @lru_cache(maxsize=1)
 def _load_model():
-    if joblib is None:
+    try:
+        import joblib
+    except ImportError:
+        print("CRF_SERVICE: joblib not installed")
         return None
     model_path_str = settings.keyword_crf_model_path
     model_path = Path(model_path_str)
