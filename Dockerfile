@@ -40,5 +40,5 @@ ENV PYTHONPATH=/app
 EXPOSE 8080
 
 # Cloud Run requires the server to listen on $PORT
-# We run ls -R first to debug the filesystem, then start the safe mode app
-CMD ["sh", "-c", "echo 'DEBUG: Filesystem structure:' && ls -R /app && echo 'DEBUG: Starting Safe Mode Server...' && uvicorn app.main_safe:app --host 0.0.0.0 --port ${PORT:-8080}"]
+# We keep diagnostics for now to monitor the full app startup
+CMD ["sh", "-c", "echo 'DEBUG: Filesystem structure:' && ls -R /app && echo 'DEBUG: Starting Full Application...' && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
