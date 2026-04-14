@@ -22,6 +22,7 @@ export default function TopNav() {
     { code: "uk", flag: "🇺🇦" },
     { code: "pl", flag: "🇵🇱" },
     { code: "sk", flag: "🇸🇰" },
+    { code: "cs", flag: "🇨🇿" },
     { code: "es", flag: "🇪🇸" },
   ];
 

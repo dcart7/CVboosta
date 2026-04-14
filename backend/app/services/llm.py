@@ -22,6 +22,7 @@ _UI_LANGUAGE_NAMES: dict[str, str] = {
     "uk": "Ukrainian",
     "pl": "Polish",
     "sk": "Slovak",
+    "cs": "Czech",
     "es": "Spanish",
 }
 
