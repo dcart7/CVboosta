@@ -1,36 +1,19 @@
-print("INFO: Starting main.py execution...")
 import time
-print("INFO: time imported")
-
 from fastapi import FastAPI, Request
-print("INFO: fastapi imported")
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings, get_cors_origins
-print("INFO: core.config imported")
 from app.api.routes.analyze import router as analyze_router
-print("INFO: routes.analyze imported")
 from app.api.routes.auth import router as auth_router
-print("INFO: routes.auth imported")
 from app.api.routes.history import router as history_router
-print("INFO: routes.history imported")
 from app.api.routes.logs import router as logs_router
-print("INFO: routes.logs imported")
 from app.api.routes.optimize import router as optimize_router
-print("INFO: routes.optimize imported")
 from app.api.routes.billing import router as billing_router
-print("INFO: routes.billing imported")
 from app.core.api_key import api_key_middleware
-print("INFO: core.api_key imported")
 from app.core.rate_limit import rate_limit_middleware
-print("INFO: core.rate_limit imported")
-from app.db.init_db import init_db
-print("INFO: db.init_db imported")
 from app.services.request_logger import capture_response_body, log_request_response
-print("INFO: services.request_logger imported")
 from app.services.llm import LLMServiceError
-print("INFO: services.llm imported")
 
 app = FastAPI(title="Smart CV Optimizer API")
 

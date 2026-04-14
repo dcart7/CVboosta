@@ -8,7 +8,7 @@ from fastapi import Request
 from starlette.responses import Response, StreamingResponse
 
 from app.core.config import settings
-from app.db.session import SessionLocal
+from app.db.session import get_sessionlocal
 from app.models.request_log import RequestLog
 
 _SKIP_PATHS = {"/health", "/openapi.json", "/auth/login", "/auth/register"}
@@ -80,7 +80,10 @@ def _client_ip(request: Request) -> str | None:
 
 
 def _safe_commit(log: RequestLog) -> None:
-    db = SessionLocal()
+    session_local = get_sessionlocal()
+    if not session_local:
+        return
+    db = session_local()
     try:
         db.add(log)
         db.commit()
