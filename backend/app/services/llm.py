@@ -19,7 +19,7 @@ _GEMINI_FALLBACK_MODELS = ("gemini-2.0-flash", "gemini-flash-latest")
 # BCP-47-style codes from the frontend LanguageContext
 _UI_LANGUAGE_NAMES: dict[str, str] = {
     "en": "English",
-    "uk": "Ukrainian",
+    "ua": "Ukrainian",
     "pl": "Polish",
     "sk": "Slovak",
     "cs": "Czech",
