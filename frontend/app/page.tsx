@@ -76,6 +76,66 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="section fade-up project-explainer">
+          <div className="project-explainer-card">
+            <h2 className="section-title">What CVboosta does behind the scenes</h2>
+            <p className="project-lead">
+              CVboosta is not just a text rewriter. It compares your current CV to the exact language of a target role,
+              spots mismatches, and then rebuilds your content into a stronger narrative that still stays true to your
+              real experience.
+            </p>
+            <div className="project-points">
+              <article className="project-point">
+                <h3>Signal extraction</h3>
+                <p>
+                  We parse structure, role history, measurable outcomes, and skill signals from your CV to avoid blind
+                  rewriting.
+                </p>
+              </article>
+              <article className="project-point">
+                <h3>Role intelligence</h3>
+                <p>
+                  Job descriptions are analyzed for required skills, seniority expectations, and repeated priority
+                  phrases recruiters are likely screening for.
+                </p>
+              </article>
+              <article className="project-point">
+                <h3>Guided optimization</h3>
+                <p>
+                  You receive a rewritten draft, missing keyword map, and practical recommendations so you can improve
+                  quality before applying.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="section fade-up workflow-section">
+          <h2 className="section-title">How the project workflow works</h2>
+          <div className="workflow-grid">
+            <div className="card workflow-card">
+              <span className="workflow-tag">Phase 1</span>
+              <h3>Upload and parse</h3>
+              <p>Your file is converted into structured text so section quality and impact signals can be evaluated.</p>
+            </div>
+            <div className="card workflow-card">
+              <span className="workflow-tag">Phase 2</span>
+              <h3>Match against vacancy</h3>
+              <p>We compare your profile to role requirements and rank what is missing, weak, or already competitive.</p>
+            </div>
+            <div className="card workflow-card">
+              <span className="workflow-tag">Phase 3</span>
+              <h3>Generate upgraded draft</h3>
+              <p>A cleaner CV version is generated with stronger bullet phrasing and clearer ATS-friendly alignment.</p>
+            </div>
+            <div className="card workflow-card">
+              <span className="workflow-tag">Phase 4</span>
+              <h3>Review, export, iterate</h3>
+              <p>You can inspect recommendations, save versions to history, and export a polished CV for applications.</p>
+            </div>
+          </div>
+        </section>
+
         <section className="section fade-up" style={{ marginTop: "4rem" }}>
           <h2 className="section-title" style={{ textAlign: "center", marginBottom: "3rem" }}>
             {t("testimonials.title")}

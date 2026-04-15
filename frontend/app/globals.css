@@ -1548,6 +1548,181 @@ a {
   padding: 2.5rem !important;
 }
 
+.project-explainer-card {
+  position: relative;
+  padding: 30px 28px;
+  border-radius: 22px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--glass-hi) 88%, transparent),
+      var(--surface));
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.project-explainer-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(700px 220px at 14% 0%,
+      var(--glass-stroke),
+      transparent 60%),
+    radial-gradient(680px 220px at 100% 0%,
+      rgba(255, 255, 255, 0.12),
+      transparent 66%);
+  mix-blend-mode: overlay;
+}
+
+.project-lead {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.72;
+  color: var(--ink);
+  opacity: 0.9;
+  max-width: 980px;
+}
+
+.project-points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.project-point {
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  padding: 18px 16px;
+}
+
+.project-point h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.project-point p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.workflow-section {
+  margin-top: 28px;
+}
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.workflow-card {
+  display: grid;
+  gap: 10px;
+}
+
+.workflow-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 36%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+}
+
+.workflow-card p {
+  line-height: 1.6;
+}
+
+.legal-page-shell {
+  width: min(980px, 100%);
+}
+
+.legal-hero {
+  margin-bottom: 32px;
+}
+
+.legal-doc {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(140deg,
+      color-mix(in srgb, var(--glass-hi) 90%, transparent),
+      var(--glass));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(22px) saturate(160%);
+  padding: 36px 30px;
+  overflow: hidden;
+}
+
+.legal-doc::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(920px 240px at 6% -4%, var(--glass-stroke), transparent 60%),
+    radial-gradient(880px 230px at 100% 2%, rgba(255, 255, 255, 0.12), transparent 63%);
+}
+
+.legal-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 24px;
+}
+
+.legal-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--surface-2) 86%, transparent);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 6px 12px;
+}
+
+.legal-content {
+  display: grid;
+  gap: 18px;
+}
+
+.legal-block {
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px 18px;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+}
+
+.legal-block h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: var(--accent);
+}
+
+.legal-block p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--ink);
+  opacity: 0.92;
+}
+
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(calc(-50% - 10px)); }
@@ -1570,6 +1745,28 @@ a {
   .testi-card {
     width: 280px;
     scroll-snap-align: center;
+  }
+
+  .project-explainer-card,
+  .legal-doc {
+    padding: 22px 16px;
+    border-radius: 20px;
+  }
+
+  .project-lead {
+    font-size: 15px;
+  }
+
+  .legal-block {
+    padding: 16px 14px;
+  }
+
+  .legal-block h3 {
+    font-size: 18px;
+  }
+
+  .legal-block p {
+    font-size: 15px;
   }
 }
 
