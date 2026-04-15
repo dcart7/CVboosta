@@ -27,7 +27,7 @@ export default function RegisterPage() {
     const isLongEnough = password.length >= 10;
 
     if (!isLongEnough || !hasNumber || !hasSymbol) {
-      setError("Password is too weak. Must be at least 10 characters and include a number and a symbol.");
+      setError(t("auth.passwordWeak"));
       return;
     }
 
@@ -104,9 +104,9 @@ export default function RegisterPage() {
                 onChange={(event) => setPassword(event.target.value)}
               />
               <ul className="password-rules" aria-label="Password requirements">
-                <li>At least 10 characters</li>
-                <li>At least 1 number</li>
-                <li>At least 1 symbol (!@#$...)</li>
+                <li>{t("auth.passwordRuleLen")}</li>
+                <li>{t("auth.passwordRuleNumber")}</li>
+                <li>{t("auth.passwordRuleSymbol")}</li>
               </ul>
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}

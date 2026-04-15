@@ -10,7 +10,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="shell">
         <div className="footer-content">
-          <div className="footer-brand">
+          <div className="footer-left">
             <Link href="/" className="logo">
               <img src="/logo.png" alt="CVboosta logo" width={34} height={34} className="footer-logo" />
               <span className="logo-text">
@@ -31,15 +31,17 @@ export default function Footer() {
               <a href={`mailto:${t("footer.support")}`} className="footer-email">
                 {t("footer.support")}
               </a>
+            </div>
+          </div>
 
-              <div className="footer-links">
-                <Link href="/privacy" className="footer-link">
-                  {t("footer.privacy")}
-                </Link>
-                <Link href="/terms" className="footer-link">
-                  {t("footer.terms")}
-                </Link>
-              </div>
+          <div className="footer-right">
+            <div className="footer-links">
+              <Link href="/privacy" className="footer-link">
+                {t("footer.privacy")}
+              </Link>
+              <Link href="/terms" className="footer-link">
+                {t("footer.terms")}
+              </Link>
             </div>
           </div>
         </div>
@@ -69,19 +71,27 @@ export default function Footer() {
         }
         .footer-content {
           display: flex;
-          justify-content: flex-start;
+          justify-content: space-between;
           align-items: flex-start;
           gap: 24px;
         }
-        .footer-brand {
+        .footer-left {
           display: flex;
           flex-direction: column;
           gap: 14px;
+        }
+        .footer-right {
+          display: flex;
+          align-items: flex-start;
+          justify-content: flex-end;
+          min-width: 220px;
+          padding-top: 8px;
         }
         .logo {
           display: inline-flex;
           align-items: center;
           gap: 10px;
+          min-height: 34px;
           font-size: 20px;
           font-weight: 700;
           text-decoration: none;
@@ -97,8 +107,10 @@ export default function Footer() {
           flex-shrink: 0;
         }
         .logo-text {
-          color: var(--ink);
+          display: inline-flex;
+          align-items: center;
           line-height: 1;
+          color: var(--ink);
         }
         .logo-text span {
           color: var(--accent);
@@ -143,15 +155,15 @@ export default function Footer() {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          gap: 8px;
-          padding-top: 2px;
+          gap: 10px;
         }
         .footer-link {
           font-size: 14px;
           color: var(--ink);
           text-decoration: none;
-          opacity: 0.65;
+          opacity: 0.75;
           transition: all 0.2s ease;
+          font-weight: 500;
         }
         .footer-link:hover {
           opacity: 1;
@@ -182,8 +194,14 @@ export default function Footer() {
         }
         @media (max-width: 640px) {
           .footer-content {
+            flex-direction: column;
             align-items: flex-start;
             text-align: left;
+          }
+          .footer-right {
+            justify-content: flex-start;
+            min-width: 0;
+            padding-top: 0;
           }
           .footer-bottom-text {
             text-align: left;

@@ -474,6 +474,32 @@ export default function WorkspacePage() {
       setOptimizedSummary((data.optimized_cv || "").split("\n")[0] || "—");
       setRecommendations(data.recommendations || []);
       setOptimizeStatus("Optimization complete.");
+
+      // Reset workspace input state after successful scan so dashboard starts clean.
+      setFile(null);
+      setParsed(null);
+      setTargetRole("");
+      setTargetCompany("");
+      setJobText("");
+      setKeywordCache([]);
+      setKeywordSource("");
+      setMatchPercent(null);
+      setMissingKeywords([]);
+      setAnalysisStatus("");
+      try {
+        localStorage.removeItem(parsedCvStorageKey(userEmail));
+        localStorage.removeItem(wsFieldKey(workspaceId, "target_role"));
+        localStorage.removeItem(wsFieldKey(workspaceId, "target_company"));
+        localStorage.removeItem(wsFieldKey(workspaceId, "job_text"));
+        localStorage.removeItem(wsFieldKey(workspaceId, "cv_text"));
+        localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords"));
+        localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_hash"));
+        localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_source"));
+        sessionStorage.removeItem(sessionCvParsedKey(workspaceId));
+      } catch {
+        // ignore storage errors
+      }
+
       if (data.analysis_id) {
         // Automatically inject the ID into localStorage so when /results mounts, it has a fallback if search params fail
         localStorage.setItem("current_analysis_id", String(data.analysis_id));

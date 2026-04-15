@@ -52,7 +52,7 @@ export default function PricingPage() {
         },
       });
     } else {
-      alert("Paddle billing service is loading. Please try again in a moment.");
+      alert(t("pricing.paddleLoading"));
     }
   };
 
@@ -66,6 +66,7 @@ export default function PricingPage() {
         `1 ${t("pricing.featureScan")}`,
         `1 ${t("pricing.featureCl")}`,
         `1 ${t("pricing.featurePrep")}`,
+        t("pricing.featureNoWatermark"),
         t("pricing.featureHistory"),
       ],
       cta: t("pricing.ctaBuy"),
@@ -81,6 +82,7 @@ export default function PricingPage() {
         `15 ${t("pricing.featureScan")}`,
         `15 ${t("pricing.featureCl")}`,
         `15 ${t("pricing.featurePrep")}`,
+        t("pricing.featureNoWatermark"),
         t("pricing.featureHistory"),
       ],
       cta: t("pricing.ctaUpgrade"),
@@ -96,7 +98,8 @@ export default function PricingPage() {
       cycle: billingCycle === "week" ? t("pricing.perWeek") : t("pricing.perMonth"),
       features: [
         t("pricing.featureUnlimited"),
-        "Priority Support",
+        t("pricing.featureNoWatermark"),
+        t("pricing.prioritySupport"),
         t("pricing.featureHistory"),
       ],
       cta: t("pricing.ctaUpgrade"),
@@ -111,8 +114,9 @@ export default function PricingPage() {
       cycle: t("pricing.oneTime"),
       features: [
         t("pricing.featureUnlimited"),
-        "Lifetime Access",
-        "All Future Updates",
+        t("pricing.featureNoWatermark"),
+        t("pricing.lifetimeAccess"),
+        t("pricing.allFutureUpdates"),
         t("pricing.featureHistory"),
       ],
       cta: t("pricing.ctaUpgrade"),
@@ -138,13 +142,13 @@ export default function PricingPage() {
                  onClick={() => setBillingCycle("week")}
                  className={billingCycle === "week" ? "active" : ""}
                >
-                 Weekly
+                 {t("pricing.weekly")}
                </button>
                <button 
                  onClick={() => setBillingCycle("month")}
                  className={billingCycle === "month" ? "active" : ""}
                >
-                 Monthly
+                 {t("pricing.monthly")}
                </button>
             </div>
           )}
