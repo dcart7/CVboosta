@@ -36,6 +36,7 @@ export default function LoginPage() {
       }
       const data = await response.json();
       localStorage.setItem("auth_token", data.access_token);
+      localStorage.setItem("user_email", email.trim().toLowerCase());
       window.dispatchEvent(new Event("auth-change"));
       router.push("/account");
     } catch (err) {

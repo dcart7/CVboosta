@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
     paddle_webhook_secret: str | None = None
+    paddle_price_single_scan: str | None = None
+    paddle_price_go_weekly: str | None = None
+    paddle_price_go_monthly: str | None = None
+    paddle_price_pro_weekly: str | None = None
+    paddle_price_pro_monthly: str | None = None
+    paddle_price_lifetime: str | None = None
 
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",

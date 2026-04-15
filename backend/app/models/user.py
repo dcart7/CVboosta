@@ -28,6 +28,9 @@ class User(Base):
 
     def reset_usage_if_needed(self):
         from datetime import datetime, timezone
+        # Single plan is one-time quota; do not auto-reset daily counters.
+        if self.subscription_tier == "single":
+            return False
         now = datetime.now(timezone.utc)
         if self.last_usage_reset is None or self.last_usage_reset.date() < now.date():
             self.daily_scans_count = 0

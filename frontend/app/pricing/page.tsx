@@ -22,6 +22,47 @@ export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"week" | "month">("month");
   const [mounted, setMounted] = useState(false);
 
+  const paddlePrices = {
+    single: process.env.NEXT_PUBLIC_PADDLE_PRICE_SINGLE_SCAN || "",
+    go: {
+      week: process.env.NEXT_PUBLIC_PADDLE_PRICE_GO_WEEKLY || "",
+      month: process.env.NEXT_PUBLIC_PADDLE_PRICE_GO_MONTHLY || "",
+    },
+    pro: {
+      week: process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO_WEEKLY || "",
+      month: process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY || "",
+    },
+    lifetime: process.env.NEXT_PUBLIC_PADDLE_PRICE_LIFETIME || "",
+  } as const;
+
+  const getEmailForCheckout = () => {
+    const saved = localStorage.getItem("user_email");
+    if (saved?.trim()) return saved.trim();
+    const token = localStorage.getItem("auth_token");
+    if (!token) return undefined;
+    try {
+      const base64Url = token.split(".")[1] || "";
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+      const payload = JSON.parse(atob(padded));
+      const email = typeof payload?.email === "string" ? payload.email : undefined;
+      if (email) {
+        localStorage.setItem("user_email", email);
+      }
+      return email;
+    } catch {
+      return undefined;
+    }
+  };
+
+  const resolvePriceId = (tierId: string) => {
+    if (tierId === "single") return paddlePrices.single;
+    if (tierId === "go") return paddlePrices.go[billingCycle];
+    if (tierId === "pro") return paddlePrices.pro[billingCycle];
+    if (tierId === "lifetime") return paddlePrices.lifetime;
+    return "";
+  };
+
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined" && (window as any).Paddle) {
@@ -38,7 +79,12 @@ export default function PricingPage() {
     }
   }, []);
 
-  const openCheckout = (priceId: string) => {
+  const openCheckout = (tierId: string) => {
+    const priceId = resolvePriceId(tierId);
+    if (!priceId) {
+      alert("Paddle price ID is missing for this plan. Set NEXT_PUBLIC_PADDLE_PRICE_* env vars.");
+      return;
+    }
     if (typeof window !== "undefined" && (window as any).Paddle) {
       (window as any).Paddle.Checkout.open({
         items: [
@@ -48,7 +94,16 @@ export default function PricingPage() {
           },
         ],
         customer: {
-          email: localStorage.getItem("user_email") || undefined,
+          email: getEmailForCheckout(),
+        },
+        customData: {
+          tier:
+            tierId === "single"
+              ? "single_scan"
+              : tierId === "lifetime"
+                ? "lifetime"
+                : tierId,
+          period: tierId === "go" || tierId === "pro" ? billingCycle : "one_time",
         },
       });
     } else {

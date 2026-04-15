@@ -18,6 +18,10 @@ type ActivityItem = {
   meta?: Record<string, string>;
 };
 
+type BillingStatusResponse = {
+  tier?: string;
+};
+
 export default function AccountPage() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -28,10 +32,21 @@ export default function AccountPage() {
   const [messageTone, setMessageTone] = useState<"ok" | "error">("ok");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
   const [profileError, setProfileError] = useState<"unauthorized" | "offline" | null>(
     null,
   );
   const apiBase = getApiBase();
+
+  const getPlanLabel = (tierRaw: string | null) => {
+    const tier = (tierRaw || "").toLowerCase();
+    if (!tier || tier === "free") return "Free";
+    if (tier === "single" || tier === "single_scan") return "Single Scan";
+    if (tier === "go") return t("pricing.go");
+    if (tier === "pro") return t("pricing.pro");
+    if (tier === "lifetime") return t("pricing.lifetime");
+    return tierRaw || "Free";
+  };
 
   const loadAccount = useCallback(async () => {
     const token = localStorage.getItem("auth_token");
@@ -52,6 +67,7 @@ export default function AccountPage() {
         localStorage.removeItem("auth_token");
         setUser(null);
         setProfileError("unauthorized");
+        setSubscriptionTier(null);
         setLoading(false);
         setActivityLoading(false);
         return;
@@ -59,6 +75,7 @@ export default function AccountPage() {
       if (!meRes.ok) {
         setUser(null);
         setProfileError("offline");
+        setSubscriptionTier(null);
         setLoading(false);
         setActivityLoading(false);
         return;
@@ -67,6 +84,7 @@ export default function AccountPage() {
       if (!meData?.email) {
         setUser(null);
         setProfileError("offline");
+        setSubscriptionTier(null);
         setLoading(false);
         setActivityLoading(false);
         return;
@@ -74,6 +92,24 @@ export default function AccountPage() {
       setUser({ email: meData.email });
       setProfileError(null);
       setLoading(false);
+
+      try {
+        const billingRes = await fetchWithRetry(
+          `${apiBase}/billing/status`,
+          { headers: { Authorization: `Bearer ${token}` } },
+          { attempts: 4, baseDelayMs: 350, timeoutMs: 20_000 },
+        );
+        if (billingRes.ok) {
+          const billingData: BillingStatusResponse = await billingRes.json();
+          setSubscriptionTier(
+            typeof billingData.tier === "string" ? billingData.tier : null,
+          );
+        } else {
+          setSubscriptionTier(null);
+        }
+      } catch {
+        setSubscriptionTier(null);
+      }
 
       try {
         const actRes = await fetchWithRetry(
@@ -91,6 +127,7 @@ export default function AccountPage() {
     } catch {
       setUser(null);
       setProfileError("offline");
+      setSubscriptionTier(null);
       setLoading(false);
       setActivityLoading(false);
     }
@@ -184,7 +221,7 @@ export default function AccountPage() {
                 </div>
                 <div className="card">
                   <h3>{t("account.plan")}</h3>
-                  <p>{t("account.planValue")}</p>
+                  <p>{getPlanLabel(subscriptionTier)}</p>
                 </div>
               </div>
 
