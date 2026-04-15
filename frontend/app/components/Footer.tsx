@@ -109,7 +109,8 @@ export default function Footer() {
         .logo-text {
           display: inline-flex;
           align-items: center;
-          line-height: 1;
+          line-height: 1.05;
+          transform: translateY(1px);
           color: var(--ink);
         }
         .logo-text span {
@@ -158,16 +159,38 @@ export default function Footer() {
           gap: 10px;
         }
         .footer-link {
+          position: relative;
           font-size: 14px;
           color: var(--ink);
           text-decoration: none;
-          opacity: 0.75;
+          opacity: 0.9;
           transition: all 0.2s ease;
           font-weight: 500;
+          padding: 9px 12px;
+          border-radius: 12px;
+          border: 1px solid color-mix(in srgb, var(--glass-border) 80%, rgba(255, 255, 255, 0.35));
+          background:
+            linear-gradient(140deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.10) 62%, rgba(255, 255, 255, 0.05)),
+            color-mix(in srgb, var(--surface) 76%, transparent);
+          box-shadow:
+            0 8px 20px rgba(15, 23, 42, 0.10),
+            0 1px 0 rgba(255, 255, 255, 0.35) inset;
+          backdrop-filter: blur(14px) saturate(150%);
+          overflow: hidden;
+        }
+        .footer-link::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          pointer-events: none;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 35%, rgba(255, 255, 255, 0.08) 70%, transparent);
         }
         .footer-link:hover {
           opacity: 1;
           color: var(--accent);
+          border-color: color-mix(in srgb, var(--accent) 45%, var(--glass-border));
+          transform: translateY(-1px);
         }
         .footer-bottom {
           margin-top: 30px;

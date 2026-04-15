@@ -345,6 +345,26 @@ function extractNameOnly(titleLine: string): string {
   return words.join(" ");
 }
 
+function extractHeaderDetails(cleanedCv: string, titleLineRaw: string): string[] {
+  const lines = cleanedCv.split("\n").map((line) => line.trim()).filter(Boolean);
+  if (!lines.length) return [];
+
+  const firstTitle = (titleLineRaw || lines[0] || "").trim();
+  const startIdx = Math.max(0, lines.findIndex((line) => line === firstTitle));
+  const details: string[] = [];
+
+  for (let i = startIdx + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!line) break;
+    if (isSectionHeading(line)) break;
+    const normalizedBullet = line.replace(/^(?:[•\-\*]+)\s+/, "").trim();
+    if (!normalizedBullet) continue;
+    details.push(normalizedBullet);
+    if (details.length >= 3) break;
+  }
+  return details;
+}
+
 export default function ResultsPage() {
   return (
     <Suspense fallback={<div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div className="spinner"></div></div>}>
@@ -583,6 +603,11 @@ function ResultsContent() {
     [optimizedCv],
   );
   const parsedCv = useMemo(() => extractSections(cleanedCv), [cleanedCv]);
+  const headerName = useMemo(() => extractNameOnly(parsedCv.title), [parsedCv.title]);
+  const headerDetails = useMemo(
+    () => extractHeaderDetails(cleanedCv, parsedCv.title),
+    [cleanedCv, parsedCv.title],
+  );
   const compactSummary = useMemo(() => {
     if (!previewBlocks.length) return "";
     const items = previewBlocks
@@ -595,9 +620,52 @@ function ResultsContent() {
     if (joined.length <= limit) return joined;
     return `${joined.slice(0, limit).trim()}…`;
   }, [previewBlocks]);
+  const titleBarPreviewBlocks = useMemo(() => {
+    if (headerDetails.length === 0) {
+      return previewBlocks.filter((block) => block.type !== "title");
+    }
+
+    const detailsQueue = [...headerDetails];
+    return previewBlocks
+      .filter((block) => block.type !== "title")
+      .filter((block) => {
+        if (detailsQueue.length === 0) return true;
+        if (block.type !== "text" && block.type !== "bullet") return true;
+        const text = ("text" in block ? block.text : "").trim();
+        if (!text) return true;
+        if (text === detailsQueue[0]) {
+          detailsQueue.shift();
+          return false;
+        }
+        return true;
+      });
+  }, [previewBlocks, headerDetails]);
 
   const remainingKeywords = missing;
   const showFreeWatermark = subscriptionTier === "free";
+
+  useEffect(() => {
+    const clearTransientResults = () => {
+      try {
+        localStorage.removeItem("optimized_cv");
+        localStorage.removeItem("missing_skills");
+        localStorage.removeItem("added_keywords");
+        localStorage.removeItem("recommendations");
+        localStorage.removeItem("match_before");
+        localStorage.removeItem("match_after");
+        localStorage.removeItem("current_analysis_id");
+      } catch {
+        // ignore
+      }
+    };
+
+    const onBeforeUnload = () => clearTransientResults();
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      clearTransientResults();
+    };
+  }, []);
 
   const copyCv = async () => {
     if (!optimizedCv) {
@@ -836,6 +904,7 @@ function ResultsContent() {
 
       const { title: titleLineRaw, sections } = parsedCv;
       const titleLine = extractNameOnly(titleLineRaw);
+      const titleDetails = extractHeaderDetails(cleanedCv, titleLineRaw);
       let cursorY = marginY;
 
       if (template.layout === "sidebar") {
@@ -901,14 +970,25 @@ function ResultsContent() {
           doc.setFontSize(fontTitle);
           const titleWrapped = doc.splitTextToSize(titleLine.trim(), contentWidth);
           doc.text(titleWrapped, marginX, 60);
-          cursorY = 130;
+          cursorY = 124;
+          if (titleDetails.length > 0) {
+            doc.setTextColor(71, 85, 105);
+            doc.setFont(fontFamily, "normal");
+            doc.setFontSize(Math.max(10, fontBody));
+            for (const line of titleDetails) {
+              cursorY = renderWrapped(line, marginX, cursorY, contentWidth, Math.max(10, fontBody), false);
+              cursorY += 2;
+            }
+            cursorY += 10;
+          }
         } else {
           doc.setTextColor(accent.r, accent.g, accent.b);
           cursorY = renderWrapped(titleLine.trim(), marginX, cursorY, contentWidth, fontTitle, true);
           cursorY += 12;
         }
 
-        for (const sec of sections) {
+        for (let secIdx = 0; secIdx < sections.length; secIdx += 1) {
+          const sec = sections[secIdx];
           cursorY = ensureSpace(cursorY, fontHeader + 20);
           doc.setFont(fontFamily, "bold");
           doc.setFontSize(fontHeader);
@@ -926,7 +1006,24 @@ function ResultsContent() {
           cursorY += 20;
 
           doc.setTextColor(30, 41, 59);
-          for (const raw of sec.lines) {
+          const normalizedTitleDetails = titleDetails.map((line) => line.trim());
+          const sectionLines =
+            template.titleBar && secIdx === 0 && normalizedTitleDetails.length > 0
+              ? (() => {
+                  const linesCopy = [...sec.lines];
+                  let idx = 0;
+                  while (
+                    idx < normalizedTitleDetails.length &&
+                    linesCopy[idx] &&
+                    linesCopy[idx].trim() === normalizedTitleDetails[idx]
+                  ) {
+                    idx += 1;
+                  }
+                  return linesCopy.slice(idx);
+                })()
+              : sec.lines;
+
+          for (const raw of sectionLines) {
             const line = raw.trim();
             if (!line) { cursorY += 8; continue; }
             
@@ -1156,6 +1253,28 @@ function ResultsContent() {
                           </div>
                         ))}
                       </div>
+                    </>
+                  ) : activeTemplate.titleBar ? (
+                    <>
+                      <div className="pdf-bar-title">{headerName}</div>
+                      {headerDetails.map((line, idx) => (
+                        <div className="pdf-contact-line" key={`c-${idx}`}>
+                          {line}
+                        </div>
+                      ))}
+                      {titleBarPreviewBlocks
+                        .slice(0, 22)
+                        .map((block, idx) => {
+                          if (block.type === "spacer") return <div className="pdf-spacer" key={`s-${idx}`} />;
+                          if (block.type === "heading") return <div className="pdf-heading" key={`h-${idx}`}>{block.text}</div>;
+                          if (block.type === "bullet") return (
+                            <div className="pdf-bullet" key={`b-${idx}`}>
+                              <span className="pdf-bullet-dot">•</span>
+                              <span>{block.text}</span>
+                            </div>
+                          );
+                          return <div className="pdf-text" key={`p-${idx}`}>{block.text}</div>;
+                        })}
                     </>
                   ) : (
                     previewBlocks.slice(0, 28).map((block, idx) => {

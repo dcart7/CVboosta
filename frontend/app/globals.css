@@ -496,6 +496,26 @@ a {
   margin-bottom: 6px;
 }
 
+.pdf-bar-title {
+  position: absolute;
+  left: 18px;
+  top: 16px;
+  right: 18px;
+  font-weight: 800;
+  font-size: 16px;
+  color: #f8fafc;
+  letter-spacing: 0.01em;
+  z-index: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdf-contact-line {
+  font-size: 10px;
+  color: color-mix(in srgb, var(--pdf-ink) 74%, transparent);
+}
+
 .pdf-heading {
   font-weight: 800;
   font-size: 12px;
@@ -534,6 +554,7 @@ a {
   --pdf-accent: #0a84ff;
   --pdf-bar-bg: #080b12;
   --pdf-bar-line: #0a84ff;
+  font-family: "Playfair Display", "Times New Roman", serif;
   padding-top: 72px;
   position: relative;
 }
@@ -589,6 +610,7 @@ a {
   --pdf-accent: #63a6ff;
   --pdf-bar-bg: #080b12;
   --pdf-bar-line: #63a6ff;
+  font-family: "Manrope", "Helvetica Neue", sans-serif;
   padding-top: 72px;
   position: relative;
 }
