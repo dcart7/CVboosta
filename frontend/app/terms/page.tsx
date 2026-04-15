@@ -32,6 +32,22 @@ export default function TermsPage() {
                 <p>{t("legal.termsUsage")}</p>
               </div>
               <div className="legal-block">
+                <h3>Data and File Handling</h3>
+                <p>
+                  CVboosta does not persistently store user-uploaded CV files or job-description files. Files are processed
+                  only for generating optimization outputs and are removed from transient processing context after
+                  completion.
+                </p>
+              </div>
+              <div className="legal-block">
+                <h3>Merchant of Record and Billing</h3>
+                <p>
+                  Paddle is the Merchant of Record for purchases made through this service. Paddle manages checkout, tax,
+                  and payment processing operations. Any billing dispute or refund request is handled under Paddle-enabled
+                  billing policies shown at checkout and in your invoice records.
+                </p>
+              </div>
+              <div className="legal-block">
                 <h3>{t("legal.termsDisclaimerTitle")}</h3>
                 <p>{t("legal.termsDisclaimer")}</p>
               </div>

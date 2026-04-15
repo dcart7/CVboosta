@@ -68,14 +68,14 @@ export default function RegisterPage() {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <section className="split auth-split fade-up">
+        <section className="split auth-split register-layout fade-up">
           <div className="auth-header">
             <h1 className="hero-title">{t("auth.createWorkspace")}</h1>
             <p className="hero-subtitle">
               {t("auth.registerSubtitle")}
             </p>
           </div>
-          <form className="form-card form-grid auth-form">
+          <form className="form-card form-grid auth-form register-form">
             <div>
               <div className="label">{t("auth.fullName")}</div>
               <input
@@ -103,6 +103,11 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
               />
+              <ul className="password-rules" aria-label="Password requirements">
+                <li>At least 10 characters</li>
+                <li>At least 1 number</li>
+                <li>At least 1 symbol (!@#$...)</li>
+              </ul>
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             <button className="btn secondary" type="button" onClick={submit}>
@@ -113,7 +118,7 @@ export default function RegisterPage() {
             </Link>
           </form>
 
-          <div className="steps auth-footer-card">
+          <div className="steps auth-footer-card register-steps">
             <div className="step">
               <span>1</span>
               <h3>{t("auth.setupProfile")}</h3>

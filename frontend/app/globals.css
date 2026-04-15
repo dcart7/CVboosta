@@ -1130,6 +1130,39 @@ a {
   justify-content: flex-start;
 }
 
+.register-layout {
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+}
+
+.register-layout .auth-header {
+  margin-bottom: 0;
+}
+
+.register-layout .register-form {
+  align-self: stretch;
+  height: 100%;
+  min-height: 100%;
+}
+
+.register-layout .register-steps {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.password-rules {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.password-rules li + li {
+  margin-top: 2px;
+}
+
 @media (max-width: 900px) {
   .split {
     grid-template-columns: 1fr;
@@ -1146,6 +1179,10 @@ a {
   .auth-split .auth-header {
     margin-bottom: 8px;
     text-align: center;
+  }
+
+  .register-layout .register-form {
+    min-height: auto;
   }
 }
 
@@ -1655,15 +1692,18 @@ a {
 
 .legal-doc {
   position: relative;
-  border-radius: 28px;
-  border: 1px solid var(--glass-border);
-  background: linear-gradient(140deg,
-      color-mix(in srgb, var(--glass-hi) 90%, transparent),
-      var(--glass));
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(22px) saturate(160%);
-  padding: 36px 30px;
+  border-radius: 30px;
+  border: 1px solid color-mix(in srgb, var(--glass-border) 80%, rgba(255, 255, 255, 0.45));
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0.14) 56%, rgba(255, 255, 255, 0.06)),
+    linear-gradient(140deg, color-mix(in srgb, var(--glass-hi) 68%, transparent), color-mix(in srgb, var(--glass) 86%, transparent));
+  box-shadow:
+    0 30px 75px rgba(15, 23, 42, 0.14),
+    0 8px 20px rgba(255, 255, 255, 0.25) inset,
+    0 -6px 20px rgba(255, 255, 255, 0.08) inset;
+  backdrop-filter: blur(28px) saturate(180%);
   overflow: hidden;
+  padding: 38px 32px;
 }
 
 .legal-doc::before {
@@ -1673,8 +1713,21 @@ a {
   border-radius: inherit;
   pointer-events: none;
   background:
-    radial-gradient(920px 240px at 6% -4%, var(--glass-stroke), transparent 60%),
-    radial-gradient(880px 230px at 100% 2%, rgba(255, 255, 255, 0.12), transparent 63%);
+    radial-gradient(780px 260px at 4% -10%, rgba(255, 255, 255, 0.5), transparent 62%),
+    radial-gradient(900px 260px at 100% 2%, var(--glass-stroke), transparent 58%),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.14), transparent 42%, rgba(255, 255, 255, 0.08) 72%, transparent);
+}
+
+.legal-doc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 88% 88%, rgba(10, 132, 255, 0.08), transparent 42%);
+  mix-blend-mode: screen;
 }
 
 .legal-meta {
@@ -1698,14 +1751,32 @@ a {
 
 .legal-content {
   display: grid;
-  gap: 18px;
+  gap: 20px;
 }
 
 .legal-block {
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  padding: 20px 18px;
-  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--glass-border) 70%, rgba(255, 255, 255, 0.35));
+  border-radius: 18px;
+  padding: 22px 20px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.12) 60%, rgba(255, 255, 255, 0.06)),
+    color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(20px) saturate(155%);
+  box-shadow:
+    0 10px 26px rgba(15, 23, 42, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.42) inset;
+  overflow: hidden;
+}
+
+.legal-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.20), transparent 34%, rgba(255, 255, 255, 0.08) 78%, transparent);
+  opacity: 0.95;
 }
 
 .legal-block h3 {
@@ -1721,6 +1792,27 @@ a {
   line-height: 1.7;
   color: var(--ink);
   opacity: 0.92;
+}
+
+[data-theme="dark"] .legal-doc {
+  border-color: rgba(160, 195, 255, 0.22);
+  background:
+    linear-gradient(155deg, rgba(123, 176, 255, 0.16), rgba(31, 45, 75, 0.26) 56%, rgba(15, 21, 36, 0.52)),
+    linear-gradient(140deg, rgba(21, 28, 46, 0.72), rgba(13, 18, 31, 0.84));
+  box-shadow:
+    0 34px 80px rgba(0, 0, 0, 0.46),
+    0 8px 26px rgba(166, 202, 255, 0.12) inset,
+    0 -8px 20px rgba(255, 255, 255, 0.02) inset;
+}
+
+[data-theme="dark"] .legal-block {
+  border-color: rgba(160, 195, 255, 0.2);
+  background:
+    linear-gradient(145deg, rgba(123, 176, 255, 0.13), rgba(24, 34, 56, 0.32) 58%, rgba(12, 18, 30, 0.58)),
+    rgba(15, 21, 35, 0.7);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.36),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
 }
 
 @keyframes marquee {

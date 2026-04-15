@@ -13,34 +13,37 @@ export default function Footer() {
           <div className="footer-brand">
             <Link href="/" className="logo">
               <img src="/logo.png" alt="CVboosta logo" width={34} height={34} className="footer-logo" />
-              <span>CV<span>boosta</span></span>
+              <span className="logo-text">
+                CV<span>boosta</span>
+              </span>
             </Link>
-            <div className="footer-info">
+
+            <div className="footer-meta">
               <p className="footer-copy">{t("footer.rights")}</p>
-              <div className="footer-attribution">
-                <a 
-                  href="https://virelsolutions.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="attribution-link"
-                >
-                  {t("footer.createdBy")}
-                </a>
+              <a
+                href="https://virelsolutions.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="attribution-link"
+              >
+                {t("footer.createdBy")}
+              </a>
+              <a href={`mailto:${t("footer.support")}`} className="footer-email">
+                {t("footer.support")}
+              </a>
+
+              <div className="footer-links">
+                <Link href="/privacy" className="footer-link">
+                  {t("footer.privacy")}
+                </Link>
+                <Link href="/terms" className="footer-link">
+                  {t("footer.terms")}
+                </Link>
               </div>
             </div>
-            <a href={`mailto:${t("footer.support")}`} className="footer-email">
-              {t("footer.support")}
-            </a>
-          </div>
-          <div className="footer-links">
-            <Link href="/privacy" className="footer-link">
-              {t("footer.privacy")}
-            </Link>
-            <Link href="/terms" className="footer-link">
-              {t("footer.terms")}
-            </Link>
           </div>
         </div>
+
         <div className="footer-bottom">
           <p className="footer-bottom-text">
             If any communication service is unavailable, we&apos;ll be happy to respond on LinkedIn.{" "}
@@ -55,6 +58,7 @@ export default function Footer() {
           </p>
         </div>
       </div>
+
       <style jsx>{`
         .footer {
           margin-top: auto;
@@ -65,14 +69,14 @@ export default function Footer() {
         }
         .footer-content {
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-start;
           align-items: flex-start;
-          gap: 40px;
+          gap: 24px;
         }
         .footer-brand {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 14px;
         }
         .logo {
           display: inline-flex;
@@ -90,29 +94,34 @@ export default function Footer() {
           object-fit: contain;
           border-radius: 8px;
           filter: drop-shadow(0 3px 10px rgba(10, 132, 255, 0.2));
+          flex-shrink: 0;
         }
-        .logo span {
-          color: var(--primary);
+        .logo-text {
+          color: var(--ink);
+          line-height: 1;
         }
-        .footer-info {
+        .logo-text span {
+          color: var(--accent);
+        }
+        .footer-meta {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 8px;
+          align-items: flex-start;
         }
         .footer-copy {
           font-size: 13px;
           color: var(--muted);
-          opacity: 0.8;
-        }
-        .footer-attribution {
-          font-size: 13px;
+          opacity: 0.82;
+          margin: 0;
         }
         .attribution-link {
-          color: var(--primary);
+          color: var(--accent);
           text-decoration: none;
-          opacity: 0.8;
+          opacity: 0.86;
           transition: opacity 0.2s ease;
           font-weight: 500;
+          font-size: 13px;
         }
         .attribution-link:hover {
           opacity: 1;
@@ -122,18 +131,31 @@ export default function Footer() {
           font-size: 14px;
           color: var(--ink);
           text-decoration: none;
-          opacity: 0.6;
+          opacity: 0.65;
           transition: all 0.2s ease;
           width: fit-content;
         }
         .footer-email:hover {
           opacity: 1;
-          color: var(--primary);
+          color: var(--accent);
         }
         .footer-links {
           display: flex;
-          gap: 32px;
-          padding-top: 4px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          padding-top: 2px;
+        }
+        .footer-link {
+          font-size: 14px;
+          color: var(--ink);
+          text-decoration: none;
+          opacity: 0.65;
+          transition: all 0.2s ease;
+        }
+        .footer-link:hover {
+          opacity: 1;
+          color: var(--accent);
         }
         .footer-bottom {
           margin-top: 30px;
@@ -144,42 +166,24 @@ export default function Footer() {
           margin: 0;
           font-size: 12px;
           color: var(--muted);
-          opacity: 0.75;
+          opacity: 0.8;
           line-height: 1.6;
           text-align: center;
         }
         .footer-bottom-link {
-          color: var(--primary);
+          color: var(--accent);
           text-decoration: none;
           font-weight: 600;
           transition: opacity 0.2s ease;
         }
         .footer-bottom-link:hover {
-          opacity: 0.85;
+          opacity: 0.88;
           text-decoration: underline;
-        }
-        .footer-link {
-          font-size: 14px;
-          color: var(--ink);
-          text-decoration: none;
-          opacity: 0.6;
-          transition: all 0.2s ease;
-        }
-        .footer-link:hover {
-          opacity: 1;
-          color: var(--primary);
         }
         @media (max-width: 640px) {
           .footer-content {
-            flex-direction: column;
             align-items: flex-start;
             text-align: left;
-          }
-          .footer-brand {
-            align-items: flex-start;
-          }
-          .footer-links {
-            gap: 24px;
           }
           .footer-bottom-text {
             text-align: left;
