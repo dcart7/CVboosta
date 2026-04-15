@@ -3,6 +3,15 @@
 import { fetchWithRetry } from "./fetchRetry";
 
 export const GUEST_WORKSPACE_ID = "__guest__";
+const WORKSPACE_DRAFT_FIELDS = [
+  "target_role",
+  "target_company",
+  "job_text",
+  "cv_text",
+  "job_keywords",
+  "job_keywords_hash",
+  "job_keywords_source",
+] as const;
 
 export function workspaceIdFromEmail(email: string | null | undefined): string {
   if (!email?.trim()) return GUEST_WORKSPACE_ID;
@@ -71,6 +80,22 @@ export function migrateLegacyGuestWorkspace(workspaceId: string): void {
       const legacy = localStorage.getItem(field);
       if (legacy != null) localStorage.setItem(namespaced, legacy);
     }
+  } catch {
+    /* quota / private mode */
+  }
+}
+
+/** Remove transient dashboard draft data for a specific workspace. */
+export function clearWorkspaceDraftData(
+  workspaceId: string,
+  email: string | null | undefined,
+): void {
+  try {
+    localStorage.removeItem(parsedCvStorageKey(email ?? null));
+    for (const field of WORKSPACE_DRAFT_FIELDS) {
+      localStorage.removeItem(wsFieldKey(workspaceId, field));
+    }
+    sessionStorage.removeItem(sessionCvParsedKey(workspaceId));
   } catch {
     /* quota / private mode */
   }

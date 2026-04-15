@@ -1714,16 +1714,16 @@ a {
 
 .legal-doc {
   position: relative;
-  border-radius: 30px;
-  border: 1px solid color-mix(in srgb, var(--glass-border) 80%, rgba(255, 255, 255, 0.45));
+  border-radius: 32px;
+  border: 1px solid color-mix(in srgb, var(--glass-border) 78%, rgba(255, 255, 255, 0.55));
   background:
-    linear-gradient(155deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0.14) 56%, rgba(255, 255, 255, 0.06)),
-    linear-gradient(140deg, color-mix(in srgb, var(--glass-hi) 68%, transparent), color-mix(in srgb, var(--glass) 86%, transparent));
+    linear-gradient(140deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18) 48%, rgba(255, 255, 255, 0.08)),
+    color-mix(in srgb, var(--glass-hi) 64%, transparent);
   box-shadow:
-    0 30px 75px rgba(15, 23, 42, 0.14),
-    0 8px 20px rgba(255, 255, 255, 0.25) inset,
-    0 -6px 20px rgba(255, 255, 255, 0.08) inset;
-  backdrop-filter: blur(28px) saturate(180%);
+    0 24px 56px rgba(15, 23, 42, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.74) inset,
+    0 -8px 20px rgba(255, 255, 255, 0.12) inset;
+  backdrop-filter: blur(18px) saturate(145%);
   overflow: hidden;
   padding: 38px 32px;
 }
@@ -1731,13 +1731,13 @@ a {
 .legal-doc::before {
   content: "";
   position: absolute;
-  inset: -1px;
+  inset: 0;
   border-radius: inherit;
   pointer-events: none;
   background:
-    radial-gradient(780px 260px at 4% -10%, rgba(255, 255, 255, 0.5), transparent 62%),
-    radial-gradient(900px 260px at 100% 2%, var(--glass-stroke), transparent 58%),
-    linear-gradient(120deg, rgba(255, 255, 255, 0.14), transparent 42%, rgba(255, 255, 255, 0.08) 72%, transparent);
+    linear-gradient(115deg, rgba(255, 255, 255, 0.52), transparent 34%, rgba(255, 255, 255, 0.12) 68%, transparent),
+    radial-gradient(640px 170px at 14% -12%, rgba(255, 255, 255, 0.55), transparent 66%);
+  opacity: 0.92;
 }
 
 .legal-doc::after {
@@ -1747,9 +1747,7 @@ a {
   pointer-events: none;
   border-radius: inherit;
   background:
-    linear-gradient(125deg, rgba(255, 255, 255, 0.18), transparent 28%),
-    radial-gradient(circle at 88% 88%, rgba(10, 132, 255, 0.08), transparent 42%);
-  mix-blend-mode: screen;
+    radial-gradient(circle at 90% 88%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 48%);
 }
 
 .legal-meta {
@@ -1778,16 +1776,16 @@ a {
 
 .legal-block {
   position: relative;
-  border: 1px solid color-mix(in srgb, var(--glass-border) 70%, rgba(255, 255, 255, 0.35));
+  border: 1px solid color-mix(in srgb, var(--glass-border) 76%, rgba(255, 255, 255, 0.45));
   border-radius: 18px;
   padding: 22px 20px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.12) 60%, rgba(255, 255, 255, 0.06)),
-    color-mix(in srgb, var(--surface) 80%, transparent);
-  backdrop-filter: blur(20px) saturate(155%);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.14) 58%, rgba(255, 255, 255, 0.08)),
+    color-mix(in srgb, var(--surface) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(136%);
   box-shadow:
-    0 10px 26px rgba(15, 23, 42, 0.10),
-    0 1px 0 rgba(255, 255, 255, 0.42) inset;
+    0 10px 22px rgba(15, 23, 42, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.54) inset;
   overflow: hidden;
 }
 
@@ -1819,12 +1817,12 @@ a {
 [data-theme="dark"] .legal-doc {
   border-color: rgba(160, 195, 255, 0.22);
   background:
-    linear-gradient(155deg, rgba(123, 176, 255, 0.16), rgba(31, 45, 75, 0.26) 56%, rgba(15, 21, 36, 0.52)),
-    linear-gradient(140deg, rgba(21, 28, 46, 0.72), rgba(13, 18, 31, 0.84));
+    linear-gradient(145deg, rgba(123, 176, 255, 0.16), rgba(31, 45, 75, 0.22) 56%, rgba(14, 20, 34, 0.52)),
+    rgba(14, 20, 34, 0.72);
   box-shadow:
-    0 34px 80px rgba(0, 0, 0, 0.46),
-    0 8px 26px rgba(166, 202, 255, 0.12) inset,
-    0 -8px 20px rgba(255, 255, 255, 0.02) inset;
+    0 30px 72px rgba(0, 0, 0, 0.44),
+    0 1px 0 rgba(214, 230, 255, 0.22) inset,
+    0 -8px 20px rgba(255, 255, 255, 0.03) inset;
 }
 
 [data-theme="dark"] .legal-block {

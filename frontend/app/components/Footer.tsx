@@ -110,7 +110,7 @@ export default function Footer() {
           display: inline-flex;
           align-items: center;
           line-height: 1.05;
-          transform: translateY(1px);
+          transform: translateY(-2px);
           color: var(--ink);
         }
         .logo-text span {

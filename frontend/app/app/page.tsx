@@ -8,6 +8,7 @@ import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { useTranslation } from "../lib/LanguageContext";
 import {
+  clearWorkspaceDraftData,
   fetchWorkspaceEmail,
   GUEST_WORKSPACE_ID,
   migrateLegacyGuestWorkspace,
@@ -140,47 +141,32 @@ export default function WorkspacePage() {
 
   const loadWorkspace = useCallback(async () => {
     setWorkspaceReady(false);
-    let wid = GUEST_WORKSPACE_ID;
     try {
       const token = localStorage.getItem("auth_token");
       const email = token ? await fetchWorkspaceEmail(apiBase) : null;
-      wid = workspaceIdFromEmail(email);
+      const wid = workspaceIdFromEmail(email);
       migrateLegacyGuestWorkspace(wid);
       setUserEmail(email);
       setWorkspaceId(wid);
 
-      let storedParsed = localStorage.getItem(parsedCvStorageKey(email));
-      if (!storedParsed && wid === GUEST_WORKSPACE_ID) {
-        const legacy = localStorage.getItem("parsed_cv");
-        if (legacy) {
-          localStorage.setItem(parsedCvStorageKey(null), legacy);
-          localStorage.removeItem("parsed_cv");
-          storedParsed = legacy;
-        }
-      }
-      if (storedParsed) {
-        try {
-          setParsed(JSON.parse(storedParsed));
-        } catch {
-          setParsed(null);
-        }
-      } else {
-        setParsed(null);
-      }
-
-      setTargetRole(localStorage.getItem(wsFieldKey(wid, "target_role")) || "");
-      setTargetCompany(
-        localStorage.getItem(wsFieldKey(wid, "target_company")) || "",
-      );
-      setJobText(localStorage.getItem(wsFieldKey(wid, "job_text")) || "");
-      try {
-        setShowDetectedSkillsSession(
-          typeof sessionStorage !== "undefined" &&
-            sessionStorage.getItem(sessionCvParsedKey(wid)) === "1",
-        );
-      } catch {
-        setShowDetectedSkillsSession(false);
-      }
+      // Dashboard should always open empty (new visit / after previous scan).
+      clearWorkspaceDraftData(wid, email);
+      setFile(null);
+      setParsed(null);
+      setTargetRole("");
+      setTargetCompany("");
+      setJobText("");
+      setShowDetectedSkillsSession(false);
+      setStatus("");
+      setAnalysisStatus("");
+      setOptimizeStatus("");
+      setKeywordCache([]);
+      setKeywordSource("");
+      setKeywordInput("");
+      setMatchPercent(null);
+      setMissingKeywords([]);
+      setOptimizedSummary("");
+      setRecommendations([]);
     } catch {
       setUserEmail(null);
       setWorkspaceId(GUEST_WORKSPACE_ID);
@@ -189,6 +175,17 @@ export default function WorkspacePage() {
       setTargetCompany("");
       setJobText("");
       setShowDetectedSkillsSession(false);
+      setStatus("");
+      setAnalysisStatus("");
+      setOptimizeStatus("");
+      setKeywordCache([]);
+      setKeywordSource("");
+      setKeywordInput("");
+      setMatchPercent(null);
+      setMissingKeywords([]);
+      setOptimizedSummary("");
+      setRecommendations([]);
+      clearWorkspaceDraftData(GUEST_WORKSPACE_ID, null);
     } finally {
       setWorkspaceReady(true);
     }
@@ -486,19 +483,7 @@ export default function WorkspacePage() {
       setMatchPercent(null);
       setMissingKeywords([]);
       setAnalysisStatus("");
-      try {
-        localStorage.removeItem(parsedCvStorageKey(userEmail));
-        localStorage.removeItem(wsFieldKey(workspaceId, "target_role"));
-        localStorage.removeItem(wsFieldKey(workspaceId, "target_company"));
-        localStorage.removeItem(wsFieldKey(workspaceId, "job_text"));
-        localStorage.removeItem(wsFieldKey(workspaceId, "cv_text"));
-        localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords"));
-        localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_hash"));
-        localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_source"));
-        sessionStorage.removeItem(sessionCvParsedKey(workspaceId));
-      } catch {
-        // ignore storage errors
-      }
+      clearWorkspaceDraftData(workspaceId, userEmail);
 
       if (data.analysis_id) {
         // Automatically inject the ID into localStorage so when /results mounts, it has a fallback if search params fail
