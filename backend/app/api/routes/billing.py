@@ -7,6 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 import stripe
 
@@ -233,25 +234,35 @@ def _apply_paid_tier_to_user(
 
 def _find_user_for_stripe_object(db: Session, payload: dict[str, Any]) -> User | None:
     metadata = payload.get("metadata") or {}
-    user_id_raw = metadata.get("user_id") or payload.get("client_reference_id")
-    if user_id_raw is not None:
+    id_candidates = [
+        metadata.get("user_id"),
+        payload.get("client_reference_id"),
+    ]
+    for candidate in id_candidates:
+        if candidate is None:
+            continue
         try:
-            user_id = int(str(user_id_raw).strip())
+            user_id = int(str(candidate).strip())
             user = db.query(User).filter(User.id == user_id).first()
             if user:
                 return user
         except Exception:
-            pass
+            continue
 
-    email = None
+    emails: list[str] = []
     if isinstance(payload.get("customer_details"), dict):
-        email = payload.get("customer_details", {}).get("email")
-    if not email:
-        email = metadata.get("email")
-    if isinstance(email, str) and email.strip():
-        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        details_email = payload.get("customer_details", {}).get("email")
+        if isinstance(details_email, str) and details_email.strip():
+            emails.append(details_email.strip())
+    for value in [metadata.get("email"), payload.get("customer_email")]:
+        if isinstance(value, str) and value.strip():
+            emails.append(value.strip())
+    for email in emails:
+        normalized = email.lower()
+        user = db.query(User).filter(func.lower(User.email) == normalized).first()
         if user:
             return user
+
     customer_id = payload.get("customer")
     if isinstance(customer_id, str) and customer_id:
         return db.query(User).filter(User.paddle_customer_id == customer_id).first()
