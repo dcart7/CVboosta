@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
@@ -20,11 +20,25 @@ type ActivityItem = {
 
 type BillingStatusResponse = {
   tier?: string;
+  limits?: {
+    scans: number;
+    cl: number;
+    prep: number;
+  };
+  usage?: {
+    scans: number;
+    cl: number;
+    prep: number;
+  };
+  single_scan_remaining?: number | null;
+  cancel_at_period_end?: boolean;
+  subscription_active_until?: string | null;
 };
 
 export default function AccountPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const finalizedSessionRef = useRef<string | null>(null);
   const [user, setUser] = useState<MeResponse | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
@@ -33,6 +47,8 @@ export default function AccountPage() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const [billingStatus, setBillingStatus] = useState<BillingStatusResponse | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
   const [profileError, setProfileError] = useState<"unauthorized" | "offline" | null>(
     null,
   );
@@ -104,11 +120,14 @@ export default function AccountPage() {
           setSubscriptionTier(
             typeof billingData.tier === "string" ? billingData.tier : null,
           );
+          setBillingStatus(billingData);
         } else {
           setSubscriptionTier(null);
+          setBillingStatus(null);
         }
       } catch {
         setSubscriptionTier(null);
+        setBillingStatus(null);
       }
 
       try {
@@ -128,6 +147,7 @@ export default function AccountPage() {
       setUser(null);
       setProfileError("offline");
       setSubscriptionTier(null);
+      setBillingStatus(null);
       setLoading(false);
       setActivityLoading(false);
     }
@@ -136,6 +156,39 @@ export default function AccountPage() {
   useEffect(() => {
     void loadAccount();
   }, [loadAccount]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const billing = params.get("billing");
+    const sessionId = params.get("session_id");
+    if (billing !== "success" || !sessionId) return;
+    if (finalizedSessionRef.current === sessionId) return;
+    finalizedSessionRef.current = sessionId;
+
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+
+    (async () => {
+      try {
+        const response = await fetchWithRetry(
+          `${apiBase}/billing/stripe/finalize-session?session_id=${encodeURIComponent(sessionId)}`,
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+          { attempts: 3, baseDelayMs: 300, timeoutMs: 20_000 },
+        );
+        const payload = await response.json().catch(() => ({}));
+        if (response.ok) {
+          setMessageTone("ok");
+          setMessage("Payment confirmed. Your plan was activated.");
+          await loadAccount();
+        }
+      } finally {
+        router.replace("/account");
+      }
+    })();
+  }, [apiBase, loadAccount, router]);
 
   const changePassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -181,6 +234,44 @@ export default function AccountPage() {
       minute: "2-digit",
     });
 
+  const cancelSubscription = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+    setCancelLoading(true);
+    setMessage("");
+    try {
+      const response = await fetchWithRetry(
+        `${apiBase}/billing/stripe/cancel-subscription`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+        { attempts: 3, baseDelayMs: 350, timeoutMs: 20_000 },
+      );
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.detail || "Failed to cancel subscription.");
+      }
+      setMessageTone("ok");
+      if (payload.active_until) {
+        setMessage(
+          `Subscription canceled. Access remains active until ${formatDate(payload.active_until)}.`,
+        );
+      } else {
+        setMessage("Subscription canceled.");
+      }
+      await loadAccount();
+    } catch (err) {
+      setMessageTone("error");
+      setMessage(err instanceof Error ? err.message : "Failed to cancel subscription.");
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   return (
     <main className="page">
       <TopNav />
@@ -222,8 +313,43 @@ export default function AccountPage() {
                 <div className="card">
                   <h3>{t("account.plan")}</h3>
                   <p>{getPlanLabel(subscriptionTier)}</p>
+                  {subscriptionTier === "single" && (
+                    <p style={{ marginTop: 6, color: "var(--muted)", fontSize: 13 }}>
+                      Single Scan available: {billingStatus?.single_scan_remaining ?? 0}
+                    </p>
+                  )}
+                  {billingStatus?.cancel_at_period_end &&
+                    typeof billingStatus.subscription_active_until === "string" && (
+                      <p style={{ marginTop: 6, color: "var(--muted)", fontSize: 13 }}>
+                        Cancels at period end: {formatDate(billingStatus.subscription_active_until)}
+                      </p>
+                    )}
                 </div>
               </div>
+
+              {(subscriptionTier === "go" || subscriptionTier === "pro") && (
+                <div className="section">
+                  <h2 className="section-title">Subscription</h2>
+                  {!billingStatus?.cancel_at_period_end ? (
+                    <button
+                      className="btn ghost"
+                      type="button"
+                      onClick={() => void cancelSubscription()}
+                      disabled={cancelLoading}
+                    >
+                      {cancelLoading ? "Canceling..." : "Cancel subscription"}
+                    </button>
+                  ) : (
+                    <p className="hero-subtitle">
+                      Subscription is already canceled and remains active until{" "}
+                      {billingStatus.subscription_active_until
+                        ? formatDate(billingStatus.subscription_active_until)
+                        : "the end of your period"}
+                      .
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div className="section">
                 <h2 className="section-title">{t("account.focusThisWeek")}</h2>
@@ -260,6 +386,14 @@ export default function AccountPage() {
                   ))}
                 </div>
               </div>
+
+              {message && !showPasswordModal && (
+                <div className="section">
+                  <p style={{ color: messageTone === "ok" ? "#0f766e" : "#b42318" }}>
+                    {message}
+                  </p>
+                </div>
+              )}
             </>
           )}
 

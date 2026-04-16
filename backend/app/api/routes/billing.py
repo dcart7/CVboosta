@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import time
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -25,6 +26,15 @@ class StripeCheckoutRequest(BaseModel):
     billing_cycle: str | None = None
     success_url: str | None = None
     cancel_url: str | None = None
+
+
+def _from_unix_ts(value: Any) -> datetime | None:
+    if isinstance(value, (int, float)):
+        try:
+            return datetime.fromtimestamp(value, tz=timezone.utc)
+        except Exception:
+            return None
+    return None
 
 
 def _parse_paddle_signature(signature_header: str) -> tuple[int, str] | None:
@@ -175,6 +185,38 @@ def _resolve_stripe_price_for_checkout(tier: str, billing_cycle: str | None) -> 
     raise HTTPException(status_code=400, detail="Unknown checkout tier.")
 
 
+def _extract_stripe_subscription_tier(subscription_obj: dict[str, Any]) -> str | None:
+    items = subscription_obj.get("items", {}).get("data", [])
+    if not isinstance(items, list) or not items:
+        return None
+    first_item = items[0] if isinstance(items[0], dict) else {}
+    price_obj = first_item.get("price", {})
+    if not isinstance(price_obj, dict):
+        return None
+    return _resolve_stripe_tier_by_price_id(price_obj.get("id"))
+
+
+def _apply_paid_tier_to_user(
+    user: User,
+    *,
+    resolved_tier: str,
+    customer_id: str | None = None,
+    subscription_id: str | None = None,
+    period_end_dt: datetime | None = None,
+) -> None:
+    user.subscription_tier = resolved_tier
+    if resolved_tier == "single":
+        user.daily_scans_count = 0
+        user.daily_cl_count = 0
+        user.daily_prep_count = 0
+    if customer_id:
+        user.paddle_customer_id = customer_id
+    if subscription_id:
+        user.paddle_subscription_id = subscription_id
+    if period_end_dt is not None:
+        user.subscription_active_until = period_end_dt
+
+
 def _find_user_for_stripe_object(db: Session, payload: dict[str, Any]) -> User | None:
     metadata = payload.get("metadata") or {}
     email = None
@@ -204,7 +246,7 @@ def create_stripe_checkout_session(
 
     price_id, mode = _resolve_stripe_price_for_checkout(payload.tier, payload.billing_cycle)
     origin = f"{request.url.scheme}://{request.url.netloc}"
-    success_url = payload.success_url or f"{origin}/account?billing=success"
+    success_url = payload.success_url or f"{origin}/account?billing=success&session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = payload.cancel_url or f"{origin}/pricing?billing=cancel"
 
     metadata = {
@@ -231,6 +273,134 @@ def create_stripe_checkout_session(
         raise HTTPException(status_code=500, detail=f"Stripe checkout error: {exc}") from exc
 
     return {"checkout_url": checkout_session.url, "session_id": checkout_session.id}
+
+
+@router.post("/stripe/cancel-subscription")
+def cancel_stripe_subscription(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not settings.stripe_secret_key:
+        raise HTTPException(status_code=500, detail="Stripe secret key is not configured.")
+    if not current_user.paddle_subscription_id:
+        raise HTTPException(status_code=400, detail="No active subscription found.")
+
+    stripe.api_key = settings.stripe_secret_key
+    try:
+        current = stripe.Subscription.retrieve(current_user.paddle_subscription_id)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Unable to load subscription: {exc}") from exc
+
+    status = str(current.get("status") or "").lower()
+    if status in {"canceled", "incomplete_expired", "unpaid"}:
+        current_user.subscription_tier = "free"
+        current_user.paddle_subscription_id = None
+        current_user.subscription_active_until = None
+        db.add(current_user)
+        db.commit()
+        return {
+            "status": "already_inactive",
+            "cancel_at_period_end": False,
+            "active_until": None,
+        }
+
+    updated = current
+    if not bool(current.get("cancel_at_period_end")):
+        try:
+            updated = stripe.Subscription.modify(
+                current_user.paddle_subscription_id,
+                cancel_at_period_end=True,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Unable to cancel subscription: {exc}") from exc
+
+    period_end_dt = _from_unix_ts(updated.get("current_period_end"))
+    current_user.subscription_active_until = period_end_dt
+    db.add(current_user)
+    db.commit()
+    record_activity(
+        db,
+        user_id=current_user.id,
+        action="Stripe cancellation scheduled",
+        meta={"subscription_id": current_user.paddle_subscription_id},
+    )
+    return {
+        "status": "scheduled",
+        "cancel_at_period_end": bool(updated.get("cancel_at_period_end")),
+        "active_until": period_end_dt.isoformat() if period_end_dt else None,
+    }
+
+
+@router.post("/stripe/finalize-session")
+def finalize_stripe_checkout_session(
+    session_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not settings.stripe_secret_key:
+        raise HTTPException(status_code=500, detail="Stripe secret key is not configured.")
+    stripe.api_key = settings.stripe_secret_key
+
+    try:
+        checkout = stripe.checkout.Session.retrieve(
+            session_id,
+            expand=["line_items.data.price"],
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Unable to load checkout session: {exc}") from exc
+
+    payment_status = str(checkout.get("payment_status") or "").lower()
+    if payment_status not in {"paid", "no_payment_required"}:
+        raise HTTPException(status_code=400, detail="Checkout session is not paid yet.")
+
+    metadata = checkout.get("metadata") or {}
+    checkout_email = str((checkout.get("customer_details") or {}).get("email") or "").strip().lower()
+    metadata_email = str(metadata.get("email") or "").strip().lower()
+    if checkout_email and checkout_email != current_user.email.lower() and metadata_email != current_user.email.lower():
+        raise HTTPException(status_code=403, detail="This checkout session does not belong to current user.")
+
+    tier = str(metadata.get("tier") or "").strip().lower()
+    resolved_tier = None
+    if tier in {"single", "single_scan", "go", "pro", "lifetime"}:
+        resolved_tier = "single" if tier in {"single", "single_scan"} else tier
+    if not resolved_tier:
+        line_items = checkout.get("line_items", {}).get("data", [])
+        if isinstance(line_items, list) and line_items:
+            first_item = line_items[0] if isinstance(line_items[0], dict) else {}
+            price = first_item.get("price", {})
+            if isinstance(price, dict):
+                resolved_tier = _resolve_stripe_tier_by_price_id(price.get("id"))
+    if not resolved_tier:
+        raise HTTPException(status_code=400, detail="Unable to resolve purchased tier from session.")
+
+    customer_id = checkout.get("customer")
+    customer_id_value = customer_id if isinstance(customer_id, str) else None
+    subscription_id = checkout.get("subscription")
+    subscription_id_value = subscription_id if isinstance(subscription_id, str) else None
+    period_end_dt = None
+    if subscription_id_value:
+        try:
+            subscription = stripe.Subscription.retrieve(subscription_id_value)
+            period_end_dt = _from_unix_ts(subscription.get("current_period_end"))
+        except Exception:
+            period_end_dt = None
+
+    _apply_paid_tier_to_user(
+        current_user,
+        resolved_tier=resolved_tier,
+        customer_id=customer_id_value,
+        subscription_id=subscription_id_value,
+        period_end_dt=period_end_dt,
+    )
+    db.add(current_user)
+    db.commit()
+    record_activity(
+        db,
+        user_id=current_user.id,
+        action="Stripe purchase applied",
+        meta={"tier": current_user.subscription_tier, "session_id": session_id},
+    )
+    return {"status": "ok", "tier": current_user.subscription_tier}
 
 
 @router.post("/stripe/webhook")
@@ -285,17 +455,24 @@ async def stripe_webhook(
                 resolved_tier = _resolve_stripe_tier_by_price_id(price_id)
 
         if resolved_tier:
-            user.subscription_tier = resolved_tier
-            if resolved_tier == "single":
-                user.daily_scans_count = 0
-                user.daily_cl_count = 0
-                user.daily_prep_count = 0
             customer_id = obj.get("customer")
-            if isinstance(customer_id, str):
-                user.paddle_customer_id = customer_id
+            customer_id_value = customer_id if isinstance(customer_id, str) else None
             subscription_id = obj.get("subscription")
-            if isinstance(subscription_id, str):
-                user.paddle_subscription_id = subscription_id
+            subscription_id_value = subscription_id if isinstance(subscription_id, str) else None
+            period_end_dt = None
+            if subscription_id_value:
+                try:
+                    sub = stripe.Subscription.retrieve(subscription_id_value)
+                    period_end_dt = _from_unix_ts(sub.get("current_period_end"))
+                except Exception:
+                    period_end_dt = None
+            _apply_paid_tier_to_user(
+                user,
+                resolved_tier=resolved_tier,
+                customer_id=customer_id_value,
+                subscription_id=subscription_id_value,
+                period_end_dt=period_end_dt,
+            )
             db.add(user)
             db.commit()
             record_activity(
@@ -308,6 +485,7 @@ async def stripe_webhook(
     elif event_type in {"customer.subscription.deleted"}:
         user.subscription_tier = "free"
         user.paddle_subscription_id = None
+        user.subscription_active_until = None
         db.add(user)
         db.commit()
         record_activity(db, user_id=user.id, action="Stripe subscription canceled", meta={"event": event_type})
@@ -324,10 +502,12 @@ async def stripe_webhook(
         if status in {"canceled", "incomplete_expired", "unpaid"}:
             user.subscription_tier = "free"
             user.paddle_subscription_id = None
+            user.subscription_active_until = None
         elif tier:
             user.subscription_tier = tier
             subscription_id = obj.get("id")
             customer_id = obj.get("customer")
+            user.subscription_active_until = _from_unix_ts(obj.get("current_period_end"))
             if isinstance(subscription_id, str):
                 user.paddle_subscription_id = subscription_id
             if isinstance(customer_id, str):
@@ -444,18 +624,58 @@ async def paddle_webhook(
         return {"status": "error", "message": str(e)}
 
 @router.get("/status")
-def get_subscription_status(current_user: User = Depends(get_current_user)):
+def get_subscription_status(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     tier = current_user.subscription_tier
     if current_user.email == "dcartheartist@gmail.com":
         tier = "lifetime"
 
+    cancel_at_period_end = False
+    active_until = current_user.subscription_active_until
+    if (
+        settings.stripe_secret_key
+        and current_user.paddle_subscription_id
+        and tier in {"go", "pro"}
+    ):
+        stripe.api_key = settings.stripe_secret_key
+        try:
+            sub = stripe.Subscription.retrieve(current_user.paddle_subscription_id)
+            status = str(sub.get("status") or "").lower()
+            if status in {"canceled", "incomplete_expired", "unpaid"}:
+                current_user.subscription_tier = "free"
+                current_user.paddle_subscription_id = None
+                current_user.subscription_active_until = None
+                db.add(current_user)
+                db.commit()
+                tier = "free"
+                active_until = None
+            else:
+                mapped_tier = _extract_stripe_subscription_tier(sub)
+                if mapped_tier and mapped_tier != current_user.subscription_tier:
+                    current_user.subscription_tier = mapped_tier
+                    db.add(current_user)
+                    db.commit()
+                    tier = mapped_tier
+                cancel_at_period_end = bool(sub.get("cancel_at_period_end"))
+                active_until = _from_unix_ts(sub.get("current_period_end"))
+                current_user.subscription_active_until = active_until
+                db.add(current_user)
+                db.commit()
+        except Exception:
+            pass
+
+    limits = current_user.get_limits()
+    usage = {
+        "scans": current_user.daily_scans_count,
+        "cl": current_user.daily_cl_count,
+        "prep": current_user.daily_prep_count,
+    }
+
     # Simple endpoint to return tier and limits
     return {
         "tier": tier,
-        "limits": current_user.get_limits(),
-        "usage": {
-            "scans": current_user.daily_scans_count,
-            "cl": current_user.daily_cl_count,
-            "prep": current_user.daily_prep_count
-        }
+        "limits": limits,
+        "usage": usage,
+        "single_scan_remaining": max(0, limits["scans"] - usage["scans"]) if tier == "single" else None,
+        "cancel_at_period_end": cancel_at_period_end,
+        "subscription_active_until": active_until.isoformat() if active_until else None,
     }

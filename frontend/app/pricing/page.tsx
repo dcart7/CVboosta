@@ -75,7 +75,7 @@ export default function PricingPage() {
         body: JSON.stringify({
           tier: tierId,
           billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : null,
-          success_url: `${window.location.origin}/account?billing=success`,
+          success_url: `${window.location.origin}/account?billing=success&session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${window.location.origin}/pricing?billing=cancel`,
         }),
       });

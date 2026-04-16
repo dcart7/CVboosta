@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const apiBase = getApiBase();
 
   const submit = async () => {
@@ -97,13 +98,23 @@ export default function RegisterPage() {
             </div>
             <div>
               <div className="label">{t("auth.password")}</div>
-              <input
-                className="input"
-                placeholder={t("auth.passwordPlaceholder")}
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
+              <div className="password-field">
+                <input
+                  className="input password-input"
+                  placeholder={t("auth.passwordPlaceholder")}
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+                <button
+                  className="password-toggle"
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
               <ul className="password-rules" aria-label="Password requirements">
                 <li>{t("auth.passwordRuleLen")}</li>
                 <li>{t("auth.passwordRuleNumber")}</li>

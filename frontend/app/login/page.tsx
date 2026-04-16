@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const apiBase = getApiBase();
 
   const submit = async () => {
@@ -74,13 +75,23 @@ export default function LoginPage() {
             </div>
             <div>
               <div className="label">{t("auth.password")}</div>
-              <input
-                className="input"
-                placeholder="••••••••"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
+              <div className="password-field">
+                <input
+                  className="input password-input"
+                  placeholder="••••••••"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+                <button
+                  className="password-toggle"
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             <button className="btn primary" type="button" onClick={submit}>

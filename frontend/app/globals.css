@@ -1181,6 +1181,34 @@ a {
   line-height: 1.55;
 }
 
+.password-field {
+  position: relative;
+}
+
+.password-input {
+  padding-right: 88px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 999px;
+  padding: 7px 11px;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
 .password-rules li + li {
   margin-top: 2px;
 }
