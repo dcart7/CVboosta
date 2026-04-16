@@ -28,6 +28,20 @@ class StripeCheckoutRequest(BaseModel):
     cancel_url: str | None = None
 
 
+def _stripe_to_dict(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    to_dict_recursive = getattr(value, "to_dict_recursive", None)
+    if callable(to_dict_recursive):
+        result = to_dict_recursive()
+        if isinstance(result, dict):
+            return result
+    try:
+        return dict(value)
+    except Exception:
+        return {}
+
+
 def _from_unix_ts(value: Any) -> datetime | None:
     if isinstance(value, (int, float)):
         try:
@@ -291,7 +305,8 @@ def cancel_stripe_subscription(
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Unable to load subscription: {exc}") from exc
 
-    status = str(current.get("status") or "").lower()
+    current_data = _stripe_to_dict(current)
+    status = str(current_data.get("status") or "").lower()
     if status in {"canceled", "incomplete_expired", "unpaid"}:
         current_user.subscription_tier = "free"
         current_user.paddle_subscription_id = None
@@ -305,7 +320,7 @@ def cancel_stripe_subscription(
         }
 
     updated = current
-    if not bool(current.get("cancel_at_period_end")):
+    if not bool(current_data.get("cancel_at_period_end")):
         try:
             updated = stripe.Subscription.modify(
                 current_user.paddle_subscription_id,
@@ -314,7 +329,8 @@ def cancel_stripe_subscription(
         except Exception as exc:
             raise HTTPException(status_code=400, detail=f"Unable to cancel subscription: {exc}") from exc
 
-    period_end_dt = _from_unix_ts(updated.get("current_period_end"))
+    updated_data = _stripe_to_dict(updated)
+    period_end_dt = _from_unix_ts(updated_data.get("current_period_end"))
     current_user.subscription_active_until = period_end_dt
     db.add(current_user)
     db.commit()
@@ -326,7 +342,7 @@ def cancel_stripe_subscription(
     )
     return {
         "status": "scheduled",
-        "cancel_at_period_end": bool(updated.get("cancel_at_period_end")),
+        "cancel_at_period_end": bool(updated_data.get("cancel_at_period_end")),
         "active_until": period_end_dt.isoformat() if period_end_dt else None,
     }
 
@@ -342,13 +358,14 @@ def finalize_stripe_checkout_session(
     stripe.api_key = settings.stripe_secret_key
 
     try:
-        checkout = stripe.checkout.Session.retrieve(
+        checkout_raw = stripe.checkout.Session.retrieve(
             session_id,
             expand=["line_items.data.price"],
         )
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Unable to load checkout session: {exc}") from exc
 
+    checkout = _stripe_to_dict(checkout_raw)
     payment_status = str(checkout.get("payment_status") or "").lower()
     if payment_status not in {"paid", "no_payment_required"}:
         raise HTTPException(status_code=400, detail="Checkout session is not paid yet.")
@@ -381,7 +398,8 @@ def finalize_stripe_checkout_session(
     if subscription_id_value:
         try:
             subscription = stripe.Subscription.retrieve(subscription_id_value)
-            period_end_dt = _from_unix_ts(subscription.get("current_period_end"))
+            sub_data = _stripe_to_dict(subscription)
+            period_end_dt = _from_unix_ts(sub_data.get("current_period_end"))
         except Exception:
             period_end_dt = None
 
@@ -418,11 +436,12 @@ async def stripe_webhook(
         if not stripe_signature:
             raise HTTPException(status_code=400, detail="Missing Stripe-Signature")
         try:
-            event = stripe.Webhook.construct_event(
+            event_raw = stripe.Webhook.construct_event(
                 payload=body,
                 sig_header=stripe_signature,
                 secret=settings.stripe_webhook_secret,
             )
+            event = _stripe_to_dict(event_raw)
         except Exception as exc:
             raise HTTPException(status_code=400, detail=f"Invalid webhook signature: {exc}") from exc
     else:
@@ -639,7 +658,8 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
         stripe.api_key = settings.stripe_secret_key
         try:
             sub = stripe.Subscription.retrieve(current_user.paddle_subscription_id)
-            status = str(sub.get("status") or "").lower()
+            sub_data = _stripe_to_dict(sub)
+            status = str(sub_data.get("status") or "").lower()
             if status in {"canceled", "incomplete_expired", "unpaid"}:
                 current_user.subscription_tier = "free"
                 current_user.paddle_subscription_id = None
@@ -649,14 +669,14 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
                 tier = "free"
                 active_until = None
             else:
-                mapped_tier = _extract_stripe_subscription_tier(sub)
+                mapped_tier = _extract_stripe_subscription_tier(sub_data)
                 if mapped_tier and mapped_tier != current_user.subscription_tier:
                     current_user.subscription_tier = mapped_tier
                     db.add(current_user)
                     db.commit()
                     tier = mapped_tier
-                cancel_at_period_end = bool(sub.get("cancel_at_period_end"))
-                active_until = _from_unix_ts(sub.get("current_period_end"))
+                cancel_at_period_end = bool(sub_data.get("cancel_at_period_end"))
+                active_until = _from_unix_ts(sub_data.get("current_period_end"))
                 current_user.subscription_active_until = active_until
                 db.add(current_user)
                 db.commit()
