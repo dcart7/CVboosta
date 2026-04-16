@@ -26,10 +26,37 @@ export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"week" | "month">("month");
   const [mounted, setMounted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [activeTier, setActiveTier] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      setActiveTier(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${apiBase}/billing/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && typeof data?.tier === "string") {
+          setActiveTier(data.tier.toLowerCase());
+        }
+      } catch {
+        // ignore, pricing page still works without badge
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiBase]);
 
   const openCheckout = async (tierId: string) => {
     const token = localStorage.getItem("auth_token");
@@ -164,10 +191,20 @@ export default function PricingPage() {
 
         <div className="pricing-grid">
           {tiers.map((tier) => (
+            (() => {
+              const isActive =
+                (tier.id === "single" && activeTier === "single") ||
+                (tier.id === "go" && activeTier === "go") ||
+                (tier.id === "pro" && activeTier === "pro") ||
+                (tier.id === "lifetime" && activeTier === "lifetime");
+              return (
             <div 
               key={tier.id}
-              className={`pricing-card ${tier.style} ${tier.highlight ? "highlight" : ""} ${tier.premium ? "premium" : ""} ${tier.badge ? "has-badge" : ""}`}
+              className={`pricing-card ${tier.style} ${tier.highlight ? "highlight" : ""} ${tier.premium ? "premium" : ""} ${tier.badge ? "has-badge" : ""} ${isActive ? "is-active-plan" : ""}`}
             >
+              {isActive && (
+                <div className="active-plan-tag">{t("pricing.activePlan")}</div>
+              )}
               {tier.badge && (
                 <div className="badge-tag">{tier.badge}</div>
               )}
@@ -203,6 +240,8 @@ export default function PricingPage() {
                 {checkoutLoading === tier.id ? "Redirecting..." : tier.cta}
               </button>
             </div>
+            );
+            })()
           ))}
         </div>
 
@@ -301,6 +340,27 @@ export default function PricingPage() {
           transform: translateY(-8px);
           border-color: var(--accent);
           box-shadow: var(--shadow-hover);
+        }
+        .pricing-card.is-active-plan {
+          border-color: color-mix(in srgb, var(--accent) 70%, #39d98a);
+          box-shadow:
+            var(--shadow-hover),
+            0 0 0 1px color-mix(in srgb, var(--accent) 28%, #39d98a) inset;
+        }
+        .active-plan-tag {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          background: linear-gradient(135deg, #14b86f, #0f9f5f);
+          color: #fff;
+          padding: 6px 12px;
+          border-radius: 999px;
+          font-size: 0.68rem;
+          font-weight: 800;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+          z-index: 2;
+          box-shadow: 0 6px 18px rgba(15, 159, 95, 0.35);
         }
 
         .pricing-card.highlight {

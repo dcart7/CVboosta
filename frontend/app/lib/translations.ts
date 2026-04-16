@@ -399,6 +399,7 @@ export const translations = {
       enterpriseTitle: "Enterprise / Teams?",
       enterpriseSubtitle: "Looking for custom limits or volume licenses for your organization?",
       contactSales: "Contact Sales →",
+      activePlan: "Active Plan",
       },
       premiumModal: {
         title: "Daily Limit Reached",
@@ -804,6 +805,7 @@ export const translations = {
       enterpriseTitle: "Для компаній та команд?",
       enterpriseSubtitle: "Шукаєте індивідуальні ліміти або групові ліцензії для вашої організації?",
       contactSales: "Зв’язатися з відділом продажів →",
+      activePlan: "Активний план",
       },
       premiumModal: {
         title: "Денний ліміт вичерпано",
@@ -1201,6 +1203,7 @@ export const translations = {
       enterpriseTitle: "Enterprise / Zespoły?",
       enterpriseSubtitle: "Szukasz niestandardowych limitów lub licencji wolumenowych dla swojej organizacji?",
       contactSales: "Skontaktuj się z działem sprzedaży →",
+      activePlan: "Aktywny plan",
       },
       premiumModal: {
         title: "Dzienny limit wyczerpany",
@@ -1596,6 +1599,7 @@ export const translations = {
       enterpriseTitle: "Pre firmy a tímy?",
       enterpriseSubtitle: "Hľadáte vlastné limity alebo hromadné licencie pre vašu organizáciu?",
       contactSales: "Kontaktovať obchodné oddelenie →",
+      activePlan: "Aktívny plán",
       },
       premiumModal: {
         title: "Denný limit vyčerpaný",
@@ -1999,6 +2003,7 @@ export const translations = {
       enterpriseTitle: "Tým nebo Podnik?",
       enterpriseSubtitle: "Hledáte objemové licence?",
       contactSales: "Kontaktovat →",
+      activePlan: "Aktivní plán",
       },
       premiumModal: {
         title: "Dosažen denní limit",
@@ -2399,6 +2404,7 @@ export const translations = {
       enterpriseTitle: "¿Empresas / Equipos?",
       enterpriseSubtitle: "¿Buscas límites personalizados o licencias por volumen para tu organización?",
       contactSales: "Contactar con ventas →",
+      activePlan: "Plan activo",
       },
       premiumModal: {
         title: "Límite diario alcanzado",
