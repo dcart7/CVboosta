@@ -46,6 +46,15 @@ class Settings(BaseSettings):
     paddle_price_pro_weekly: str | None = None
     paddle_price_pro_monthly: str | None = None
     paddle_price_lifetime: str | None = None
+    stripe_secret_key: str | None = None
+    stripe_webhook_secret: str | None = None
+    stripe_product_id: str | None = None
+    stripe_price_single_scan: str | None = None
+    stripe_price_go_weekly: str | None = None
+    stripe_price_go_monthly: str | None = None
+    stripe_price_pro_weekly: str | None = None
+    stripe_price_pro_monthly: str | None = None
+    stripe_price_lifetime: str | None = None
 
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",

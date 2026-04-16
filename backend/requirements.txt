@@ -13,3 +13,4 @@ email-validator
 joblib
 sklearn-crfsuite
 paddle-sdk
+stripe

@@ -27,6 +27,7 @@ from app.services.keyword_clean import (
 from app.core.config import settings
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
+from app.services.fair_use import enforce_fair_use_or_raise
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.models.analysis import Analysis
@@ -42,6 +43,7 @@ async def optimize_cv(
     current_user=Depends(get_current_user_optional),
 ) -> OptimizeResponse:
     if current_user:
+        enforce_fair_use_or_raise(db, current_user)
         if not current_user.can_use("scan"):
             raise HTTPException(status_code=402, detail="Daily scan limit reached. Please upgrade your plan.")
     else:
@@ -174,7 +176,8 @@ def optimize_cover_letter(
 ) -> CoverLetterResponse:
     if not current_user:
         raise HTTPException(status_code=401, detail="Authentication required.")
-    
+
+    enforce_fair_use_or_raise(db, current_user)
     if not current_user.can_use("cl"):
         raise HTTPException(status_code=402, detail="Daily Cover Letter limit reached. Please upgrade your plan.")
 

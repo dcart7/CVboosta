@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "../lib/LanguageContext";
 import TopNav from "../components/TopNav";
+import { getApiBase } from "../lib/apiBase";
 
 const CheckIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -19,95 +21,46 @@ const CheckIcon = ({ className }: { className?: string }) => (
 
 export default function PricingPage() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const apiBase = getApiBase();
   const [billingCycle, setBillingCycle] = useState<"week" | "month">("month");
   const [mounted, setMounted] = useState(false);
-
-  const paddlePrices = {
-    single: process.env.NEXT_PUBLIC_PADDLE_PRICE_SINGLE_SCAN || "",
-    go: {
-      week: process.env.NEXT_PUBLIC_PADDLE_PRICE_GO_WEEKLY || "",
-      month: process.env.NEXT_PUBLIC_PADDLE_PRICE_GO_MONTHLY || "",
-    },
-    pro: {
-      week: process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO_WEEKLY || "",
-      month: process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY || "",
-    },
-    lifetime: process.env.NEXT_PUBLIC_PADDLE_PRICE_LIFETIME || "",
-  } as const;
-
-  const getEmailForCheckout = () => {
-    const saved = localStorage.getItem("user_email");
-    if (saved?.trim()) return saved.trim();
-    const token = localStorage.getItem("auth_token");
-    if (!token) return undefined;
-    try {
-      const base64Url = token.split(".")[1] || "";
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-      const payload = JSON.parse(atob(padded));
-      const email = typeof payload?.email === "string" ? payload.email : undefined;
-      if (email) {
-        localStorage.setItem("user_email", email);
-      }
-      return email;
-    } catch {
-      return undefined;
-    }
-  };
-
-  const resolvePriceId = (tierId: string) => {
-    if (tierId === "single") return paddlePrices.single;
-    if (tierId === "go") return paddlePrices.go[billingCycle];
-    if (tierId === "pro") return paddlePrices.pro[billingCycle];
-    if (tierId === "lifetime") return paddlePrices.lifetime;
-    return "";
-  };
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined" && (window as any).Paddle) {
-      const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "test_74843068e2f89ca230553bb1802";
-      
-      // Set environment if it's a test token
-      if (paddleToken.startsWith('test_')) {
-        (window as any).Paddle.Environment.set('sandbox');
-      }
-      
-      (window as any).Paddle.Initialize({ 
-        token: paddleToken
-      });
-    }
   }, []);
 
-  const openCheckout = (tierId: string) => {
-    const priceId = resolvePriceId(tierId);
-    if (!priceId) {
-      alert("Paddle price ID is missing for this plan. Set NEXT_PUBLIC_PADDLE_PRICE_* env vars.");
+  const openCheckout = async (tierId: string) => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      router.push("/login");
       return;
     }
-    if (typeof window !== "undefined" && (window as any).Paddle) {
-      (window as any).Paddle.Checkout.open({
-        items: [
-          {
-            priceId: priceId,
-            quantity: 1,
-          },
-        ],
-        customer: {
-          email: getEmailForCheckout(),
+    setCheckoutLoading(tierId);
+    try {
+      const response = await fetch(`${apiBase}/billing/stripe/checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        customData: {
-          tier:
-            tierId === "single"
-              ? "single_scan"
-              : tierId === "lifetime"
-                ? "lifetime"
-                : tierId,
-          period: tierId === "go" || tierId === "pro" ? billingCycle : "one_time",
-        },
+        body: JSON.stringify({
+          tier: tierId,
+          billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : null,
+          success_url: `${window.location.origin}/account?billing=success`,
+          cancel_url: `${window.location.origin}/pricing?billing=cancel`,
+        }),
       });
-    } else {
-      alert(t("pricing.paddleLoading"));
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data?.checkout_url) {
+        throw new Error(data?.detail || t("pricing.paddleLoading"));
+      }
+      window.location.href = data.checkout_url;
+    } catch (err) {
+      alert(err instanceof Error ? err.message : t("pricing.paddleLoading"));
+    } finally {
+      setCheckoutLoading(null);
     }
   };
 
@@ -245,8 +198,9 @@ export default function PricingPage() {
               <button
                 onClick={() => openCheckout(tier.id)}
                 className="cta-button"
+                disabled={checkoutLoading === tier.id}
               >
-                {tier.cta}
+                {checkoutLoading === tier.id ? "Redirecting..." : tier.cta}
               </button>
             </div>
           ))}

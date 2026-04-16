@@ -13,7 +13,7 @@ export default function PrivacyPage() {
         "CVboosta does not store uploaded CV files, CV document content, or job-description files in a persistent file storage system. Documents are processed in transient runtime memory for analysis and output generation, then discarded.",
       billingTitle: "Billing and Payment Data",
       billingDesc:
-        "Payments and subscription billing are provided by Paddle, which acts as Merchant of Record. CVboosta does not collect or store full card numbers, CVV/CVC, or other raw payment instrument details.",
+        "Payments are processed by Stripe. CVboosta does not collect or store full card numbers, CVV/CVC, or other raw payment instrument details.",
     },
     uk: {
       noStorageTitle: "Відсутність зберігання особистих файлів і вмісту документів",
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
         "CVboosta не зберігає завантажені CV-файли, вміст CV або файли опису вакансій у постійному файловому сховищі. Документи обробляються у тимчасовій пам'яті для аналізу та генерації результату, після чого видаляються.",
       billingTitle: "Оплата та платіжні дані",
       billingDesc:
-        "Оплату та білінг підписок забезпечує Paddle як Merchant of Record. CVboosta не збирає і не зберігає повні номери карток, CVV/CVC або інші сирі платіжні реквізити.",
+        "Оплата обробляється через Stripe. CVboosta не збирає і не зберігає повні номери карток, CVV/CVC або інші сирі платіжні реквізити.",
     },
     pl: {
       noStorageTitle: "Brak trwałego przechowywania plików i treści dokumentów",
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         "CVboosta nie przechowuje przesłanych plików CV, treści CV ani plików opisów ofert w trwałym magazynie plików. Dokumenty są przetwarzane tymczasowo w pamięci operacyjnej, a następnie usuwane.",
       billingTitle: "Płatności i dane rozliczeniowe",
       billingDesc:
-        "Płatności i rozliczenia subskrypcji realizuje Paddle jako Merchant of Record. CVboosta nie zbiera ani nie przechowuje pełnych numerów kart, CVV/CVC ani surowych danych instrumentów płatniczych.",
+        "Płatności są przetwarzane przez Stripe. CVboosta nie zbiera ani nie przechowuje pełnych numerów kart, CVV/CVC ani surowych danych instrumentów płatniczych.",
     },
     sk: {
       noStorageTitle: "Bez trvalého ukladania osobných súborov a obsahu dokumentov",
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
         "CVboosta neukladá nahrané CV súbory, obsah CV ani súbory popisu pracovnej pozície do trvalého úložiska. Dokumenty sa spracúvajú dočasne v pamäti a po spracovaní sa odstránia.",
       billingTitle: "Platby a fakturačné údaje",
       billingDesc:
-        "Platby a fakturáciu predplatného zabezpečuje Paddle ako Merchant of Record. CVboosta nezhromažďuje ani neukladá celé čísla kariet, CVV/CVC ani surové údaje platobných nástrojov.",
+        "Platby sú spracované cez Stripe. CVboosta nezhromažďuje ani neukladá celé čísla kariet, CVV/CVC ani surové údaje platobných nástrojov.",
     },
     cs: {
       noStorageTitle: "Bez trvalého ukládání osobních souborů a obsahu dokumentů",
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
         "CVboosta neukládá nahrané soubory CV, obsah CV ani soubory popisu pozice do trvalého úložiště. Dokumenty jsou zpracovány dočasně v paměti a po zpracování odstraněny.",
       billingTitle: "Platby a platební údaje",
       billingDesc:
-        "Platby a billing předplatného zajišťuje Paddle jako Merchant of Record. CVboosta neshromažďuje ani neukládá úplná čísla karet, CVV/CVC ani surové údaje platebních prostředků.",
+        "Platby jsou zpracovány přes Stripe. CVboosta neshromažďuje ani neukládá úplná čísla karet, CVV/CVC ani surové údaje platebních prostředků.",
     },
     es: {
       noStorageTitle: "Sin almacenamiento persistente de archivos personales ni contenido",
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
         "CVboosta no almacena archivos CV subidos, contenido del CV ni archivos de descripción de vacante en almacenamiento persistente. Los documentos se procesan de forma temporal en memoria y luego se eliminan.",
       billingTitle: "Facturación y datos de pago",
       billingDesc:
-        "Los pagos y la facturación de suscripciones son gestionados por Paddle como Merchant of Record. CVboosta no recopila ni almacena números completos de tarjeta, CVV/CVC ni datos crudos del instrumento de pago.",
+        "Los pagos se procesan mediante Stripe. CVboosta no recopila ni almacena números completos de tarjeta, CVV/CVC ni datos crudos del instrumento de pago.",
     },
   }[language];
 
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
           <div className="legal-doc">
             <div className="legal-meta">
               <span className="legal-chip">{t("results.legalDocumentLabel")}</span>
-              <span className="legal-chip">{t("results.lastUpdatedPrefix")}: April 15, 2026</span>
+              <span className="legal-chip">{t("results.lastUpdatedPrefix")}: April 16, 2026</span>
             </div>
 
             <div className="legal-content">

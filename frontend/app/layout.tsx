@@ -62,7 +62,6 @@ export default function RootLayout({
             to { transform: translateY(0); opacity: 1; }
           }
         `}} />
-        <script src="https://cdn.paddle.com/paddle/v2/paddle.js" async></script>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script

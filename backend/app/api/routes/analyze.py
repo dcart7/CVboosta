@@ -40,6 +40,7 @@ from app.services.matching import compute_match_score
 from app.db.session import get_db
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
+from app.services.fair_use import enforce_fair_use_or_raise
 
 router = APIRouter()
 
@@ -308,7 +309,8 @@ def interview_prep_route(
 ) -> InterviewPrepResponse:
     if not current_user:
         raise HTTPException(status_code=401, detail="Authentication required.")
-    
+
+    enforce_fair_use_or_raise(db, current_user)
     if not current_user.can_use("prep"):
         raise HTTPException(status_code=402, detail="Daily Interview Prep limit reached. Please upgrade your plan.")
 
