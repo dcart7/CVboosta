@@ -233,6 +233,16 @@ def _apply_paid_tier_to_user(
 
 def _find_user_for_stripe_object(db: Session, payload: dict[str, Any]) -> User | None:
     metadata = payload.get("metadata") or {}
+    user_id_raw = metadata.get("user_id") or payload.get("client_reference_id")
+    if user_id_raw is not None:
+        try:
+            user_id = int(str(user_id_raw).strip())
+            user = db.query(User).filter(User.id == user_id).first()
+            if user:
+                return user
+        except Exception:
+            pass
+
     email = None
     if isinstance(payload.get("customer_details"), dict):
         email = payload.get("customer_details", {}).get("email")
