@@ -457,16 +457,17 @@ async def stripe_webhook(
         if not stripe_signature:
             raise HTTPException(status_code=400, detail="Missing Stripe-Signature")
         try:
-            event_raw = stripe.Webhook.construct_event(
+            stripe.Webhook.construct_event(
                 payload=body,
                 sig_header=stripe_signature,
                 secret=settings.stripe_webhook_secret,
             )
-            event = _stripe_to_dict(event_raw)
         except Exception as exc:
             raise HTTPException(status_code=400, detail=f"Invalid webhook signature: {exc}") from exc
-    else:
+    try:
         event = json.loads(body.decode("utf-8"))
+    except Exception:
+        event = {}
 
     event_type = event.get("type")
     obj = event.get("data", {}).get("object", {})
@@ -503,7 +504,8 @@ async def stripe_webhook(
             if subscription_id_value:
                 try:
                     sub = stripe.Subscription.retrieve(subscription_id_value)
-                    period_end_dt = _from_unix_ts(sub.get("current_period_end"))
+                    sub_data = _stripe_to_dict(sub)
+                    period_end_dt = _from_unix_ts(sub_data.get("current_period_end"))
                 except Exception:
                     period_end_dt = None
             _apply_paid_tier_to_user(
