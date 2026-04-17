@@ -4,17 +4,34 @@ import CookieBanner from "./components/CookieBanner";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
+import type { Metadata } from "next";
 
-export const metadata = {
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
+
+export const metadata: Metadata = {
   title: "CVboosta | ATS-Friendly CV Optimization",
   description: "Stop guessing why you don't get callbacks. Get an honest AI feedback and ATS-optimized rewrite for your CV in seconds.",
   keywords: ["CV optimization", "ATS resume", "AI resume builder", "career feedback", "CVboosta"],
   authors: [{ name: "CVboosta Team" }],
-  metadataBase: new URL("http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     title: "CVboosta | Tune your CV for real hiring teams",
     description: "Upload a CV, paste a vacancy, and get an ATS-friendly rewrite with honest feedback.",
-    url: "http://localhost:3000",
+    url: siteUrl,
     siteName: "CVboosta",
     images: [
       {
@@ -48,7 +65,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
