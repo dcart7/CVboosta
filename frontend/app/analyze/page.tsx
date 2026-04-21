@@ -165,6 +165,14 @@ export default function AnalyzePage() {
           <div className="form-card">
             <h2 className="section-title">{t("analyze.title")}</h2>
             <p className="hero-subtitle">{t("analyze.subtitle")}</p>
+            <div className="card" style={{ marginBottom: "16px" }}>
+              <h3>Free ATS Resume Checker</h3>
+              <p>
+                CV analysis and match scoring are free without registration.
+                Upload your CV, paste a job description, and get your ATS score
+                with missing keywords in minutes.
+              </p>
+            </div>
             {loading && <p>{t("common.loading")}</p>}
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             {!loading && (!jobText || !parsed?.raw_text) && (

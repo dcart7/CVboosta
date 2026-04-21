@@ -1,15 +1,26 @@
 import { MetadataRoute } from "next";
+import { getPublishedBlogPosts } from "./lib/blogPosts";
+import { getResumeKeywordStaticSlugs } from "./lib/resumeKeywordClusters";
+
+export const revalidate = 3600;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
+  const publishedBlogRoutes = getPublishedBlogPosts().map((post) => `/blog/${post.slug}`);
+  const resumeKeywordRoutes = getResumeKeywordStaticSlugs().map(
+    (slug) => `/resume-keywords/${slug}`,
+  );
 
   const routes = [
     "",
     "/about",
     "/blog",
-    "/blog/tailor-resume-to-job-description",
-    "/blog/ats-resume-mistakes",
-    "/blog/improve-ats-resume-score",
+    "/free-ats-resume-checker",
+    "/resume-keywords",
+    "/ai.txt",
+    "/llms.txt",
+    ...publishedBlogRoutes,
+    ...resumeKeywordRoutes,
     "/pricing",
     "/privacy",
     "/terms",

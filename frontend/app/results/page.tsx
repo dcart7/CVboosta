@@ -379,6 +379,7 @@ function ResultsContent() {
   const apiBase = getApiBase();
   const searchParams = useSearchParams();
   const { t, language } = useTranslation();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
   const [optimizedCv, setOptimizedCv] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
   const [addedKeywords, setAddedKeywords] = useState<string[]>([]);
@@ -403,6 +404,17 @@ function ResultsContent() {
   const [subscriptionTier, setSubscriptionTier] = useState<string>("free");
 
   const sessionId = searchParams.get("id");
+  const shareUrl = sessionId
+    ? `${siteUrl}/results?id=${encodeURIComponent(sessionId)}`
+    : `${siteUrl}/results`;
+  const shareTitle =
+    matchAfter !== null
+      ? `My ATS resume score is ${matchAfter}/100`
+      : "I just optimized my CV for ATS";
+  const shareText =
+    matchAfter !== null
+      ? `I just checked my resume ATS score: ${matchAfter}/100.`
+      : "I just checked and improved my resume for ATS.";
 
   const loadHistorySession = useCallback(async () => {
     if (!sessionId) return;
@@ -689,6 +701,28 @@ function ResultsContent() {
       console.error("Copy failed:", err);
       setStatus(t("results.copyFailed"));
     }
+  };
+
+  const openShareWindow = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const shareOnLinkedIn = () => {
+    openShareWindow(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+    );
+  };
+
+  const shareOnTwitter = () => {
+    openShareWindow(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+    );
+  };
+
+  const shareOnReddit = () => {
+    openShareWindow(
+      `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`,
+    );
   };
 
   const fetchInterviewPrep = async () => {
@@ -1320,6 +1354,20 @@ function ResultsContent() {
                 <button className="btn secondary" onClick={downloadPdf}>
                   {t("results.downloadPdf")}
                 </button>
+              </div>
+              <div className="section" style={{ marginTop: "12px" }}>
+                <h3 className="section-title">Share your result</h3>
+                <div className="nav-actions">
+                  <button className="btn ghost" type="button" onClick={shareOnLinkedIn}>
+                    LinkedIn
+                  </button>
+                  <button className="btn ghost" type="button" onClick={shareOnTwitter}>
+                    Twitter/X
+                  </button>
+                  <button className="btn ghost" type="button" onClick={shareOnReddit}>
+                    Reddit
+                  </button>
+                </div>
               </div>
               {status && <p>{status}</p>}
             </div>

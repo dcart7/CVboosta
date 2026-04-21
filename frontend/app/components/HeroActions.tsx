@@ -17,6 +17,9 @@ export default function HeroActions() {
       <Link className="btn primary" href="/app">
         {t("hero.startWithCv")}
       </Link>
+      <Link className="btn ghost" href="/free-ats-resume-checker">
+        Free ATS checker
+      </Link>
       {!isAuthed && (
         <Link className="btn primary" href="/register">
           {t("nav.register")}

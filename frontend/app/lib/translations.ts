@@ -505,7 +505,7 @@ export const translations = {
       dashboard: "Панель",
       results: "Результати",
       history: "Історія",
-      about: "Про сервіс",
+      about: "Про нас",
       pricing: "Тарифи",
       login: "Увійти",
       register: "Реєстрація",

@@ -205,6 +205,9 @@ export default function HomePage() {
             <p className="pill">{t("home.pill")}</p>
             <h1 className="hero-title">{t("home.heroTitle")}</h1>
             <p className="hero-subtitle">{t("home.heroSubtitle")}</p>
+            <p className="hero-subtitle" style={{ marginTop: "10px" }}>
+              Free ATS Resume Checker: run CV analysis and match scoring without registration.
+            </p>
             <HeroActions />
           </div>
         </section>

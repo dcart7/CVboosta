@@ -16,6 +16,10 @@ export default function TopNav() {
   const { t, language, setLanguage } = useTranslation();
   const trackRef = useRef<HTMLDivElement>(null);
   const [pillStyle, setPillStyle] = useState({ transform: "translateX(0px)" });
+  const desktopNavStyle =
+    language === "uk"
+      ? { display: "flex", gap: "14px", fontSize: "13px" }
+      : { display: "flex", gap: "20px", fontSize: "14px" };
 
   const languages: { code: Language; flag: string }[] = [
     { code: "en", flag: "🇺🇸" },
@@ -100,7 +104,7 @@ export default function TopNav() {
         </Link>
 
         {/* Desktop Links */}
-        <nav className="nav-links cv-desktop-only" style={{ display: "flex", gap: "20px", fontSize: "14px" }}>
+        <nav className="nav-links cv-desktop-only" style={desktopNavStyle}>
           <Link href="/app">{t("nav.dashboard")}</Link>
           <Link href="/results">{t("nav.results")}</Link>
           <Link href="/history">{t("nav.history")}</Link>
