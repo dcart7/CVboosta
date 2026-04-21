@@ -20,6 +20,25 @@ export default function TermsPage() {
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "For unlimited plans (Pro Weekly, Pro Monthly, and Lifetime), Fair Use limits apply: maximum 10 requests per minute and maximum 100 requests per rolling 24-hour window across CV optimization, cover letters, and interview prep.",
+      faqTitle: "Service FAQ",
+      faq: [
+        {
+          q: "Can I use CVboosta without a subscription?",
+          a: "Yes. You can use single-scan purchases, and you can upgrade to a subscription if you need recurring access.",
+        },
+        {
+          q: "Are purchases refundable after I use features?",
+          a: "No. Once included features are used, Single Scan and subscription charges are generally non-refundable unless required by law or confirmed billing error.",
+        },
+        {
+          q: "Can I cancel my subscription anytime?",
+          a: "Yes. You can cancel anytime to stop future renewals. Cancellation does not retroactively refund already processed charges.",
+        },
+        {
+          q: "Do unlimited plans have usage limits?",
+          a: "Yes. Fair Use applies to protect platform stability, including request-per-minute and rolling 24-hour limits.",
+        },
+      ],
     },
     uk: {
       dataTitle: "Обробка даних і файлів",
@@ -34,6 +53,25 @@ export default function TermsPage() {
       fairUseTitle: "Політика справедливого використання",
       fairUseDesc:
         "Для безлімітних планів (Pro Weekly, Pro Monthly та Lifetime) діють обмеження Fair Use: максимум 10 запитів за хвилину і максимум 100 запитів за rolling-вікно 24 години для оптимізації CV, супровідних листів та тренажера співбесіди.",
+      faqTitle: "FAQ по сервісу",
+      faq: [
+        {
+          q: "Чи можна користуватися CVboosta без підписки?",
+          a: "Так. Доступні разові покупки Single Scan, а за потреби ви можете перейти на підписку.",
+        },
+        {
+          q: "Чи є повернення після використання функцій?",
+          a: "Ні. Після використання включених функцій платежі Single Scan і підписки зазвичай не повертаються, окрім випадків, передбачених законом, або підтвердженої помилки білінгу.",
+        },
+        {
+          q: "Чи можна скасувати підписку в будь-який момент?",
+          a: "Так. Підписку можна скасувати в будь-який момент, щоб зупинити наступні списання. Вже проведені списання не повертаються автоматично.",
+        },
+        {
+          q: "Чи мають безлімітні плани обмеження?",
+          a: "Так. Діє Fair Use для стабільності платформи, включно з лімітом запитів за хвилину та у 24-годинному вікні.",
+        },
+      ],
     },
     pl: {
       dataTitle: "Przetwarzanie danych i plików",
@@ -48,6 +86,25 @@ export default function TermsPage() {
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "Dla planów nielimitowanych (Pro Weekly, Pro Monthly i Lifetime) obowiązują limity Fair Use: maksymalnie 10 żądań na minutę i maksymalnie 100 żądań w ruchomym oknie 24 godzin dla optymalizacji CV, listów motywacyjnych i przygotowania do rozmowy.",
+      faqTitle: "FAQ usługi",
+      faq: [
+        {
+          q: "Czy można korzystać z CVboosta bez subskrypcji?",
+          a: "Tak. Dostępne są zakupy Single Scan, a subskrypcję możesz włączyć, gdy potrzebujesz regularnego dostępu.",
+        },
+        {
+          q: "Czy po użyciu funkcji przysługuje zwrot?",
+          a: "Nie. Po użyciu funkcji opłaty Single Scan i subskrypcji zasadniczo nie podlegają zwrotowi, chyba że wymagają tego przepisy lub potwierdzony błąd rozliczenia.",
+        },
+        {
+          q: "Czy mogę anulować subskrypcję w dowolnym momencie?",
+          a: "Tak. Możesz anulować subskrypcję w dowolnym momencie, aby zatrzymać kolejne odnowienia. Już zrealizowane opłaty nie są automatycznie zwracane.",
+        },
+        {
+          q: "Czy plany nielimitowane mają limity?",
+          a: "Tak. Obowiązuje Fair Use dla stabilności platformy, w tym limity żądań na minutę i w oknie 24-godzinnym.",
+        },
+      ],
     },
     sk: {
       dataTitle: "Spracovanie dát a súborov",
@@ -62,6 +119,25 @@ export default function TermsPage() {
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "Pre neobmedzené plány (Pro Weekly, Pro Monthly a Lifetime) platia limity Fair Use: maximálne 10 požiadaviek za minútu a maximálne 100 požiadaviek v kĺzavom 24-hodinovom okne pre optimalizáciu CV, motivačné listy a prípravu na pohovor.",
+      faqTitle: "FAQ služby",
+      faq: [
+        {
+          q: "Môžem používať CVboosta bez predplatného?",
+          a: "Áno. K dispozícii sú jednorazové nákupy Single Scan a podľa potreby môžete prejsť na predplatné.",
+        },
+        {
+          q: "Sú platby vratné po použití funkcií?",
+          a: "Nie. Po použití zahrnutých funkcií sú platby Single Scan a predplatného spravidla nevratné, okrem prípadov vyžadovaných zákonom alebo potvrdenej chyby fakturácie.",
+        },
+        {
+          q: "Môžem predplatné kedykoľvek zrušiť?",
+          a: "Áno. Predplatné môžete kedykoľvek zrušiť, aby sa zastavili budúce obnovenia. Už spracované platby sa automaticky nevracajú.",
+        },
+        {
+          q: "Majú neobmedzené plány limity?",
+          a: "Áno. Platí Fair Use na ochranu stability platformy, vrátane limitov požiadaviek za minútu a v 24-hodinovom okne.",
+        },
+      ],
     },
     cs: {
       dataTitle: "Zpracování dat a souborů",
@@ -76,6 +152,25 @@ export default function TermsPage() {
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "Pro neomezené plány (Pro Weekly, Pro Monthly a Lifetime) platí Fair Use limity: maximálně 10 požadavků za minutu a maximálně 100 požadavků v klouzavém 24hodinovém okně pro optimalizaci CV, motivační dopisy a přípravu na pohovor.",
+      faqTitle: "FAQ služby",
+      faq: [
+        {
+          q: "Mohu používat CVboosta bez předplatného?",
+          a: "Ano. K dispozici jsou jednorázové nákupy Single Scan a podle potřeby můžete přejít na předplatné.",
+        },
+        {
+          q: "Jsou platby vratné po použití funkcí?",
+          a: "Ne. Po použití zahrnutých funkcí jsou platby Single Scan a předplatného obecně nevratné, kromě případů vyžadovaných zákonem nebo potvrzené chyby účtování.",
+        },
+        {
+          q: "Mohu předplatné kdykoli zrušit?",
+          a: "Ano. Předplatné můžete kdykoli zrušit, aby se zastavila budoucí obnovení. Již zpracované platby se automaticky nevracejí.",
+        },
+        {
+          q: "Mají neomezené plány limity?",
+          a: "Ano. Platí Fair Use pro stabilitu platformy, včetně limitu požadavků za minutu a v 24hodinovém okně.",
+        },
+      ],
     },
     es: {
       dataTitle: "Gestión de datos y archivos",
@@ -90,6 +185,25 @@ export default function TermsPage() {
       fairUseTitle: "Política de uso justo",
       fairUseDesc:
         "Para los planes ilimitados (Pro Weekly, Pro Monthly y Lifetime) se aplican límites de uso justo: máximo 10 solicitudes por minuto y máximo 100 solicitudes por ventana móvil de 24 horas para optimización de CV, cartas de presentación y preparación de entrevistas.",
+      faqTitle: "FAQ del servicio",
+      faq: [
+        {
+          q: "¿Puedo usar CVboosta sin suscripción?",
+          a: "Sí. Puedes usar compras de Single Scan y cambiar a suscripción si necesitas acceso recurrente.",
+        },
+        {
+          q: "¿Hay reembolso después de usar funciones?",
+          a: "No. Después de usar funciones incluidas, los cobros de Single Scan y suscripción generalmente no son reembolsables, salvo ley aplicable o error de facturación confirmado.",
+        },
+        {
+          q: "¿Puedo cancelar la suscripción en cualquier momento?",
+          a: "Sí. Puedes cancelar en cualquier momento para detener renovaciones futuras. Los cobros ya procesados no se reembolsan automáticamente.",
+        },
+        {
+          q: "¿Los planes ilimitados tienen límites?",
+          a: "Sí. Se aplica uso justo para mantener la estabilidad de la plataforma, con límites por minuto y en ventana de 24 horas.",
+        },
+      ],
     },
   }[language];
 
@@ -145,6 +259,17 @@ export default function TermsPage() {
               <div className="legal-block">
                 <h3>{t("legal.termsUserRespTitle")}</h3>
                 <p>{t("legal.termsUserRespDesc")}</p>
+              </div>
+              <div className="legal-block">
+                <h3>{localizedBlocks.faqTitle}</h3>
+                <div className="legal-faq-list">
+                  {localizedBlocks.faq.map((item) => (
+                    <details key={item.q} className="legal-faq-item">
+                      <summary>{item.q}</summary>
+                      <p>{item.a}</p>
+                    </details>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

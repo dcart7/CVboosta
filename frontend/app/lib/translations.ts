@@ -425,6 +425,7 @@ export const translations = {
       support: "support@virelsolutions.com",
       privacy: "Privacy Policy",
       terms: "Terms of Service",
+      resumeKeywords: "Resume Keywords by Role",
       cookieNotice: "Our website uses cookies to improve your experience and analyze usage limits.",
     },
     legal: {
@@ -917,6 +918,7 @@ export const translations = {
       support: "support@virelsolutions.com",
       privacy: "Конфіденційність",
       terms: "Умови використання",
+      resumeKeywords: "Ключові слова резюме за ролями",
       cookieNotice: "Наш сайт використовує файли cookie для покращення вашого досвіду та аналізу лімітів використання.",
     },
     legal: {
@@ -1401,6 +1403,7 @@ export const translations = {
       support: "support@virelsolutions.com",
       privacy: "Polityka prywatności",
       terms: "Warunki korzystania",
+      resumeKeywords: "Słowa kluczowe CV wg roli",
       cookieNotice: "Nasza strona korzysta z plików cookie, aby poprawić wrażenia użytkownika i analizować limity użycia.",
     },
     legal: {
@@ -1880,6 +1883,7 @@ export const translations = {
       support: "support@virelsolutions.com",
       privacy: "Zásady ochrany osobných údajov",
       terms: "Podmienky používania",
+      resumeKeywords: "Kľúčové slová životopisu podľa role",
       cookieNotice: "Naša webová stránka používa súbory cookie na zlepšenie vášho zážitku a analýzu limitov používania.",
     },
     legal: {
@@ -2373,6 +2377,7 @@ export const translations = {
       support: "support@virelsolutions.com",
       privacy: "Zásady ochrany osobních údajů",
       terms: "Podmínky použití",
+      resumeKeywords: "Klíčová slova životopisu podle role",
       cookieNotice: "Naše weby využívají soubory cookie pro lepší uživatelský zážitek.",
     },
     legal: {
@@ -2858,6 +2863,7 @@ export const translations = {
       support: "support@virelsolutions.com",
       privacy: "Política de privacidad",
       terms: "Términos de uso",
+      resumeKeywords: "Palabras clave de CV por rol",
       cookieNotice: "Nuestro sitio web utiliza cookies para mejorar su experiencia y analizar los límites de uso.",
     },
     legal: {

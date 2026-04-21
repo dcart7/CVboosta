@@ -1,7 +1,7 @@
 export type ResumeKeywordLocale = "en";
 export type PublishStatus = "draft" | "published";
 
-type RoleCategory =
+export type RoleCategory =
   | "engineering"
   | "data"
   | "product"
@@ -30,6 +30,7 @@ export type ResumeKeywordExample = {
 export type ResumeKeywordCluster = {
   slug: string;
   role: string;
+  category: RoleCategory;
   intent: "resume keywords";
   keywords: string[];
   mistakes: string[];
@@ -347,6 +348,7 @@ function roleFaq(role: string): ResumeKeywordFaq[] {
 const CLUSTERS: ResumeKeywordCluster[] = ROLE_SEEDS.map((seed) => ({
   slug: toSlug(seed.role),
   role: seed.role,
+  category: seed.category,
   intent: "resume keywords",
   keywords: roleKeywords(seed.role, seed.category),
   mistakes: roleMistakes(seed.role),
