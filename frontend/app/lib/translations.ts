@@ -10,6 +10,7 @@ export const translations = {
       pricing: "Pricing",
       login: "Log in",
       register: "Register",
+      blog: "Blog",
       logout: "Log out",
     },
     home: {
@@ -50,6 +51,81 @@ export const translations = {
         step3: {
           title: "Review results",
           desc: "Get a new draft and improvement tips.",
+        },
+      },
+    },
+    blog: {
+      title: "CV & ATS Blog",
+      subtitle:
+        "Practical guides to tailor your resume, avoid ATS pitfalls, and improve your match score.",
+      readArticle: "Read article",
+      backToBlog: "Back to blog",
+      publishedOn: "Published",
+      articles: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          excerpt:
+            "A practical step-by-step method to adapt your resume for each role without keyword stuffing.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          excerpt:
+            "The most common formatting and content mistakes that cause ATS rejection or low match scores.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          excerpt:
+            "Use this checklist to increase ATS alignment with stronger keywords, structure, and impact bullets.",
+        },
+      },
+      posts: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          lead: "Tailoring your resume is about relevance, not rewriting everything from scratch.",
+          section1Title: "1) Extract the role priorities",
+          section1Body:
+            "Read the job description and list repeated skills, tools, and outcomes. These repeated signals are what ATS and recruiters focus on first.",
+          section2Title: "2) Align your strongest evidence",
+          section2Body:
+            "For each priority, map a real example from your experience. Update summary, skills, and bullet points so the match is obvious in the first scan.",
+          section3Title: "3) Keep wording clear and truthful",
+          section3Body:
+            "Use the employer's terminology where accurate, but avoid copying whole sentences. Your goal is precise alignment, not artificial keyword stuffing.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "A tailored resume wins by showing direct role fit with credible evidence and clear wording.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          lead: "Most ATS failures come from avoidable structure and wording issues.",
+          section1Title: "1) Overdesigned layouts",
+          section1Body:
+            "Complex columns, tables, and visual-heavy templates can hide important text from ATS parsing. Keep structure simple and readable.",
+          section2Title: "2) Weak keyword alignment",
+          section2Body:
+            "If your resume doesn't reflect the core terms from the job description, your match score drops even when experience is relevant.",
+          section3Title: "3) Vague bullet points",
+          section3Body:
+            "Bullets like 'responsible for' do not show impact. Use action verbs, measurable outcomes, and role-relevant language.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Use a clean format, role-specific keywords, and quantified achievements to avoid ATS rejection.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          lead: "Improving ATS score is a process you can systematize in every application.",
+          section1Title: "1) Match keywords by section",
+          section1Body:
+            "Place critical role keywords in summary, skills, and recent experience. This helps ATS confirm relevance quickly.",
+          section2Title: "2) Strengthen impact bullets",
+          section2Body:
+            "Each bullet should show action + context + result. Numbers and scope increase both ATS confidence and recruiter trust.",
+          section3Title: "3) Run a final relevance pass",
+          section3Body:
+            "Before submitting, compare your resume against role requirements one more time and close the biggest gaps first.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Higher ATS score comes from clear role alignment, measurable impact, and disciplined final review.",
         },
       },
     },
@@ -433,6 +509,7 @@ export const translations = {
       pricing: "Тарифи",
       login: "Увійти",
       register: "Реєстрація",
+      blog: "Блог",
       logout: "Вийти",
     },
     home: {
@@ -467,6 +544,81 @@ export const translations = {
         step3: {
           title: "Перевірте результат",
           desc: "Отримайте нову чернетку та поради для покращення.",
+        },
+      },
+    },
+    blog: {
+      title: "CV & ATS Blog",
+      subtitle:
+        "Practical guides to tailor your resume, avoid ATS pitfalls, and improve your match score.",
+      readArticle: "Read article",
+      backToBlog: "Back to blog",
+      publishedOn: "Published",
+      articles: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          excerpt:
+            "A practical step-by-step method to adapt your resume for each role without keyword stuffing.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          excerpt:
+            "The most common formatting and content mistakes that cause ATS rejection or low match scores.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          excerpt:
+            "Use this checklist to increase ATS alignment with stronger keywords, structure, and impact bullets.",
+        },
+      },
+      posts: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          lead: "Tailoring your resume is about relevance, not rewriting everything from scratch.",
+          section1Title: "1) Extract the role priorities",
+          section1Body:
+            "Read the job description and list repeated skills, tools, and outcomes. These repeated signals are what ATS and recruiters focus on first.",
+          section2Title: "2) Align your strongest evidence",
+          section2Body:
+            "For each priority, map a real example from your experience. Update summary, skills, and bullet points so the match is obvious in the first scan.",
+          section3Title: "3) Keep wording clear and truthful",
+          section3Body:
+            "Use the employer's terminology where accurate, but avoid copying whole sentences. Your goal is precise alignment, not artificial keyword stuffing.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "A tailored resume wins by showing direct role fit with credible evidence and clear wording.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          lead: "Most ATS failures come from avoidable structure and wording issues.",
+          section1Title: "1) Overdesigned layouts",
+          section1Body:
+            "Complex columns, tables, and visual-heavy templates can hide important text from ATS parsing. Keep structure simple and readable.",
+          section2Title: "2) Weak keyword alignment",
+          section2Body:
+            "If your resume does not reflect the core terms from the job description, your match score drops even when experience is relevant.",
+          section3Title: "3) Vague bullet points",
+          section3Body:
+            "Bullets like 'responsible for' do not show impact. Use action verbs, measurable outcomes, and role-relevant language.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Use a clean format, role-specific keywords, and quantified achievements to avoid ATS rejection.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          lead: "Improving ATS score is a process you can systematize in every application.",
+          section1Title: "1) Match keywords by section",
+          section1Body:
+            "Place critical role keywords in summary, skills, and recent experience. This helps ATS confirm relevance quickly.",
+          section2Title: "2) Strengthen impact bullets",
+          section2Body:
+            "Each bullet should show action + context + result. Numbers and scope increase both ATS confidence and recruiter trust.",
+          section3Title: "3) Run a final relevance pass",
+          section3Body:
+            "Before submitting, compare your resume against role requirements one more time and close the biggest gaps first.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Higher ATS score comes from clear role alignment, measurable impact, and disciplined final review.",
         },
       },
     },
@@ -847,6 +999,7 @@ export const translations = {
       pricing: "Cennik",
       login: "Zaloguj się",
       register: "Rejestracja",
+      blog: "Blog",
       logout: "Wyloguj",
     },
     home: {
@@ -881,6 +1034,81 @@ export const translations = {
         step3: {
           title: "Sprawdź wyniki",
           desc: "Otrzymaj nowy szkic i wskazówki dotyczące ulepszeń.",
+        },
+      },
+    },
+    blog: {
+      title: "CV & ATS Blog",
+      subtitle:
+        "Practical guides to tailor your resume, avoid ATS pitfalls, and improve your match score.",
+      readArticle: "Read article",
+      backToBlog: "Back to blog",
+      publishedOn: "Published",
+      articles: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          excerpt:
+            "A practical step-by-step method to adapt your resume for each role without keyword stuffing.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          excerpt:
+            "The most common formatting and content mistakes that cause ATS rejection or low match scores.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          excerpt:
+            "Use this checklist to increase ATS alignment with stronger keywords, structure, and impact bullets.",
+        },
+      },
+      posts: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          lead: "Tailoring your resume is about relevance, not rewriting everything from scratch.",
+          section1Title: "1) Extract the role priorities",
+          section1Body:
+            "Read the job description and list repeated skills, tools, and outcomes. These repeated signals are what ATS and recruiters focus on first.",
+          section2Title: "2) Align your strongest evidence",
+          section2Body:
+            "For each priority, map a real example from your experience. Update summary, skills, and bullet points so the match is obvious in the first scan.",
+          section3Title: "3) Keep wording clear and truthful",
+          section3Body:
+            "Use the employer's terminology where accurate, but avoid copying whole sentences. Your goal is precise alignment, not artificial keyword stuffing.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "A tailored resume wins by showing direct role fit with credible evidence and clear wording.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          lead: "Most ATS failures come from avoidable structure and wording issues.",
+          section1Title: "1) Overdesigned layouts",
+          section1Body:
+            "Complex columns, tables, and visual-heavy templates can hide important text from ATS parsing. Keep structure simple and readable.",
+          section2Title: "2) Weak keyword alignment",
+          section2Body:
+            "If your resume does not reflect the core terms from the job description, your match score drops even when experience is relevant.",
+          section3Title: "3) Vague bullet points",
+          section3Body:
+            "Bullets like 'responsible for' do not show impact. Use action verbs, measurable outcomes, and role-relevant language.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Use a clean format, role-specific keywords, and quantified achievements to avoid ATS rejection.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          lead: "Improving ATS score is a process you can systematize in every application.",
+          section1Title: "1) Match keywords by section",
+          section1Body:
+            "Place critical role keywords in summary, skills, and recent experience. This helps ATS confirm relevance quickly.",
+          section2Title: "2) Strengthen impact bullets",
+          section2Body:
+            "Each bullet should show action + context + result. Numbers and scope increase both ATS confidence and recruiter trust.",
+          section3Title: "3) Run a final relevance pass",
+          section3Body:
+            "Before submitting, compare your resume against role requirements one more time and close the biggest gaps first.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Higher ATS score comes from clear role alignment, measurable impact, and disciplined final review.",
         },
       },
     },
@@ -1255,6 +1483,7 @@ export const translations = {
       pricing: "Cenník",
       login: "Prihlásiť",
       register: "Registrácia",
+      blog: "Blog",
       logout: "Odhlásiť",
     },
     home: {
@@ -1287,6 +1516,81 @@ export const translations = {
         step1: { title: "Nahrajte CV", desc: "PDF alebo text — štruktúrujeme údaje." },
         step2: { title: "Pridajte prácu", desc: "Extrahujeme zručnosti a priority roly." },
         step3: { title: "Skontrolujte výsledky", desc: "Získajte nový návrh a tipy na zlepšenie." },
+      },
+    },
+    blog: {
+      title: "CV & ATS Blog",
+      subtitle:
+        "Practical guides to tailor your resume, avoid ATS pitfalls, and improve your match score.",
+      readArticle: "Read article",
+      backToBlog: "Back to blog",
+      publishedOn: "Published",
+      articles: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          excerpt:
+            "A practical step-by-step method to adapt your resume for each role without keyword stuffing.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          excerpt:
+            "The most common formatting and content mistakes that cause ATS rejection or low match scores.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          excerpt:
+            "Use this checklist to increase ATS alignment with stronger keywords, structure, and impact bullets.",
+        },
+      },
+      posts: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          lead: "Tailoring your resume is about relevance, not rewriting everything from scratch.",
+          section1Title: "1) Extract the role priorities",
+          section1Body:
+            "Read the job description and list repeated skills, tools, and outcomes. These repeated signals are what ATS and recruiters focus on first.",
+          section2Title: "2) Align your strongest evidence",
+          section2Body:
+            "For each priority, map a real example from your experience. Update summary, skills, and bullet points so the match is obvious in the first scan.",
+          section3Title: "3) Keep wording clear and truthful",
+          section3Body:
+            "Use the employer's terminology where accurate, but avoid copying whole sentences. Your goal is precise alignment, not artificial keyword stuffing.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "A tailored resume wins by showing direct role fit with credible evidence and clear wording.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          lead: "Most ATS failures come from avoidable structure and wording issues.",
+          section1Title: "1) Overdesigned layouts",
+          section1Body:
+            "Complex columns, tables, and visual-heavy templates can hide important text from ATS parsing. Keep structure simple and readable.",
+          section2Title: "2) Weak keyword alignment",
+          section2Body:
+            "If your resume does not reflect the core terms from the job description, your match score drops even when experience is relevant.",
+          section3Title: "3) Vague bullet points",
+          section3Body:
+            "Bullets like 'responsible for' do not show impact. Use action verbs, measurable outcomes, and role-relevant language.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Use a clean format, role-specific keywords, and quantified achievements to avoid ATS rejection.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          lead: "Improving ATS score is a process you can systematize in every application.",
+          section1Title: "1) Match keywords by section",
+          section1Body:
+            "Place critical role keywords in summary, skills, and recent experience. This helps ATS confirm relevance quickly.",
+          section2Title: "2) Strengthen impact bullets",
+          section2Body:
+            "Each bullet should show action + context + result. Numbers and scope increase both ATS confidence and recruiter trust.",
+          section3Title: "3) Run a final relevance pass",
+          section3Body:
+            "Before submitting, compare your resume against role requirements one more time and close the biggest gaps first.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Higher ATS score comes from clear role alignment, measurable impact, and disciplined final review.",
+        },
       },
     },
     common: {
@@ -1661,6 +1965,7 @@ export const translations = {
       pricing: "Ceník",
       login: "Přihlásit se",
       register: "Registrace",
+      blog: "Blog",
       logout: "Odhlásit",
     },
     home: {
@@ -1695,6 +2000,81 @@ export const translations = {
         step3: {
           title: "Zkontrolujte výsledek",
           desc: "Získejte nový návrh a tipy na zlepšení.",
+        },
+      },
+    },
+    blog: {
+      title: "CV & ATS Blog",
+      subtitle:
+        "Practical guides to tailor your resume, avoid ATS pitfalls, and improve your match score.",
+      readArticle: "Read article",
+      backToBlog: "Back to blog",
+      publishedOn: "Published",
+      articles: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          excerpt:
+            "A practical step-by-step method to adapt your resume for each role without keyword stuffing.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          excerpt:
+            "The most common formatting and content mistakes that cause ATS rejection or low match scores.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          excerpt:
+            "Use this checklist to increase ATS alignment with stronger keywords, structure, and impact bullets.",
+        },
+      },
+      posts: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          lead: "Tailoring your resume is about relevance, not rewriting everything from scratch.",
+          section1Title: "1) Extract the role priorities",
+          section1Body:
+            "Read the job description and list repeated skills, tools, and outcomes. These repeated signals are what ATS and recruiters focus on first.",
+          section2Title: "2) Align your strongest evidence",
+          section2Body:
+            "For each priority, map a real example from your experience. Update summary, skills, and bullet points so the match is obvious in the first scan.",
+          section3Title: "3) Keep wording clear and truthful",
+          section3Body:
+            "Use the employer's terminology where accurate, but avoid copying whole sentences. Your goal is precise alignment, not artificial keyword stuffing.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "A tailored resume wins by showing direct role fit with credible evidence and clear wording.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          lead: "Most ATS failures come from avoidable structure and wording issues.",
+          section1Title: "1) Overdesigned layouts",
+          section1Body:
+            "Complex columns, tables, and visual-heavy templates can hide important text from ATS parsing. Keep structure simple and readable.",
+          section2Title: "2) Weak keyword alignment",
+          section2Body:
+            "If your resume does not reflect the core terms from the job description, your match score drops even when experience is relevant.",
+          section3Title: "3) Vague bullet points",
+          section3Body:
+            "Bullets like 'responsible for' do not show impact. Use action verbs, measurable outcomes, and role-relevant language.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Use a clean format, role-specific keywords, and quantified achievements to avoid ATS rejection.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          lead: "Improving ATS score is a process you can systematize in every application.",
+          section1Title: "1) Match keywords by section",
+          section1Body:
+            "Place critical role keywords in summary, skills, and recent experience. This helps ATS confirm relevance quickly.",
+          section2Title: "2) Strengthen impact bullets",
+          section2Body:
+            "Each bullet should show action + context + result. Numbers and scope increase both ATS confidence and recruiter trust.",
+          section3Title: "3) Run a final relevance pass",
+          section3Body:
+            "Before submitting, compare your resume against role requirements one more time and close the biggest gaps first.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Higher ATS score comes from clear role alignment, measurable impact, and disciplined final review.",
         },
       },
     },
@@ -2075,6 +2455,7 @@ export const translations = {
       pricing: "Precios",
       login: "Entrar",
       register: "Registro",
+      blog: "Blog",
       logout: "Salir",
     },
     home: {
@@ -2109,6 +2490,81 @@ export const translations = {
         step3: {
           title: "Revisa resultados",
           desc: "Obtén un nuevo borrador y consejos de mejora.",
+        },
+      },
+    },
+    blog: {
+      title: "CV & ATS Blog",
+      subtitle:
+        "Practical guides to tailor your resume, avoid ATS pitfalls, and improve your match score.",
+      readArticle: "Read article",
+      backToBlog: "Back to blog",
+      publishedOn: "Published",
+      articles: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          excerpt:
+            "A practical step-by-step method to adapt your resume for each role without keyword stuffing.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          excerpt:
+            "The most common formatting and content mistakes that cause ATS rejection or low match scores.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          excerpt:
+            "Use this checklist to increase ATS alignment with stronger keywords, structure, and impact bullets.",
+        },
+      },
+      posts: {
+        tailor: {
+          title: "How to Tailor Resume to Job Description",
+          lead: "Tailoring your resume is about relevance, not rewriting everything from scratch.",
+          section1Title: "1) Extract the role priorities",
+          section1Body:
+            "Read the job description and list repeated skills, tools, and outcomes. These repeated signals are what ATS and recruiters focus on first.",
+          section2Title: "2) Align your strongest evidence",
+          section2Body:
+            "For each priority, map a real example from your experience. Update summary, skills, and bullet points so the match is obvious in the first scan.",
+          section3Title: "3) Keep wording clear and truthful",
+          section3Body:
+            "Use the employer's terminology where accurate, but avoid copying whole sentences. Your goal is precise alignment, not artificial keyword stuffing.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "A tailored resume wins by showing direct role fit with credible evidence and clear wording.",
+        },
+        mistakes: {
+          title: "Top ATS Resume Mistakes to Avoid",
+          lead: "Most ATS failures come from avoidable structure and wording issues.",
+          section1Title: "1) Overdesigned layouts",
+          section1Body:
+            "Complex columns, tables, and visual-heavy templates can hide important text from ATS parsing. Keep structure simple and readable.",
+          section2Title: "2) Weak keyword alignment",
+          section2Body:
+            "If your resume does not reflect the core terms from the job description, your match score drops even when experience is relevant.",
+          section3Title: "3) Vague bullet points",
+          section3Body:
+            "Bullets like 'responsible for' do not show impact. Use action verbs, measurable outcomes, and role-relevant language.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Use a clean format, role-specific keywords, and quantified achievements to avoid ATS rejection.",
+        },
+        score: {
+          title: "How to Improve ATS Resume Score",
+          lead: "Improving ATS score is a process you can systematize in every application.",
+          section1Title: "1) Match keywords by section",
+          section1Body:
+            "Place critical role keywords in summary, skills, and recent experience. This helps ATS confirm relevance quickly.",
+          section2Title: "2) Strengthen impact bullets",
+          section2Body:
+            "Each bullet should show action + context + result. Numbers and scope increase both ATS confidence and recruiter trust.",
+          section3Title: "3) Run a final relevance pass",
+          section3Body:
+            "Before submitting, compare your resume against role requirements one more time and close the biggest gaps first.",
+          takeawayTitle: "Key takeaway",
+          takeawayBody:
+            "Higher ATS score comes from clear role alignment, measurable impact, and disciplined final review.",
         },
       },
     },

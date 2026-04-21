@@ -6,6 +6,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
     "/about",
+    "/blog",
+    "/blog/tailor-resume-to-job-description",
+    "/blog/ats-resume-mistakes",
+    "/blog/improve-ats-resume-score",
     "/pricing",
     "/privacy",
     "/terms",

@@ -104,6 +104,7 @@ export default function TopNav() {
           <Link href="/app">{t("nav.dashboard")}</Link>
           <Link href="/results">{t("nav.results")}</Link>
           <Link href="/history">{t("nav.history")}</Link>
+          <Link href="/blog">{t("nav.blog")}</Link>
           <Link href="/pricing">{t("nav.pricing")}</Link>
           <Link href="/about">{t("nav.about")}</Link>
         </nav>
@@ -168,6 +169,7 @@ export default function TopNav() {
               <Link href="/app" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
               <Link href="/results" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.results")}</Link>
               <Link href="/history" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.history")}</Link>
+              <Link href="/blog" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.blog")}</Link>
               <Link href="/pricing" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.pricing")}</Link>
               <Link href="/about" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.about")}</Link>
             </nav>
