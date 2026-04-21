@@ -415,6 +415,7 @@ function ResultsContent() {
     matchAfter !== null
       ? `I just checked my resume ATS score: ${matchAfter}/100.`
       : "I just checked and improved my resume for ATS.";
+  const composedShareMessage = `${shareText} ${shareUrl}`;
 
   const loadHistorySession = useCallback(async () => {
     if (!sessionId) return;
@@ -703,26 +704,75 @@ function ResultsContent() {
     }
   };
 
+  const shareResult = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setStatus(t("results.shareLinkCopied"));
+    } catch {
+      setStatus(t("results.copyFailed"));
+    }
+  };
+
   const openShareWindow = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const shareOnLinkedIn = () => {
+  const shareOnWhatsApp = () => {
     openShareWindow(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      `https://wa.me/?text=${encodeURIComponent(composedShareMessage)}`,
     );
   };
 
-  const shareOnTwitter = () => {
+  const shareOnFacebook = () => {
     openShareWindow(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
     );
   };
 
-  const shareOnReddit = () => {
+  const shareOnMessages = () => {
+    const smsUrl = `sms:?&body=${encodeURIComponent(composedShareMessage)}`;
+    window.location.href = smsUrl;
+  };
+
+  const shareOnTelegram = () => {
     openShareWindow(
-      `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`,
+      `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
     );
+  };
+
+  const shareForInstagram = async () => {
+    try {
+      await navigator.clipboard.writeText(composedShareMessage);
+      setStatus(t("results.shareForInstagramCopied"));
+      openShareWindow("https://www.instagram.com/");
+    } catch {
+      setStatus(t("results.copyFailed"));
+    }
+  };
+
+  const shareForTikTok = async () => {
+    try {
+      await navigator.clipboard.writeText(composedShareMessage);
+      setStatus(t("results.shareForTikTokCopied"));
+      openShareWindow("https://www.tiktok.com/upload");
+    } catch {
+      setStatus(t("results.copyFailed"));
+    }
   };
 
   const fetchInterviewPrep = async () => {
@@ -1354,18 +1404,30 @@ function ResultsContent() {
                 <button className="btn secondary" onClick={downloadPdf}>
                   {t("results.downloadPdf")}
                 </button>
+                <button className="btn ghost" onClick={shareResult}>
+                  {t("results.shareResult")}
+                </button>
               </div>
               <div className="section" style={{ marginTop: "12px" }}>
-                <h3 className="section-title">Share your result</h3>
+                <h3 className="section-title">{t("results.shareYourResult")}</h3>
                 <div className="nav-actions">
-                  <button className="btn ghost" type="button" onClick={shareOnLinkedIn}>
-                    LinkedIn
+                  <button className="btn ghost" type="button" onClick={shareOnWhatsApp}>
+                    {t("results.shareOnWhatsApp")}
                   </button>
-                  <button className="btn ghost" type="button" onClick={shareOnTwitter}>
-                    Twitter/X
+                  <button className="btn ghost" type="button" onClick={shareOnFacebook}>
+                    {t("results.shareOnFacebook")}
                   </button>
-                  <button className="btn ghost" type="button" onClick={shareOnReddit}>
-                    Reddit
+                  <button className="btn ghost" type="button" onClick={shareOnMessages}>
+                    {t("results.shareOnMessages")}
+                  </button>
+                  <button className="btn ghost" type="button" onClick={shareOnTelegram}>
+                    {t("results.shareOnTelegram")}
+                  </button>
+                  <button className="btn ghost" type="button" onClick={shareForInstagram}>
+                    {t("results.shareForInstagram")}
+                  </button>
+                  <button className="btn ghost" type="button" onClick={shareForTikTok}>
+                    {t("results.shareForTikTok")}
                   </button>
                 </div>
               </div>
