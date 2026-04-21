@@ -1,9 +1,9 @@
 import { LanguageProvider } from "./lib/LanguageContext";
 import Footer from "./components/Footer";
 import CookieBanner from "./components/CookieBanner";
+import GoogleAnalytics from "./components/GoogleAnalytics";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
-import Script from "next/script";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
@@ -79,24 +79,9 @@ export default function RootLayout({
             to { transform: translateY(0); opacity: 1; }
           }
         `}} />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
-              `}
-            </Script>
-          </>
-        )}
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <GoogleAnalytics />
         <LanguageProvider>
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             {children}

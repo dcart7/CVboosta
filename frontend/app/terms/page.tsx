@@ -16,7 +16,7 @@ export default function TermsPage() {
         "Payments are processed securely by Stripe. CVboosta does not receive or store full payment card numbers, CVV/CVC, or raw payment credentials.",
       refundTitle: "Refund Policy",
       refundDesc:
-        "Single Scan purchases are non-refundable after any included feature is used. Subscriptions can be canceled at any time to stop future renewals. Already-processed charges are generally non-refundable, except where required by law or when Stripe confirms a billing error.",
+        "Single Scan purchases are non-refundable after any included feature is used. Any subscription is non-refundable once any included feature has been used. Subscriptions can be canceled at any time to stop future renewals. Already-processed charges are generally non-refundable, except where required by law or when Stripe confirms a billing error.",
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "For unlimited plans (Pro Weekly, Pro Monthly, and Lifetime), Fair Use limits apply: maximum 10 requests per minute and maximum 100 requests per rolling 24-hour window across CV optimization, cover letters, and interview prep.",
@@ -30,7 +30,7 @@ export default function TermsPage() {
         "Платежі безпечно обробляються через Stripe. CVboosta не отримує і не зберігає повні номери карток, CVV/CVC або сирі платіжні реквізити.",
       refundTitle: "Політика повернення коштів",
       refundDesc:
-        "Покупка Single Scan не підлягає поверненню після використання будь-якої включеної функції. Підписку можна скасувати у будь-який момент, щоб зупинити наступні списання. Уже проведені платежі зазвичай не повертаються, окрім випадків, передбачених законом, або підтвердженої Stripe помилки білінгу.",
+        "Покупка Single Scan не підлягає поверненню після використання будь-якої включеної функції. Будь-яка підписка не підлягає поверненню після використання будь-якої включеної функції. Підписку можна скасувати у будь-який момент, щоб зупинити наступні списання. Уже проведені платежі зазвичай не повертаються, окрім випадків, передбачених законом, або підтвердженої Stripe помилки білінгу.",
       fairUseTitle: "Політика справедливого використання",
       fairUseDesc:
         "Для безлімітних планів (Pro Weekly, Pro Monthly та Lifetime) діють обмеження Fair Use: максимум 10 запитів за хвилину і максимум 100 запитів за rolling-вікно 24 години для оптимізації CV, супровідних листів та тренажера співбесіди.",
@@ -44,7 +44,7 @@ export default function TermsPage() {
         "Płatności są bezpiecznie przetwarzane przez Stripe. CVboosta nie otrzymuje ani nie przechowuje pełnych numerów kart, CVV/CVC ani surowych danych instrumentów płatniczych.",
       refundTitle: "Polityka zwrotów",
       refundDesc:
-        "Zakup Single Scan nie podlega zwrotowi po użyciu dowolnej funkcji z pakietu. Subskrypcję można anulować w dowolnym momencie, aby zatrzymać kolejne odnowienia. Już zrealizowane płatności zasadniczo nie podlegają zwrotowi, chyba że wymagają tego przepisy prawa lub Stripe potwierdzi błąd rozliczenia.",
+        "Zakup Single Scan nie podlega zwrotowi po użyciu dowolnej funkcji z pakietu. Każda subskrypcja nie podlega zwrotowi po użyciu dowolnej funkcji z pakietu. Subskrypcję można anulować w dowolnym momencie, aby zatrzymać kolejne odnowienia. Już zrealizowane płatności zasadniczo nie podlegają zwrotowi, chyba że wymagają tego przepisy prawa lub Stripe potwierdzi błąd rozliczenia.",
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "Dla planów nielimitowanych (Pro Weekly, Pro Monthly i Lifetime) obowiązują limity Fair Use: maksymalnie 10 żądań na minutę i maksymalnie 100 żądań w ruchomym oknie 24 godzin dla optymalizacji CV, listów motywacyjnych i przygotowania do rozmowy.",
@@ -58,7 +58,7 @@ export default function TermsPage() {
         "Platby sú bezpečne spracované cez Stripe. CVboosta nezhromažďuje ani neukladá celé čísla kariet, CVV/CVC ani surové údaje platobných nástrojov.",
       refundTitle: "Refund Policy",
       refundDesc:
-        "Nákup Single Scan je nevratný po použití akejkoľvek zahrnutej funkcie. Predplatné môžete kedykoľvek zrušiť, aby sa zastavili ďalšie obnovenia. Už spracované platby sú spravidla nevratné, okrem prípadov vyžadovaných zákonom alebo keď Stripe potvrdí chybu fakturácie.",
+        "Nákup Single Scan je nevratný po použití akejkoľvek zahrnutej funkcie. Akékoľvek predplatné je nevratné po použití akejkoľvek zahrnutej funkcie. Predplatné môžete kedykoľvek zrušiť, aby sa zastavili ďalšie obnovenia. Už spracované platby sú spravidla nevratné, okrem prípadov vyžadovaných zákonom alebo keď Stripe potvrdí chybu fakturácie.",
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "Pre neobmedzené plány (Pro Weekly, Pro Monthly a Lifetime) platia limity Fair Use: maximálne 10 požiadaviek za minútu a maximálne 100 požiadaviek v kĺzavom 24-hodinovom okne pre optimalizáciu CV, motivačné listy a prípravu na pohovor.",
@@ -72,7 +72,7 @@ export default function TermsPage() {
         "Platby jsou bezpečně zpracovány přes Stripe. CVboosta neshromažďuje ani neukládá úplná čísla karet, CVV/CVC ani surové platební údaje.",
       refundTitle: "Zásady vrácení peněz",
       refundDesc:
-        "Nákup Single Scan je nevratný po použití jakékoli zahrnuté funkce. Předplatné lze kdykoli zrušit, aby se zastavilo další obnovování. Již zpracované platby jsou obecně nevratné, kromě případů vyžadovaných zákonem nebo když Stripe potvrdí chybu účtování.",
+        "Nákup Single Scan je nevratný po použití jakékoli zahrnuté funkce. Jakékoli předplatné je nevratné po použití jakékoli zahrnuté funkce. Předplatné lze kdykoli zrušit, aby se zastavilo další obnovování. Již zpracované platby jsou obecně nevratné, kromě případů vyžadovaných zákonem nebo když Stripe potvrdí chybu účtování.",
       fairUseTitle: "Fair Use Policy",
       fairUseDesc:
         "Pro neomezené plány (Pro Weekly, Pro Monthly a Lifetime) platí Fair Use limity: maximálně 10 požadavků za minutu a maximálně 100 požadavků v klouzavém 24hodinovém okně pro optimalizaci CV, motivační dopisy a přípravu na pohovor.",
@@ -86,7 +86,7 @@ export default function TermsPage() {
         "Los pagos se procesan de forma segura a través de Stripe. CVboosta no recopila ni almacena números completos de tarjeta, CVV/CVC ni credenciales de pago en bruto.",
       refundTitle: "Política de reembolsos",
       refundDesc:
-        "Las compras de Single Scan no son reembolsables después de usar cualquier función incluida. Las suscripciones pueden cancelarse en cualquier momento para detener renovaciones futuras. Los cargos ya procesados generalmente no son reembolsables, salvo que la ley lo exija o Stripe confirme un error de facturación.",
+        "Las compras de Single Scan no son reembolsables después de usar cualquier función incluida. Cualquier suscripción no es reembolsable después de usar cualquier función incluida. Las suscripciones pueden cancelarse en cualquier momento para detener renovaciones futuras. Los cargos ya procesados generalmente no son reembolsables, salvo que la ley lo exija o Stripe confirme un error de facturación.",
       fairUseTitle: "Política de uso justo",
       fairUseDesc:
         "Para los planes ilimitados (Pro Weekly, Pro Monthly y Lifetime) se aplican límites de uso justo: máximo 10 solicitudes por minuto y máximo 100 solicitudes por ventana móvil de 24 horas para optimización de CV, cartas de presentación y preparación de entrevistas.",
