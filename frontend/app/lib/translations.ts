@@ -236,6 +236,7 @@ export const translations = {
       networkError:
         "Could not reach the API after several tries. Start the backend on port 8000 and check your connection.",
       loginFailed: "Login failed.",
+      invalidCredentials: "Incorrect email or password.",
       registerFailed: "Could not create account.",
       passwordWeak:
         "Password is too weak. Must be at least 10 characters and include a number and a symbol.",
@@ -642,6 +643,7 @@ export const translations = {
       networkError:
         "Не вдалося зв’язатися з API після кількох спроб. Запустіть бекенд на порту 8000 і перевірте з’єднання.",
       loginFailed: "Не вдалося увійти.",
+      invalidCredentials: "Неправильний email або пароль.",
       registerFailed: "Не вдалося створити акаунт.",
       passwordWeak:
         "Пароль занадто слабкий. Має містити щонайменше 10 символів, цифру і спеціальний символ.",
@@ -1040,6 +1042,7 @@ export const translations = {
       networkError:
         "Nie udało się połączyć z API po kilku próbach. Uruchom backend na porcie 8000 i sprawdź połączenie.",
       loginFailed: "Logowanie nie powiodło się.",
+      invalidCredentials: "Nieprawidłowy e-mail lub hasło.",
       registerFailed: "Nie udało się utworzyć konta.",
       passwordWeak:
         "Hasło jest zbyt słabe. Musi mieć co najmniej 10 znaków oraz zawierać cyfrę i znak specjalny.",
@@ -1433,6 +1436,7 @@ export const translations = {
       networkError:
         "Po niekoľkých pokusoch sa nepodarilo spojiť s API. Spustite backend na porte 8000 a skontrolujte pripojenie.",
       loginFailed: "Prihlásenie zlyhalo.",
+      invalidCredentials: "Nesprávny e-mail alebo heslo.",
       registerFailed: "Účet sa nepodarilo vytvoriť.",
       passwordWeak:
         "Heslo je príliš slabé. Musí mať aspoň 10 znakov a obsahovať číslo a špeciálny znak.",
@@ -1840,6 +1844,7 @@ export const translations = {
       networkError:
         "Nepodařilo se připojit k API. Spusťte backend na portu 8000 a zkontrolujte připojení.",
       loginFailed: "Přihlášení selhalo.",
+      invalidCredentials: "Nesprávný e-mail nebo heslo.",
       registerFailed: "Účet se nepodařilo vytvořit.",
       passwordWeak:
         "Heslo je příliš slabé. Musí mít alespoň 10 znaků a obsahovat číslo i speciální znak.",
@@ -2239,6 +2244,7 @@ export const translations = {
       networkError:
         "No se pudo conectar con la API tras varios intentos. Inicia el backend en el puerto 8000 y comprueba la conexión.",
       loginFailed: "No se pudo iniciar sesión.",
+      invalidCredentials: "Correo o contraseña incorrectos.",
       registerFailed: "No se pudo crear la cuenta.",
       passwordWeak:
         "La contraseña es demasiado débil. Debe tener al menos 10 caracteres e incluir un número y un símbolo.",

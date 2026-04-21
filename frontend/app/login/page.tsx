@@ -8,6 +8,42 @@ import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 
+function extractErrorMessage(payload: unknown): string {
+  if (typeof payload === "string") {
+    return payload;
+  }
+  if (!payload || typeof payload !== "object") {
+    return "";
+  }
+
+  const obj = payload as { detail?: unknown; message?: unknown };
+  if (typeof obj.detail === "string") {
+    return obj.detail;
+  }
+  if (Array.isArray(obj.detail)) {
+    const firstWithMsg = obj.detail.find(
+      (item) =>
+        item &&
+        typeof item === "object" &&
+        "msg" in item &&
+        typeof (item as { msg?: unknown }).msg === "string",
+    ) as { msg?: string } | undefined;
+    if (firstWithMsg?.msg) {
+      return firstWithMsg.msg;
+    }
+  }
+  if (obj.detail && typeof obj.detail === "object") {
+    const nestedMessage = (obj.detail as { message?: unknown }).message;
+    if (typeof nestedMessage === "string") {
+      return nestedMessage;
+    }
+  }
+  if (typeof obj.message === "string") {
+    return obj.message;
+  }
+  return "";
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -33,7 +69,7 @@ export default function LoginPage() {
       );
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.detail || "Login failed");
+        throw new Error(extractErrorMessage(payload) || "Login failed");
       }
       const data = await response.json();
       localStorage.setItem("auth_token", data.access_token);
@@ -46,7 +82,16 @@ export default function LoginPage() {
         err instanceof TypeError ||
         (err instanceof Error && err.name === "AbortError") ||
         /failed to fetch|load failed|networkerror/i.test(msg);
-      setError(network ? t("auth.networkError") : msg || t("auth.loginFailed"));
+      const invalidCredentials = /invalid (email|password|credentials)|incorrect password/i.test(
+        msg.toLowerCase(),
+      );
+      setError(
+        network
+          ? t("auth.networkError")
+          : invalidCredentials
+            ? t("auth.invalidCredentials")
+            : msg || t("auth.loginFailed"),
+      );
     } finally {
       setLoading(false);
     }
