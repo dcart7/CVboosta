@@ -16,21 +16,23 @@ export default function AtsResumeMistakesPostPage() {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <article className="section fade-up">
-          <Link className="btn ghost" href="/blog">
-            {tr("blog.backToBlog", "Back to blog")}
-          </Link>
-          <h1 className="hero-title" style={{ marginTop: "18px" }}>
-            {tr(`${key}.title`, "Top ATS Resume Mistakes to Avoid")}
-          </h1>
-          <p className="hero-subtitle">
-            {tr(
-              `${key}.lead`,
-              "Most ATS failures come from avoidable structure and wording issues.",
-            )}
-          </p>
+        <article className="section fade-up blog-post-wrap">
+          <div className="blog-post-head card">
+            <Link className="btn ghost" href="/blog">
+              {tr("blog.backToBlog", "Back to blog")}
+            </Link>
+            <h1 className="hero-title blog-post-title">
+              {tr(`${key}.title`, "Top ATS Resume Mistakes to Avoid")}
+            </h1>
+            <p className="hero-subtitle blog-post-lead">
+              {tr(
+                `${key}.lead`,
+                "Most ATS failures come from avoidable structure and wording issues.",
+              )}
+            </p>
+          </div>
 
-          <div className="card">
+          <div className="blog-post-section card">
             <h2>{tr(`${key}.section1Title`, "1) Overdesigned layouts")}</h2>
             <p>
               {tr(
@@ -38,6 +40,8 @@ export default function AtsResumeMistakesPostPage() {
                 "Complex columns, tables, and visual-heavy templates can hide important text from ATS parsing. Keep structure simple and readable.",
               )}
             </p>
+          </div>
+          <div className="blog-post-section card">
             <h2>{tr(`${key}.section2Title`, "2) Weak keyword alignment")}</h2>
             <p>
               {tr(
@@ -45,6 +49,8 @@ export default function AtsResumeMistakesPostPage() {
                 "If your resume does not reflect the core terms from the job description, your match score drops even when experience is relevant.",
               )}
             </p>
+          </div>
+          <div className="blog-post-section card">
             <h2>{tr(`${key}.section3Title`, "3) Vague bullet points")}</h2>
             <p>
               {tr(
@@ -52,6 +58,8 @@ export default function AtsResumeMistakesPostPage() {
                 "Bullets like 'responsible for' do not show impact. Use action verbs, measurable outcomes, and role-relevant language.",
               )}
             </p>
+          </div>
+          <div className="blog-takeaway card">
             <h3>{tr(`${key}.takeawayTitle`, "Key takeaway")}</h3>
             <p>
               {tr(

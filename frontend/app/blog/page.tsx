@@ -33,11 +33,11 @@ export default function BlogPage() {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <section className="hero fade-up">
-          <div>
+        <section className="hero fade-up blog-hero">
+          <div className="blog-hero-panel">
             <p className="pill">CVboosta Blog</p>
-            <h1 className="hero-title">{tr("blog.title", "CV & ATS Blog")}</h1>
-            <p className="hero-subtitle">
+            <h1 className="hero-title blog-title">{tr("blog.title", "CV & ATS Blog")}</h1>
+            <p className="hero-subtitle blog-subtitle">
               {tr(
                 "blog.subtitle",
                 "Practical guides to tailor your resume, avoid ATS pitfalls, and improve your match score.",
@@ -46,14 +46,18 @@ export default function BlogPage() {
           </div>
         </section>
 
-        <section className="section fade-up">
-          <div className="grid">
+        <section className="section fade-up blog-grid-wrap">
+          <div className="grid blog-grid">
             {articles.map((article) => (
-              <article className="card" key={article.slug}>
-                <p className="label">
+              <article className="card blog-card" key={article.slug}>
+                <div className="blog-meta-row">
+                  <span className="blog-meta-pill">ATS</span>
+                  <span className="blog-meta-pill">CV</span>
+                </div>
+                <p className="label blog-label">
                   {tr("blog.publishedOn", "Published")}: {article.date}
                 </p>
-                <h3>
+                <h3 className="blog-card-title">
                   {tr(
                     `blog.articles.${article.key}.title`,
                     article.key === "tailor"
@@ -63,7 +67,7 @@ export default function BlogPage() {
                         : "How to Improve ATS Resume Score",
                   )}
                 </h3>
-                <p>
+                <p className="blog-card-excerpt">
                   {tr(
                     `blog.articles.${article.key}.excerpt`,
                     article.key === "tailor"
@@ -73,7 +77,7 @@ export default function BlogPage() {
                         : "Use this checklist to increase ATS alignment with stronger keywords, structure, and impact bullets.",
                   )}
                 </p>
-                <div style={{ marginTop: "16px" }}>
+                <div className="blog-card-cta">
                   <Link className="btn primary" href={`/blog/${article.slug}`}>
                     {tr("blog.readArticle", "Read article")}
                   </Link>
