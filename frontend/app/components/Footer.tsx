@@ -42,6 +42,9 @@ export default function Footer() {
               <Link href="/terms" className="footer-link">
                 {t("footer.terms")}
               </Link>
+              <Link href="/terms#service-faq" className="footer-link">
+                {t("footer.faq")}
+              </Link>
               <Link href="/resume-keywords" className="footer-link">
                 {t("footer.resumeKeywords")}
               </Link>

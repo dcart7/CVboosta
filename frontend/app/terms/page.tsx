@@ -260,7 +260,7 @@ export default function TermsPage() {
                 <h3>{t("legal.termsUserRespTitle")}</h3>
                 <p>{t("legal.termsUserRespDesc")}</p>
               </div>
-              <div className="legal-block">
+              <div className="legal-block" id="service-faq">
                 <h3>{localizedBlocks.faqTitle}</h3>
                 <div className="legal-faq-list">
                   {localizedBlocks.faq.map((item) => (

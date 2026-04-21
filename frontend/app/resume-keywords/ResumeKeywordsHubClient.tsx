@@ -55,8 +55,8 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
     <main className="page">
       <TopNav />
       <div className="shell">
-        <section className="hero fade-up rk-hero">
-          <div className="rk-hero-panel" style={{ maxWidth: "980px", width: "100%" }}>
+        <section className="hero fade-up blog-hero rk-hero">
+          <div className="blog-hero-panel rk-hero-panel">
             <p className="pill">{ui.hubKicker}</p>
             <h1 className="hero-title">{ui.hubTitle}</h1>
             <p className="hero-subtitle rk-hero-subtitle">{ui.hubSubtitle}</p>

@@ -2524,7 +2524,9 @@ a {
 
 .rk-hero-panel {
   position: relative;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   overflow: hidden;
   border: 1px solid var(--glass-stroke);
   background:
