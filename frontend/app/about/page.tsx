@@ -40,33 +40,27 @@ export default function AboutPage() {
           <h2 className="section-title">{t("about.principles")}</h2>
           <div className="grid">
             <div className="hero-card">
-              <p className="quote">
-                &ldquo;Careers belong to those who measure outcomes.&rdquo;
-              </p>
-              <p className="quote-sub">
-                Great work is not enough if impact is invisible.
-              </p>
+              <p className="quote">{t("about.principle1Quote")}</p>
+              <p className="quote-sub">{t("about.principle1Desc")}</p>
             </div>
             <div className="hero-card">
-              <p className="quote">&ldquo;HR doesn&apos;t read between the lines.&rdquo;</p>
-              <p className="quote-sub">
-                If you don&apos;t say it clearly, it doesn&apos;t count.
-              </p>
+              <p className="quote">{t("about.principle2Quote")}</p>
+              <p className="quote-sub">{t("about.principle2Desc")}</p>
             </div>
             <div className="hero-card">
-              <p className="quote">
-                &ldquo;Careers aren&apos;t made by the best, but by the clear.&rdquo;
-              </p>
-              <p className="quote-sub">
-                Make the signal obvious: skills, scope, results.
-              </p>
+              <p className="quote">{t("about.principle3Quote")}</p>
+              <p className="quote-sub">{t("about.principle3Desc")}</p>
             </div>
             <div className="hero-card">
-              <p className="quote">&ldquo;You&apos;re a fit — it just doesn&apos;t show.&rdquo;</p>
-              <p className="quote-sub">
-                The goal is not to exaggerate. The goal is to be seen.
-              </p>
+              <p className="quote">{t("about.principle4Quote")}</p>
+              <p className="quote-sub">{t("about.principle4Desc")}</p>
             </div>
+          </div>
+        </section>
+
+        <section className="section fade-up">
+          <div className="card">
+            <p>{t("about.createdBy")}</p>
           </div>
         </section>
 

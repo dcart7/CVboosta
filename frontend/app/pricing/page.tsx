@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "../lib/LanguageContext";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { trackEvent } from "../lib/analytics";
 
 const CheckIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -59,6 +60,11 @@ export default function PricingPage() {
   }, [apiBase]);
 
   const openCheckout = async (tierId: string) => {
+    trackEvent("checkout_click", {
+      tier: tierId,
+      billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : "one_time",
+    });
+
     const token = localStorage.getItem("auth_token");
     if (!token) {
       router.push("/login");

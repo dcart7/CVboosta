@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
+import { trackEvent } from "../lib/analytics";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 
@@ -50,6 +51,7 @@ export default function RegisterPage() {
       const data = await response.json();
       localStorage.setItem("auth_token", data.access_token);
       localStorage.setItem("user_email", email.trim().toLowerCase());
+      trackEvent("sign_up", { method: "email" });
       window.dispatchEvent(new Event("auth-change"));
       router.push("/account");
     } catch (err) {
