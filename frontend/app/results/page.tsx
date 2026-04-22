@@ -1397,37 +1397,20 @@ function ResultsContent() {
             </div>
             {isShareSheetOpen && (
               <div
+                className="share-sheet-backdrop"
                 onClick={() => setIsShareSheetOpen(false)}
-                style={{
-                  position: "fixed",
-                  inset: 0,
-                  background: "rgba(7, 10, 18, 0.44)",
-                  zIndex: 1200,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "16px",
-                }}
               >
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="card"
-                  style={{ width: "min(520px, 100%)", borderRadius: "18px" }}
+                  className="card share-sheet-card"
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <h3 style={{ margin: 0 }}>{t("results.shareYourResult")}</h3>
+                  <div className="share-sheet-header">
+                    <h3 className="share-sheet-title">{t("results.shareYourResult")}</h3>
                     <button className="btn ghost" onClick={() => setIsShareSheetOpen(false)}>
                       {t("common.dismiss")}
                     </button>
                   </div>
-                  <div className="nav-actions">
+                  <div className="share-sheet-actions">
                     <button className="btn ghost" type="button" onClick={shareOnWhatsApp}>
                       {t("results.shareOnWhatsApp")}
                     </button>
