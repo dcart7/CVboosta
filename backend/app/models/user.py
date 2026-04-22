@@ -3,6 +3,10 @@ from sqlalchemy.sql import func
 
 from app.db.model_base import Base
 
+LIFETIME_WHITELIST_EMAILS = {
+    "dcartheartist@gmail.com",
+    "virelsolutions@gmail.com",
+}
 
 
 class User(Base):
@@ -41,7 +45,7 @@ class User(Base):
         return False
 
     def get_limits(self) -> dict:
-        if self.email == "dcartheartist@gmail.com":
+        if (self.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
             return {"scans": 999999, "cl": 999999, "prep": 999999}
             
         # Tiers: free, single, go, pro, lifetime
@@ -58,7 +62,7 @@ class User(Base):
 
     def can_use(self, feature: str) -> bool:
         # God mode for superuser
-        if self.email == "dcartheartist@gmail.com":
+        if (self.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
             return True
             
         self.reset_usage_if_needed()

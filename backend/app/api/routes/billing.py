@@ -14,7 +14,7 @@ import stripe
 from app.api.routes.auth import get_current_user
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.user import User
+from app.models.user import LIFETIME_WHITELIST_EMAILS, User
 from app.services.activity_logger import record_activity
 
 router = APIRouter()
@@ -668,7 +668,7 @@ async def paddle_webhook(
 @router.get("/status")
 def get_subscription_status(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     tier = current_user.subscription_tier
-    if current_user.email == "dcartheartist@gmail.com":
+    if (current_user.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
         tier = "lifetime"
 
     cancel_at_period_end = False

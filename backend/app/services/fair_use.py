@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.activity import ActivityLog
-from app.models.user import User
+from app.models.user import LIFETIME_WHITELIST_EMAILS, User
 
 FAIR_USE_TIERS = {"pro", "lifetime"}
 FAIR_USE_MAX_PER_MINUTE = 10
@@ -24,7 +24,7 @@ def _is_fair_use_tier(user: User) -> bool:
 
 def enforce_fair_use_or_raise(db: Session, user: User) -> None:
     """Apply fair-use caps for unlimited tiers using persisted activity logs."""
-    if user.email == "dcartheartist@gmail.com":
+    if (user.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
         return
     if not _is_fair_use_tier(user):
         return
