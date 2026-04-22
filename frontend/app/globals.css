@@ -758,68 +758,37 @@ a {
   box-shadow: var(--shadow-hover);
 }
 
-.share-sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  background: rgba(7, 10, 18, 0.44);
-}
-
-.share-sheet-card {
-  width: min(520px, 100%);
-  border-radius: 18px;
-  max-height: calc(100vh - 32px);
+.share-modal-card {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
   overflow: auto;
 }
 
-.share-sheet-header {
+.share-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
-.share-sheet-title {
+.share-modal-title {
   margin: 0;
 }
 
-.share-sheet-actions {
+.share-modal-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-.share-sheet-actions .btn {
+.share-modal-actions .btn {
   width: 100%;
   justify-content: center;
 }
 
 @media (max-width: 520px) {
-  .share-sheet-backdrop {
-    align-items: flex-end;
-    padding: 8px;
-  }
-
-  .share-sheet-card {
-    width: 100%;
-    max-height: calc(100vh - 12px);
-    border-radius: 16px 16px 12px 12px;
-  }
-
-  .share-sheet-header {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    padding-bottom: 8px;
-    background: var(--surface);
-  }
-
-  .share-sheet-actions {
+  .share-modal-actions {
     grid-template-columns: 1fr;
   }
 }

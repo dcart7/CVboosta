@@ -5,7 +5,7 @@ import ResumeKeywordsHubClient from "./ResumeKeywordsHubClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Resume Keywords by Role (100+ Pages) | CVboosta",
+  title: "Resume Keywords by Role (600 Pages) | CVboosta",
   description:
     "Browse role-based resume keyword guides with ATS terms, mistakes, bullet rewrite examples, and FAQ.",
   alternates: {

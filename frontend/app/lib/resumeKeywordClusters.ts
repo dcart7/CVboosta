@@ -45,6 +45,44 @@ type RoleSeed = {
   category: RoleCategory;
 };
 
+const TARGET_CLUSTER_COUNT = 600;
+const LEVEL_PREFIXES = ["Junior", "Mid-Level", "Senior", "Lead", "Principal", "Staff"] as const;
+const LEVEL_PREFIX_RE = /^(junior|mid-level|senior|lead|principal|staff|entry-level|head|director)\s+/i;
+
+const CATEGORY_TRACKS: Record<RoleCategory, string[]> = {
+  engineering: ["Platform", "Cloud", "API", "Performance", "Security"],
+  data: ["Analytics", "BI", "Reporting", "Forecasting", "Experimentation"],
+  product: ["Growth", "B2B SaaS", "Mobile", "Platform", "AI"],
+  design: ["UX", "UI", "Accessibility", "Design Systems", "Research"],
+  marketing: ["SEO", "Content", "Lifecycle", "Performance", "Brand"],
+  sales: ["Enterprise", "SMB", "Outbound", "Inbound", "Partnerships"],
+  operations: ["Process", "Strategy", "Execution", "Supply Chain", "Vendor"],
+  finance: ["FP&A", "Reporting", "Budgeting", "Revenue", "Compliance"],
+  hr: ["Talent", "People Ops", "Learning", "Recruiting", "HRIS"],
+  customer: ["Onboarding", "Retention", "Support", "Expansion", "Success"],
+  legal: ["Contracts", "Compliance", "Regulatory", "Corporate", "Risk"],
+  healthcare: ["Clinical", "Care Delivery", "Patient Safety", "Operations", "Documentation"],
+  education: ["Curriculum", "Student Success", "Assessment", "Program", "Instruction"],
+  security: ["SOC", "Cloud Security", "IAM", "Threat Detection", "Risk"],
+};
+
+const CATEGORY_IMPACT_AREAS: Record<RoleCategory, string[]> = {
+  engineering: ["delivery speed", "system reliability", "latency", "release quality", "incident reduction"],
+  data: ["decision speed", "data accuracy", "reporting quality", "forecast quality", "insight adoption"],
+  product: ["activation", "retention", "conversion", "time-to-value", "roadmap impact"],
+  design: ["usability", "completion rate", "consistency", "accessibility", "engagement quality"],
+  marketing: ["ROAS", "organic growth", "pipeline quality", "CAC efficiency", "campaign conversion"],
+  sales: ["quota attainment", "win rate", "pipeline velocity", "deal cycle", "revenue growth"],
+  operations: ["cycle time", "SLA reliability", "process quality", "cost control", "execution speed"],
+  finance: ["forecast accuracy", "close-cycle speed", "margin quality", "cost discipline", "reporting integrity"],
+  hr: ["time-to-hire", "retention", "candidate quality", "engagement", "policy compliance"],
+  customer: ["renewal rate", "adoption", "NPS", "churn reduction", "account expansion"],
+  legal: ["contract turnaround", "risk exposure", "policy adherence", "compliance posture", "legal clarity"],
+  healthcare: ["care quality", "patient throughput", "documentation quality", "clinical coordination", "safety outcomes"],
+  education: ["learning outcomes", "completion rates", "student engagement", "program quality", "instruction clarity"],
+  security: ["MTTD", "MTTR", "vulnerability closure", "control coverage", "audit readiness"],
+};
+
 const CATEGORY_KEYWORDS: Record<RoleCategory, string[]> = {
   engineering: [
     "system design",
@@ -276,84 +314,169 @@ function toSlug(input: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+function hashString(input: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return Math.abs(hash >>> 0);
+}
+
+function stripLeadingLevel(role: string): string {
+  return role.replace(LEVEL_PREFIX_RE, "").trim();
+}
+
+function buildExpandedRoleSeeds(baseSeeds: RoleSeed[]): RoleSeed[] {
+  const seedMap = new Map<string, RoleSeed>();
+  const addSeed = (role: string, category: RoleCategory) => {
+    const normalized = role.trim().replace(/\s+/g, " ");
+    if (!normalized) return;
+    const slug = toSlug(normalized);
+    if (!slug || seedMap.has(slug)) return;
+    seedMap.set(slug, { role: normalized, category });
+  };
+
+  baseSeeds.forEach((seed) => addSeed(seed.role, seed.category));
+
+  for (const seed of baseSeeds) {
+    const baseRole = stripLeadingLevel(seed.role);
+    for (const level of LEVEL_PREFIXES) {
+      addSeed(`${level} ${baseRole}`, seed.category);
+    }
+  }
+
+  for (const seed of baseSeeds) {
+    const baseRole = stripLeadingLevel(seed.role);
+    for (const track of CATEGORY_TRACKS[seed.category]) {
+      addSeed(`${baseRole} ${track}`, seed.category);
+      addSeed(`${track} ${baseRole}`, seed.category);
+    }
+  }
+
+  for (const seed of baseSeeds) {
+    const baseRole = stripLeadingLevel(seed.role);
+    for (const level of LEVEL_PREFIXES) {
+      for (const track of CATEGORY_TRACKS[seed.category].slice(0, 3)) {
+        addSeed(`${level} ${baseRole} ${track}`, seed.category);
+      }
+    }
+  }
+
+  return Array.from(seedMap.values()).slice(0, TARGET_CLUSTER_COUNT);
+}
+
 function roleKeywords(role: string, category: RoleCategory): string[] {
   const base = CATEGORY_KEYWORDS[category];
+  const impactArea = CATEGORY_IMPACT_AREAS[category][hashString(role) % CATEGORY_IMPACT_AREAS[category].length];
+  const roleLower = role.toLowerCase();
+  const roleWords = roleLower
+    .split(/[^a-z0-9]+/)
+    .filter((part) => part.length > 2)
+    .slice(0, 3)
+    .join(" ");
   return [
     ...base,
-    `${role.toLowerCase()} resume`,
-    `${role.toLowerCase()} achievements`,
-    `${role.toLowerCase()} responsibilities`,
-    `${role.toLowerCase()} tools`,
-    `${role.toLowerCase()} projects`,
-    `${role.toLowerCase()} results`,
+    `${roleLower} resume`,
+    `${roleLower} achievements`,
+    `${roleLower} responsibilities`,
+    `${roleLower} tools`,
+    `${roleLower} projects`,
+    `${roleLower} results`,
+    `${roleLower} ats keywords`,
+    `${roleLower} resume bullets`,
+    `${roleWords} measurable impact`,
+    `${roleLower} ${impactArea}`,
   ];
 }
 
-function roleMistakes(role: string): string[] {
+function roleMistakes(role: string, category: RoleCategory): string[] {
+  const h = hashString(role);
+  const impactArea = CATEGORY_IMPACT_AREAS[category][h % CATEGORY_IMPACT_AREAS[category].length];
+  const track = CATEGORY_TRACKS[category][Math.floor(h / 3) % CATEGORY_TRACKS[category].length];
   return [
-    `Using a generic summary that never mentions ${role} priorities.`,
-    "Listing tools without impact metrics or scope.",
-    "Missing the exact terms repeated in the target job description.",
-    "Overusing buzzwords and underusing measurable outcomes.",
+    `Using a generic summary that does not show ${role} priorities in the first 3 lines.`,
+    `Listing ${track.toLowerCase()} tools without measurable scope, ownership, or outcomes.`,
+    `Ignoring repeated job-description terms tied to ${impactArea}.`,
+    "Overusing buzzwords while missing concrete numbers, constraints, and business context.",
   ];
 }
 
-function roleExamples(role: string): ResumeKeywordExample[] {
+function roleExamples(role: string, category: RoleCategory): ResumeKeywordExample[] {
+  const h = hashString(role);
+  const initiativeCount = 2 + (h % 5);
+  const speedGain = 12 + (h % 23);
+  const qualityFrom = 70 + (h % 16);
+  const qualityTo = qualityFrom + 8 + (h % 9);
+  const lagCut = 18 + (h % 21);
+  const impactArea = CATEGORY_IMPACT_AREAS[category][Math.floor(h / 7) % CATEGORY_IMPACT_AREAS[category].length];
   return [
     {
       before: "Responsible for multiple cross-team initiatives.",
-      after: `Led 4 cross-functional ${role.toLowerCase()} initiatives, reducing delivery time by 23% in two quarters.`,
+      after: `Led ${initiativeCount} cross-functional ${role.toLowerCase()} initiatives, improving ${impactArea} by ${speedGain}% within two quarters.`,
     },
     {
       before: "Worked on process improvements.",
-      after: `Redesigned core ${role.toLowerCase()} workflow and improved quality KPI from 81% to 93% within 6 months.`,
+      after: `Redesigned core ${role.toLowerCase()} workflow and improved quality KPI from ${qualityFrom}% to ${qualityTo}% in 6 months.`,
     },
     {
       before: "Helped with reporting and communication.",
-      after: `Built weekly ${role.toLowerCase()} reporting cadence for leadership, cutting decision lag by 30%.`,
+      after: `Built weekly ${role.toLowerCase()} reporting cadence for leadership, cutting decision lag by ${lagCut}%.`,
     },
   ];
 }
 
-function roleFaq(role: string): ResumeKeywordFaq[] {
+function roleFaq(role: string, category: RoleCategory): ResumeKeywordFaq[] {
+  const h = hashString(role);
+  const keywordMin = 18 + (h % 8);
+  const keywordMax = keywordMin + 10 + (h % 7);
+  const track = CATEGORY_TRACKS[category][h % CATEGORY_TRACKS[category].length];
+  const impactArea = CATEGORY_IMPACT_AREAS[category][Math.floor(h / 11) % CATEGORY_IMPACT_AREAS[category].length];
   return [
     {
       question: `How many keywords should a ${role} resume include?`,
       answer:
-        "Aim for relevance first: usually 20-35 role-specific terms naturally distributed across summary, skills, and recent experience. Prioritize repeated terms from the vacancy.",
+        `Aim for relevance first: usually ${keywordMin}-${keywordMax} role-specific terms distributed across summary, skills, and recent experience. Prioritize repeated vacancy terms tied to ${impactArea}.`,
     },
     {
       question: `Where should I place ${role} keywords in my resume?`,
       answer:
-        "Start with headline/summary, then skills, then top 2 most recent roles. This gives ATS and recruiters fast confirmation of role fit in the first scan.",
+        "Start with headline/summary, then skills, then the top 2 most recent roles. This gives ATS and recruiters fast confirmation of role fit.",
     },
     {
       question: `Can I use exact wording from the job description for ${role} applications?`,
       answer:
-        "Yes, if truthful. Mirror terminology only when it reflects your real experience. Do not paste full lines without evidence in bullet points.",
+        `Yes, if truthful. Mirror terminology only when it reflects your real experience with ${track.toLowerCase()} work. Do not paste full lines without evidence.`,
     },
     {
       question: `What is the fastest way to tailor a ${role} resume per vacancy?`,
       answer:
-        "Extract top requirements, map each one to evidence from your experience, rewrite top bullets, then run one final ATS check before submit.",
+        "Extract top requirements, map each one to evidence from your experience, rewrite top bullets with numbers, then run one ATS check before submission.",
     },
     {
       question: `Should I keep one master resume for every ${role} application?`,
       answer:
-        "Keep one strong base version, then tailor summary, skills ordering, and first bullet points for each target role. This balances speed with relevance.",
+        "Keep one strong base version, then tailor summary, skills order, and first bullet points for each role target. This balances speed with relevance.",
     },
   ];
 }
 
-const CLUSTERS: ResumeKeywordCluster[] = ROLE_SEEDS.map((seed) => ({
+const EXPANDED_ROLE_SEEDS = buildExpandedRoleSeeds(ROLE_SEEDS);
+if (EXPANDED_ROLE_SEEDS.length < TARGET_CLUSTER_COUNT) {
+  throw new Error(
+    `Resume keyword cluster generation produced ${EXPANDED_ROLE_SEEDS.length} roles, expected at least ${TARGET_CLUSTER_COUNT}.`,
+  );
+}
+
+const CLUSTERS: ResumeKeywordCluster[] = EXPANDED_ROLE_SEEDS.map((seed) => ({
   slug: toSlug(seed.role),
   role: seed.role,
   category: seed.category,
   intent: "resume keywords",
   keywords: roleKeywords(seed.role, seed.category),
-  mistakes: roleMistakes(seed.role),
-  examples: roleExamples(seed.role),
-  faq: roleFaq(seed.role),
+  mistakes: roleMistakes(seed.role, seed.category),
+  examples: roleExamples(seed.role, seed.category),
+  faq: roleFaq(seed.role, seed.category),
   locale: "en",
   publish_status: "published",
 }));

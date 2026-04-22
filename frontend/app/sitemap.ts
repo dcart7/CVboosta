@@ -10,26 +10,50 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const resumeKeywordRoutes = getResumeKeywordStaticSlugs().map(
     (slug) => `/resume-keywords/${slug}`,
   );
-
-  const routes = [
+  const staticRoutes = [
     "",
     "/about",
     "/blog",
     "/free-ats-resume-checker",
     "/resume-keywords",
+    "/share/result",
     "/ai.txt",
     "/llms.txt",
-    ...publishedBlogRoutes,
-    ...resumeKeywordRoutes,
     "/pricing",
     "/privacy",
     "/terms",
-  ].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: route === "" ? 1 : 0.8,
-  }));
+  ];
+
+  const allRoutes = Array.from(new Set([
+    ...staticRoutes,
+    ...publishedBlogRoutes,
+    ...resumeKeywordRoutes,
+  ]));
+
+  const routes = allRoutes.map((route) => {
+    const priority =
+      route === ""
+        ? 1
+        : route.startsWith("/resume-keywords/")
+          ? 0.86
+          : route === "/resume-keywords"
+            ? 0.92
+            : route.startsWith("/blog/")
+              ? 0.82
+              : 0.8;
+
+    const changeFrequency =
+      route.startsWith("/resume-keywords/") || route.startsWith("/blog/")
+        ? ("weekly" as const)
+        : ("monthly" as const);
+
+    return {
+      url: `${baseUrl}${route}`,
+      lastModified: new Date(),
+      changeFrequency,
+      priority,
+    };
+  });
 
   return routes;
 }

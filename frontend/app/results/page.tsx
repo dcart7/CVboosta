@@ -405,16 +405,19 @@ function ResultsContent() {
   const [subscriptionTier, setSubscriptionTier] = useState<string>("free");
 
   const sessionId = searchParams.get("id");
-  const shareUrl = sessionId
-    ? `${siteUrl}/results?id=${encodeURIComponent(sessionId)}`
-    : `${siteUrl}/results`;
+  const shareBefore = typeof matchBefore === "number" ? Math.max(0, Math.min(100, Math.round(matchBefore))) : null;
+  const shareAfter = typeof matchAfter === "number" ? Math.max(0, Math.min(100, Math.round(matchAfter))) : null;
+  const shareUrl =
+    shareBefore !== null && shareAfter !== null
+      ? `${siteUrl}/share/result?before=${encodeURIComponent(String(shareBefore))}&after=${encodeURIComponent(String(shareAfter))}`
+      : `${siteUrl}/share/result`;
   const shareTitle =
-    matchAfter !== null
-      ? `My ATS resume score is ${matchAfter}/100`
+    shareAfter !== null
+      ? `My ATS resume score is ${shareAfter}/100`
       : "I just optimized my CV for ATS";
   const shareText =
-    matchAfter !== null
-      ? `I just checked my resume ATS score: ${matchAfter}/100.`
+    shareAfter !== null && shareBefore !== null
+      ? `I improved my ATS resume score from ${shareBefore}% to ${shareAfter}% with CVboosta.`
       : "I just checked and improved my resume for ATS.";
   const composedShareMessage = `${shareText} ${shareUrl}`;
 
@@ -705,7 +708,13 @@ function ResultsContent() {
     }
   };
 
-  const shareResult = () => setIsShareSheetOpen(true);
+  const shareResult = () => {
+    if (shareBefore === null || shareAfter === null) {
+      setStatus(t("results.matchLoadFailed"));
+      return;
+    }
+    setIsShareSheetOpen(true);
+  };
 
   const openShareWindow = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -1397,20 +1406,20 @@ function ResultsContent() {
             </div>
             {isShareSheetOpen && (
               <div
-                className="share-sheet-backdrop"
+                className="modal-backdrop"
                 onClick={() => setIsShareSheetOpen(false)}
               >
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="card share-sheet-card"
+                  className="modal-card fade-up share-modal-card"
                 >
-                  <div className="share-sheet-header">
-                    <h3 className="share-sheet-title">{t("results.shareYourResult")}</h3>
+                  <div className="share-modal-header">
+                    <h3 className="share-modal-title">{t("results.shareYourResult")}</h3>
                     <button className="btn ghost" onClick={() => setIsShareSheetOpen(false)}>
                       {t("common.dismiss")}
                     </button>
                   </div>
-                  <div className="share-sheet-actions">
+                  <div className="share-modal-actions">
                     <button className="btn ghost" type="button" onClick={shareOnWhatsApp}>
                       {t("results.shareOnWhatsApp")}
                     </button>
