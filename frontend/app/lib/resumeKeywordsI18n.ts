@@ -891,8 +891,9 @@ export function localizeResumeKeywordCluster(
   return {
     ...cluster,
     keywords: cluster.keywords.map((k) => localizeGeneratedKeyword(k, cluster.role, language)),
-    mistakes: localizeMistakes(cluster.role, language),
-    examples: localizeExamples(cluster.role, language),
-    faq: localizeFaq(cluster.role, language),
+    // Keep role-level uniqueness from generated content. We only localize keywords here.
+    mistakes: cluster.mistakes,
+    examples: cluster.examples,
+    faq: cluster.faq,
   };
 }

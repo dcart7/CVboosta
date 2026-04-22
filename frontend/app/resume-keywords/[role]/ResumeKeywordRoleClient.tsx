@@ -11,8 +11,10 @@ import {
 } from "../../lib/resumeKeywordsI18n";
 import {
   getFinalChecklist,
+  getRoleFreshnessNotes,
   getRoleExpectations,
   getRoleImpactBullets,
+  getRoleLongFormSections,
   getRoleToolStack,
   getSectionBlueprint,
 } from "../../lib/resumeKeywordContent";
@@ -20,9 +22,10 @@ import {
 type Props = {
   cluster: ResumeKeywordCluster;
   longTailPhrases: string[];
+  relatedRoles: Array<{ slug: string; role: string }>;
 };
 
-export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Props) {
+export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, relatedRoles }: Props) {
   const { language } = useTranslation();
   const ui = getResumeKeywordsUi(language);
   const localized = useMemo(
@@ -34,6 +37,8 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Pr
   const toolStack = useMemo(() => getRoleToolStack(localized), [localized]);
   const blueprint = useMemo(() => getSectionBlueprint(cluster, language), [cluster, language]);
   const checklist = useMemo(() => getFinalChecklist(cluster, language), [cluster, language]);
+  const longFormSections = useMemo(() => getRoleLongFormSections(cluster), [cluster]);
+  const freshnessNotes = useMemo(() => getRoleFreshnessNotes(cluster), [cluster]);
 
   return (
     <main className="page">
@@ -176,6 +181,25 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Pr
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
+            <h2 className="section-title">In-depth {localized.role} Resume Guide</h2>
+            <p className="rk-copy">
+              This section is updated regularly and designed to keep the page useful for real applications, not just keyword matching.
+            </p>
+            <div className="rk-deep-grid">
+              {longFormSections.map((section) => (
+                <article key={section.heading} className="card rk-deep-card">
+                  <h3>{section.heading}</h3>
+                  {section.paragraphs.map((paragraph) => (
+                    <p key={paragraph} className="rk-copy">{paragraph}</p>
+                  ))}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
             <h2 className="section-title">{ui.faqTitle}</h2>
             <div className="rk-faq-list">
               {localized.faq.map((item) => (
@@ -198,6 +222,36 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Pr
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
+            <h2 className="section-title">Monthly content updates</h2>
+            <ol className="rk-mistakes-list">
+              {freshnessNotes.map((item) => (
+                <li key={item} className="rk-mistake-item">
+                  {item}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
+            <h2 className="section-title">Related roles</h2>
+            <p className="rk-copy">
+              Explore adjacent guides to improve internal linking and discover role-specific keyword patterns.
+            </p>
+            <div className="rk-related-grid">
+              {relatedRoles.map((item) => (
+                <Link key={item.slug} href={`/resume-keywords/${item.slug}`} className="rk-related-link">
+                  <span>{item.role}</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 

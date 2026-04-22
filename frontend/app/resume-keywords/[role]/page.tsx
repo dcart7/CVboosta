@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getResumeKeywordClusterBySlug,
+  getRelatedResumeKeywordClusters,
   getResumeKeywordStaticSlugs,
 } from "../../lib/resumeKeywordClusters";
 import ResumeKeywordRoleClient from "./ResumeKeywordRoleClient";
@@ -97,6 +98,10 @@ export default async function ResumeKeywordRolePage({
     `${cluster.role.toLowerCase()} ats resume tips`,
     `${cluster.role.toLowerCase()} bullet points resume`,
   ];
+  const relatedRoles = getRelatedResumeKeywordClusters(cluster.slug, 10).map((item) => ({
+    slug: item.slug,
+    role: item.role,
+  }));
 
   return (
     <>
@@ -110,7 +115,11 @@ export default async function ResumeKeywordRolePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ResumeKeywordRoleClient cluster={cluster} longTailPhrases={longTailPhrases} />
+      <ResumeKeywordRoleClient
+        cluster={cluster}
+        longTailPhrases={longTailPhrases}
+        relatedRoles={relatedRoles}
+      />
     </>
   );
 }

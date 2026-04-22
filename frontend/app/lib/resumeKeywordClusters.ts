@@ -394,10 +394,15 @@ function roleMistakes(role: string, category: RoleCategory): string[] {
   const h = hashString(role);
   const impactArea = CATEGORY_IMPACT_AREAS[category][h % CATEGORY_IMPACT_AREAS[category].length];
   const track = CATEGORY_TRACKS[category][Math.floor(h / 3) % CATEGORY_TRACKS[category].length];
+  const sections = ["summary", "skills", "recent experience", "project bullets"];
+  const weakSection = sections[h % sections.length];
+  const altWeakSection = sections[Math.floor(h / 5) % sections.length];
   return [
     `Using a generic summary that does not show ${role} priorities in the first 3 lines.`,
     `Listing ${track.toLowerCase()} tools without measurable scope, ownership, or outcomes.`,
     `Ignoring repeated job-description terms tied to ${impactArea}.`,
+    `Keeping ${weakSection} wording too broad, which lowers ATS confidence.`,
+    `Skipping role-specific numbers in ${altWeakSection}, even when strong evidence exists.`,
     "Overusing buzzwords while missing concrete numbers, constraints, and business context.",
   ];
 }
@@ -410,6 +415,8 @@ function roleExamples(role: string, category: RoleCategory): ResumeKeywordExampl
   const qualityTo = qualityFrom + 8 + (h % 9);
   const lagCut = 18 + (h % 21);
   const impactArea = CATEGORY_IMPACT_AREAS[category][Math.floor(h / 7) % CATEGORY_IMPACT_AREAS[category].length];
+  const processGain = 10 + (h % 19);
+  const costReduction = 6 + (h % 16);
   return [
     {
       before: "Responsible for multiple cross-team initiatives.",
@@ -423,6 +430,14 @@ function roleExamples(role: string, category: RoleCategory): ResumeKeywordExampl
       before: "Helped with reporting and communication.",
       after: `Built weekly ${role.toLowerCase()} reporting cadence for leadership, cutting decision lag by ${lagCut}%.`,
     },
+    {
+      before: "Collaborated on process improvements and documentation.",
+      after: `Standardized ${role.toLowerCase()} workflows and documentation, improving process consistency by ${processGain}% across teams.`,
+    },
+    {
+      before: "Supported optimization initiatives across departments.",
+      after: `Partnered across teams to optimize ${role.toLowerCase()} operations, reducing avoidable cost and rework by ${costReduction}%.`,
+    },
   ];
 }
 
@@ -432,6 +447,7 @@ function roleFaq(role: string, category: RoleCategory): ResumeKeywordFaq[] {
   const keywordMax = keywordMin + 10 + (h % 7);
   const track = CATEGORY_TRACKS[category][h % CATEGORY_TRACKS[category].length];
   const impactArea = CATEGORY_IMPACT_AREAS[category][Math.floor(h / 11) % CATEGORY_IMPACT_AREAS[category].length];
+  const docLength = 720 + (h % 360);
   return [
     {
       question: `How many keywords should a ${role} resume include?`,
@@ -457,6 +473,21 @@ function roleFaq(role: string, category: RoleCategory): ResumeKeywordFaq[] {
       question: `Should I keep one master resume for every ${role} application?`,
       answer:
         "Keep one strong base version, then tailor summary, skills order, and first bullet points for each role target. This balances speed with relevance.",
+    },
+    {
+      question: `How long should a ${role} resume be for ATS and hiring teams?`,
+      answer:
+        `For most applicants, one to two pages is enough. Aim for around ${docLength}-${docLength + 180} words of high-signal content with clear metrics, not filler text.`,
+    },
+    {
+      question: `How often should I update my ${role} resume while job searching?`,
+      answer:
+        "Review and refine it weekly. Add new quantified wins, remove weak bullets, and retune keywords whenever your target vacancy mix changes.",
+    },
+    {
+      question: `What is the best way to show ${track.toLowerCase()} experience in a ${role} resume?`,
+      answer:
+        `Name the context, your ownership, and a measurable outcome tied to ${impactArea}. Recruiters trust concrete proof over tool lists.`,
     },
   ];
 }
@@ -493,4 +524,42 @@ export function getResumeKeywordClusterBySlug(slug: string): ResumeKeywordCluste
 
 export function getResumeKeywordStaticSlugs(): string[] {
   return getPublishedResumeKeywordClusters().map((item) => item.slug);
+}
+
+function roleTokens(role: string): Set<string> {
+  return new Set(
+    role
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((part) => part.length > 2),
+  );
+}
+
+export function getRelatedResumeKeywordClusters(
+  slug: string,
+  limit = 8,
+): ResumeKeywordCluster[] {
+  const target = getResumeKeywordClusterBySlug(slug);
+  if (!target) return [];
+
+  const targetTokens = roleTokens(target.role);
+
+  const scored = CLUSTERS
+    .filter((item) => item.slug !== slug && item.publish_status === "published")
+    .map((item) => {
+      const tokens = roleTokens(item.role);
+      let overlap = 0;
+      targetTokens.forEach((token) => {
+        if (tokens.has(token)) overlap += 1;
+      });
+
+      const sameCategory = item.category === target.category ? 4 : 0;
+      const prefixBoost = item.role.startsWith("Senior ") || item.role.startsWith("Lead ") ? 0.4 : 0;
+      const score = sameCategory + overlap * 2 + prefixBoost;
+
+      return { item, score };
+    })
+    .sort((a, b) => b.score - a.score || a.item.role.localeCompare(b.item.role));
+
+  return scored.slice(0, limit).map((entry) => entry.item);
 }

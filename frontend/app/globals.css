@@ -2795,6 +2795,25 @@ a {
   margin-top: 8px;
 }
 
+.rk-deep-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 14px;
+}
+
+.rk-deep-card {
+  border-radius: 16px;
+}
+
+.rk-deep-card h3 {
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+
+.rk-deep-card .rk-copy + .rk-copy {
+  margin-top: 10px;
+}
+
 .rk-example-card {
   border-radius: 16px;
 }
@@ -2873,6 +2892,36 @@ a {
   margin: 10px 0 0;
   color: var(--muted);
   line-height: 1.65;
+}
+
+.rk-related-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.rk-related-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-stroke);
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.32);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+[data-theme="dark"] .rk-related-link {
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.rk-related-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.42);
 }
 
 .rk-cta-panel {
