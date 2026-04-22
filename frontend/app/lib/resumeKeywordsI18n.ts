@@ -895,8 +895,51 @@ function escapeRegExp(input: string): string {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+const TECH_ROLE_MARKERS = [
+  "engineer",
+  "engineering",
+  "developer",
+  "devops",
+  "sre",
+  "site reliability",
+  "software",
+  "frontend",
+  "backend",
+  "full stack",
+  "fullstack",
+  "mobile",
+  "ios",
+  "android",
+  "platform",
+  "cloud",
+  "data",
+  "analytics engineer",
+  "machine learning",
+  "ai ",
+  "qa",
+  "automation",
+  "security",
+  "cybersecurity",
+  "soc",
+  "network",
+  "systems administrator",
+  "it support",
+  "ux",
+  "ui",
+  "product designer",
+  "instructional designer",
+] as const;
+
+function isTechnicalRoleName(role: string): boolean {
+  const normalized = role.toLowerCase();
+  return TECH_ROLE_MARKERS.some((marker) => normalized.includes(marker));
+}
+
 export function localizeRoleName(role: string, language: Language): string {
   if (language === "en") {
+    return role;
+  }
+  if (isTechnicalRoleName(role)) {
     return role;
   }
 
