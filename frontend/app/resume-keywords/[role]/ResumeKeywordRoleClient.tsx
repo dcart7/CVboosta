@@ -7,6 +7,7 @@ import { useTranslation } from "../../lib/LanguageContext";
 import type { ResumeKeywordCluster } from "../../lib/resumeKeywordClusters";
 import {
   getResumeKeywordsUi,
+  localizeRoleName,
   localizeResumeKeywordCluster,
 } from "../../lib/resumeKeywordsI18n";
 import {
@@ -247,7 +248,7 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
             <div className="rk-related-grid">
               {relatedRoles.map((item) => (
                 <Link key={item.slug} href={`/resume-keywords/${item.slug}`} className="rk-related-link">
-                  <span>{item.role}</span>
+                  <span>{localizeRoleName(item.role, language)}</span>
                   <span aria-hidden="true">→</span>
                 </Link>
               ))}

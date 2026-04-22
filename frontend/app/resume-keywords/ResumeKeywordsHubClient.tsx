@@ -5,7 +5,7 @@ import Link from "next/link";
 import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
 import type { ResumeKeywordCluster, RoleCategory } from "../lib/resumeKeywordClusters";
-import { getResumeKeywordsUi, getSectorLabel } from "../lib/resumeKeywordsI18n";
+import { getResumeKeywordsUi, getSectorLabel, localizeRoleName } from "../lib/resumeKeywordsI18n";
 
 type Props = {
   clusters: ResumeKeywordCluster[];
@@ -34,14 +34,22 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"all" | RoleCategory>("all");
+  const localizedClusters = useMemo(
+    () =>
+      clusters.map((item) => ({
+        ...item,
+        role: localizeRoleName(item.role, language),
+      })),
+    [clusters, language],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return clusters
+    return localizedClusters
       .filter((item) => (category === "all" ? true : item.category === category))
       .filter((item) => (q ? item.role.toLowerCase().includes(q) : true))
       .sort((a, b) => a.role.localeCompare(b.role));
-  }, [clusters, query, category]);
+  }, [localizedClusters, query, category]);
 
   const grouped = useMemo(() => {
     return CATEGORY_ORDER.map((cat) => ({
