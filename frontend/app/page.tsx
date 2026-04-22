@@ -196,6 +196,15 @@ export default function HomePage() {
     },
   }[language];
 
+  const localizedFreeCheckerLine = {
+    en: "Free ATS Resume Checker: run CV analysis and match scoring without registration.",
+    uk: "Безкоштовний ATS Resume Checker: запускайте аналіз CV і оцінку відповідності без реєстрації.",
+    pl: "Darmowy ATS Resume Checker: uruchom analizę CV i ocenę dopasowania bez rejestracji.",
+    sk: "Bezplatný ATS Resume Checker: spustite analýzu CV a hodnotenie zhody bez registrácie.",
+    cs: "Bezplatný ATS Resume Checker: spusťte analýzu CV a hodnocení shody bez registrace.",
+    es: "Free ATS Resume Checker: ejecuta el análisis de CV y la puntuación de coincidencia sin registro.",
+  }[language];
+
   return (
     <main className="page">
       <TopNav />
@@ -206,7 +215,7 @@ export default function HomePage() {
             <h1 className="hero-title">{t("home.heroTitle")}</h1>
             <p className="hero-subtitle">{t("home.heroSubtitle")}</p>
             <p className="hero-subtitle" style={{ marginTop: "10px" }}>
-              Free ATS Resume Checker: run CV analysis and match scoring without registration.
+              {localizedFreeCheckerLine}
             </p>
             <HeroActions />
           </div>
