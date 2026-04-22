@@ -6,12 +6,14 @@ import TopNav from "../../components/TopNav";
 import { useTranslation } from "../../lib/LanguageContext";
 import type { BlogPost } from "../../lib/blogPosts";
 import { localizeBlogPost } from "../../lib/blogLocalize";
+import { localizeRoleName } from "../../lib/resumeKeywordsI18n";
 
 type BlogPostClientProps = {
   post: BlogPost;
+  relatedRoles: Array<{ slug: string; role: string }>;
 };
 
-export default function BlogPostClient({ post }: BlogPostClientProps) {
+export default function BlogPostClient({ post, relatedRoles }: BlogPostClientProps) {
   const { t, language } = useTranslation();
   const tr = (path: string, fallback: string) => {
     const value = t(path);
@@ -65,6 +67,23 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
           <div className="blog-takeaway card">
             <h3>{takeawayTitle}</h3>
             <p>{takeawayBody}</p>
+          </div>
+
+          <div className="blog-takeaway card">
+            <h3>Related role guides</h3>
+            <p>Explore role-specific keyword pages linked to this topic.</p>
+            <div className="rk-related-grid" style={{ marginTop: "10px" }}>
+              {relatedRoles.map((item) => (
+                <Link
+                  key={item.slug}
+                  className="rk-related-link"
+                  href={`/resume-keywords/${item.slug}`}
+                >
+                  <span>{localizeRoleName(item.role, language)}</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </article>
       </div>

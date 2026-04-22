@@ -15,6 +15,7 @@ import {
   getRoleFreshnessNotes,
   getRoleExpectations,
   getRoleImpactBullets,
+  getRoleUniqueIntro,
   getRoleLongFormSections,
   getRoleToolStack,
   getSectionBlueprint,
@@ -38,6 +39,7 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
   const toolStack = useMemo(() => getRoleToolStack(localized), [localized]);
   const blueprint = useMemo(() => getSectionBlueprint(cluster, language), [cluster, language]);
   const checklist = useMemo(() => getFinalChecklist(cluster, language), [cluster, language]);
+  const uniqueIntro = useMemo(() => getRoleUniqueIntro(cluster), [cluster]);
   const longFormSections = useMemo(() => getRoleLongFormSections(cluster), [cluster]);
   const freshnessNotes = useMemo(() => getRoleFreshnessNotes(cluster), [cluster]);
 
@@ -58,6 +60,15 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
                 {ui.optimizeCv}
               </Link>
             </div>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
+            <h2 className="section-title">{localized.role} resume strategy snapshot</h2>
+            {uniqueIntro.map((paragraph) => (
+              <p key={paragraph} className="rk-copy" style={{ marginTop: "8px" }}>{paragraph}</p>
+            ))}
           </div>
         </section>
 

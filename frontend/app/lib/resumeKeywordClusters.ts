@@ -563,3 +563,29 @@ export function getRelatedResumeKeywordClusters(
 
   return scored.slice(0, limit).map((entry) => entry.item);
 }
+
+export function getResumeKeywordClustersForTopic(
+  topic: string,
+  limit = 10,
+): ResumeKeywordCluster[] {
+  const topicTokens = roleTokens(topic);
+  if (topicTokens.size === 0) {
+    return getPublishedResumeKeywordClusters().slice(0, limit);
+  }
+
+  const scored = CLUSTERS
+    .filter((item) => item.publish_status === "published")
+    .map((item) => {
+      const itemTokens = roleTokens(item.role);
+      let overlap = 0;
+      topicTokens.forEach((token) => {
+        if (itemTokens.has(token)) overlap += 1;
+      });
+      const keywordOverlap = item.keywords.filter((k) => topic.toLowerCase().includes(k.toLowerCase())).length;
+      const score = overlap * 3 + keywordOverlap;
+      return { item, score };
+    })
+    .sort((a, b) => b.score - a.score || a.item.role.localeCompare(b.item.role));
+
+  return scored.slice(0, limit).map((entry) => entry.item);
+}

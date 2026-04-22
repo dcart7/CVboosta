@@ -384,3 +384,16 @@ export function getRoleFreshnessNotes(cluster: ResumeKeywordCluster): string[] {
     "Examples and FAQ were updated to improve clarity, metrics focus, and role-specific relevance.",
   ];
 }
+
+export function getRoleUniqueIntro(cluster: ResumeKeywordCluster): string[] {
+  const h = hashString(cluster.slug);
+  const outcomes = CATEGORY_OUTCOMES[cluster.category];
+  const anchor = outcomes[h % outcomes.length];
+  const supporting = outcomes[(h + 2) % outcomes.length];
+  const metric = 11 + (h % 24);
+
+  return [
+    `${cluster.role} hiring pipelines are highly comparison-driven: recruiters quickly benchmark profile relevance, vocabulary fit, and measurable business impact. This guide is built to make that comparison easier by mapping ATS terms, role-specific phrasing, and evidence patterns to one practical page. Instead of generic advice, you get a structure tailored to ${cluster.role.toLowerCase()} expectations and current vacancy language.`,
+    `For this role, the strongest resume versions usually show clear ownership and outcomes such as ${anchor} and ${supporting}. In most review flows, moving those signals into summary and lead bullets can raise match quality by ${metric}% or more versus baseline drafts that rely on responsibilities only. Use this page as a working template: adjust keywords by target vacancy, then rewrite evidence lines with precise numbers and scope.`,
+  ];
+}

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import BlogPostClient from "./BlogPostClient";
 import { getBlogPostBySlug, isPostPublished } from "../../lib/blogPosts";
+import { getResumeKeywordClustersForTopic } from "../../lib/resumeKeywordClusters";
 
 export const revalidate = 3600;
 
@@ -16,5 +17,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  return <BlogPostClient post={post} />;
+  const topicText = `${post.title} ${post.lead} ${post.tags.join(" ")}`;
+  const relatedRoles = getResumeKeywordClustersForTopic(topicText, 10).map((item) => ({
+    slug: item.slug,
+    role: item.role,
+  }));
+
+  return <BlogPostClient post={post} relatedRoles={relatedRoles} />;
 }
