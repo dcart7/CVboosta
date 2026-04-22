@@ -9,6 +9,13 @@ import {
   getResumeKeywordsUi,
   localizeResumeKeywordCluster,
 } from "../../lib/resumeKeywordsI18n";
+import {
+  getFinalChecklist,
+  getRoleExpectations,
+  getRoleImpactBullets,
+  getRoleToolStack,
+  getSectionBlueprint,
+} from "../../lib/resumeKeywordContent";
 
 type Props = {
   cluster: ResumeKeywordCluster;
@@ -22,6 +29,11 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Pr
     () => localizeResumeKeywordCluster(cluster, language),
     [cluster, language],
   );
+  const expectations = useMemo(() => getRoleExpectations(cluster, language), [cluster, language]);
+  const impactBullets = useMemo(() => getRoleImpactBullets(cluster, language), [cluster, language]);
+  const toolStack = useMemo(() => getRoleToolStack(localized), [localized]);
+  const blueprint = useMemo(() => getSectionBlueprint(cluster, language), [cluster, language]);
+  const checklist = useMemo(() => getFinalChecklist(cluster, language), [cluster, language]);
 
   return (
     <main className="page">
@@ -73,6 +85,20 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Pr
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
+            <h2 className="section-title">{ui.expectationsTitle(localized.role)}</h2>
+            <p className="rk-copy">{ui.expectationsText}</p>
+            <ol className="rk-mistakes-list">
+              {expectations.map((item) => (
+                <li key={item} className="rk-mistake-item">
+                  {item}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
             <h2 className="section-title">{ui.examplesTitle(localized.role)}</h2>
             <p className="rk-copy">{ui.examplesText}</p>
             <div className="grid rk-example-grid">
@@ -88,6 +114,50 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Pr
                     {" "}
                     {example.after}
                   </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
+            <h2 className="section-title">{ui.impactTitle(localized.role)}</h2>
+            <p className="rk-copy">{ui.impactText}</p>
+            <ol className="rk-mistakes-list">
+              {impactBullets.map((item) => (
+                <li key={item} className="rk-mistake-item">
+                  {item}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
+            <h2 className="section-title">{ui.toolStackTitle}</h2>
+            <p className="rk-copy">{ui.toolStackText}</p>
+            <div className="rk-chip-grid">
+              {toolStack.map((tool) => (
+                <div key={tool} className="rk-chip">
+                  {tool}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
+            <h2 className="section-title">{ui.blueprintTitle(localized.role)}</h2>
+            <p className="rk-copy">{ui.blueprintText}</p>
+            <div className="grid rk-blueprint-grid">
+              {blueprint.map((item) => (
+                <article key={item.section} className="card rk-blueprint-card">
+                  <h3>{item.section}</h3>
+                  <p><strong>{ui.blueprintPurposeLabel}:</strong> {item.purpose}</p>
+                  <p><strong>{ui.blueprintKeywordPlacementLabel}:</strong> {item.keywordPlacement}</p>
                 </article>
               ))}
             </div>
@@ -115,6 +185,19 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases }: Pr
                 </details>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="section fade-up rk-section">
+          <div className="card rk-panel">
+            <h2 className="section-title">{ui.finalChecklistTitle}</h2>
+            <ol className="rk-mistakes-list">
+              {checklist.map((item) => (
+                <li key={item} className="rk-mistake-item">
+                  {item}
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 

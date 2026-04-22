@@ -2746,6 +2746,20 @@ a {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.rk-blueprint-grid {
+  margin-top: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.rk-blueprint-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.02rem;
+}
+
+.rk-blueprint-card p + p {
+  margin-top: 8px;
+}
+
 .rk-example-card {
   border-radius: 16px;
 }

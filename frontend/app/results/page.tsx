@@ -401,6 +401,7 @@ function ResultsContent() {
   const [clError, setClError] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"document" | "metrics">("document");
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("free");
 
   const sessionId = searchParams.get("id");
@@ -704,52 +705,34 @@ function ResultsContent() {
     }
   };
 
-  const shareResult = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: shareTitle,
-          text: shareText,
-          url: shareUrl,
-        });
-        return;
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") {
-        return;
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setStatus(t("results.shareLinkCopied"));
-    } catch {
-      setStatus(t("results.copyFailed"));
-    }
-  };
+  const shareResult = () => setIsShareSheetOpen(true);
 
   const openShareWindow = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const shareOnWhatsApp = () => {
+    setIsShareSheetOpen(false);
     openShareWindow(
       `https://wa.me/?text=${encodeURIComponent(composedShareMessage)}`,
     );
   };
 
   const shareOnFacebook = () => {
+    setIsShareSheetOpen(false);
     openShareWindow(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
     );
   };
 
   const shareOnMessages = () => {
+    setIsShareSheetOpen(false);
     const smsUrl = `sms:?&body=${encodeURIComponent(composedShareMessage)}`;
     window.location.href = smsUrl;
   };
 
   const shareOnTelegram = () => {
+    setIsShareSheetOpen(false);
     openShareWindow(
       `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
     );
@@ -759,6 +742,7 @@ function ResultsContent() {
     try {
       await navigator.clipboard.writeText(composedShareMessage);
       setStatus(t("results.shareForInstagramCopied"));
+      setIsShareSheetOpen(false);
       openShareWindow("https://www.instagram.com/");
     } catch {
       setStatus(t("results.copyFailed"));
@@ -769,6 +753,7 @@ function ResultsContent() {
     try {
       await navigator.clipboard.writeText(composedShareMessage);
       setStatus(t("results.shareForTikTokCopied"));
+      setIsShareSheetOpen(false);
       openShareWindow("https://www.tiktok.com/upload");
     } catch {
       setStatus(t("results.copyFailed"));
@@ -1408,31 +1393,63 @@ function ResultsContent() {
                   {t("results.shareResult")}
                 </button>
               </div>
-              <div className="section" style={{ marginTop: "12px" }}>
-                <h3 className="section-title">{t("results.shareYourResult")}</h3>
-                <div className="nav-actions">
-                  <button className="btn ghost" type="button" onClick={shareOnWhatsApp}>
-                    {t("results.shareOnWhatsApp")}
-                  </button>
-                  <button className="btn ghost" type="button" onClick={shareOnFacebook}>
-                    {t("results.shareOnFacebook")}
-                  </button>
-                  <button className="btn ghost" type="button" onClick={shareOnMessages}>
-                    {t("results.shareOnMessages")}
-                  </button>
-                  <button className="btn ghost" type="button" onClick={shareOnTelegram}>
-                    {t("results.shareOnTelegram")}
-                  </button>
-                  <button className="btn ghost" type="button" onClick={shareForInstagram}>
-                    {t("results.shareForInstagram")}
-                  </button>
-                  <button className="btn ghost" type="button" onClick={shareForTikTok}>
-                    {t("results.shareForTikTok")}
-                  </button>
+              {status && status !== t("results.missingInputs") && <p>{status}</p>}
+            </div>
+            {isShareSheetOpen && (
+              <div
+                onClick={() => setIsShareSheetOpen(false)}
+                style={{
+                  position: "fixed",
+                  inset: 0,
+                  background: "rgba(7, 10, 18, 0.44)",
+                  zIndex: 1200,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "16px",
+                }}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="card"
+                  style={{ width: "min(520px, 100%)", borderRadius: "18px" }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <h3 style={{ margin: 0 }}>{t("results.shareYourResult")}</h3>
+                    <button className="btn ghost" onClick={() => setIsShareSheetOpen(false)}>
+                      {t("common.dismiss")}
+                    </button>
+                  </div>
+                  <div className="nav-actions">
+                    <button className="btn ghost" type="button" onClick={shareOnWhatsApp}>
+                      {t("results.shareOnWhatsApp")}
+                    </button>
+                    <button className="btn ghost" type="button" onClick={shareOnFacebook}>
+                      {t("results.shareOnFacebook")}
+                    </button>
+                    <button className="btn ghost" type="button" onClick={shareOnMessages}>
+                      {t("results.shareOnMessages")}
+                    </button>
+                    <button className="btn ghost" type="button" onClick={shareOnTelegram}>
+                      {t("results.shareOnTelegram")}
+                    </button>
+                    <button className="btn ghost" type="button" onClick={shareForInstagram}>
+                      {t("results.shareForInstagram")}
+                    </button>
+                    <button className="btn ghost" type="button" onClick={shareForTikTok}>
+                      {t("results.shareForTikTok")}
+                    </button>
+                  </div>
                 </div>
               </div>
-              {status && <p>{status}</p>}
-            </div>
+            )}
 
           <div className={`metrics-column ${activeTab === 'metrics' ? "" : "desktop-only"}`}>
             <div className="form-card">
