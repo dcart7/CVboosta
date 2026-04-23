@@ -275,7 +275,7 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
               <Link className="btn primary" href="/free-ats-resume-checker">
                 {ui.freeChecker}
               </Link>
-              <Link className="btn ghost" href="/optimize">
+              <Link className="btn ghost" href="/app">
                 {ui.optimizeCv}
               </Link>
             </div>
