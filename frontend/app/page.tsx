@@ -208,63 +208,108 @@ export default function HomePage() {
   const conversionUi = {
     en: {
       ctaAction: "Upload your CV — get results in 60 seconds",
-      noSignup: "No signup required",
       freeScore: "Free ATS score instantly",
       control: "You stay in control — edit before export. Nothing is auto-submitted.",
-      urgency: "Free scans are limited per day.",
       verified: "Verified beta user",
       caseProof: "Case study details available on request.",
       priceValue: "Same output quality. Faster workflow for rapid iteration.",
     },
     uk: {
       ctaAction: "Завантажте CV — отримайте результат за 60 секунд",
-      noSignup: "Без реєстрації",
       freeScore: "Безкоштовний ATS score одразу",
       control: "Ви контролюєте результат — редагуєте перед експортом. Нічого не надсилається автоматично.",
-      urgency: "Кількість безкоштовних сканів за день обмежена.",
       verified: "Перевірений beta-користувач",
       caseProof: "Деталі кейсів доступні за запитом.",
       priceValue: "Той самий рівень результату. Швидший workflow для швидких ітерацій.",
     },
     pl: {
       ctaAction: "Prześlij CV — otrzymaj wynik w 60 sekund",
-      noSignup: "Bez rejestracji",
       freeScore: "Darmowy ATS score od razu",
       control: "Masz pełną kontrolę — edytujesz przed eksportem. Nic nie wysyła się automatycznie.",
-      urgency: "Liczba darmowych skanów dziennie jest ograniczona.",
       verified: "Zweryfikowany użytkownik beta",
       caseProof: "Szczegóły case study dostępne na życzenie.",
       priceValue: "Ta sama jakość wyniku. Szybszy workflow do szybkich iteracji.",
     },
     sk: {
       ctaAction: "Nahrajte CV — výsledok získate za 60 sekúnd",
-      noSignup: "Bez registrácie",
       freeScore: "Bezplatný ATS score okamžite",
       control: "Máte kontrolu — upravíte pred exportom. Nič sa neodosiela automaticky.",
-      urgency: "Počet bezplatných skenov za deň je obmedzený.",
       verified: "Overený beta používateľ",
       caseProof: "Detaily case study sú dostupné na požiadanie.",
       priceValue: "Rovnaká kvalita výsledku. Rýchlejší workflow pre rýchle iterácie.",
     },
     cs: {
       ctaAction: "Nahrajte CV — výsledek získáte za 60 sekund",
-      noSignup: "Bez registrace",
       freeScore: "Free ATS score okamžitě",
       control: "Máte kontrolu — upravíte před exportem. Nic se neodesílá automaticky.",
-      urgency: "Počet bezplatných skenů za den je omezený.",
       verified: "Ověřený beta uživatel",
       caseProof: "Detaily case study jsou dostupné na vyžádání.",
       priceValue: "Stejná kvalita výstupu. Rychlejší workflow pro rychlé iterace.",
     },
     es: {
       ctaAction: "Sube tu CV — obtén resultados en 60 segundos",
-      noSignup: "Sin registro",
       freeScore: "ATS score gratis al instante",
       control: "Tú mantienes el control: editas antes de exportar. Nada se envía automáticamente.",
-      urgency: "Los escaneos gratis por día son limitados.",
       verified: "Usuario beta verificado",
       caseProof: "Detalles de casos disponibles bajo solicitud.",
       priceValue: "Misma calidad de resultado. Workflow más rápido para iterar.",
+    },
+  }[language];
+
+  const compactBehindTheScenes = {
+    en: {
+      title: "How CVboosta works behind the scenes",
+      lead:
+        "We do not rewrite blindly. CVboosta parses your CV, matches it to role language, and upgrades weak points while keeping your real experience intact.",
+      p1: "1) Parse and extract impact signals",
+      p2: "2) Match against role requirements",
+      p3: "3) Generate a stronger ATS-friendly draft",
+      p4: "4) Review, edit, and export when ready",
+    },
+    uk: {
+      title: "Як CVboosta працює за лаштунками",
+      lead:
+        "Ми не робимо сліпий rewrite. CVboosta парсить ваше CV, звіряє його з мовою ролі та підсилює слабкі місця, зберігаючи реальний досвід.",
+      p1: "1) Парсинг і витяг сигналів впливу",
+      p2: "2) Матчинг із вимогами ролі",
+      p3: "3) Генерація сильнішого ATS-friendly драфту",
+      p4: "4) Перегляд, редагування та експорт",
+    },
+    pl: {
+      title: "Jak CVboosta działa za kulisami",
+      lead:
+        "Nie robimy ślepego rewrite. CVboosta parsuje Twoje CV, dopasowuje je do języka roli i wzmacnia słabe punkty bez zmiany realnego doświadczenia.",
+      p1: "1) Parsowanie i ekstrakcja sygnałów wpływu",
+      p2: "2) Dopasowanie do wymagań roli",
+      p3: "3) Generowanie mocniejszego draftu ATS-friendly",
+      p4: "4) Przegląd, edycja i eksport",
+    },
+    sk: {
+      title: "Ako CVboosta funguje na pozadí",
+      lead:
+        "Nerobíme slepý rewrite. CVboosta spracuje vaše CV, porovná ho s jazykom role a posilní slabé miesta bez skreslenia reálnych skúseností.",
+      p1: "1) Parsovanie a extrahovanie signálov dopadu",
+      p2: "2) Porovnanie s požiadavkami role",
+      p3: "3) Generovanie silnejšieho ATS-friendly draftu",
+      p4: "4) Kontrola, úprava a export",
+    },
+    cs: {
+      title: "Jak CVboosta funguje na pozadí",
+      lead:
+        "Neděláme slepý rewrite. CVboosta zpracuje vaše CV, porovná ho s jazykem role a posílí slabá místa bez zkreslení reálných zkušeností.",
+      p1: "1) Parsování a extrakce signálů dopadu",
+      p2: "2) Match s požadavky role",
+      p3: "3) Generování silnějšího ATS-friendly draftu",
+      p4: "4) Kontrola, úprava a export",
+    },
+    es: {
+      title: "Cómo funciona CVboosta detrás de escena",
+      lead:
+        "No hacemos un rewrite ciego. CVboosta analiza tu CV, lo compara con el lenguaje del rol y refuerza puntos débiles sin distorsionar tu experiencia real.",
+      p1: "1) Parseo y extracción de señales de impacto",
+      p2: "2) Match con requisitos del rol",
+      p3: "3) Generación de un draft ATS-friendly más fuerte",
+      p4: "4) Revisión, edición y exportación",
     },
   }[language];
 
@@ -566,12 +611,13 @@ export default function HomePage() {
               {localizedFreeCheckerLine}
             </p>
             <HeroActions />
-            <p className="hero-cta-hint">{conversionUi.ctaAction}</p>
-            <div className="hero-proof-chips">
-              <span className="tag">{conversionUi.freeScore}</span>
+            <div className="hero-mini-block">
+              <p className="hero-mini-title">{conversionUi.ctaAction}</p>
+              <p className="hero-mini-text">{conversionUi.control}</p>
+              <div className="hero-proof-chips">
+                <span className="tag">{conversionUi.freeScore}</span>
+              </div>
             </div>
-            <p className="hero-control-line">{conversionUi.control}</p>
-            <p className="hero-urgency-line">{conversionUi.urgency}</p>
           </div>
         </section>
 
@@ -661,6 +707,19 @@ export default function HomePage() {
               <span>3</span>
               <h3>{t("home.howItWorks.step3.title")}</h3>
               <p>{t("home.howItWorks.step3.desc")}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="section fade-up">
+          <div className="card compact-process-card">
+            <h2 className="section-title">{compactBehindTheScenes.title}</h2>
+            <p className="compact-process-lead">{compactBehindTheScenes.lead}</p>
+            <div className="compact-process-points">
+              <span>{compactBehindTheScenes.p1}</span>
+              <span>{compactBehindTheScenes.p2}</span>
+              <span>{compactBehindTheScenes.p3}</span>
+              <span>{compactBehindTheScenes.p4}</span>
             </div>
           </div>
         </section>

@@ -881,6 +881,36 @@ a {
   max-width: 900px;
 }
 
+.hero-proof-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.hero-mini-block {
+  margin-top: 14px;
+  max-width: 760px;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+}
+
+.hero-mini-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.hero-mini-text {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.52;
+  color: var(--muted);
+}
+
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2.5rem;
@@ -1259,6 +1289,18 @@ a {
   gap: 8px;
 }
 
+.trust-badge {
+  width: fit-content;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: linear-gradient(135deg, #14b86f, #0f9f5f);
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
 .trust-role {
   font-size: 13px !important;
   opacity: 0.8;
@@ -1273,6 +1315,38 @@ a {
 .trust-note {
   font-size: 12px !important;
   opacity: 0.78;
+}
+
+.trust-case-proof {
+  margin: -4px 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.compact-process-card {
+  padding: 24px 22px;
+}
+
+.compact-process-lead {
+  margin: -6px 0 14px !important;
+  font-size: 15px !important;
+  line-height: 1.62;
+}
+
+.compact-process-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.compact-process-points span {
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  line-height: 1.5;
 }
 
 .pricing-perception-card .section-title {

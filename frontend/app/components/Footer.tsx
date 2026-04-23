@@ -101,9 +101,9 @@ export default function Footer() {
         .footer-social-row {
           margin-top: 4px;
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-start;
           align-items: center;
-          width: min(320px, 100%);
+          width: fit-content;
           gap: 16px;
         }
         .footer-social-btn {
