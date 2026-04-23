@@ -5,8 +5,21 @@ import GoogleAnalytics from "./components/GoogleAnalytics";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
+import { Manrope, Playfair_Display } from "next/font/google";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-manrope",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
+});
 
 export const metadata: Metadata = {
   title: "CVboosta | ATS-Friendly CV Optimization",
@@ -50,10 +63,7 @@ export const metadata: Metadata = {
     images: ["/logo.png"],
   },
   icons: {
-    icon: [
-      { url: "/favicon-v2.ico", sizes: "any" },
-      { url: "/favicon-v2.png", type: "image/png" },
-    ],
+    icon: [{ url: "/favicon-v2.png", type: "image/png", sizes: "64x64" }],
     shortcut: "/favicon-v2.png",
     apple: "/apple-icon-v2.png",
   },
@@ -108,7 +118,10 @@ export default function RootLayout({
           }
         `}} />
       </head>
-      <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <body
+        className={`${manrope.variable} ${playfair.variable}`}
+        style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
         <GoogleAnalytics />
         <LanguageProvider>
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>

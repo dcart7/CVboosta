@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslation } from "../lib/LanguageContext";
 
 export default function Footer() {
@@ -12,7 +13,14 @@ export default function Footer() {
         <div className="footer-content">
           <div className="footer-left">
             <Link href="/" className="logo">
-              <img src="/logo.png" alt="CVboosta logo" width={34} height={34} className="footer-logo" />
+              <Image
+                src="/logo.png"
+                alt="CVboosta logo"
+                width={34}
+                height={34}
+                className="footer-logo"
+                sizes="34px"
+              />
               <span className="logo-text">
                 CV<span>boosta</span>
               </span>

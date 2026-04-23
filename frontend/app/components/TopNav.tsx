@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
@@ -99,9 +100,17 @@ export default function TopNav() {
       <header className="nav">
         <div className="nav-inner">
           <Link className="brand" href="/">
-          <img src="/logo.png" alt="Logo" width={40} height={40} className="brand-logo" />
-          <span>CVboosta</span>
-        </Link>
+            <Image
+              src="/logo.png"
+              alt="CVboosta logo"
+              width={40}
+              height={40}
+              className="brand-logo"
+              priority
+              sizes="40px"
+            />
+            <span>CVboosta</span>
+          </Link>
 
         {/* Desktop Links */}
         <nav className="nav-links cv-desktop-only" style={desktopNavStyle}>
