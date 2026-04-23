@@ -208,7 +208,7 @@ export default function HomePage() {
   const conversionContent = {
     en: {
       hookLabel: "Stop getting ignored by recruiters",
-      hookTitle: "Most rejections happen before interviews. Fix your CV in 3 minutes.",
+      hookTitle: "Get more interviews — without changing your experience.",
       hookSubtitle:
         "Most candidates fail ATS pre-screening. Upload your CV and role now to turn weak bullets into interview-ready proof.",
       kpiA: "average ATS score lift",
@@ -255,7 +255,7 @@ export default function HomePage() {
     },
     uk: {
       hookLabel: "Припиніть залишатися без відповіді від рекрутерів",
-      hookTitle: "Більшість відмов стається ще до співбесіди. Виправте CV за 3 хвилини.",
+      hookTitle: "Отримуйте більше співбесід — без зміни вашого досвіду.",
       hookSubtitle:
         "Більшість кандидатів не проходять ATS-первинний відбір. Завантажте CV і роль зараз, щоб перетворити слабкі bullets на доказ результату.",
       kpiA: "середнє зростання ATS score",
@@ -302,7 +302,7 @@ export default function HomePage() {
     },
     pl: {
       hookLabel: "Przestań być ignorowany przez rekruterów",
-      hookTitle: "Większość odrzuceń dzieje się przed rozmową. Popraw CV w 3 minuty.",
+      hookTitle: "Zdobywaj więcej rozmów — bez zmiany swojego doświadczenia.",
       hookSubtitle:
         "Większość kandydatów odpada na wstępnym ATS. Prześlij CV i rolę teraz, aby zamienić słabe bullet points w dowód efektu.",
       kpiA: "średni wzrost ATS score",
@@ -349,7 +349,7 @@ export default function HomePage() {
     },
     sk: {
       hookLabel: "Prestaňte byť ignorovaní recruitermi",
-      hookTitle: "Väčšina odmietnutí sa stane ešte pred pohovorom. Opravte CV za 3 minúty.",
+      hookTitle: "Získajte viac pohovorov — bez zmeny vašich skúseností.",
       hookSubtitle:
         "Väčšina kandidátov neprejde ATS predvýberom. Nahrajte CV a rolu teraz, aby sa slabé bullets zmenili na dôkaz výsledkov.",
       kpiA: "priemerné zvýšenie ATS score",
@@ -396,7 +396,7 @@ export default function HomePage() {
     },
     cs: {
       hookLabel: "Přestaňte být ignorováni recruitery",
-      hookTitle: "Většina odmítnutí se stane ještě před pohovorem. Opravte CV za 3 minuty.",
+      hookTitle: "Získejte více pohovorů — bez změny vašich zkušeností.",
       hookSubtitle:
         "Většina kandidátů neprojde ATS předvýběrem. Nahrajte CV a roli teď, aby se slabé bullets změnily na důkaz výsledku.",
       kpiA: "průměrné navýšení ATS score",
@@ -443,7 +443,7 @@ export default function HomePage() {
     },
     es: {
       hookLabel: "Deja de ser ignorado por reclutadores",
-      hookTitle: "La mayoría de rechazos ocurre antes de la entrevista. Arregla tu CV en 3 minutos.",
+      hookTitle: "Consigue más entrevistas — sin cambiar tu experiencia.",
       hookSubtitle:
         "La mayoría de candidatos falla el pre-screening ATS. Sube tu CV y el rol ahora para convertir bullets débiles en prueba de impacto.",
       kpiA: "aumento promedio de ATS score",
@@ -573,7 +573,7 @@ export default function HomePage() {
             <span className="score-proof-arrow">→</span>
             <div className="score-proof-card score-proof-card-up">
               <span className="score-proof-label">ATS</span>
-              <strong>87</strong>
+              <strong>93</strong>
             </div>
           </div>
           <div className="before-after-grid">
