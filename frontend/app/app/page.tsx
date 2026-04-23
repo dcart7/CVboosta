@@ -67,6 +67,7 @@ export default function WorkspacePage() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [mobileDashboardTab, setMobileDashboardTab] = useState<"editor" | "preview">("editor");
 
   const hashText = (value: string) => {
     let hash = 0;
@@ -506,8 +507,32 @@ export default function WorkspacePage() {
     <main className="page">
       <TopNav />
       <div className="shell">
+        <div className="mobile-dash-tabs" role="tablist" aria-label="Dashboard sections">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileDashboardTab === "editor"}
+            className={`mobile-dash-tab ${mobileDashboardTab === "editor" ? "is-active" : ""}`}
+            onClick={() => setMobileDashboardTab("editor")}
+          >
+            {t("dashboard.uploadCv").replace(/^\s*\d+\.\s*/, "")}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileDashboardTab === "preview"}
+            className={`mobile-dash-tab ${mobileDashboardTab === "preview" ? "is-active" : ""}`}
+            onClick={() => setMobileDashboardTab("preview")}
+          >
+            {t("dashboard.sessionPreview")}
+          </button>
+        </div>
         <section className="split fade-up">
-          <div className="form-card form-grid">
+          <div
+            className={`form-card form-grid dashboard-panel ${
+              mobileDashboardTab === "editor" ? "is-mobile-active" : "is-mobile-hidden"
+            }`}
+          >
             <div className="pill">{t("dashboard.pill")}</div>
             <div>
               <h2 className="section-title">{t("dashboard.uploadCv")}</h2>
@@ -682,7 +707,11 @@ export default function WorkspacePage() {
             )}
           </div>
 
-          <div className="hero-card">
+          <div
+            className={`hero-card dashboard-panel ${
+              mobileDashboardTab === "preview" ? "is-mobile-active" : "is-mobile-hidden"
+            }`}
+          >
             <h2 className="section-title">{t("dashboard.sessionPreview")}</h2>
             <div className="kpi">
               <h3>

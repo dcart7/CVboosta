@@ -1443,6 +1443,10 @@ a {
   gap: 24px;
 }
 
+.mobile-dash-tabs {
+  display: none;
+}
+
 .auth-split {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -3266,6 +3270,48 @@ body {
   .share-modal-actions {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .mobile-dash-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 6px 0 14px;
+    padding: 4px;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border);
+    background: color-mix(in srgb, var(--surface) 84%, transparent);
+    position: sticky;
+    top: 72px;
+    z-index: 8;
+    backdrop-filter: blur(10px) saturate(130%);
+  }
+
+  .mobile-dash-tab {
+    min-height: 40px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .mobile-dash-tab.is-active {
+    background: color-mix(in srgb, var(--accent-soft) 65%, var(--surface));
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--ink);
+  }
+
+  .dashboard-panel.is-mobile-hidden {
+    display: none !important;
+  }
+
+  .dashboard-panel.is-mobile-active {
+    display: grid;
   }
 }
 
