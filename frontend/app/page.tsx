@@ -205,6 +205,69 @@ export default function HomePage() {
     es: "Free ATS Resume Checker: ejecuta el análisis de CV y la puntuación de coincidencia sin registro.",
   }[language];
 
+  const conversionUi = {
+    en: {
+      ctaAction: "Upload your CV — get results in 60 seconds",
+      noSignup: "No signup required",
+      freeScore: "Free ATS score instantly",
+      control: "You stay in control — edit before export. Nothing is auto-submitted.",
+      urgency: "Free scans are limited per day.",
+      verified: "Verified beta user",
+      caseProof: "Case study details available on request.",
+      priceValue: "Same output quality. Faster workflow for rapid iteration.",
+    },
+    uk: {
+      ctaAction: "Завантажте CV — отримайте результат за 60 секунд",
+      noSignup: "Без реєстрації",
+      freeScore: "Безкоштовний ATS score одразу",
+      control: "Ви контролюєте результат — редагуєте перед експортом. Нічого не надсилається автоматично.",
+      urgency: "Кількість безкоштовних сканів за день обмежена.",
+      verified: "Перевірений beta-користувач",
+      caseProof: "Деталі кейсів доступні за запитом.",
+      priceValue: "Той самий рівень результату. Швидший workflow для швидких ітерацій.",
+    },
+    pl: {
+      ctaAction: "Prześlij CV — otrzymaj wynik w 60 sekund",
+      noSignup: "Bez rejestracji",
+      freeScore: "Darmowy ATS score od razu",
+      control: "Masz pełną kontrolę — edytujesz przed eksportem. Nic nie wysyła się automatycznie.",
+      urgency: "Liczba darmowych skanów dziennie jest ograniczona.",
+      verified: "Zweryfikowany użytkownik beta",
+      caseProof: "Szczegóły case study dostępne na życzenie.",
+      priceValue: "Ta sama jakość wyniku. Szybszy workflow do szybkich iteracji.",
+    },
+    sk: {
+      ctaAction: "Nahrajte CV — výsledok získate za 60 sekúnd",
+      noSignup: "Bez registrácie",
+      freeScore: "Bezplatný ATS score okamžite",
+      control: "Máte kontrolu — upravíte pred exportom. Nič sa neodosiela automaticky.",
+      urgency: "Počet bezplatných skenov za deň je obmedzený.",
+      verified: "Overený beta používateľ",
+      caseProof: "Detaily case study sú dostupné na požiadanie.",
+      priceValue: "Rovnaká kvalita výsledku. Rýchlejší workflow pre rýchle iterácie.",
+    },
+    cs: {
+      ctaAction: "Nahrajte CV — výsledek získáte za 60 sekund",
+      noSignup: "Bez registrace",
+      freeScore: "Free ATS score okamžitě",
+      control: "Máte kontrolu — upravíte před exportem. Nic se neodesílá automaticky.",
+      urgency: "Počet bezplatných skenů za den je omezený.",
+      verified: "Ověřený beta uživatel",
+      caseProof: "Detaily case study jsou dostupné na vyžádání.",
+      priceValue: "Stejná kvalita výstupu. Rychlejší workflow pro rychlé iterace.",
+    },
+    es: {
+      ctaAction: "Sube tu CV — obtén resultados en 60 segundos",
+      noSignup: "Sin registro",
+      freeScore: "ATS score gratis al instante",
+      control: "Tú mantienes el control: editas antes de exportar. Nada se envía automáticamente.",
+      urgency: "Los escaneos gratis por día son limitados.",
+      verified: "Usuario beta verificado",
+      caseProof: "Detalles de casos disponibles bajo solicitud.",
+      priceValue: "Misma calidad de resultado. Workflow más rápido para iterar.",
+    },
+  }[language];
+
   const conversionContent = {
     en: {
       hookLabel: "Stop getting ignored by recruiters",
@@ -215,7 +278,7 @@ export default function HomePage() {
       kpiB: "from upload to first draft",
       kpiC: "faster tailoring per vacancy",
       kpiNote:
-        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
+        "Internal benchmark (100+ test CVs): score improved from 48 to 91 using the same candidate data.",
       demoTitle: "Before / after preview",
       demoLeftTitle: "Before (weak signal)",
       demoRightTitle: "After (hire-ready signal)",
@@ -503,6 +566,12 @@ export default function HomePage() {
               {localizedFreeCheckerLine}
             </p>
             <HeroActions />
+            <p className="hero-cta-hint">{conversionUi.ctaAction}</p>
+            <div className="hero-proof-chips">
+              <span className="tag">{conversionUi.freeScore}</span>
+            </div>
+            <p className="hero-control-line">{conversionUi.control}</p>
+            <p className="hero-urgency-line">{conversionUi.urgency}</p>
           </div>
         </section>
 
@@ -522,6 +591,39 @@ export default function HomePage() {
             </div>
           </div>
           <p className="kpi-proof-note">{conversionContent.kpiNote}</p>
+        </section>
+
+        <section className="section fade-up">
+          <h2 className="section-title">{conversionContent.demoTitle}</h2>
+          <div className="score-proof">
+            <div className="score-proof-card">
+              <span className="score-proof-label">ATS</span>
+              <strong>43</strong>
+            </div>
+            <span className="score-proof-arrow">→</span>
+            <div className="score-proof-card score-proof-card-up">
+              <span className="score-proof-label">ATS</span>
+              <strong>93</strong>
+            </div>
+          </div>
+          <div className="before-after-grid">
+            <article className="card before-after-card">
+              <h3>{conversionContent.demoLeftTitle}</h3>
+              <p>{conversionContent.beforeText}</p>
+            </article>
+            <article className="card before-after-card">
+              <h3>{conversionContent.demoRightTitle}</h3>
+              <p>{conversionContent.afterText}</p>
+            </article>
+          </div>
+          <div className="card before-after-impact">
+            <h3>{conversionContent.demoImpactTitle}</h3>
+            <ul>
+              <li>{conversionContent.demoImpact1}</li>
+              <li>{conversionContent.demoImpact2}</li>
+              <li>{conversionContent.demoImpact3}</li>
+            </ul>
+          </div>
         </section>
 
         <section className="section fade-up" style={{ marginBottom: "6rem" }}>
@@ -563,92 +665,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section fade-up">
-          <h2 className="section-title">{conversionContent.demoTitle}</h2>
-          <div className="score-proof">
-            <div className="score-proof-card">
-              <span className="score-proof-label">ATS</span>
-              <strong>43</strong>
-            </div>
-            <span className="score-proof-arrow">→</span>
-            <div className="score-proof-card score-proof-card-up">
-              <span className="score-proof-label">ATS</span>
-              <strong>93</strong>
-            </div>
-          </div>
-          <div className="before-after-grid">
-            <article className="card before-after-card">
-              <h3>{conversionContent.demoLeftTitle}</h3>
-              <p>{conversionContent.beforeText}</p>
-            </article>
-            <article className="card before-after-card">
-              <h3>{conversionContent.demoRightTitle}</h3>
-              <p>{conversionContent.afterText}</p>
-            </article>
-          </div>
-          <div className="card before-after-impact">
-            <h3>{conversionContent.demoImpactTitle}</h3>
-            <ul>
-              <li>{conversionContent.demoImpact1}</li>
-              <li>{conversionContent.demoImpact2}</li>
-              <li>{conversionContent.demoImpact3}</li>
-            </ul>
-          </div>
-        </section>
-
-        <section className="section fade-up project-explainer">
-          <div className="project-explainer-card">
-            <h2 className="section-title">{localizedProjectInfo.behindTitle}</h2>
-            <p className="project-lead">{localizedProjectInfo.behindLead}</p>
-            <div className="project-points">
-              <article className="project-point">
-                <h3>{localizedProjectInfo.p1Title}</h3>
-                <p>{localizedProjectInfo.p1Desc}</p>
-              </article>
-              <article className="project-point">
-                <h3>{localizedProjectInfo.p2Title}</h3>
-                <p>{localizedProjectInfo.p2Desc}</p>
-              </article>
-              <article className="project-point">
-                <h3>{localizedProjectInfo.p3Title}</h3>
-                <p>{localizedProjectInfo.p3Desc}</p>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section className="section fade-up workflow-section">
-          <h2 className="section-title">{localizedProjectInfo.workflowTitle}</h2>
-          <div className="workflow-grid">
-            <div className="card workflow-card">
-              <span className="workflow-tag">{localizedProjectInfo.phase1}</span>
-              <h3>{localizedProjectInfo.phase1Title}</h3>
-              <p>{localizedProjectInfo.phase1Desc}</p>
-            </div>
-            <div className="card workflow-card">
-              <span className="workflow-tag">{localizedProjectInfo.phase2}</span>
-              <h3>{localizedProjectInfo.phase2Title}</h3>
-              <p>{localizedProjectInfo.phase2Desc}</p>
-            </div>
-            <div className="card workflow-card">
-              <span className="workflow-tag">{localizedProjectInfo.phase3}</span>
-              <h3>{localizedProjectInfo.phase3Title}</h3>
-              <p>{localizedProjectInfo.phase3Desc}</p>
-            </div>
-            <div className="card workflow-card">
-              <span className="workflow-tag">{localizedProjectInfo.phase4}</span>
-              <h3>{localizedProjectInfo.phase4Title}</h3>
-              <p>{localizedProjectInfo.phase4Desc}</p>
-            </div>
-          </div>
-        </section>
-
         <section className="section fade-up" style={{ marginTop: "4rem" }}>
           <h2 className="section-title">{conversionContent.trustTitle}</h2>
           <p className="trust-lead">{conversionContent.trustLead}</p>
+          <p className="trust-case-proof">{conversionUi.caseProof}</p>
           <div className="grid">
             {conversionContent.proofCases.map((item) => (
               <article key={item.name} className="card trust-card">
+                <span className="trust-badge">{conversionUi.verified}</span>
                 <h3>{item.name}</h3>
                 <p className="trust-role">{item.role}</p>
                 <p className="trust-outcome">{item.outcome}</p>
@@ -661,7 +685,7 @@ export default function HomePage() {
         <section className="section fade-up">
           <div className="card pricing-perception-card">
             <h2 className="section-title">{conversionContent.priceTitle}</h2>
-            <p>{conversionContent.priceDesc}</p>
+            <p>{conversionUi.priceValue}</p>
           </div>
         </section>
       </div>
