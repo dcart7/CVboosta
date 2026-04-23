@@ -336,6 +336,32 @@ export const translations = {
       passwordRuleLen: "At least 10 characters",
       passwordRuleNumber: "At least 1 number",
       passwordRuleSymbol: "At least 1 symbol (!@#$...)",
+      forgotPassword: "Forgot password?",
+      forgotPasswordTitle: "Forgot your password?",
+      forgotPasswordSubtitle:
+        "Enter your email and we'll send you a secure reset link.",
+      sendResetLink: "Send reset link",
+      sendingResetLink: "Sending...",
+      resetEmailSent:
+        "If this email exists, we've sent a password reset link. Check your inbox.",
+      checkInbox: "Check your inbox",
+      checkInboxDesc:
+        "The message comes from support@virelsolutions.com. It may take up to a few minutes.",
+      backToLogin: "Back to login",
+      resetRequestFailed: "Could not request reset link.",
+      resetPasswordTitle: "Set a new password",
+      resetPasswordSubtitle:
+        "Create a new password for your account using the secure reset link.",
+      newPassword: "New password",
+      passwordsDoNotMatch: "Passwords do not match.",
+      invalidResetLink: "Invalid or expired reset link.",
+      resetPasswordFailed: "Could not reset password.",
+      passwordResetSuccess: "Password updated. Redirecting to login...",
+      updatingPassword: "Updating...",
+      resetPasswordCta: "Update password",
+      securityFirst: "Security first",
+      securityFirstDesc:
+        "Reset links expire quickly and can be used only while your old password is unchanged.",
     },
     account: {
       title: "Account",
@@ -852,6 +878,32 @@ export const translations = {
       passwordRuleLen: "Щонайменше 10 символів",
       passwordRuleNumber: "Щонайменше 1 цифра",
       passwordRuleSymbol: "Щонайменше 1 спецсимвол (!@#$...)",
+      forgotPassword: "Забули пароль?",
+      forgotPasswordTitle: "Забули пароль?",
+      forgotPasswordSubtitle:
+        "Вкажіть email, і ми надішлемо безпечне посилання для скидання.",
+      sendResetLink: "Надіслати посилання",
+      sendingResetLink: "Надсилання...",
+      resetEmailSent:
+        "Якщо такий email існує, ми надіслали посилання для скидання. Перевірте пошту.",
+      checkInbox: "Перевірте пошту",
+      checkInboxDesc:
+        "Лист надходить з support@virelsolutions.com. Це може зайняти кілька хвилин.",
+      backToLogin: "Назад до входу",
+      resetRequestFailed: "Не вдалося надіслати посилання для скидання.",
+      resetPasswordTitle: "Створіть новий пароль",
+      resetPasswordSubtitle:
+        "Створіть новий пароль для акаунта через безпечне посилання.",
+      newPassword: "Новий пароль",
+      passwordsDoNotMatch: "Паролі не збігаються.",
+      invalidResetLink: "Недійсне або прострочене посилання.",
+      resetPasswordFailed: "Не вдалося скинути пароль.",
+      passwordResetSuccess: "Пароль оновлено. Переадресація на вхід...",
+      updatingPassword: "Оновлення...",
+      resetPasswordCta: "Оновити пароль",
+      securityFirst: "Безпека перш за все",
+      securityFirstDesc:
+        "Посилання швидко спливає і працює лише поки старий пароль не змінено.",
     },
     account: {
       title: "Акаунт",
@@ -1360,6 +1412,32 @@ export const translations = {
       passwordRuleLen: "Co najmniej 10 znaków",
       passwordRuleNumber: "Co najmniej 1 cyfra",
       passwordRuleSymbol: "Co najmniej 1 znak specjalny (!@#$...)",
+      forgotPassword: "Nie pamiętasz hasła?",
+      forgotPasswordTitle: "Nie pamiętasz hasła?",
+      forgotPasswordSubtitle:
+        "Podaj email, a wyślemy bezpieczny link do resetu hasła.",
+      sendResetLink: "Wyślij link resetujący",
+      sendingResetLink: "Wysyłanie...",
+      resetEmailSent:
+        "Jeśli email istnieje, wysłaliśmy link do resetu hasła. Sprawdź skrzynkę.",
+      checkInbox: "Sprawdź skrzynkę",
+      checkInboxDesc:
+        "Wiadomość przyjdzie z support@virelsolutions.com. Może to potrwać kilka minut.",
+      backToLogin: "Powrót do logowania",
+      resetRequestFailed: "Nie udało się wysłać linku resetującego.",
+      resetPasswordTitle: "Ustaw nowe hasło",
+      resetPasswordSubtitle:
+        "Ustaw nowe hasło do konta, korzystając z bezpiecznego linku.",
+      newPassword: "Nowe hasło",
+      passwordsDoNotMatch: "Hasła nie są takie same.",
+      invalidResetLink: "Nieprawidłowy lub wygasły link resetujący.",
+      resetPasswordFailed: "Nie udało się zresetować hasła.",
+      passwordResetSuccess: "Hasło zaktualizowane. Przekierowanie do logowania...",
+      updatingPassword: "Aktualizacja...",
+      resetPasswordCta: "Zaktualizuj hasło",
+      securityFirst: "Bezpieczeństwo przede wszystkim",
+      securityFirstDesc:
+        "Link resetujący szybko wygasa i działa tylko, gdy stare hasło nie zostało jeszcze zmienione.",
     },
     account: {
       title: "Konto",
@@ -1863,6 +1941,32 @@ export const translations = {
       passwordRuleLen: "Aspoň 10 znakov",
       passwordRuleNumber: "Aspoň 1 číslo",
       passwordRuleSymbol: "Aspoň 1 špeciálny znak (!@#$...)",
+      forgotPassword: "Zabudli ste heslo?",
+      forgotPasswordTitle: "Zabudli ste heslo?",
+      forgotPasswordSubtitle:
+        "Zadajte email a pošleme vám bezpečný odkaz na reset hesla.",
+      sendResetLink: "Poslať odkaz na reset",
+      sendingResetLink: "Odosiela sa...",
+      resetEmailSent:
+        "Ak email existuje, poslali sme odkaz na reset hesla. Skontrolujte schránku.",
+      checkInbox: "Skontrolujte schránku",
+      checkInboxDesc:
+        "Správa príde z support@virelsolutions.com. Môže to trvať pár minút.",
+      backToLogin: "Späť na prihlásenie",
+      resetRequestFailed: "Nepodarilo sa odoslať odkaz na reset.",
+      resetPasswordTitle: "Nastavte nové heslo",
+      resetPasswordSubtitle:
+        "Nastavte nové heslo pre účet pomocou bezpečného odkazu.",
+      newPassword: "Nové heslo",
+      passwordsDoNotMatch: "Heslá sa nezhodujú.",
+      invalidResetLink: "Neplatný alebo expirovaný odkaz.",
+      resetPasswordFailed: "Nepodarilo sa resetovať heslo.",
+      passwordResetSuccess: "Heslo je aktualizované. Presmerovanie na prihlásenie...",
+      updatingPassword: "Aktualizácia...",
+      resetPasswordCta: "Aktualizovať heslo",
+      securityFirst: "Bezpečnosť na prvom mieste",
+      securityFirstDesc:
+        "Reset odkaz rýchlo expiruje a funguje len dovtedy, kým sa staré heslo nezmení.",
     },
     account: {
       title: "Účet",
@@ -2380,6 +2484,32 @@ export const translations = {
       passwordRuleLen: "Alespoň 10 znaků",
       passwordRuleNumber: "Alespoň 1 číslo",
       passwordRuleSymbol: "Alespoň 1 speciální znak (!@#$...)",
+      forgotPassword: "Zapomněli jste heslo?",
+      forgotPasswordTitle: "Zapomněli jste heslo?",
+      forgotPasswordSubtitle:
+        "Zadejte email a pošleme vám bezpečný odkaz pro reset hesla.",
+      sendResetLink: "Odeslat odkaz pro reset",
+      sendingResetLink: "Odesílání...",
+      resetEmailSent:
+        "Pokud email existuje, poslali jsme odkaz pro reset hesla. Zkontrolujte schránku.",
+      checkInbox: "Zkontrolujte schránku",
+      checkInboxDesc:
+        "Zpráva přijde z support@virelsolutions.com. Může to trvat pár minut.",
+      backToLogin: "Zpět na přihlášení",
+      resetRequestFailed: "Nepodařilo se odeslat odkaz pro reset.",
+      resetPasswordTitle: "Nastavte nové heslo",
+      resetPasswordSubtitle:
+        "Nastavte nové heslo k účtu pomocí bezpečného odkazu.",
+      newPassword: "Nové heslo",
+      passwordsDoNotMatch: "Hesla se neshodují.",
+      invalidResetLink: "Neplatný nebo vypršený odkaz.",
+      resetPasswordFailed: "Nepodařilo se resetovat heslo.",
+      passwordResetSuccess: "Heslo aktualizováno. Přesměrování na přihlášení...",
+      updatingPassword: "Aktualizace...",
+      resetPasswordCta: "Aktualizovat heslo",
+      securityFirst: "Bezpečnost na prvním místě",
+      securityFirstDesc:
+        "Resetovací odkaz rychle vyprší a funguje jen dokud není změněno staré heslo.",
     },
     account: {
       title: "Účet",
@@ -2889,6 +3019,32 @@ export const translations = {
       passwordRuleLen: "Al menos 10 caracteres",
       passwordRuleNumber: "Al menos 1 número",
       passwordRuleSymbol: "Al menos 1 símbolo (!@#$...)",
+      forgotPassword: "¿Olvidaste tu contraseña?",
+      forgotPasswordTitle: "¿Olvidaste tu contraseña?",
+      forgotPasswordSubtitle:
+        "Introduce tu email y te enviaremos un enlace seguro para restablecerla.",
+      sendResetLink: "Enviar enlace",
+      sendingResetLink: "Enviando...",
+      resetEmailSent:
+        "Si el email existe, enviamos un enlace para restablecer la contraseña. Revisa tu bandeja.",
+      checkInbox: "Revisa tu bandeja",
+      checkInboxDesc:
+        "El mensaje llega desde support@virelsolutions.com. Puede tardar unos minutos.",
+      backToLogin: "Volver al login",
+      resetRequestFailed: "No se pudo solicitar el enlace de restablecimiento.",
+      resetPasswordTitle: "Crear nueva contraseña",
+      resetPasswordSubtitle:
+        "Crea una nueva contraseña usando el enlace seguro de restablecimiento.",
+      newPassword: "Nueva contraseña",
+      passwordsDoNotMatch: "Las contraseñas no coinciden.",
+      invalidResetLink: "Enlace inválido o vencido.",
+      resetPasswordFailed: "No se pudo restablecer la contraseña.",
+      passwordResetSuccess: "Contraseña actualizada. Redirigiendo al login...",
+      updatingPassword: "Actualizando...",
+      resetPasswordCta: "Actualizar contraseña",
+      securityFirst: "Seguridad primero",
+      securityFirstDesc:
+        "Los enlaces de restablecimiento vencen rápido y solo sirven mientras la contraseña anterior no cambie.",
     },
     account: {
       title: "Cuenta",

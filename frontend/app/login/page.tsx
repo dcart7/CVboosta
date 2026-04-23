@@ -139,6 +139,11 @@ export default function LoginPage() {
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
+              <div style={{ marginTop: 8 }}>
+                <Link href="/forgot-password" style={{ fontSize: 13, color: "var(--accent)" }}>
+                  {t("auth.forgotPassword")}
+                </Link>
+              </div>
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
             <button className="btn primary" type="button" onClick={submit}>

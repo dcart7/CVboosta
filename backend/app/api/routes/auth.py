@@ -11,18 +11,24 @@ from app.schemas.auth import (
     ActivityResponse,
     AuthResponse,
     ChangePasswordRequest,
+    ForgotPasswordRequest,
     LoginRequest,
     RegisterRequest,
+    ResetPasswordRequest,
     UserResponse,
 )
 from app.services.auth import (
     create_access_token,
+    create_password_reset_token,
     decode_access_token,
+    decode_password_reset_token,
     hash_password,
+    validate_password_reset_token_for_user,
     verify_password,
 )
 from app.services.activity_logger import record_activity
 from app.models.activity import ActivityLog
+from app.services.emailer import build_password_reset_link, send_password_reset_email
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -117,6 +123,59 @@ def change_password(
     db.add(current_user)
     db.commit()
     record_activity(db, user_id=current_user.id, action="Password updated", meta={})
+    return {"status": "ok"}
+
+
+@router.post("/auth/forgot-password")
+def forgot_password(
+    payload: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+) -> dict:
+    # Always return the same response to prevent email enumeration.
+    response = {"status": "ok", "message": "If this email exists, reset instructions were sent."}
+    user = db.query(User).filter(User.email == payload.email.lower().strip()).first()
+    if not user:
+        return response
+
+    try:
+        token = create_password_reset_token(user)
+        reset_link = build_password_reset_link(token)
+        if reset_link:
+            send_password_reset_email(to_email=user.email, reset_link=reset_link)
+            record_activity(db, user_id=user.id, action="Password reset requested", meta={})
+    except Exception:
+        # Keep response generic to avoid account/email leaks.
+        return response
+    return response
+
+
+@router.post("/auth/reset-password")
+def reset_password(
+    payload: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        token_payload = decode_password_reset_token(payload.token)
+        user_id = int(str(token_payload.get("sub", "0")))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link.") from exc
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link.")
+
+    try:
+        validate_password_reset_token_for_user(token_payload, user)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link.") from exc
+
+    if verify_password(payload.new_password, user.password_hash):
+        raise HTTPException(status_code=400, detail="New password must be different.")
+
+    user.password_hash = hash_password(payload.new_password)
+    db.add(user)
+    db.commit()
+    record_activity(db, user_id=user.id, action="Password reset completed", meta={})
     return {"status": "ok"}
 
 

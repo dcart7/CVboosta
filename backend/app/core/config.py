@@ -65,6 +65,15 @@ class Settings(BaseSettings):
     stripe_price_pro_weekly: str | None = None
     stripe_price_pro_monthly: str | None = None
     stripe_price_lifetime: str | None = None
+    password_reset_exp_minutes: int = 30
+    password_reset_frontend_url: str | None = None
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_use_tls: bool = True
+    smtp_use_ssl: bool = False
+    smtp_from_email: str = "support@virelsolutions.com"
 
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",
