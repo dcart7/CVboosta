@@ -42,20 +42,20 @@ export default function Footer() {
             </div>
             <div className="footer-social-row">
               <a
-                href="https://www.linkedin.com/company/virel-solutions/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-social-link"
-              >
-                {t("footer.linkedin")}
-              </a>
-              <a
                 href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="footer-social-link"
+                className="footer-social-btn"
               >
                 {t("footer.productHunt")}
+              </a>
+              <a
+                href="https://www.linkedin.com/company/virel-solutions/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-social-btn"
+              >
+                {t("footer.linkedin")}
               </a>
             </div>
           </div>
@@ -106,17 +106,31 @@ export default function Footer() {
           width: min(320px, 100%);
           gap: 16px;
         }
-        .footer-social-link {
-          font-size: 14px;
-          font-weight: 600;
+        .footer-social-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 40px;
+          padding: 8px 14px;
+          border-radius: 12px;
+          border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--glass-border));
+          background:
+            linear-gradient(140deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.08) 62%, rgba(255, 255, 255, 0.04)),
+            color-mix(in srgb, var(--surface) 80%, transparent);
+          box-shadow:
+            0 8px 20px rgba(15, 23, 42, 0.08),
+            0 1px 0 rgba(255, 255, 255, 0.3) inset;
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.01em;
           color: var(--accent);
           text-decoration: none;
-          transition: opacity 0.2s ease, transform 0.2s ease;
+          transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
         }
-        .footer-social-link:hover {
-          opacity: 0.86;
+        .footer-social-btn:hover {
+          border-color: color-mix(in srgb, var(--accent) 56%, var(--glass-border));
+          opacity: 0.92;
           transform: translateY(-1px);
-          text-decoration: underline;
         }
         .footer-right {
           display: flex;

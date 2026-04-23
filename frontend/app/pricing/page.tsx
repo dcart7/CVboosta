@@ -21,13 +21,27 @@ const CheckIcon = ({ className }: { className?: string }) => (
 );
 
 export default function PricingPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const router = useRouter();
   const apiBase = getApiBase();
   const [billingCycle, setBillingCycle] = useState<"week" | "month">("month");
   const [mounted, setMounted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [activeTier, setActiveTier] = useState<string | null>(null);
+  const tierRank: Record<string, number> = {
+    single: 1,
+    go: 2,
+    pro: 3,
+    lifetime: 4,
+  };
+  const pricingUiCopy = {
+    en: { notUpgrade: "Not an upgrade" },
+    uk: { notUpgrade: "Не є апгрейдом" },
+    pl: { notUpgrade: "To nie upgrade" },
+    sk: { notUpgrade: "Nie je to upgrade" },
+    cs: { notUpgrade: "Není to upgrade" },
+    es: { notUpgrade: "No es una mejora" },
+  } as const;
 
   useEffect(() => {
     setMounted(true);
@@ -203,6 +217,14 @@ export default function PricingPage() {
                 (tier.id === "go" && activeTier === "go") ||
                 (tier.id === "pro" && activeTier === "pro") ||
                 (tier.id === "lifetime" && activeTier === "lifetime");
+              const activeRank = activeTier && tierRank[activeTier] ? tierRank[activeTier] : 0;
+              const isUpgrade = activeRank === 0 || tierRank[tier.id] > activeRank;
+              const canCheckout = !isActive && isUpgrade;
+              const ctaLabel = isActive
+                ? t("pricing.activePlan")
+                : isUpgrade
+                ? tier.cta
+                : pricingUiCopy[language].notUpgrade;
               return (
             <div 
               key={tier.id}
@@ -239,11 +261,14 @@ export default function PricingPage() {
               </ul>
 
               <button
-                onClick={() => openCheckout(tier.id)}
-                className="cta-button"
-                disabled={checkoutLoading === tier.id}
+                onClick={() => {
+                  if (!canCheckout) return;
+                  openCheckout(tier.id);
+                }}
+                className={`cta-button ${!canCheckout ? "is-disabled" : ""}`}
+                disabled={checkoutLoading === tier.id || !canCheckout}
               >
-                {checkoutLoading === tier.id ? "Redirecting..." : tier.cta}
+                {checkoutLoading === tier.id ? "Redirecting..." : ctaLabel}
               </button>
             </div>
             );
@@ -509,6 +534,18 @@ export default function PricingPage() {
         .cta-button:hover {
           transform: scale(1.02);
           opacity: 0.9;
+        }
+        .cta-button.is-disabled,
+        .cta-button:disabled {
+          cursor: not-allowed;
+          opacity: 0.62;
+          transform: none !important;
+          filter: grayscale(0.1);
+        }
+        .cta-button.is-disabled:hover,
+        .cta-button:disabled:hover {
+          transform: none;
+          opacity: 0.62;
         }
 
         .premium {
