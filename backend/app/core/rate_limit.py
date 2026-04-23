@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+import ipaddress
 from threading import Lock
 from time import monotonic
 
@@ -44,21 +45,48 @@ _rate_limiter = RateLimiter(
 
 
 def _client_ip(request: Request) -> str:
-    # Prefer secure headers populated by reverse proxies like Nginx/Cloudflare
-    for header in ["cf-connecting-ip", "x-real-ip", "true-client-ip"]:
-        val = request.headers.get(header)
+    remote_host = request.client.host if request.client and request.client.host else "unknown"
+
+    trusted_proxies = {ip.strip() for ip in settings.trusted_proxy_ips if ip.strip()}
+    trust_all = "*" in trusted_proxies
+
+    is_trusted_proxy = trust_all or remote_host in trusted_proxies
+    if not is_trusted_proxy:
+        try:
+            remote_ip = ipaddress.ip_address(remote_host)
+            for cidr in settings.trusted_proxy_cidrs:
+                try:
+                    if remote_ip in ipaddress.ip_network(cidr, strict=False):
+                        is_trusted_proxy = True
+                        break
+                except ValueError:
+                    continue
+        except ValueError:
+            pass
+
+    # Trust proxy-provided client IP only when the immediate peer is trusted.
+    if is_trusted_proxy:
+        forwarded_for = request.headers.get("x-forwarded-for")
+        if forwarded_for:
+            ips = [ip.strip() for ip in forwarded_for.split(",") if ip.strip()]
+            if ips:
+                # Leftmost is the original client, right side are proxy hops.
+                return ips[0]
+
+        val = request.headers.get("x-real-ip")
         if val:
             return val.strip()
 
-    forwarded_for = request.headers.get("x-forwarded-for")
-    if forwarded_for:
-        ips = [ip.strip() for ip in forwarded_for.split(",") if ip.strip()]
-        if ips:
-            # Taking the rightmost IP as it is the one appended by the proxy closest to our server
-            return ips[-1]
+        val = request.headers.get("cf-connecting-ip")
+        if val:
+            return val.strip()
 
-    if request.client and request.client.host:
-        return request.client.host
+        val = request.headers.get("true-client-ip")
+        if val:
+            return val.strip()
+
+    if remote_host:
+        return remote_host
     return "unknown"
 
 

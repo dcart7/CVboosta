@@ -29,6 +29,21 @@ class StripeCheckoutRequest(BaseModel):
     cancel_url: str | None = None
 
 
+def _safe_checkout_redirect_url(
+    candidate_url: str | None,
+    *,
+    origin: str,
+    fallback_url: str,
+) -> str:
+    value = (candidate_url or "").strip()
+    if not value:
+        return fallback_url
+    # Prevent open redirect abuse: only allow same-origin redirects.
+    if value.startswith(origin):
+        return value
+    return fallback_url
+
+
 def _stripe_to_dict(value: Any) -> dict[str, Any]:
     if isinstance(value, dict):
         return value
@@ -281,8 +296,10 @@ def create_stripe_checkout_session(
 
     price_id, mode = _resolve_stripe_price_for_checkout(payload.tier, payload.billing_cycle)
     origin = f"{request.url.scheme}://{request.url.netloc}"
-    success_url = payload.success_url or f"{origin}/account?billing=success&session_id={{CHECKOUT_SESSION_ID}}"
-    cancel_url = payload.cancel_url or f"{origin}/pricing?billing=cancel"
+    success_fallback = f"{origin}/account?billing=success&session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_fallback = f"{origin}/pricing?billing=cancel"
+    success_url = _safe_checkout_redirect_url(payload.success_url, origin=origin, fallback_url=success_fallback)
+    cancel_url = _safe_checkout_redirect_url(payload.cancel_url, origin=origin, fallback_url=cancel_fallback)
 
     metadata = {
         "user_id": str(current_user.id),
@@ -305,7 +322,7 @@ def create_stripe_checkout_session(
             session_params["subscription_data"] = {"metadata": metadata}
         checkout_session = stripe.checkout.Session.create(**session_params)
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Stripe checkout error: {exc}") from exc
+        raise HTTPException(status_code=500, detail="Stripe checkout failed. Please try again.") from exc
 
     return {"checkout_url": checkout_session.url, "session_id": checkout_session.id}
 
@@ -324,7 +341,7 @@ def cancel_stripe_subscription(
     try:
         current = stripe.Subscription.retrieve(current_user.paddle_subscription_id)
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Unable to load subscription: {exc}") from exc
+        raise HTTPException(status_code=400, detail="Unable to load subscription.") from exc
 
     current_data = _stripe_to_dict(current)
     status = str(current_data.get("status") or "").lower()
@@ -348,7 +365,7 @@ def cancel_stripe_subscription(
                 cancel_at_period_end=True,
             )
         except Exception as exc:
-            raise HTTPException(status_code=400, detail=f"Unable to cancel subscription: {exc}") from exc
+            raise HTTPException(status_code=400, detail="Unable to cancel subscription.") from exc
 
     updated_data = _stripe_to_dict(updated)
     period_end_dt = _from_unix_ts(updated_data.get("current_period_end"))
@@ -384,7 +401,7 @@ def finalize_stripe_checkout_session(
             expand=["line_items.data.price"],
         )
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Unable to load checkout session: {exc}") from exc
+        raise HTTPException(status_code=400, detail="Unable to load checkout session.") from exc
 
     checkout = _stripe_to_dict(checkout_raw)
     payment_status = str(checkout.get("payment_status") or "").lower()
@@ -395,6 +412,13 @@ def finalize_stripe_checkout_session(
     checkout_email = str((checkout.get("customer_details") or {}).get("email") or "").strip().lower()
     metadata_email = str(metadata.get("email") or "").strip().lower()
     if checkout_email and checkout_email != current_user.email.lower() and metadata_email != current_user.email.lower():
+        raise HTTPException(status_code=403, detail="This checkout session does not belong to current user.")
+    ref_user_id = str(checkout.get("client_reference_id") or "").strip()
+    metadata_user_id = str(metadata.get("user_id") or "").strip()
+    current_user_id = str(current_user.id)
+    if ref_user_id and ref_user_id != current_user_id:
+        raise HTTPException(status_code=403, detail="This checkout session does not belong to current user.")
+    if metadata_user_id and metadata_user_id != current_user_id:
         raise HTTPException(status_code=403, detail="This checkout session does not belong to current user.")
 
     tier = str(metadata.get("tier") or "").strip().lower()

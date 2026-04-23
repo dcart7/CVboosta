@@ -9,11 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "jspdf": "^2.5.2",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "@vercel/analytics": "latest"
+    "@vercel/analytics": "2.0.1",
+    "jspdf": "4.2.1",
+    "next": "16.2.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@types/node": "25.5.2",

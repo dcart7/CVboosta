@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
@@ -27,6 +27,7 @@ const CATEGORY_ORDER: RoleCategory[] = [
   "education",
   "security",
 ];
+const PAGE_SIZE = 72;
 
 export default function ResumeKeywordsHubClient({ clusters }: Props) {
   const { language } = useTranslation();
@@ -34,6 +35,7 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"all" | RoleCategory>("all");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const localizedClusters = useMemo(
     () =>
       clusters.map((item) => ({
@@ -51,13 +53,32 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
       .sort((a, b) => a.role.localeCompare(b.role));
   }, [localizedClusters, query, category]);
 
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [query, category]);
+
+  const visibleFiltered = useMemo(
+    () => filtered.slice(0, visibleCount),
+    [filtered, visibleCount],
+  );
+
   const grouped = useMemo(() => {
     return CATEGORY_ORDER.map((cat) => ({
       category: cat,
       label: getSectorLabel(language, cat),
-      items: filtered.filter((item) => item.category === cat),
+      items: visibleFiltered.filter((item) => item.category === cat),
     })).filter((group) => group.items.length > 0);
-  }, [filtered, language]);
+  }, [visibleFiltered, language]);
+
+  const hasMore = filtered.length > visibleCount;
+  const loadMoreLabel = {
+    en: "Load more roles",
+    uk: "Показати більше ролей",
+    pl: "Pokaż więcej ról",
+    sk: "Zobraziť viac rolí",
+    cs: "Zobrazit více rolí",
+    es: "Ver más roles",
+  }[language];
 
   return (
     <main className="page">
@@ -122,25 +143,38 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
               <p>{ui.checkSpelling}</p>
             </div>
           ) : (
-            grouped.map((group) => (
-              <div key={group.category} className="rk-category-block">
-                <h3 className="rk-category-title">{group.label}</h3>
-                <div className="grid rk-role-grid">
-                  {group.items.map((cluster) => (
-                    <article key={cluster.slug} className="card rk-role-card">
-                      <p className="rk-role-card-kicker">{ui.roleGuideKicker}</p>
-                      <h3 className="rk-role-card-title">{cluster.role}</h3>
-                      <p className="rk-role-card-copy">
-                        {ui.hubSubtitle}
-                      </p>
-                      <Link className="btn ghost rk-role-card-btn" href={`/resume-keywords/${cluster.slug}`}>
-                        {ui.openGuide}
-                      </Link>
-                    </article>
-                  ))}
+            <>
+              {grouped.map((group) => (
+                <div key={group.category} className="rk-category-block">
+                  <h3 className="rk-category-title">{group.label}</h3>
+                  <div className="grid rk-role-grid">
+                    {group.items.map((cluster) => (
+                      <article key={cluster.slug} className="rk-role-card">
+                        <p className="rk-role-card-kicker">{ui.roleGuideKicker}</p>
+                        <h3 className="rk-role-card-title">{cluster.role}</h3>
+                        <p className="rk-role-card-copy">
+                          {ui.hubSubtitle}
+                        </p>
+                        <Link className="btn ghost rk-role-card-btn" href={`/resume-keywords/${cluster.slug}`}>
+                          {ui.openGuide}
+                        </Link>
+                      </article>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+              {hasMore && (
+                <div className="rk-load-more-wrap">
+                  <button
+                    type="button"
+                    className="btn primary"
+                    onClick={() => setVisibleCount((value) => value + PAGE_SIZE)}
+                  >
+                    {loadMoreLabel}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </div>
