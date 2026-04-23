@@ -161,8 +161,7 @@ export default function Footer() {
         .logo-text {
           display: inline-flex;
           align-items: center;
-          line-height: 1.05;
-          transform: translateY(-2px);
+          line-height: 1;
           color: var(--ink);
         }
         .logo-text span {
