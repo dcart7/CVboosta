@@ -174,6 +174,7 @@ export default function TopNav() {
         </div>
       </div>
       </header>
+      <div className="nav-spacer" aria-hidden="true" />
 
       {/* Mobile Menu Overlay — Glass Shutter */}
       {isMenuOpen && (
