@@ -1,6 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap");
+
 :root {
   color-scheme: light;
-  font-family: var(--font-manrope), "Helvetica Neue", sans-serif;
+  font-family: "Manrope", "Helvetica Neue", sans-serif;
   background: #f6f6f4;
   color: #111111;
   --ink: #0c0c0e;
@@ -490,7 +492,7 @@ a {
   overflow: hidden;
   display: grid;
   gap: 6px;
-  font-family: var(--font-manrope), "Helvetica Neue", sans-serif;
+  font-family: "Manrope", "Helvetica Neue", sans-serif;
 }
 
 .pdf-preview-empty {
@@ -564,7 +566,7 @@ a {
   --pdf-accent: #0a84ff;
   --pdf-bar-bg: #080b12;
   --pdf-bar-line: #0a84ff;
-  font-family: var(--font-playfair), "Times New Roman", serif;
+  font-family: "Playfair Display", "Times New Roman", serif;
   padding-top: 72px;
   position: relative;
 }
@@ -588,7 +590,7 @@ a {
 }
 
 .pdf-preview.template-classic {
-  font-family: var(--font-playfair), "Times New Roman", serif;
+  font-family: "Playfair Display", "Times New Roman", serif;
 }
 .pdf-preview.template-classic .pdf-heading,
 .pdf-preview.template-classic .pdf-bullet-dot {
@@ -620,7 +622,7 @@ a {
   --pdf-accent: #63a6ff;
   --pdf-bar-bg: #080b12;
   --pdf-bar-line: #63a6ff;
-  font-family: var(--font-manrope), "Helvetica Neue", sans-serif;
+  font-family: "Manrope", "Helvetica Neue", sans-serif;
   padding-top: 72px;
   position: relative;
 }
@@ -651,7 +653,7 @@ a {
 
 .pdf-preview.template-serif {
   --pdf-accent: #1e3a8a;
-  font-family: var(--font-playfair), "Times New Roman", serif;
+  font-family: "Playfair Display", "Times New Roman", serif;
 }
 
 .pdf-preview.template-timeline {
@@ -835,7 +837,7 @@ a {
 }
 
 .hero-title {
-  font-family: var(--font-playfair), serif;
+  font-family: "Playfair Display", serif;
   font-size: clamp(36px, 6vw, 64px);
   letter-spacing: -0.02em;
   margin: 0 0 16px;
@@ -1449,7 +1451,7 @@ a {
   color: var(--result-ink);
   border-radius: 22px;
   padding: 24px;
-  font-family: var(--font-manrope), sans-serif;
+  font-family: "Manrope", sans-serif;
   max-height: 190px;
   overflow: hidden;
 }
