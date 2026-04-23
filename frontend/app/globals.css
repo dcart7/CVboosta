@@ -956,6 +956,14 @@ a {
   font-size: 14px;
 }
 
+.kpi-proof-note {
+  margin: 18px 4px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 760px;
+}
+
 .section {
   margin-top: 48px;
 }
@@ -1157,6 +1165,66 @@ a {
   margin: 0;
   color: var(--muted);
   font-size: 14px;
+}
+
+.before-after-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.before-after-card p {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.before-after-impact {
+  margin-top: 16px;
+}
+
+.before-after-impact ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+
+.before-after-impact li {
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.trust-lead {
+  margin: -8px 0 18px;
+  color: var(--muted);
+  max-width: 780px;
+  line-height: 1.6;
+}
+
+.trust-card {
+  display: grid;
+  gap: 8px;
+}
+
+.trust-role {
+  font-size: 13px !important;
+  opacity: 0.8;
+}
+
+.trust-outcome {
+  color: var(--ink) !important;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.trust-note {
+  font-size: 12px !important;
+  opacity: 0.78;
+}
+
+.pricing-perception-card .section-title {
+  margin-bottom: 12px;
 }
 
 .steps {

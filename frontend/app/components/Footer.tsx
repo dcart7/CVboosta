@@ -56,6 +56,22 @@ export default function Footer() {
               <Link href="/resume-keywords" className="footer-link">
                 {t("footer.resumeKeywords")}
               </Link>
+              <a
+                href="https://www.linkedin.com/company/virel-solutions/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+              >
+                LinkedIn
+              </a>
+              <a
+                href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+              >
+                Product Hunt
+              </a>
             </div>
           </div>
         </div>

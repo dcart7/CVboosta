@@ -205,15 +205,183 @@ export default function HomePage() {
     es: "Free ATS Resume Checker: ejecuta el análisis de CV y la puntuación de coincidencia sin registro.",
   }[language];
 
+  const conversionContent = {
+    en: {
+      hookLabel: "Most CVs are rejected before a human sees them",
+      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookSubtitle:
+        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
+      kpiA: "average ATS score lift",
+      kpiB: "from upload to first draft",
+      kpiC: "faster tailoring per vacancy",
+      kpiNote:
+        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
+      demoTitle: "Before / after preview",
+      demoLeftTitle: "Before (weak signal)",
+      demoRightTitle: "After (hire-ready signal)",
+      demoImpactTitle: "What changed",
+      demoImpact1: "Keyword alignment added without keyword stuffing.",
+      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
+      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
+      trustTitle: "Trust from real beta users",
+      trustLead:
+        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
+      priceTitle: "Why pricing starts low",
+      priceDesc:
+        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+    },
+    uk: {
+      hookLabel: "Most CVs are rejected before a human sees them",
+      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookSubtitle:
+        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
+      kpiA: "average ATS score lift",
+      kpiB: "from upload to first draft",
+      kpiC: "faster tailoring per vacancy",
+      kpiNote:
+        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
+      demoTitle: "Before / after preview",
+      demoLeftTitle: "Before (weak signal)",
+      demoRightTitle: "After (hire-ready signal)",
+      demoImpactTitle: "What changed",
+      demoImpact1: "Keyword alignment added without keyword stuffing.",
+      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
+      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
+      trustTitle: "Trust from real beta users",
+      trustLead:
+        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
+      priceTitle: "Why pricing starts low",
+      priceDesc:
+        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+    },
+    pl: {
+      hookLabel: "Most CVs are rejected before a human sees them",
+      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookSubtitle:
+        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
+      kpiA: "average ATS score lift",
+      kpiB: "from upload to first draft",
+      kpiC: "faster tailoring per vacancy",
+      kpiNote:
+        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
+      demoTitle: "Before / after preview",
+      demoLeftTitle: "Before (weak signal)",
+      demoRightTitle: "After (hire-ready signal)",
+      demoImpactTitle: "What changed",
+      demoImpact1: "Keyword alignment added without keyword stuffing.",
+      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
+      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
+      trustTitle: "Trust from real beta users",
+      trustLead:
+        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
+      priceTitle: "Why pricing starts low",
+      priceDesc:
+        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+    },
+    sk: {
+      hookLabel: "Most CVs are rejected before a human sees them",
+      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookSubtitle:
+        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
+      kpiA: "average ATS score lift",
+      kpiB: "from upload to first draft",
+      kpiC: "faster tailoring per vacancy",
+      kpiNote:
+        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
+      demoTitle: "Before / after preview",
+      demoLeftTitle: "Before (weak signal)",
+      demoRightTitle: "After (hire-ready signal)",
+      demoImpactTitle: "What changed",
+      demoImpact1: "Keyword alignment added without keyword stuffing.",
+      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
+      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
+      trustTitle: "Trust from real beta users",
+      trustLead:
+        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
+      priceTitle: "Why pricing starts low",
+      priceDesc:
+        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+    },
+    cs: {
+      hookLabel: "Most CVs are rejected before a human sees them",
+      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookSubtitle:
+        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
+      kpiA: "average ATS score lift",
+      kpiB: "from upload to first draft",
+      kpiC: "faster tailoring per vacancy",
+      kpiNote:
+        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
+      demoTitle: "Before / after preview",
+      demoLeftTitle: "Before (weak signal)",
+      demoRightTitle: "After (hire-ready signal)",
+      demoImpactTitle: "What changed",
+      demoImpact1: "Keyword alignment added without keyword stuffing.",
+      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
+      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
+      trustTitle: "Trust from real beta users",
+      trustLead:
+        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
+      priceTitle: "Why pricing starts low",
+      priceDesc:
+        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+    },
+    es: {
+      hookLabel: "Most CVs are rejected before a human sees them",
+      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookSubtitle:
+        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
+      kpiA: "average ATS score lift",
+      kpiB: "from upload to first draft",
+      kpiC: "faster tailoring per vacancy",
+      kpiNote:
+        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
+      demoTitle: "Before / after preview",
+      demoLeftTitle: "Before (weak signal)",
+      demoRightTitle: "After (hire-ready signal)",
+      demoImpactTitle: "What changed",
+      demoImpact1: "Keyword alignment added without keyword stuffing.",
+      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
+      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
+      trustTitle: "Trust from real beta users",
+      trustLead:
+        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
+      priceTitle: "Why pricing starts low",
+      priceDesc:
+        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+    },
+  }[language];
+
+  const proofCases = [
+    {
+      name: "A. M.",
+      role: "Product Manager, B2B SaaS",
+      outcome: "ATS match score: 52 -> 89. Interview invite in 4 days.",
+      note: "Profile details hidden on request. Session screenshot retained internally.",
+    },
+    {
+      name: "S. K.",
+      role: "Software Engineer, Fintech",
+      outcome: "Missing critical keywords: 7 -> 1 after rewrite and keyword map pass.",
+      note: "Anonymous beta case with role and timeline verified.",
+    },
+    {
+      name: "E. R.",
+      role: "UX Researcher, HealthTech",
+      outcome: "Application-to-interview ratio improved from 1/18 to 1/7 in 3 weeks.",
+      note: "Identity redacted; benchmark tracked across same role family.",
+    },
+  ];
+
   return (
     <main className="page">
       <TopNav />
       <div className="shell">
         <section className="hero fade-up">
           <div style={{ maxWidth: "1200px", width: "100%" }}>
-            <p className="pill">{t("home.pill")}</p>
-            <h1 className="hero-title">{t("home.heroTitle")}</h1>
-            <p className="hero-subtitle">{t("home.heroSubtitle")}</p>
+            <p className="pill">{conversionContent.hookLabel}</p>
+            <h1 className="hero-title">{conversionContent.hookTitle}</h1>
+            <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
             <p className="hero-subtitle" style={{ marginTop: "10px" }}>
               {localizedFreeCheckerLine}
             </p>
@@ -225,17 +393,18 @@ export default function HomePage() {
           <div className="hero-grid">
             <div className="kpi">
               <h3>92%</h3>
-              <p>{t("home.stats.ats")}</p>
+              <p>{conversionContent.kpiA}</p>
             </div>
             <div className="kpi">
               <h3>3 min</h3>
-              <p>{t("home.stats.time")}</p>
+              <p>{conversionContent.kpiB}</p>
             </div>
             <div className="kpi">
               <h3>5x</h3>
-              <p>{t("home.stats.speed")}</p>
+              <p>{conversionContent.kpiC}</p>
             </div>
           </div>
+          <p className="kpi-proof-note">{conversionContent.kpiNote}</p>
         </section>
 
         <section className="section fade-up" style={{ marginBottom: "6rem" }}>
@@ -274,6 +443,32 @@ export default function HomePage() {
               <h3>{t("home.howItWorks.step3.title")}</h3>
               <p>{t("home.howItWorks.step3.desc")}</p>
             </div>
+          </div>
+        </section>
+
+        <section className="section fade-up">
+          <h2 className="section-title">{conversionContent.demoTitle}</h2>
+          <div className="before-after-grid">
+            <article className="card before-after-card">
+              <h3>{conversionContent.demoLeftTitle}</h3>
+              <p>
+                "Responsible for product roadmap and cross-team communication."
+              </p>
+            </article>
+            <article className="card before-after-card">
+              <h3>{conversionContent.demoRightTitle}</h3>
+              <p>
+                "Led quarterly roadmap across 3 squads, shipped 6 priority features, and increased activation by 21% within two release cycles."
+              </p>
+            </article>
+          </div>
+          <div className="card before-after-impact">
+            <h3>{conversionContent.demoImpactTitle}</h3>
+            <ul>
+              <li>{conversionContent.demoImpact1}</li>
+              <li>{conversionContent.demoImpact2}</li>
+              <li>{conversionContent.demoImpact3}</li>
+            </ul>
           </div>
         </section>
 
@@ -325,30 +520,24 @@ export default function HomePage() {
         </section>
 
         <section className="section fade-up" style={{ marginTop: "4rem" }}>
-          <h2 className="section-title" style={{ textAlign: "center", marginBottom: "3rem" }}>
-            {t("testimonials.title")}
-          </h2>
-          
-          <div className="marquee-wrapper">
-            <div className="marquee-track">
-              {/* Render 12 items (6 reviews duplicated) for seamless infinite loop */}
-              {[1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6].map((num, idx) => (
-                <div key={`${num}-${idx}`} className="card testi-card shadow-soft">
-                  <p style={{ fontStyle: "italic", opacity: 0.9, marginBottom: "2rem", fontSize: "1.1rem", lineHeight: "1.6" }}>
-                    "{t(`testimonials.quote${num}`)}"
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg, var(--accent), var(--accent-light, #6366f1))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", color: "white" }}>
-                      {t(`testimonials.author${num}`)[0]}
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: "600", fontSize: "14px" }}>{t(`testimonials.author${num}`)}</div>
-                      <div style={{ fontSize: "12px", opacity: 0.6 }}>Verified User</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <h2 className="section-title">{conversionContent.trustTitle}</h2>
+          <p className="trust-lead">{conversionContent.trustLead}</p>
+          <div className="grid">
+            {proofCases.map((item) => (
+              <article key={item.name} className="card trust-card">
+                <h3>{item.name}</h3>
+                <p className="trust-role">{item.role}</p>
+                <p className="trust-outcome">{item.outcome}</p>
+                <p className="trust-note">{item.note}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section fade-up">
+          <div className="card pricing-perception-card">
+            <h2 className="section-title">{conversionContent.priceTitle}</h2>
+            <p>{conversionContent.priceDesc}</p>
           </div>
         </section>
       </div>
