@@ -264,8 +264,8 @@ export default function AnalyzePage() {
               </>
             )}
             <div className="nav-actions">
-              <Link className="btn primary" href="/optimize">
-                {t("common.continue")}
+              <Link className="btn primary" href="/app">
+                {t("analyze.optimizeCvCta")}
               </Link>
               <Link className="btn ghost" href="/app">
                 {t("common.back")}

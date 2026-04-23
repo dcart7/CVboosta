@@ -167,6 +167,11 @@ export const translations = {
       target: "Target",
       roleNotSet: "Role not set",
       companyNotSet: "Company not set",
+      setupHint: "This is step 2. First upload CV and job description on the Analyze page.",
+      needInputs: "Upload CV and job description first.",
+      doneOpening: "Done. Opening results...",
+      optimizationFailed: "Optimization failed.",
+      backendUnavailable: "Cannot reach backend. Check that it is running.",
     },
     analyze: {
       title: "Analysis overview",
@@ -185,6 +190,7 @@ export const translations = {
       headline: "Headline",
       topSkills: "Top skills",
       experienceSignals: "Experience signals",
+      optimizeCvCta: "Optimize CV",
     },
     results: {
       optimizedCv: "Optimized CV",
@@ -673,6 +679,11 @@ export const translations = {
       target: "Ціль",
       roleNotSet: "Роль не задана",
       companyNotSet: "Компанія не задана",
+      setupHint: "Це крок 2. Спочатку завантажте резюме та опис вакансії на сторінці Аналіз.",
+      needInputs: "Спочатку завантажте резюме та опис вакансії.",
+      doneOpening: "Готово. Відкриваємо результати...",
+      optimizationFailed: "Оптимізація не вдалась.",
+      backendUnavailable: "Немає з'єднання з бекендом. Перевірте, що він запущений.",
     },
     analyze: {
       title: "Огляд аналізу",
@@ -691,6 +702,7 @@ export const translations = {
       headline: "Заголовок",
       topSkills: "Ключові навички",
       experienceSignals: "Сигнали досвіду",
+      optimizeCvCta: "Оптимізувати CV",
     },
     results: {
       optimizedCv: "Оптимізоване резюме",
@@ -1176,6 +1188,11 @@ export const translations = {
       target: "Cel",
       roleNotSet: "Rola nieustawiona",
       companyNotSet: "Firma nieustawiona",
+      setupHint: "To krok 2. Najpierw prześlij CV i opis stanowiska na stronie Analiza.",
+      needInputs: "Najpierw prześlij CV i opis stanowiska.",
+      doneOpening: "Gotowe. Otwieramy wyniki...",
+      optimizationFailed: "Optymalizacja nie powiodła się.",
+      backendUnavailable: "Brak połączenia z backendem. Sprawdź, czy działa.",
     },
     analyze: {
       title: "Przegląd analizy",
@@ -1194,6 +1211,7 @@ export const translations = {
       headline: "Nagłówek",
       topSkills: "Kluczowe umiejętności",
       experienceSignals: "Sygnały doświadczenia",
+      optimizeCvCta: "Optymalizuj CV",
     },
     results: {
       optimizedCv: "Zoptymalizowane CV",
@@ -1670,6 +1688,11 @@ export const translations = {
       target: "Cieľ",
       roleNotSet: "Rola nie je nastavená",
       companyNotSet: "Spoločnosť nie je nastavená",
+      setupHint: "Toto je krok 2. Najprv nahrajte CV a popis práce na stránke Analýza.",
+      needInputs: "Najprv nahrajte CV a popis práce.",
+      doneOpening: "Hotovo. Otvárame výsledky...",
+      optimizationFailed: "Optimalizácia zlyhala.",
+      backendUnavailable: "Nedá sa pripojiť k backendu. Skontrolujte, či beží.",
     },
     analyze: {
       title: "Prehľad analýzy",
@@ -1688,6 +1711,7 @@ export const translations = {
       headline: "Nadpis",
       topSkills: "Top zručnosti",
       experienceSignals: "Signály skúseností",
+      optimizeCvCta: "Optimalizovať CV",
     },
     results: {
       optimizedCv: "Optimalizované CV",
@@ -2168,6 +2192,11 @@ export const translations = {
       target: "Cíl",
       roleNotSet: "Role nenastavena",
       companyNotSet: "Společnost nenastavena",
+      setupHint: "Toto je krok 2. Nejprve nahrajte CV a popis pozice na stránce Analýza.",
+      needInputs: "Nejprve nahrajte CV a popis pozice.",
+      doneOpening: "Hotovo. Otevíráme výsledky...",
+      optimizationFailed: "Optimalizace se nezdařila.",
+      backendUnavailable: "Nelze se připojit k backendu. Zkontrolujte, že běží.",
     },
     analyze: {
       title: "Přehled analýzy",
@@ -2186,6 +2215,7 @@ export const translations = {
       headline: "Nadpis",
       topSkills: "Klíčové dovednosti",
       experienceSignals: "Signály zkušeností",
+      optimizeCvCta: "Optimalizovat CV",
     },
     results: {
       optimizedCv: "Optimalizované CV",
@@ -2671,6 +2701,11 @@ export const translations = {
       target: "Objetivo",
       roleNotSet: "Rol no establecido",
       companyNotSet: "Empresa no establecida",
+      setupHint: "Este es el paso 2. Primero sube el CV y la vacante en la página de Análisis.",
+      needInputs: "Primero sube el CV y la descripción del puesto.",
+      doneOpening: "Listo. Abriendo resultados...",
+      optimizationFailed: "La optimización falló.",
+      backendUnavailable: "No se puede conectar con el backend. Verifica que esté activo.",
     },
     analyze: {
       title: "Resumen del análisis",
@@ -2689,6 +2724,7 @@ export const translations = {
       headline: "Titular",
       topSkills: "Habilidades principales",
       experienceSignals: "Señales de experiencia",
+      optimizeCvCta: "Optimizar CV",
     },
     results: {
       optimizedCv: "CV optimizado",
