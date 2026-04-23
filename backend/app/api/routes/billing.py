@@ -315,6 +315,8 @@ def create_stripe_checkout_session(
 
     price_id, mode = _resolve_stripe_price_for_checkout(payload.tier, payload.billing_cycle)
     request_origin = f"{request.url.scheme}://{request.url.netloc}".rstrip("/")
+    request_header_origin = _normalize_origin(request.headers.get("origin"))
+    referer_origin = _extract_origin(request.headers.get("referer"))
 
     allowed_origins: set[str] = {request_origin}
     for value in get_cors_origins():
@@ -322,12 +324,24 @@ def create_stripe_checkout_session(
         if normalized:
             allowed_origins.add(normalized)
 
+    # Runtime origins from browser request can differ from API host (frontend -> backend).
+    # Trust them only as exact origins and only for this request flow.
+    if request_header_origin:
+        allowed_origins.add(request_header_origin)
+    if referer_origin:
+        allowed_origins.add(referer_origin)
+
     payload_success_origin = _extract_origin(payload.success_url)
     payload_cancel_origin = _extract_origin(payload.cancel_url)
     preferred_frontend_origin = next(
         (
             origin
-            for origin in [payload_success_origin, payload_cancel_origin]
+            for origin in [
+                payload_success_origin,
+                payload_cancel_origin,
+                request_header_origin,
+                referer_origin,
+            ]
             if origin and origin in allowed_origins
         ),
         None,
@@ -749,6 +763,25 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
     tier = current_user.subscription_tier
     if (current_user.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
         tier = "lifetime"
+
+    # Single Scan is one-time. When the single scan quota is spent, downgrade to free
+    # so user can purchase Single Scan again.
+    if tier == "single":
+        single_limits = current_user.get_limits()
+        single_scans_remaining = max(0, single_limits["scans"] - current_user.daily_scans_count)
+        if single_scans_remaining <= 0:
+            current_user.subscription_tier = "free"
+            current_user.paddle_subscription_id = None
+            current_user.subscription_active_until = None
+            db.add(current_user)
+            db.commit()
+            record_activity(
+                db,
+                user_id=current_user.id,
+                action="Single Scan quota exhausted",
+                meta={"event": "single_scan_auto_downgrade"},
+            )
+            tier = "free"
 
     cancel_at_period_end = False
     active_until = current_user.subscription_active_until
