@@ -8,7 +8,6 @@ export default function robots(): MetadataRoute.Robots {
     "/analyze",
     "/app",
     "/history",
-    "/optimize",
     "/results",
     "/login",
     "/register",
