@@ -129,6 +129,90 @@ const BLOG_POSTS: BlogPost[] = [
       "A good career-switch summary is specific, role-focused, and evidence-based.",
   },
   {
+    slug: "how-to-pass-ats-screening",
+    publishAt: "2026-04-23",
+    title: "How to Pass ATS Screening in 7 Practical Steps",
+    excerpt:
+      "A clear ATS checklist to improve resume parsing, keyword relevance, and recruiter visibility.",
+    lead: "Passing ATS is about structure, relevance, and evidence, not keyword spam.",
+    tags: ["ATS", "Checklist"],
+    sections: [
+      {
+        title: "1) Use a clean, single-column format",
+        body: "Avoid complex layouts, tables, text boxes, and decorative graphics that can break ATS parsing. Clear headings and consistent spacing are safer.",
+      },
+      {
+        title: "2) Match role keywords to the right sections",
+        body: "Place key terms from the vacancy into your summary, skills, and recent experience. Use them naturally where they are truly supported by your background.",
+      },
+      {
+        title: "3) Rewrite weak bullets into evidence bullets",
+        body: "Replace vague lines with action + context + measurable result. This helps ATS score and makes recruiter review faster.",
+      },
+      {
+        title: "4) Keep dates, titles, and company names standard",
+        body: "Use common date formats and role titles so systems can parse your timeline reliably.",
+      },
+      {
+        title: "5) Add role-relevant hard skills",
+        body: "Prioritize tools, platforms, and methods explicitly requested in the job post.",
+      },
+      {
+        title: "6) Remove unsupported keywords",
+        body: "Do not add terms you cannot prove in your experience section. Recruiters quickly notice inflated claims.",
+      },
+      {
+        title: "7) Run a final ATS-oriented QA pass",
+        body: "Before applying, validate that your document stays readable, role-focused, and factually accurate after edits.",
+      },
+    ],
+    takeawayTitle: "Key takeaway",
+    takeawayBody:
+      "You pass ATS when your resume is easy to parse, aligned to role language, and backed by real results.",
+  },
+  {
+    slug: "how-to-write-high-quality-resume",
+    publishAt: "2026-04-23",
+    title: "How to Write a High-Quality Resume That Gets Interviews",
+    excerpt:
+      "A practical framework to build a resume that is clear, credible, and optimized for both ATS and hiring teams.",
+    lead: "A quality resume is not longer text; it is sharper evidence in the right structure.",
+    tags: ["Resume", "How-to"],
+    sections: [
+      {
+        title: "1) Start with a targeted headline and summary",
+        body: "State your target role, core strengths, and business impact in the first lines so reviewers understand your value quickly.",
+      },
+      {
+        title: "2) Prioritize relevance over completeness",
+        body: "Keep only experience that supports the target role. Remove low-signal details that dilute your positioning.",
+      },
+      {
+        title: "3) Use measurable achievements in top bullets",
+        body: "Show outcomes with numbers, scope, and constraints. Quantified impact increases trust and differentiation.",
+      },
+      {
+        title: "4) Build a focused skills section",
+        body: "Group skills by capability and align wording with the vacancy. Avoid random keyword lists without proof.",
+      },
+      {
+        title: "5) Keep formatting recruiter-friendly",
+        body: "Use readable fonts, clear section hierarchy, and stable spacing. Good readability improves both ATS and human scan speed.",
+      },
+      {
+        title: "6) Tailor for each application",
+        body: "Adapt summary, top skills, and first experience bullets to each vacancy instead of sending one generic version.",
+      },
+      {
+        title: "7) Run a final quality check",
+        body: "Verify consistency, grammar, dates, and link quality. Small mistakes can reduce trust before interview stage.",
+      },
+    ],
+    takeawayTitle: "Key takeaway",
+    takeawayBody:
+      "A high-quality resume is specific, role-aligned, and evidence-driven from the first screen to the final bullet.",
+  },
+  {
     slug: "quantify-achievements-resume",
     publishAt: "2026-04-26",
     title: "How to Quantify Achievements on Your Resume",
