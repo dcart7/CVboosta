@@ -156,6 +156,8 @@ export default function TopNav() {
           <button 
             className="btn ghost cv-mobile-only" 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            type="button"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             style={{ padding: "8px 12px", fontSize: "20px" }}
           >
              {isMenuOpen ? "✕" : "☰"}

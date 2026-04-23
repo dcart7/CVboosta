@@ -103,6 +103,11 @@ export default function CookieBanner() {
             border-radius: 10px !important;
           }
           @media (max-width: 600px) {
+            .cookie-banner {
+              bottom: max(12px, env(safe-area-inset-bottom));
+              left: max(12px, env(safe-area-inset-left));
+              right: max(12px, env(safe-area-inset-right));
+            }
             .cookie-content {
               flex-direction: column;
               align-items: flex-start;
@@ -215,6 +220,8 @@ export default function CookieBanner() {
               text-align: left;
               border-radius: 24px;
               position: relative;
+              max-height: calc(100dvh - 32px - env(safe-area-inset-bottom));
+              overflow-y: auto;
             }
             .modal-close {
               position: absolute;
@@ -254,6 +261,13 @@ export default function CookieBanner() {
             .pref-item input[type="checkbox"]:disabled {
               cursor: not-allowed;
               opacity: 0.5;
+            }
+
+            @media (max-width: 600px) {
+              .cookie-pref-modal {
+                border-radius: 18px;
+                padding: 20px 16px max(20px, env(safe-area-inset-bottom));
+              }
             }
           `}</style>
         </div>
