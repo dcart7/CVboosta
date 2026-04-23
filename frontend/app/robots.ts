@@ -5,7 +5,6 @@ export default function robots(): MetadataRoute.Robots {
   const host = new URL(baseUrl).host;
   const privatePaths = [
     "/account",
-    "/analyze",
     "/app",
     "/history",
     "/results",

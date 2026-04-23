@@ -25,7 +25,7 @@ export default function FreeAtsResumeCheckerPage() {
               Upload your CV, paste the job description, and see missing keywords in minutes.
             </p>
             <div className="nav-actions">
-              <Link className="btn primary" href="/analyze">
+              <Link className="btn primary" href="/app">
                 Start free analysis
               </Link>
               <Link className="btn ghost" href="/app">

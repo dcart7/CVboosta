@@ -167,7 +167,7 @@ export const translations = {
       target: "Target",
       roleNotSet: "Role not set",
       companyNotSet: "Company not set",
-      setupHint: "This is step 2. First upload CV and job description on the Analyze page.",
+      setupHint: "This is step 2. First upload CV and job description on the Dashboard page.",
       needInputs: "Upload CV and job description first.",
       doneOpening: "Done. Opening results...",
       optimizationFailed: "Optimization failed.",
