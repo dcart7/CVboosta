@@ -253,8 +253,21 @@ def _apply_paid_tier_to_user(
     subscription_id: str | None = None,
     period_end_dt: datetime | None = None,
 ) -> None:
+    previous_tier = (user.subscription_tier or "").lower()
     user.subscription_tier = resolved_tier
     if resolved_tier == "single":
+        if previous_tier != "single":
+            user.daily_scans_count = 0
+            user.daily_cl_count = 0
+            user.daily_prep_count = 0
+        # Single Scan is credit-based: each purchase adds one full bundle.
+        user.daily_scans_count += 1
+        user.daily_cl_count += 1
+        user.daily_prep_count += 1
+        user.paddle_subscription_id = None
+        user.subscription_active_until = None
+    else:
+        # Non-single tiers are usage-based; keep counters as usage counters.
         user.daily_scans_count = 0
         user.daily_cl_count = 0
         user.daily_prep_count = 0
@@ -589,6 +602,10 @@ async def stripe_webhook(
                 resolved_tier = _resolve_stripe_tier_by_price_id(price_id)
 
         if resolved_tier:
+            # Single credits are applied via finalize-session after frontend redirect.
+            # Skipping webhook application prevents duplicate credit grants.
+            if resolved_tier == "single":
+                return {"status": "ok"}
             customer_id = obj.get("customer")
             customer_id_value = customer_id if isinstance(customer_id, str) else None
             subscription_id = obj.get("subscription")
@@ -713,14 +730,13 @@ async def paddle_webhook(
         elif event_type in one_time_events:
             resolved_tier = _resolve_tier(payload)
             if resolved_tier in {"single", "lifetime"}:
-                user.subscription_tier = resolved_tier
-                if resolved_tier == "single":
-                    # One-time quota starts fresh from 1/1/1 usage allowance.
-                    user.daily_scans_count = 0
-                    user.daily_cl_count = 0
-                    user.daily_prep_count = 0
-                if isinstance(payload.get("customer_id"), str):
-                    user.paddle_customer_id = payload.get("customer_id")
+                customer_id = payload.get("customer_id")
+                customer_id_value = customer_id if isinstance(customer_id, str) else None
+                _apply_paid_tier_to_user(
+                    user,
+                    resolved_tier=resolved_tier,
+                    customer_id=customer_id_value,
+                )
                 db.add(user)
                 db.commit()
                 record_activity(
@@ -764,12 +780,14 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
     if (current_user.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
         tier = "lifetime"
 
-    # Single Scan is one-time. When the single scan quota is spent, downgrade to free
-    # so user can purchase Single Scan again.
+    # Single Scan is credit-based and repurchasable.
+    # When all credits are spent, downgrade to free so pricing marks it as purchasable again.
     if tier == "single":
-        single_limits = current_user.get_limits()
-        single_scans_remaining = max(0, single_limits["scans"] - current_user.daily_scans_count)
-        if single_scans_remaining <= 0:
+        if (
+            current_user.daily_scans_count <= 0
+            and current_user.daily_cl_count <= 0
+            and current_user.daily_prep_count <= 0
+        ):
             current_user.subscription_tier = "free"
             current_user.paddle_subscription_id = None
             current_user.subscription_active_until = None
@@ -830,7 +848,7 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
         "tier": tier,
         "limits": limits,
         "usage": usage,
-        "single_scan_remaining": max(0, limits["scans"] - usage["scans"]) if tier == "single" else None,
+        "single_scan_remaining": max(0, usage["scans"]) if tier == "single" else None,
         "cancel_at_period_end": cancel_at_period_end,
         "subscription_active_until": active_until.isoformat() if active_until else None,
     }

@@ -146,7 +146,10 @@ async def optimize_cv(
                 "match_after": match_after,
             },
         )
-        current_user.daily_scans_count += 1
+        if current_user.subscription_tier == "single":
+            current_user.daily_scans_count = max(0, current_user.daily_scans_count - 1)
+        else:
+            current_user.daily_scans_count += 1
         db.add(current_user)
         db.add(analysis)
         db.commit()
@@ -203,7 +206,10 @@ def optimize_cover_letter(
                 db.add(analysis)
                 db.commit()
         
-        current_user.daily_cl_count += 1
+        if current_user.subscription_tier == "single":
+            current_user.daily_cl_count = max(0, current_user.daily_cl_count - 1)
+        else:
+            current_user.daily_cl_count += 1
         db.add(current_user)
         db.commit()
         record_activity(db, user_id=current_user.id, action="Cover letter generated", meta={"analysis_id": payload.analysis_id})

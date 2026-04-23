@@ -50,7 +50,13 @@ class User(Base):
             
         # Tiers: free, single, go, pro, lifetime
         # Go: 15 per day
-        # Single: 1 scan/cl/prep total (enforced by status/one-time logic)
+        # Single: remaining credits are stored directly in counters.
+        if self.subscription_tier == "single":
+            return {
+                "scans": max(0, self.daily_scans_count),
+                "cl": max(0, self.daily_cl_count),
+                "prep": max(0, self.daily_prep_count),
+            }
         limits = {
             "free": {"scans": 1, "cl": 0, "prep": 0},
             "single": {"scans": 1, "cl": 1, "prep": 1},
@@ -64,7 +70,17 @@ class User(Base):
         # God mode for superuser
         if (self.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
             return True
-            
+
+        # Single Scan is modeled as remaining credits kept in counters.
+        if self.subscription_tier == "single":
+            if feature == "scan":
+                return self.daily_scans_count > 0
+            if feature == "cl":
+                return self.daily_cl_count > 0
+            if feature == "prep":
+                return self.daily_prep_count > 0
+            return False
+
         self.reset_usage_if_needed()
         limits = self.get_limits()
         if feature == "scan":

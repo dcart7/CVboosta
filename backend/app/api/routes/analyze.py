@@ -341,7 +341,10 @@ def interview_prep_route(
                 db.add(analysis)
                 db.commit()
                 
-        current_user.daily_prep_count += 1
+        if current_user.subscription_tier == "single":
+            current_user.daily_prep_count = max(0, current_user.daily_prep_count - 1)
+        else:
+            current_user.daily_prep_count += 1
         db.add(current_user)
         db.commit()
         record_activity(db, user_id=current_user.id, action="Interview prep", meta={"analysis_id": payload.analysis_id})

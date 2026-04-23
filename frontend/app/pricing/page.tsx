@@ -212,14 +212,18 @@ export default function PricingPage() {
         <div className="pricing-grid">
           {tiers.map((tier) => (
             (() => {
+              const isSingleTier = tier.id === "single";
               const isActive =
-                (tier.id === "single" && activeTier === "single") ||
-                (tier.id === "go" && activeTier === "go") ||
-                (tier.id === "pro" && activeTier === "pro") ||
-                (tier.id === "lifetime" && activeTier === "lifetime");
-              const activeRank = activeTier && tierRank[activeTier] ? tierRank[activeTier] : 0;
-              const isUpgrade = activeRank === 0 || tierRank[tier.id] > activeRank;
-              const canCheckout = !isActive && isUpgrade;
+                !isSingleTier &&
+                ((tier.id === "go" && activeTier === "go") ||
+                  (tier.id === "pro" && activeTier === "pro") ||
+                  (tier.id === "lifetime" && activeTier === "lifetime"));
+              const activeRank =
+                activeTier && activeTier !== "single" && tierRank[activeTier]
+                  ? tierRank[activeTier]
+                  : 0;
+              const isUpgrade = isSingleTier || activeRank === 0 || tierRank[tier.id] > activeRank;
+              const canCheckout = isSingleTier ? true : !isActive && isUpgrade;
               const ctaLabel = isActive
                 ? t("pricing.activePlan")
                 : isUpgrade
