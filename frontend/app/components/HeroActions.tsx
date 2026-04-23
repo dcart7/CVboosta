@@ -13,15 +13,15 @@ export default function HeroActions() {
   }, []);
 
   return (
-    <div className="nav-actions">
-      <Link className="btn primary" href="/app">
+    <div className="nav-actions hero-actions">
+      <Link className="btn primary hero-cta-primary" href="/app">
         {t("hero.startWithCv")}
       </Link>
-      <Link className="btn ghost" href="/free-ats-resume-checker">
+      <Link className="btn ghost hero-cta-secondary" href="/free-ats-resume-checker">
         Free ATS checker
       </Link>
       {!isAuthed && (
-        <Link className="btn primary" href="/register">
+        <Link className="btn primary hero-cta-register" href="/register">
           {t("nav.register")}
         </Link>
       )}

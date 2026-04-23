@@ -207,10 +207,10 @@ export default function HomePage() {
 
   const conversionContent = {
     en: {
-      hookLabel: "Most CVs are rejected before a human sees them",
-      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookLabel: "Stop getting ignored by recruiters",
+      hookTitle: "Most rejections happen before interviews. Fix your CV in 3 minutes.",
       hookSubtitle:
-        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
+        "Most candidates fail ATS pre-screening. Upload your CV and role now to turn weak bullets into interview-ready proof.",
       kpiA: "average ATS score lift",
       kpiB: "from upload to first draft",
       kpiC: "faster tailoring per vacancy",
@@ -219,6 +219,9 @@ export default function HomePage() {
       demoTitle: "Before / after preview",
       demoLeftTitle: "Before (weak signal)",
       demoRightTitle: "After (hire-ready signal)",
+      beforeText: "\"Responsible for product roadmap and cross-team communication.\"",
+      afterText:
+        "\"Led quarterly roadmap across 3 squads, shipped 6 priority features, and increased activation by 21% within two release cycles.\"",
       demoImpactTitle: "What changed",
       demoImpact1: "Keyword alignment added without keyword stuffing.",
       demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
@@ -228,150 +231,264 @@ export default function HomePage() {
         "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
       priceTitle: "Why pricing starts low",
       priceDesc:
-        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+        "Built for value: comparable output to $49 tools, faster and cheaper to validate before you commit.",
+      proofCases: [
+        {
+          name: "A. M.",
+          role: "Product Manager, B2B SaaS (Berlin, Germany)",
+          outcome: "ATS match score: 52 -> 89. Interview invite in 4 days.",
+          note: "Profile redacted by request. Role, timeline, and score delta confirmed during onboarding.",
+        },
+        {
+          name: "S. K.",
+          role: "Backend Engineer, Fintech (Warsaw, Poland)",
+          outcome: "Missing critical keywords: 7 -> 1 after rewrite and keyword map pass.",
+          note: "Anonymous beta case. Role, country, and before/after snapshot verified.",
+        },
+        {
+          name: "E. R.",
+          role: "UX Researcher, HealthTech (Valencia, Spain)",
+          outcome: "Application-to-interview ratio improved from 1/18 to 1/7 in 3 weeks.",
+          note: "Identity redacted; progress benchmark tracked on same role family.",
+        },
+      ],
     },
     uk: {
-      hookLabel: "Most CVs are rejected before a human sees them",
-      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookLabel: "Припиніть залишатися без відповіді від рекрутерів",
+      hookTitle: "Більшість відмов стається ще до співбесіди. Виправте CV за 3 хвилини.",
       hookSubtitle:
-        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
-      kpiA: "average ATS score lift",
-      kpiB: "from upload to first draft",
-      kpiC: "faster tailoring per vacancy",
+        "Більшість кандидатів не проходять ATS-первинний відбір. Завантажте CV і роль зараз, щоб перетворити слабкі bullets на доказ результату.",
+      kpiA: "середнє зростання ATS score",
+      kpiB: "від завантаження до першого драфту",
+      kpiC: "швидше адаптування під вакансію",
       kpiNote:
-        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
-      demoTitle: "Before / after preview",
-      demoLeftTitle: "Before (weak signal)",
-      demoRightTitle: "After (hire-ready signal)",
-      demoImpactTitle: "What changed",
-      demoImpact1: "Keyword alignment added without keyword stuffing.",
-      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
-      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
-      trustTitle: "Trust from real beta users",
+        "Приклад бенчмарку: score зріс з 48 до 91 на тестовій вакансії з тими самими даними кандидата.",
+      demoTitle: "Приклад до / після",
+      demoLeftTitle: "До (слабкий сигнал)",
+      demoRightTitle: "Після (сигнал, готовий до найму)",
+      beforeText: "\"Відповідав за roadmap продукту та комунікацію між командами.\"",
+      afterText:
+        "\"Очолив квартальний roadmap для 3 скводів, запустив 6 пріоритетних фіч і підвищив активацію на 21% за два релізні цикли.\"",
+      demoImpactTitle: "Що змінилося",
+      demoImpact1: "Додано релевантні ключові слова без keyword stuffing.",
+      demoImpact2: "Формулювання змінено з опису задач на опис результату.",
+      demoImpact3: "Покращено ATS-читабельність завдяки чистішій структурі й пріоритетам.",
+      trustTitle: "Довіра від реальних beta-користувачів",
       trustLead:
-        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
-      priceTitle: "Why pricing starts low",
+        "Імена частково приховані за запитом, але кожен кейс має вимірюваний результат і таймлайн.",
+      priceTitle: "Чому стартова ціна низька",
       priceDesc:
-        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+        "Сильне співвідношення ціни та результату: порівнюваний output із інструментами за $49, але швидше й дешевше для перевірки.",
+      proofCases: [
+        {
+          name: "A. M.",
+          role: "Product Manager, B2B SaaS (Берлін, Німеччина)",
+          outcome: "ATS score: 52 -> 89. Запрошення на співбесіду за 4 дні.",
+          note: "Профіль редаговано на запит. Роль, таймлайн і дельта score підтверджені на онбордингу.",
+        },
+        {
+          name: "S. K.",
+          role: "Backend Engineer, Fintech (Варшава, Польща)",
+          outcome: "Критично відсутні ключові слова: 7 -> 1 після rewrite і keyword map.",
+          note: "Анонімний beta-кейс. Роль, країну та before/after snapshot верифіковано.",
+        },
+        {
+          name: "E. R.",
+          role: "UX Researcher, HealthTech (Валенсія, Іспанія)",
+          outcome: "Співвідношення заявка/співбесіда покращилося з 1/18 до 1/7 за 3 тижні.",
+          note: "Ідентичність прихована; бенчмарк відстежено в межах однієї групи ролей.",
+        },
+      ],
     },
     pl: {
-      hookLabel: "Most CVs are rejected before a human sees them",
-      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookLabel: "Przestań być ignorowany przez rekruterów",
+      hookTitle: "Większość odrzuceń dzieje się przed rozmową. Popraw CV w 3 minuty.",
       hookSubtitle:
-        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
-      kpiA: "average ATS score lift",
-      kpiB: "from upload to first draft",
-      kpiC: "faster tailoring per vacancy",
+        "Większość kandydatów odpada na wstępnym ATS. Prześlij CV i rolę teraz, aby zamienić słabe bullet points w dowód efektu.",
+      kpiA: "średni wzrost ATS score",
+      kpiB: "od uploadu do pierwszego draftu",
+      kpiC: "szybsze dopasowanie pod ofertę",
       kpiNote:
-        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
-      demoTitle: "Before / after preview",
-      demoLeftTitle: "Before (weak signal)",
-      demoRightTitle: "After (hire-ready signal)",
-      demoImpactTitle: "What changed",
-      demoImpact1: "Keyword alignment added without keyword stuffing.",
-      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
-      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
-      trustTitle: "Trust from real beta users",
+        "Przykładowy benchmark: score wzrósł z 48 do 91 na testowej ofercie przy tych samych danych kandydata.",
+      demoTitle: "Podgląd przed / po",
+      demoLeftTitle: "Przed (słaby sygnał)",
+      demoRightTitle: "Po (sygnał gotowy na rekrutację)",
+      beforeText: "\"Odpowiedzialny za roadmap produktu i komunikację między zespołami.\"",
+      afterText:
+        "\"Prowadziłem kwartalny roadmap dla 3 squadów, wdrożyłem 6 priorytetowych funkcji i zwiększyłem aktywację o 21% w dwóch cyklach release.\"",
+      demoImpactTitle: "Co się zmieniło",
+      demoImpact1: "Dodano dopasowane słowa kluczowe bez keyword stuffing.",
+      demoImpact2: "Język zmieniono z opisu zadań na opis efektów.",
+      demoImpact3: "Poprawiono czytelność ATS dzięki lepszej strukturze i priorytetom.",
+      trustTitle: "Zaufanie od realnych użytkowników beta",
       trustLead:
-        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
-      priceTitle: "Why pricing starts low",
+        "Nazwy są częściowo ukryte na prośbę użytkowników, ale każdy case ma mierzalny wynik i timeline.",
+      priceTitle: "Dlaczego cena startowa jest niska",
       priceDesc:
-        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+        "Mocny value-for-money: porównywalny output do narzędzi za $49, ale szybciej i taniej na start.",
+      proofCases: [
+        {
+          name: "A. M.",
+          role: "Product Manager, B2B SaaS (Berlin, Niemcy)",
+          outcome: "ATS score: 52 -> 89. Zaproszenie na rozmowę po 4 dniach.",
+          note: "Profil zanonimizowany na prośbę. Rola, timeline i delta score potwierdzone na onboardingu.",
+        },
+        {
+          name: "S. K.",
+          role: "Backend Engineer, Fintech (Warszawa, Polska)",
+          outcome: "Brakujące kluczowe słowa: 7 -> 1 po rewrite i keyword map.",
+          note: "Anonimowy case beta. Rola, kraj i before/after snapshot zostały zweryfikowane.",
+        },
+        {
+          name: "E. R.",
+          role: "UX Researcher, HealthTech (Walencja, Hiszpania)",
+          outcome: "Relacja aplikacja/rozmowa poprawiła się z 1/18 do 1/7 w 3 tygodnie.",
+          note: "Tożsamość ukryta; benchmark śledzony w ramach tej samej grupy ról.",
+        },
+      ],
     },
     sk: {
-      hookLabel: "Most CVs are rejected before a human sees them",
-      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookLabel: "Prestaňte byť ignorovaní recruitermi",
+      hookTitle: "Väčšina odmietnutí sa stane ešte pred pohovorom. Opravte CV za 3 minúty.",
       hookSubtitle:
-        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
-      kpiA: "average ATS score lift",
-      kpiB: "from upload to first draft",
-      kpiC: "faster tailoring per vacancy",
+        "Väčšina kandidátov neprejde ATS predvýberom. Nahrajte CV a rolu teraz, aby sa slabé bullets zmenili na dôkaz výsledkov.",
+      kpiA: "priemerné zvýšenie ATS score",
+      kpiB: "od nahratia po prvý draft",
+      kpiC: "rýchlejšie prispôsobenie na pozíciu",
       kpiNote:
-        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
-      demoTitle: "Before / after preview",
-      demoLeftTitle: "Before (weak signal)",
-      demoRightTitle: "After (hire-ready signal)",
-      demoImpactTitle: "What changed",
-      demoImpact1: "Keyword alignment added without keyword stuffing.",
-      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
-      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
-      trustTitle: "Trust from real beta users",
+        "Ukážkový benchmark: score sa zvýšil z 48 na 91 na testovanej pozícii pri rovnakých dátach kandidáta.",
+      demoTitle: "Ukážka pred / po",
+      demoLeftTitle: "Pred (slabý signál)",
+      demoRightTitle: "Po (signál pripravený na hiring)",
+      beforeText: "\"Zodpovedný za produktový roadmap a komunikáciu medzi tímami.\"",
+      afterText:
+        "\"Viedol som kvartálny roadmap pre 3 squady, dodal 6 prioritných funkcií a zvýšil aktiváciu o 21% počas dvoch release cyklov.\"",
+      demoImpactTitle: "Čo sa zmenilo",
+      demoImpact1: "Doplnené relevantné kľúčové slová bez keyword stuffingu.",
+      demoImpact2: "Formulácie sa posunuli z úloh na výsledky.",
+      demoImpact3: "Zlepšila sa ATS čitateľnosť vďaka čistejšej štruktúre a prioritám.",
+      trustTitle: "Dôvera od reálnych beta používateľov",
       trustLead:
-        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
-      priceTitle: "Why pricing starts low",
+        "Mená sú na požiadanie čiastočne skryté, ale každý case obsahuje merateľný výsledok a timeline.",
+      priceTitle: "Prečo začíname nízkou cenou",
       priceDesc:
-        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+        "Silný pomer cena/výkon: porovnateľný output s nástrojmi za $49, ale rýchlejšie a lacnejšie na overenie.",
+      proofCases: [
+        {
+          name: "A. M.",
+          role: "Product Manager, B2B SaaS (Berlín, Nemecko)",
+          outcome: "ATS score: 52 -> 89. Pozvánka na pohovor za 4 dni.",
+          note: "Profil je redigovaný na požiadanie. Rola, timeline a delta score boli potvrdené pri onboardingu.",
+        },
+        {
+          name: "S. K.",
+          role: "Backend Engineer, Fintech (Varšava, Poľsko)",
+          outcome: "Chýbajúce kritické kľúčové slová: 7 -> 1 po rewrite a keyword map.",
+          note: "Anonymný beta case. Rola, krajina a before/after snapshot sú overené.",
+        },
+        {
+          name: "E. R.",
+          role: "UX Researcher, HealthTech (Valencia, Španielsko)",
+          outcome: "Pomer prihláška/pohovor sa zlepšil z 1/18 na 1/7 za 3 týždne.",
+          note: "Identita je redigovaná; benchmark sledovaný v rámci rovnakej role family.",
+        },
+      ],
     },
     cs: {
-      hookLabel: "Most CVs are rejected before a human sees them",
-      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookLabel: "Přestaňte být ignorováni recruitery",
+      hookTitle: "Většina odmítnutí se stane ještě před pohovorem. Opravte CV za 3 minuty.",
       hookSubtitle:
-        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
-      kpiA: "average ATS score lift",
-      kpiB: "from upload to first draft",
-      kpiC: "faster tailoring per vacancy",
+        "Většina kandidátů neprojde ATS předvýběrem. Nahrajte CV a roli teď, aby se slabé bullets změnily na důkaz výsledku.",
+      kpiA: "průměrné navýšení ATS score",
+      kpiB: "od nahrání k prvnímu draftu",
+      kpiC: "rychlejší přizpůsobení na pozici",
       kpiNote:
-        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
-      demoTitle: "Before / after preview",
-      demoLeftTitle: "Before (weak signal)",
-      demoRightTitle: "After (hire-ready signal)",
-      demoImpactTitle: "What changed",
-      demoImpact1: "Keyword alignment added without keyword stuffing.",
-      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
-      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
-      trustTitle: "Trust from real beta users",
+        "Ukázkový benchmark: score se zvýšil z 48 na 91 na testované pozici při stejných datech kandidáta.",
+      demoTitle: "Ukázka před / po",
+      demoLeftTitle: "Před (slabý signál)",
+      demoRightTitle: "Po (signál připravený pro hiring)",
+      beforeText: "\"Odpovědný za produktový roadmap a komunikaci mezi týmy.\"",
+      afterText:
+        "\"Vedl jsem kvartální roadmap pro 3 squady, doručil 6 prioritních funkcí a zvýšil aktivaci o 21% během dvou release cyklů.\"",
+      demoImpactTitle: "Co se změnilo",
+      demoImpact1: "Doplněná klíčová slova bez keyword stuffingu.",
+      demoImpact2: "Formulace se posunuly z popisu úkolů na výsledky.",
+      demoImpact3: "ATS čitelnost se zlepšila díky čistší struktuře a prioritám.",
+      trustTitle: "Důvěra od reálných beta uživatelů",
       trustLead:
-        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
-      priceTitle: "Why pricing starts low",
+        "Jména jsou na žádost částečně skrytá, ale každý case obsahuje měřitelný výsledek a timeline.",
+      priceTitle: "Proč je startovní cena nízká",
       priceDesc:
-        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+        "Silná hodnota za cenu: srovnatelný output s nástroji za $49, ale rychleji a levněji pro první ověření.",
+      proofCases: [
+        {
+          name: "A. M.",
+          role: "Product Manager, B2B SaaS (Berlín, Německo)",
+          outcome: "ATS score: 52 -> 89. Pozvánka na pohovor za 4 dny.",
+          note: "Profil redigován na žádost. Role, timeline a delta score ověřeny při onboardingu.",
+        },
+        {
+          name: "S. K.",
+          role: "Backend Engineer, Fintech (Varšava, Polsko)",
+          outcome: "Chybějící kritická klíčová slova: 7 -> 1 po rewrite a keyword map.",
+          note: "Anonymní beta case. Role, země a before/after snapshot byly ověřeny.",
+        },
+        {
+          name: "E. R.",
+          role: "UX Researcher, HealthTech (Valencie, Španělsko)",
+          outcome: "Poměr žádost/pohovor se zlepšil z 1/18 na 1/7 během 3 týdnů.",
+          note: "Identita je redigovaná; benchmark sledovaný v rámci stejné role family.",
+        },
+      ],
     },
     es: {
-      hookLabel: "Most CVs are rejected before a human sees them",
-      hookTitle: "Get 2-3x more interview-ready applications from the same experience.",
+      hookLabel: "Deja de ser ignorado por reclutadores",
+      hookTitle: "La mayoría de rechazos ocurre antes de la entrevista. Arregla tu CV en 3 minutos.",
       hookSubtitle:
-        "Upload your CV and target role. CVboosta rewrites weak phrasing, closes keyword gaps, and shows exactly why your score changes.",
-      kpiA: "average ATS score lift",
-      kpiB: "from upload to first draft",
-      kpiC: "faster tailoring per vacancy",
+        "La mayoría de candidatos falla el pre-screening ATS. Sube tu CV y el rol ahora para convertir bullets débiles en prueba de impacto.",
+      kpiA: "aumento promedio de ATS score",
+      kpiB: "desde la carga hasta el primer borrador",
+      kpiC: "adaptación más rápida por vacante",
       kpiNote:
-        "Sample benchmark: score improved from 48 to 91 on a test vacancy using the same candidate data.",
-      demoTitle: "Before / after preview",
-      demoLeftTitle: "Before (weak signal)",
-      demoRightTitle: "After (hire-ready signal)",
-      demoImpactTitle: "What changed",
-      demoImpact1: "Keyword alignment added without keyword stuffing.",
-      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
-      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
-      trustTitle: "Trust from real beta users",
+        "Benchmark de muestra: el score subió de 48 a 91 en una vacante de prueba con los mismos datos del candidato.",
+      demoTitle: "Vista previa antes / después",
+      demoLeftTitle: "Antes (señal débil)",
+      demoRightTitle: "Después (señal lista para hiring)",
+      beforeText: "\"Responsable del roadmap del producto y de la comunicación entre equipos.\"",
+      afterText:
+        "\"Lideré el roadmap trimestral de 3 squads, entregué 6 features prioritarias y aumenté la activación un 21% en dos ciclos de release.\"",
+      demoImpactTitle: "Qué cambió",
+      demoImpact1: "Se añadieron keywords relevantes sin keyword stuffing.",
+      demoImpact2: "La redacción pasó de tareas a resultados.",
+      demoImpact3: "Mejoró la legibilidad ATS con una estructura y prioridades más claras.",
+      trustTitle: "Confianza de usuarios beta reales",
       trustLead:
-        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
-      priceTitle: "Why pricing starts low",
+        "Los nombres están parcialmente ocultos por solicitud, pero cada caso incluye resultado medible y timeline.",
+      priceTitle: "Por qué el precio inicial es bajo",
       priceDesc:
-        "We keep the first purchase low-risk so users can validate real results before committing to a larger plan.",
+        "Gran relación valor/precio: output comparable a herramientas de $49, pero más rápido y más barato para validar.",
+      proofCases: [
+        {
+          name: "A. M.",
+          role: "Product Manager, B2B SaaS (Berlín, Alemania)",
+          outcome: "ATS score: 52 -> 89. Invitación a entrevista en 4 días.",
+          note: "Perfil redactado por solicitud. Rol, timeline y delta de score verificados en onboarding.",
+        },
+        {
+          name: "S. K.",
+          role: "Backend Engineer, Fintech (Varsovia, Polonia)",
+          outcome: "Keywords críticas faltantes: 7 -> 1 tras rewrite y keyword map.",
+          note: "Caso beta anónimo. Rol, país y before/after snapshot verificados.",
+        },
+        {
+          name: "E. R.",
+          role: "UX Researcher, HealthTech (Valencia, España)",
+          outcome: "Ratio solicitud/entrevista mejoró de 1/18 a 1/7 en 3 semanas.",
+          note: "Identidad redactada; benchmark seguido en la misma familia de roles.",
+        },
+      ],
     },
   }[language];
-
-  const proofCases = [
-    {
-      name: "A. M.",
-      role: "Product Manager, B2B SaaS",
-      outcome: "ATS match score: 52 -> 89. Interview invite in 4 days.",
-      note: "Profile details hidden on request. Session screenshot retained internally.",
-    },
-    {
-      name: "S. K.",
-      role: "Software Engineer, Fintech",
-      outcome: "Missing critical keywords: 7 -> 1 after rewrite and keyword map pass.",
-      note: "Anonymous beta case with role and timeline verified.",
-    },
-    {
-      name: "E. R.",
-      role: "UX Researcher, HealthTech",
-      outcome: "Application-to-interview ratio improved from 1/18 to 1/7 in 3 weeks.",
-      note: "Identity redacted; benchmark tracked across same role family.",
-    },
-  ];
 
   return (
     <main className="page">
@@ -380,9 +497,9 @@ export default function HomePage() {
         <section className="hero fade-up">
           <div style={{ maxWidth: "1200px", width: "100%" }}>
             <p className="pill">{conversionContent.hookLabel}</p>
-            <h1 className="hero-title">{conversionContent.hookTitle}</h1>
+            <h1 className="hero-title hero-title-conversion">{conversionContent.hookTitle}</h1>
             <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
-            <p className="hero-subtitle" style={{ marginTop: "10px" }}>
+            <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
               {localizedFreeCheckerLine}
             </p>
             <HeroActions />
@@ -448,18 +565,25 @@ export default function HomePage() {
 
         <section className="section fade-up">
           <h2 className="section-title">{conversionContent.demoTitle}</h2>
+          <div className="score-proof">
+            <div className="score-proof-card">
+              <span className="score-proof-label">ATS</span>
+              <strong>43</strong>
+            </div>
+            <span className="score-proof-arrow">→</span>
+            <div className="score-proof-card score-proof-card-up">
+              <span className="score-proof-label">ATS</span>
+              <strong>87</strong>
+            </div>
+          </div>
           <div className="before-after-grid">
             <article className="card before-after-card">
               <h3>{conversionContent.demoLeftTitle}</h3>
-              <p>
-                "Responsible for product roadmap and cross-team communication."
-              </p>
+              <p>{conversionContent.beforeText}</p>
             </article>
             <article className="card before-after-card">
               <h3>{conversionContent.demoRightTitle}</h3>
-              <p>
-                "Led quarterly roadmap across 3 squads, shipped 6 priority features, and increased activation by 21% within two release cycles."
-              </p>
+              <p>{conversionContent.afterText}</p>
             </article>
           </div>
           <div className="card before-after-impact">
@@ -523,7 +647,7 @@ export default function HomePage() {
           <h2 className="section-title">{conversionContent.trustTitle}</h2>
           <p className="trust-lead">{conversionContent.trustLead}</p>
           <div className="grid">
-            {proofCases.map((item) => (
+            {conversionContent.proofCases.map((item) => (
               <article key={item.name} className="card trust-card">
                 <h3>{item.name}</h3>
                 <p className="trust-role">{item.role}</p>

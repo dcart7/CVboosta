@@ -844,6 +844,14 @@ a {
   color: var(--ink);
 }
 
+.hero-title-conversion {
+  font-family: "Manrope", "Helvetica Neue", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  max-width: 980px;
+  text-wrap: balance;
+}
+
 [data-theme="dark"] .hero-title {
   color: rgba(242, 244, 248, 0.97);
 }
@@ -1173,6 +1181,50 @@ a {
   gap: 16px;
 }
 
+.score-proof {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.score-proof-card {
+  display: grid;
+  gap: 2px;
+  min-width: 84px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.score-proof-card strong {
+  font-size: 28px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.score-proof-card-up strong {
+  color: #0a84ff;
+}
+
+[data-theme="dark"] .score-proof-card-up strong {
+  color: #8bc2ff;
+}
+
+.score-proof-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.score-proof-arrow {
+  font-size: 28px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
 .before-after-card p {
   font-size: 15px;
   line-height: 1.7;
@@ -1225,6 +1277,21 @@ a {
 
 .pricing-perception-card .section-title {
   margin-bottom: 12px;
+}
+
+@media (max-width: 540px) {
+  .score-proof {
+    gap: 10px;
+  }
+
+  .score-proof-card {
+    min-width: 76px;
+    padding: 9px 12px;
+  }
+
+  .score-proof-card strong {
+    font-size: 24px;
+  }
 }
 
 .steps {
@@ -3199,5 +3266,89 @@ body {
   .share-modal-actions {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+}
+
+/* Homepage mobile conversion pass: reduce cognitive load, keep desktop unchanged */
+@media (max-width: 768px) {
+  .page .hero {
+    padding-top: 22px;
+    padding-bottom: 28px;
+    gap: 18px;
+  }
+
+  .page .pill {
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+
+  .hero-title-conversion {
+    font-size: clamp(30px, 8.4vw, 38px) !important;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+  }
+
+  .page .hero-subtitle {
+    font-size: 15px !important;
+    line-height: 1.45;
+    margin-bottom: 14px;
+    max-width: 100%;
+  }
+
+  .hero-secondary-line {
+    display: none;
+  }
+
+  .hero-actions {
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  .hero-actions .hero-cta-secondary,
+  .hero-actions .hero-cta-register {
+    display: none;
+  }
+
+  .hero-actions .hero-cta-primary {
+    width: 100%;
+    justify-content: center;
+    min-height: 50px;
+  }
+
+  .page .section {
+    margin-top: 64px;
+  }
+
+  .page .section-title {
+    margin-bottom: 16px;
+  }
+
+  .page .grid,
+  .page .hero-grid,
+  .page .before-after-grid {
+    gap: 14px;
+  }
+
+  .page .project-explainer,
+  .page .workflow-section {
+    display: none;
+  }
+
+  .score-proof {
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  .score-proof-card {
+    min-width: 90px;
+    padding: 11px 14px;
+  }
+
+  .trust-note {
+    display: none;
+  }
+
+  .pricing-perception-card p {
+    line-height: 1.55;
   }
 }

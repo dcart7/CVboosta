@@ -40,6 +40,24 @@ export default function Footer() {
                 {t("footer.support")}
               </a>
             </div>
+            <div className="footer-social-row">
+              <a
+                href="https://www.linkedin.com/company/virel-solutions/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-social-link"
+              >
+                {t("footer.linkedin")}
+              </a>
+              <a
+                href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-social-link"
+              >
+                {t("footer.productHunt")}
+              </a>
+            </div>
           </div>
 
           <div className="footer-right">
@@ -56,38 +74,8 @@ export default function Footer() {
               <Link href="/resume-keywords" className="footer-link">
                 {t("footer.resumeKeywords")}
               </Link>
-              <a
-                href="https://www.linkedin.com/company/virel-solutions/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-link"
-              >
-                LinkedIn
-              </a>
-              <a
-                href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-link"
-              >
-                Product Hunt
-              </a>
             </div>
           </div>
-        </div>
-
-        <div className="footer-bottom">
-          <p className="footer-bottom-text">
-            If any communication service is unavailable, we&apos;ll be happy to respond on LinkedIn.{" "}
-            <a
-              href="https://www.linkedin.com/company/virel-solutions/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-bottom-link"
-            >
-              LinkedIn →
-            </a>
-          </p>
         </div>
       </div>
 
@@ -109,6 +97,26 @@ export default function Footer() {
           display: flex;
           flex-direction: column;
           gap: 14px;
+        }
+        .footer-social-row {
+          margin-top: 4px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: min(320px, 100%);
+          gap: 16px;
+        }
+        .footer-social-link {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--accent);
+          text-decoration: none;
+          transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .footer-social-link:hover {
+          opacity: 0.86;
+          transform: translateY(-1px);
+          text-decoration: underline;
         }
         .footer-right {
           display: flex;
@@ -222,29 +230,6 @@ export default function Footer() {
           border-color: color-mix(in srgb, var(--accent) 45%, var(--glass-border));
           transform: translateY(-1px);
         }
-        .footer-bottom {
-          margin-top: 30px;
-          padding-top: 18px;
-          border-top: 1px solid var(--glass-border);
-        }
-        .footer-bottom-text {
-          margin: 0;
-          font-size: 12px;
-          color: var(--muted);
-          opacity: 0.8;
-          line-height: 1.6;
-          text-align: center;
-        }
-        .footer-bottom-link {
-          color: var(--accent);
-          text-decoration: none;
-          font-weight: 600;
-          transition: opacity 0.2s ease;
-        }
-        .footer-bottom-link:hover {
-          opacity: 0.88;
-          text-decoration: underline;
-        }
         @media (max-width: 640px) {
           .footer-content {
             flex-direction: column;
@@ -256,8 +241,8 @@ export default function Footer() {
             min-width: 0;
             padding-top: 0;
           }
-          .footer-bottom-text {
-            text-align: left;
+          .footer-social-row {
+            width: 100%;
           }
         }
       `}</style>

@@ -444,6 +444,8 @@ export const translations = {
       terms: "Terms of Service",
       faq: "Service FAQ",
       resumeKeywords: "Resume Keywords by Role",
+      linkedin: "LinkedIn",
+      productHunt: "Product Hunt",
       cookieNotice: "Our website uses cookies to improve your experience and analyze usage limits.",
     },
     legal: {
@@ -955,6 +957,8 @@ export const translations = {
       terms: "Умови використання",
       faq: "FAQ сервісу",
       resumeKeywords: "Ключові слова резюме за ролями",
+      linkedin: "LinkedIn",
+      productHunt: "Product Hunt",
       cookieNotice: "Наш сайт використовує файли cookie для покращення вашого досвіду та аналізу лімітів використання.",
     },
     legal: {
@@ -1458,6 +1462,8 @@ export const translations = {
       terms: "Warunki korzystania",
       faq: "FAQ usługi",
       resumeKeywords: "Słowa kluczowe CV wg roli",
+      linkedin: "LinkedIn",
+      productHunt: "Product Hunt",
       cookieNotice: "Nasza strona korzysta z plików cookie, aby poprawić wrażenia użytkownika i analizować limity użycia.",
     },
     legal: {
@@ -1956,6 +1962,8 @@ export const translations = {
       terms: "Podmienky používania",
       faq: "FAQ služby",
       resumeKeywords: "Kľúčové slová životopisu podľa role",
+      linkedin: "LinkedIn",
+      productHunt: "Product Hunt",
       cookieNotice: "Naša webová stránka používa súbory cookie na zlepšenie vášho zážitku a analýzu limitov používania.",
     },
     legal: {
@@ -2468,6 +2476,8 @@ export const translations = {
       terms: "Podmínky použití",
       faq: "FAQ služby",
       resumeKeywords: "Klíčová slova životopisu podle role",
+      linkedin: "LinkedIn",
+      productHunt: "Product Hunt",
       cookieNotice: "Naše weby využívají soubory cookie pro lepší uživatelský zážitek.",
     },
     legal: {
@@ -2972,6 +2982,8 @@ export const translations = {
       terms: "Términos de uso",
       faq: "FAQ del servicio",
       resumeKeywords: "Palabras clave de CV por rol",
+      linkedin: "LinkedIn",
+      productHunt: "Product Hunt",
       cookieNotice: "Nuestro sitio web utiliza cookies para mejorar su experiencia y analizar los límites de uso.",
     },
     legal: {
