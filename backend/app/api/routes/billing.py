@@ -15,6 +15,7 @@ import stripe
 from app.api.routes.auth import get_current_user
 from app.core.config import get_cors_origins, settings
 from app.db.session import get_db
+from app.models.activity import ActivityLog
 from app.models.user import LIFETIME_WHITELIST_EMAILS, User
 from app.services.activity_logger import record_activity
 
@@ -316,6 +317,25 @@ def _find_user_for_stripe_object(db: Session, payload: dict[str, Any]) -> User |
     return None
 
 
+def _session_already_applied(db: Session, *, user_id: int, session_id: str | None) -> bool:
+    sid = str(session_id or "").strip()
+    if not sid:
+        return False
+    logs = (
+        db.query(ActivityLog)
+        .filter(ActivityLog.user_id == user_id)
+        .filter(ActivityLog.action.in_(["Stripe purchase applied", "Stripe checkout completed"]))
+        .order_by(ActivityLog.created_at.desc())
+        .limit(200)
+        .all()
+    )
+    for log in logs:
+        meta = log.meta if isinstance(log.meta, dict) else {}
+        if str(meta.get("session_id") or "").strip() == sid:
+            return True
+    return False
+
+
 @router.post("/stripe/checkout-session")
 def create_stripe_checkout_session(
     payload: StripeCheckoutRequest,
@@ -517,6 +537,9 @@ def finalize_stripe_checkout_session(
     if not resolved_tier:
         raise HTTPException(status_code=400, detail="Unable to resolve purchased tier from session.")
 
+    if _session_already_applied(db, user_id=current_user.id, session_id=session_id):
+        return {"status": "ok", "tier": current_user.subscription_tier}
+
     customer_id = checkout.get("customer")
     customer_id_value = customer_id if isinstance(customer_id, str) else None
     subscription_id = checkout.get("subscription")
@@ -543,7 +566,7 @@ def finalize_stripe_checkout_session(
         db,
         user_id=current_user.id,
         action="Stripe purchase applied",
-        meta={"tier": current_user.subscription_tier, "session_id": session_id},
+        meta={"tier": current_user.subscription_tier, "session_id": session_id, "source": "finalize"},
     )
     return {"status": "ok", "tier": current_user.subscription_tier}
 
@@ -586,12 +609,14 @@ async def stripe_webhook(
 
     if event_type == "checkout.session.completed":
         metadata = obj.get("metadata") or {}
+        session_id = obj.get("id") if isinstance(obj.get("id"), str) else None
+        if _session_already_applied(db, user_id=user.id, session_id=session_id):
+            return {"status": "ok"}
         tier = (metadata.get("tier") or "").strip().lower()
         resolved_tier = None
         if tier in {"single", "single_scan", "go", "pro", "lifetime"}:
             resolved_tier = "single" if tier in {"single", "single_scan"} else tier
         if not resolved_tier:
-            session_id = obj.get("id")
             if session_id:
                 line_items = stripe.checkout.Session.list_line_items(session_id, limit=1)
                 price_id = None
@@ -602,10 +627,6 @@ async def stripe_webhook(
                 resolved_tier = _resolve_stripe_tier_by_price_id(price_id)
 
         if resolved_tier:
-            # Single credits are applied via finalize-session after frontend redirect.
-            # Skipping webhook application prevents duplicate credit grants.
-            if resolved_tier == "single":
-                return {"status": "ok"}
             customer_id = obj.get("customer")
             customer_id_value = customer_id if isinstance(customer_id, str) else None
             subscription_id = obj.get("subscription")
@@ -631,7 +652,12 @@ async def stripe_webhook(
                 db,
                 user_id=user.id,
                 action="Stripe checkout completed",
-                meta={"tier": user.subscription_tier, "event": event_type},
+                meta={
+                    "tier": user.subscription_tier,
+                    "event": event_type,
+                    "session_id": session_id,
+                    "source": "webhook",
+                },
             )
 
     elif event_type in {"customer.subscription.deleted"}:
