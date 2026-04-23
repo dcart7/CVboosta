@@ -35,6 +35,7 @@ export default function AnalyzePage() {
   const [jobText, setJobText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
 
   const runAnalysis = async (cvText: string, jobTextValue: string) => {
     setLoading(true);
@@ -80,6 +81,7 @@ export default function AnalyzePage() {
       const email = await fetchWorkspaceEmail(apiBase);
       if (cancelled) return;
       const wid = workspaceIdFromEmail(email);
+      setWorkspaceId(wid);
       migrateLegacyGuestWorkspace(wid);
 
       let storedParsed = localStorage.getItem(parsedCvStorageKey(email));
@@ -106,6 +108,18 @@ export default function AnalyzePage() {
           runAnalysis(cvText, storedJobText);
           return;
         }
+      } else if (storedCvText) {
+        setParsed({
+          raw_text: storedCvText,
+          skills: [],
+          work_experience: [],
+          education: [],
+          achievements: [],
+        });
+        if (storedJobText) {
+          runAnalysis(storedCvText, storedJobText);
+          return;
+        }
       }
       setLoading(false);
     })();
@@ -113,6 +127,11 @@ export default function AnalyzePage() {
       cancelled = true;
     };
   }, [apiBase]);
+
+  useEffect(() => {
+    if (!workspaceId) return;
+    localStorage.setItem(wsFieldKey(workspaceId, "job_text"), jobText);
+  }, [workspaceId, jobText]);
 
   const uploadCv = async () => {
     if (!file) {
@@ -201,7 +220,10 @@ export default function AnalyzePage() {
                       className="textarea"
                       placeholder={t("analyze.placeholder")}
                       value={jobText}
-                      onChange={(event) => setJobText(event.target.value)}
+                      onChange={(event) => {
+                        setJobText(event.target.value);
+                        if (error) setError("");
+                      }}
                     />
                   </div>
                   <button
@@ -216,20 +238,17 @@ export default function AnalyzePage() {
                         setError("Please paste a job description.");
                         return;
                       }
-                      void (async () => {
-                        const email = await fetchWorkspaceEmail(apiBase);
-                        const wid = workspaceIdFromEmail(email);
-                        migrateLegacyGuestWorkspace(wid);
-                        localStorage.setItem(
-                          wsFieldKey(wid, "job_text"),
-                          jobText,
-                        );
-                        localStorage.setItem(
-                          wsFieldKey(wid, "cv_text"),
-                          parsed.raw_text || "",
-                        );
-                        runAnalysis(parsed.raw_text || "", jobText);
-                      })();
+                      const wid = workspaceId || GUEST_WORKSPACE_ID;
+                      migrateLegacyGuestWorkspace(wid);
+                      localStorage.setItem(
+                        wsFieldKey(wid, "job_text"),
+                        jobText,
+                      );
+                      localStorage.setItem(
+                        wsFieldKey(wid, "cv_text"),
+                        parsed.raw_text || "",
+                      );
+                      runAnalysis(parsed.raw_text || "", jobText);
                     }}
                   >
                     {t("common.runAnalysis")}
