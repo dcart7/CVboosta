@@ -179,6 +179,17 @@ export default function TopNav() {
       {isMenuOpen && (
         <div className="mobile-shutter">
           <div className="mobile-shutter-content">
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
+              <button
+                className="btn ghost"
+                onClick={() => setIsMenuOpen(false)}
+                type="button"
+                aria-label="Close menu"
+                style={{ padding: "8px 12px", fontSize: "20px", lineHeight: 1 }}
+              >
+                ✕
+              </button>
+            </div>
             {/* Navigation links */}
             <nav style={{ display: "flex", flexDirection: "column" }}>
               <Link href="/app" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
