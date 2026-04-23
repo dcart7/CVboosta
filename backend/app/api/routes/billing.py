@@ -4,6 +4,7 @@ import json
 import time
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session
 import stripe
 
 from app.api.routes.auth import get_current_user
-from app.core.config import settings
+from app.core.config import get_cors_origins, settings
 from app.db.session import get_db
 from app.models.user import LIFETIME_WHITELIST_EMAILS, User
 from app.services.activity_logger import record_activity
@@ -32,16 +33,34 @@ class StripeCheckoutRequest(BaseModel):
 def _safe_checkout_redirect_url(
     candidate_url: str | None,
     *,
-    origin: str,
+    allowed_origins: set[str],
     fallback_url: str,
 ) -> str:
     value = (candidate_url or "").strip()
     if not value:
         return fallback_url
-    # Prevent open redirect abuse: only allow same-origin redirects.
-    if value.startswith(origin):
+    # Prevent open redirect abuse: only allow redirects to trusted frontend origins.
+    origin = _extract_origin(value)
+    if origin and origin in allowed_origins:
         return value
     return fallback_url
+
+
+def _normalize_origin(value: str | None) -> str | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    return raw.rstrip("/")
+
+
+def _extract_origin(url: str | None) -> str | None:
+    raw = (url or "").strip()
+    if not raw:
+        return None
+    parsed = urlparse(raw)
+    if parsed.scheme and parsed.netloc:
+        return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+    return None
 
 
 def _stripe_to_dict(value: Any) -> dict[str, Any]:
@@ -295,11 +314,47 @@ def create_stripe_checkout_session(
     stripe.api_key = settings.stripe_secret_key
 
     price_id, mode = _resolve_stripe_price_for_checkout(payload.tier, payload.billing_cycle)
-    origin = f"{request.url.scheme}://{request.url.netloc}"
-    success_fallback = f"{origin}/account?billing=success&session_id={{CHECKOUT_SESSION_ID}}"
-    cancel_fallback = f"{origin}/pricing?billing=cancel"
-    success_url = _safe_checkout_redirect_url(payload.success_url, origin=origin, fallback_url=success_fallback)
-    cancel_url = _safe_checkout_redirect_url(payload.cancel_url, origin=origin, fallback_url=cancel_fallback)
+    request_origin = f"{request.url.scheme}://{request.url.netloc}".rstrip("/")
+
+    allowed_origins: set[str] = {request_origin}
+    for value in get_cors_origins():
+        normalized = _normalize_origin(value)
+        if normalized:
+            allowed_origins.add(normalized)
+
+    payload_success_origin = _extract_origin(payload.success_url)
+    payload_cancel_origin = _extract_origin(payload.cancel_url)
+    preferred_frontend_origin = next(
+        (
+            origin
+            for origin in [payload_success_origin, payload_cancel_origin]
+            if origin and origin in allowed_origins
+        ),
+        None,
+    )
+    if not preferred_frontend_origin:
+        preferred_frontend_origin = next(
+            (
+                origin
+                for origin in allowed_origins
+                if origin.startswith("https://")
+                and "localhost" not in origin
+                and "127.0.0.1" not in origin
+                and origin != request_origin
+            ),
+            request_origin,
+        )
+
+    success_fallback = (
+        f"{preferred_frontend_origin}/account?billing=success&session_id={{CHECKOUT_SESSION_ID}}"
+    )
+    cancel_fallback = f"{preferred_frontend_origin}/pricing?billing=cancel"
+    success_url = _safe_checkout_redirect_url(
+        payload.success_url, allowed_origins=allowed_origins, fallback_url=success_fallback
+    )
+    cancel_url = _safe_checkout_redirect_url(
+        payload.cancel_url, allowed_origins=allowed_origins, fallback_url=cancel_fallback
+    )
 
     metadata = {
         "user_id": str(current_user.id),
