@@ -56,8 +56,8 @@ export default function AccountPage() {
 
   const getPlanLabel = (tierRaw: string | null) => {
     const tier = (tierRaw || "").toLowerCase();
-    if (!tier || tier === "free") return "Free";
-    if (tier === "single" || tier === "single_scan") return "Single Scan";
+    if (!tier || tier === "free") return t("account.freePlan");
+    if (tier === "single" || tier === "single_scan") return t("account.freePlan");
     if (tier === "go") return t("pricing.go");
     if (tier === "pro") return t("pricing.pro");
     if (tier === "lifetime") return t("pricing.lifetime");
@@ -315,7 +315,9 @@ export default function AccountPage() {
                   <p>{getPlanLabel(subscriptionTier)}</p>
                   {subscriptionTier === "single" && (
                     <p style={{ marginTop: 6, color: "var(--muted)", fontSize: 13 }}>
-                      Single Scan available: {billingStatus?.single_scan_remaining ?? 0}
+                      {t("account.singleScanActivated")}: {billingStatus?.single_scan_remaining ?? 0}
+                      {" "}
+                      {t("account.scansAvailable")}
                     </p>
                   )}
                   {billingStatus?.cancel_at_period_end &&
