@@ -158,7 +158,7 @@ export default function AnalyzePage() {
   }, [cvAnalysis]);
 
   return (
-    <main className="page">
+    <main className="page analyze-page">
       <TopNav />
       <div className="shell">
         <section className="split fade-up">

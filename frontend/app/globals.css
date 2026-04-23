@@ -3006,7 +3006,72 @@ body {
   min-height: 44px;
 }
 
+/* Analyze page spacing fixes */
+.analyze-page .section {
+  margin-top: 32px;
+}
+
+.analyze-page .form-grid {
+  gap: 20px;
+}
+
+.analyze-page .form-grid > div {
+  display: grid;
+  gap: 12px;
+}
+
+.analyze-page .grid {
+  margin-top: 16px;
+  gap: 20px;
+}
+
+.analyze-page .card p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.analyze-page .nav-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.analyze-page .nav-actions .btn {
+  min-height: 48px;
+}
+
 @media (max-width: 768px) {
+  .analyze-page .form-card {
+    padding: 24px 18px !important;
+  }
+
+  .analyze-page .section-title {
+    margin-bottom: 18px;
+  }
+
+  .analyze-page .hero-subtitle {
+    margin-bottom: 18px;
+    line-height: 1.65;
+  }
+
+  .analyze-page .grid {
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  .analyze-page .nav-actions {
+    margin-top: 26px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .analyze-page .nav-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .shell {
     padding-left: max(16px, env(safe-area-inset-left)) !important;
     padding-right: max(16px, env(safe-area-inset-right)) !important;
