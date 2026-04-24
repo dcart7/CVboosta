@@ -7,19 +7,6 @@ import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
 
-const CheckIcon = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    fill="none" 
-    viewBox="0 0 24 24" 
-    strokeWidth={1.5} 
-    stroke="currentColor" 
-    className={className}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-  </svg>
-);
-
 export default function PricingPage() {
   const { t, language } = useTranslation();
   const router = useRouter();
@@ -273,7 +260,7 @@ export default function PricingPage() {
                 {tier.features.map((feature, idx) => (
                   <li key={idx} className="feature-item">
                     <div className="check-wrapper">
-                      <CheckIcon className="check-icon" />
+                      <span className="check-glyph" aria-hidden="true">✓</span>
                     </div>
                     <span>{feature}</span>
                   </li>
@@ -522,9 +509,10 @@ export default function PricingPage() {
           justify-content: center;
           flex-shrink: 0;
         }
-        .check-icon {
-          width: 12px;
-          height: 12px;
+        .check-glyph {
+          font-size: 12px;
+          line-height: 1;
+          font-weight: 800;
           color: var(--accent);
         }
 
@@ -577,7 +565,7 @@ export default function PricingPage() {
           background: var(--warm);
         }
         .premium .check-wrapper { background: rgba(234, 179, 8, 0.15); }
-        .premium .check-icon { color: #eab308; }
+        .premium .check-glyph { color: #eab308; }
 
         .enterprise-box {
           margin-top: 80px;
