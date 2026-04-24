@@ -5,6 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2Pas
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import (
@@ -133,27 +134,47 @@ def forgot_password(
 ) -> dict:
     # Always return the same response to prevent email enumeration.
     response = {"status": "ok", "message": "If this email exists, reset instructions were sent."}
+    debug: dict[str, object] = {
+        "user_found": False,
+        "reset_link_ready": False,
+        "email_sent": False,
+        "error": None,
+    }
     user = db.query(User).filter(User.email == payload.email.lower().strip()).first()
     if not user:
+        if settings.password_reset_debug_response:
+            return {**response, "debug": debug}
         return response
+    debug["user_found"] = True
 
     try:
         token = create_password_reset_token(user)
         reset_link = build_password_reset_link(token)
         if not reset_link:
+            debug["error"] = "reset_link_empty"
             print(
                 "[password-reset] reset link is empty. Set PASSWORD_RESET_FRONTEND_URL or HTTPS CORS origin."
             )
+            if settings.password_reset_debug_response:
+                return {**response, "debug": debug}
             return response
+        debug["reset_link_ready"] = True
         sent = send_password_reset_email(to_email=user.email, reset_link=reset_link)
         if sent:
             record_activity(db, user_id=user.id, action="Password reset requested", meta={})
+            debug["email_sent"] = True
         else:
+            debug["error"] = "smtp_send_failed"
             print(f"[password-reset] failed to send reset email to {user.email}")
     except Exception:
         # Keep response generic to avoid account/email leaks.
+        debug["error"] = "unexpected_exception"
         print(f"[password-reset] unexpected error while preparing reset for {user.email}")
+        if settings.password_reset_debug_response:
+            return {**response, "debug": debug}
         return response
+    if settings.password_reset_debug_response:
+        return {**response, "debug": debug}
     return response
 
 
