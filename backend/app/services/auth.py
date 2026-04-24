@@ -22,8 +22,13 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def normalize_password_input(password: str) -> str:
-    # Normalize Unicode variants and trim accidental edge whitespace from mobile keyboards.
-    return unicodedata.normalize("NFKC", password or "").strip()
+    # Normalize Unicode variants, drop invisible control chars, and trim edge whitespace
+    # that often appears from mobile autofill/copy-paste flows.
+    normalized = unicodedata.normalize("NFKC", password or "")
+    invisible_chars = {"\u200b", "\u200c", "\u200d", "\ufeff", "\u2060"}
+    cleaned = "".join(ch for ch in normalized if ch not in invisible_chars)
+    cleaned = cleaned.replace("\u00A0", " ").replace("\u202F", " ")
+    return cleaned.strip()
 
 
 def create_access_token(user: User) -> str:
