@@ -346,7 +346,7 @@ export const translations = {
         "If this email exists, we've sent a password reset link. Check your inbox.",
       checkInbox: "Check your inbox",
       checkInboxDesc:
-        "The message comes from support@virelsolutions.com. It may take up to a few minutes.",
+        "The message comes from Virel Solutions. It may take up to a few minutes.",
       backToLogin: "Back to login",
       resetRequestFailed: "Could not request reset link.",
       resetPasswordTitle: "Set a new password",
@@ -536,6 +536,9 @@ export const translations = {
       enterpriseSubtitle: "Looking for custom limits or volume licenses for your organization?",
       contactSales: "Contact Sales →",
       activePlan: "Active Plan",
+      switchCycleCta: "Switch Billing Cycle",
+      confirmCycleSwitch: "Are you sure you want to switch billing cycle?",
+      confirmCycleDowngrade: "Are you sure you want to switch from monthly to weekly billing?",
       },
       premiumModal: {
         title: "Daily Limit Reached",
@@ -888,7 +891,7 @@ export const translations = {
         "Якщо такий email існує, ми надіслали посилання для скидання. Перевірте пошту.",
       checkInbox: "Перевірте пошту",
       checkInboxDesc:
-        "Лист надходить з support@virelsolutions.com. Це може зайняти кілька хвилин.",
+        "Лист надходить від Virel Solutions. Це може зайняти кілька хвилин.",
       backToLogin: "Назад до входу",
       resetRequestFailed: "Не вдалося надіслати посилання для скидання.",
       resetPasswordTitle: "Створіть новий пароль",
@@ -1078,6 +1081,9 @@ export const translations = {
       enterpriseSubtitle: "Шукаєте індивідуальні ліміти або групові ліцензії для вашої організації?",
       contactSales: "Зв’язатися з відділом продажів →",
       activePlan: "Активний план",
+      switchCycleCta: "Змінити цикл оплати",
+      confirmCycleSwitch: "Ви впевнені, що хочете змінити цикл оплати?",
+      confirmCycleDowngrade: "Ви впевнені, що хочете перейти з місячного на тижневий цикл оплати?",
       },
       premiumModal: {
         title: "Денний ліміт вичерпано",
@@ -1422,7 +1428,7 @@ export const translations = {
         "Jeśli email istnieje, wysłaliśmy link do resetu hasła. Sprawdź skrzynkę.",
       checkInbox: "Sprawdź skrzynkę",
       checkInboxDesc:
-        "Wiadomość przyjdzie z support@virelsolutions.com. Może to potrwać kilka minut.",
+        "Wiadomość przyjdzie od Virel Solutions. Może to potrwać kilka minut.",
       backToLogin: "Powrót do logowania",
       resetRequestFailed: "Nie udało się wysłać linku resetującego.",
       resetPasswordTitle: "Ustaw nowe hasło",
@@ -1612,6 +1618,9 @@ export const translations = {
       enterpriseSubtitle: "Szukasz niestandardowych limitów lub licencji wolumenowych dla swojej organizacji?",
       contactSales: "Skontaktuj się z działem sprzedaży →",
       activePlan: "Aktywny plan",
+      switchCycleCta: "Zmień cykl rozliczeń",
+      confirmCycleSwitch: "Czy na pewno chcesz zmienić cykl rozliczeń?",
+      confirmCycleDowngrade: "Czy na pewno chcesz przejść z rozliczenia miesięcznego na tygodniowe?",
       },
       premiumModal: {
         title: "Dzienny limit wyczerpany",
@@ -1951,7 +1960,7 @@ export const translations = {
         "Ak email existuje, poslali sme odkaz na reset hesla. Skontrolujte schránku.",
       checkInbox: "Skontrolujte schránku",
       checkInboxDesc:
-        "Správa príde z support@virelsolutions.com. Môže to trvať pár minút.",
+        "Správa príde od Virel Solutions. Môže to trvať pár minút.",
       backToLogin: "Späť na prihlásenie",
       resetRequestFailed: "Nepodarilo sa odoslať odkaz na reset.",
       resetPasswordTitle: "Nastavte nové heslo",
@@ -2144,6 +2153,9 @@ export const translations = {
       enterpriseSubtitle: "Hľadáte vlastné limity alebo hromadné licencie pre vašu organizáciu?",
       contactSales: "Kontaktovať obchodné oddelenie →",
       activePlan: "Aktívny plán",
+      switchCycleCta: "Zmeniť fakturačný cyklus",
+      confirmCycleSwitch: "Naozaj chcete zmeniť fakturačný cyklus?",
+      confirmCycleDowngrade: "Naozaj chcete prejsť z mesačného na týždenný fakturačný cyklus?",
       },
       premiumModal: {
         title: "Denný limit vyčerpaný",
@@ -2494,7 +2506,7 @@ export const translations = {
         "Pokud email existuje, poslali jsme odkaz pro reset hesla. Zkontrolujte schránku.",
       checkInbox: "Zkontrolujte schránku",
       checkInboxDesc:
-        "Zpráva přijde z support@virelsolutions.com. Může to trvat pár minut.",
+        "Zpráva přijde od Virel Solutions. Může to trvat pár minut.",
       backToLogin: "Zpět na přihlášení",
       resetRequestFailed: "Nepodařilo se odeslat odkaz pro reset.",
       resetPasswordTitle: "Nastavte nové heslo",
@@ -2684,6 +2696,9 @@ export const translations = {
       enterpriseSubtitle: "Hledáte objemové licence?",
       contactSales: "Kontaktovat →",
       activePlan: "Aktivní plán",
+      switchCycleCta: "Změnit fakturační cyklus",
+      confirmCycleSwitch: "Opravdu chcete změnit fakturační cyklus?",
+      confirmCycleDowngrade: "Opravdu chcete přejít z měsíčního na týdenní fakturační cyklus?",
       },
       premiumModal: {
         title: "Dosažen denní limit",
@@ -3029,7 +3044,7 @@ export const translations = {
         "Si el email existe, enviamos un enlace para restablecer la contraseña. Revisa tu bandeja.",
       checkInbox: "Revisa tu bandeja",
       checkInboxDesc:
-        "El mensaje llega desde support@virelsolutions.com. Puede tardar unos minutos.",
+        "El mensaje llega de Virel Solutions. Puede tardar unos minutos.",
       backToLogin: "Volver al login",
       resetRequestFailed: "No se pudo solicitar el enlace de restablecimiento.",
       resetPasswordTitle: "Crear nueva contraseña",
@@ -3222,6 +3237,9 @@ export const translations = {
       enterpriseSubtitle: "¿Buscas límites personalizados o licencias por volumen para tu organización?",
       contactSales: "Contactar con ventas →",
       activePlan: "Plan activo",
+      switchCycleCta: "Cambiar ciclo de cobro",
+      confirmCycleSwitch: "¿Seguro que quieres cambiar el ciclo de cobro?",
+      confirmCycleDowngrade: "¿Seguro que quieres cambiar de cobro mensual a semanal?",
       },
       premiumModal: {
         title: "Límite diario alcanzado",

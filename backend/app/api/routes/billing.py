@@ -205,6 +205,24 @@ def _resolve_stripe_tier_by_price_id(price_id: str | None) -> str | None:
     return price_map.get(price_id)
 
 
+def _resolve_stripe_cycle_by_price_id(price_id: str | None) -> str | None:
+    if not price_id:
+        return None
+    weekly_prices = {
+        settings.stripe_price_go_weekly,
+        settings.stripe_price_pro_weekly,
+    }
+    monthly_prices = {
+        settings.stripe_price_go_monthly,
+        settings.stripe_price_pro_monthly,
+    }
+    if price_id in weekly_prices:
+        return "week"
+    if price_id in monthly_prices:
+        return "month"
+    return None
+
+
 def _resolve_stripe_price_for_checkout(tier: str, billing_cycle: str | None) -> tuple[str, str]:
     tier_key = (tier or "").strip().lower()
     cycle_key = (billing_cycle or "").strip().lower()
@@ -829,6 +847,7 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
 
     cancel_at_period_end = False
     active_until = current_user.subscription_active_until
+    billing_cycle = None
     if (
         settings.stripe_secret_key
         and current_user.paddle_subscription_id
@@ -849,6 +868,11 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
                 active_until = None
             else:
                 mapped_tier = _extract_stripe_subscription_tier(sub_data)
+                items = sub_data.get("items", {}).get("data", [])
+                if isinstance(items, list) and items:
+                    price_obj = items[0].get("price", {})
+                    if isinstance(price_obj, dict):
+                        billing_cycle = _resolve_stripe_cycle_by_price_id(price_obj.get("id"))
                 if mapped_tier and mapped_tier != current_user.subscription_tier:
                     current_user.subscription_tier = mapped_tier
                     db.add(current_user)
@@ -875,6 +899,7 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
         "limits": limits,
         "usage": usage,
         "single_scan_remaining": max(0, usage["scans"]) if tier == "single" else None,
+        "billing_cycle": billing_cycle,
         "cancel_at_period_end": cancel_at_period_end,
         "subscription_active_until": active_until.isoformat() if active_until else None,
     }

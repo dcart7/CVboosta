@@ -31,6 +31,7 @@ type BillingStatusResponse = {
     prep: number;
   };
   single_scan_remaining?: number | null;
+  billing_cycle?: "week" | "month" | null;
   cancel_at_period_end?: boolean;
   subscription_active_until?: string | null;
 };
@@ -54,12 +55,23 @@ export default function AccountPage() {
   );
   const apiBase = getApiBase();
 
-  const getPlanLabel = (tierRaw: string | null) => {
+  const getPlanLabel = (
+    tierRaw: string | null,
+    billingCycle: "week" | "month" | null | undefined,
+  ) => {
     const tier = (tierRaw || "").toLowerCase();
     if (!tier || tier === "free") return t("account.freePlan");
     if (tier === "single" || tier === "single_scan") return t("account.freePlan");
-    if (tier === "go") return t("pricing.go");
-    if (tier === "pro") return t("pricing.pro");
+    if (tier === "go") {
+      if (billingCycle === "week") return `${t("pricing.go")} Weekly`;
+      if (billingCycle === "month") return `${t("pricing.go")} Monthly`;
+      return t("pricing.go");
+    }
+    if (tier === "pro") {
+      if (billingCycle === "week") return `${t("pricing.pro")} Weekly`;
+      if (billingCycle === "month") return `${t("pricing.pro")} Monthly`;
+      return t("pricing.pro");
+    }
     if (tier === "lifetime") return t("pricing.lifetime");
     return tierRaw || "Free";
   };
@@ -312,7 +324,7 @@ export default function AccountPage() {
                 </div>
                 <div className="card">
                   <h3>{t("account.plan")}</h3>
-                  <p>{getPlanLabel(subscriptionTier)}</p>
+                  <p>{getPlanLabel(subscriptionTier, billingStatus?.billing_cycle)}</p>
                   {subscriptionTier === "single" && (
                     <p style={{ marginTop: 6, color: "var(--muted)", fontSize: 13 }}>
                       {t("account.singleScanActivated")}: {billingStatus?.single_scan_remaining ?? 0}

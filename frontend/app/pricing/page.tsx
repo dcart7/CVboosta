@@ -28,6 +28,7 @@ export default function PricingPage() {
   const [mounted, setMounted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [activeTier, setActiveTier] = useState<string | null>(null);
+  const [activeBillingCycle, setActiveBillingCycle] = useState<"week" | "month" | null>(null);
   const tierRank: Record<string, number> = {
     single: 1,
     go: 2,
@@ -63,6 +64,11 @@ export default function PricingPage() {
         const data = await res.json();
         if (!cancelled && typeof data?.tier === "string") {
           setActiveTier(data.tier.toLowerCase());
+          if (data?.billing_cycle === "week" || data?.billing_cycle === "month") {
+            setActiveBillingCycle(data.billing_cycle);
+          } else {
+            setActiveBillingCycle(null);
+          }
         }
       } catch {
         // ignore, pricing page still works without badge
@@ -213,19 +219,29 @@ export default function PricingPage() {
           {tiers.map((tier) => (
             (() => {
               const isSingleTier = tier.id === "single";
+              const isCycleSwitch =
+                (tier.id === "go" || tier.id === "pro") &&
+                activeTier === tier.id &&
+                (activeBillingCycle === "week" || activeBillingCycle === "month") &&
+                activeBillingCycle !== billingCycle;
+              const isDowngradeCycleSwitch =
+                isCycleSwitch && activeBillingCycle === "month" && billingCycle === "week";
               const isActive =
                 !isSingleTier &&
-                ((tier.id === "go" && activeTier === "go") ||
-                  (tier.id === "pro" && activeTier === "pro") ||
+                ((tier.id === "go" && activeTier === "go" && !isCycleSwitch) ||
+                  (tier.id === "pro" && activeTier === "pro" && !isCycleSwitch) ||
                   (tier.id === "lifetime" && activeTier === "lifetime"));
               const activeRank =
                 activeTier && activeTier !== "single" && tierRank[activeTier]
                   ? tierRank[activeTier]
                   : 0;
-              const isUpgrade = isSingleTier || activeRank === 0 || tierRank[tier.id] > activeRank;
-              const canCheckout = isSingleTier ? true : !isActive && isUpgrade;
+              const isUpgrade =
+                isSingleTier || isCycleSwitch || activeRank === 0 || tierRank[tier.id] > activeRank;
+              const canCheckout = isSingleTier ? true : isCycleSwitch || (!isActive && isUpgrade);
               const ctaLabel = isActive
                 ? t("pricing.activePlan")
+                : isCycleSwitch
+                ? t("pricing.switchCycleCta")
                 : isUpgrade
                 ? tier.cta
                 : pricingUiCopy[language].notUpgrade;
@@ -267,6 +283,10 @@ export default function PricingPage() {
               <button
                 onClick={() => {
                   if (!canCheckout) return;
+                  if (isDowngradeCycleSwitch) {
+                    const confirmed = window.confirm(t("pricing.confirmCycleDowngrade"));
+                    if (!confirmed) return;
+                  }
                   openCheckout(tier.id);
                 }}
                 className={`cta-button ${!canCheckout ? "is-disabled" : ""}`}
