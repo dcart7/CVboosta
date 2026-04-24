@@ -24,12 +24,12 @@ def build_password_reset_link(token: str) -> str:
     return f"{base}/reset-password?token={token}"
 
 
-def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
+def send_password_reset_email(*, to_email: str, reset_link: str) -> tuple[bool, str | None]:
     host = (settings.smtp_host or "").strip()
     if not host:
         # SMTP not configured; keep API flow successful to avoid email enumeration.
         print(f"[password-reset] SMTP_HOST missing. Link for {to_email}: {reset_link}")
-        return False
+        return False, "smtp_host_missing"
 
     message = EmailMessage()
     message["From"] = settings.smtp_from_email
@@ -53,7 +53,7 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
                 if username:
                     server.login(username, password)
                 server.send_message(message)
-            return True
+            return True, None
 
         with smtplib.SMTP(host, port, timeout=20) as server:
             if settings.smtp_use_tls:
@@ -61,8 +61,9 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
             if username:
                 server.login(username, password)
             server.send_message(message)
-        return True
+        return True, None
     except Exception as exc:
+        error_text = str(exc)
         print(
             "[password-reset] SMTP send failed:",
             {
@@ -72,7 +73,7 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
                 "username_set": bool(username),
                 "tls": settings.smtp_use_tls,
                 "ssl": settings.smtp_use_ssl,
-                "error": str(exc),
+                "error": error_text,
             },
         )
-        return False
+        return False, error_text

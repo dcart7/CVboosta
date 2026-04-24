@@ -139,6 +139,7 @@ def forgot_password(
         "reset_link_ready": False,
         "email_sent": False,
         "error": None,
+        "smtp_error": None,
     }
     user = db.query(User).filter(User.email == payload.email.lower().strip()).first()
     if not user:
@@ -159,12 +160,13 @@ def forgot_password(
                 return {**response, "debug": debug}
             return response
         debug["reset_link_ready"] = True
-        sent = send_password_reset_email(to_email=user.email, reset_link=reset_link)
+        sent, smtp_error = send_password_reset_email(to_email=user.email, reset_link=reset_link)
         if sent:
             record_activity(db, user_id=user.id, action="Password reset requested", meta={})
             debug["email_sent"] = True
         else:
             debug["error"] = "smtp_send_failed"
+            debug["smtp_error"] = smtp_error
             print(f"[password-reset] failed to send reset email to {user.email}")
     except Exception:
         # Keep response generic to avoid account/email leaks.
