@@ -23,6 +23,7 @@ from app.services.auth import (
     decode_access_token,
     decode_password_reset_token,
     hash_password,
+    normalize_password_input,
     validate_password_reset_token_for_user,
     verify_password,
 )
@@ -37,9 +38,12 @@ optional_bearer = HTTPBearer(auto_error=False)
 
 @router.post("/auth/register", response_model=AuthResponse)
 def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> AuthResponse:
+    normalized_password = normalize_password_input(payload.password)
+    if len(normalized_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
     user = User(
         email=payload.email.lower().strip(), 
-        password_hash=hash_password(payload.password),
+        password_hash=hash_password(normalized_password),
         full_name=payload.full_name
     )
     try:
@@ -58,7 +62,15 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> AuthRes
 @router.post("/auth/login", response_model=AuthResponse)
 def login(payload: LoginRequest, db: Session = Depends(get_db)) -> AuthResponse:
     user = db.query(User).filter(User.email == payload.email.lower().strip()).first()
-    if not user or not verify_password(payload.password, user.password_hash):
+    provided_password = payload.password
+    normalized_password = normalize_password_input(provided_password)
+    candidates = [provided_password]
+    if normalized_password != provided_password:
+        candidates.append(normalized_password)
+    valid_password = bool(user) and any(
+        verify_password(candidate, user.password_hash) for candidate in candidates
+    )
+    if not user or not valid_password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
@@ -115,11 +127,23 @@ def change_password(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> dict:
-    if not verify_password(payload.current_password, current_user.password_hash):
+    current_raw = payload.current_password
+    current_normalized = normalize_password_input(current_raw)
+    current_candidates = [current_raw]
+    if current_normalized != current_raw:
+        current_candidates.append(current_normalized)
+    current_valid = any(
+        verify_password(candidate, current_user.password_hash)
+        for candidate in current_candidates
+    )
+    if not current_valid:
         raise HTTPException(status_code=400, detail="Current password is incorrect")
-    if payload.current_password == payload.new_password:
+    new_password_normalized = normalize_password_input(payload.new_password)
+    if len(new_password_normalized) < 8:
+        raise HTTPException(status_code=400, detail="New password must be at least 8 characters.")
+    if verify_password(new_password_normalized, current_user.password_hash):
         raise HTTPException(status_code=400, detail="New password must be different")
-    current_user.password_hash = hash_password(payload.new_password)
+    current_user.password_hash = hash_password(new_password_normalized)
     db.add(current_user)
     db.commit()
     record_activity(db, user_id=current_user.id, action="Password updated", meta={})
@@ -177,10 +201,13 @@ def reset_password(
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Invalid or expired reset link.") from exc
 
-    if verify_password(payload.new_password, user.password_hash):
+    new_password_normalized = normalize_password_input(payload.new_password)
+    if len(new_password_normalized) < 8:
+        raise HTTPException(status_code=400, detail="New password must be at least 8 characters.")
+    if verify_password(new_password_normalized, user.password_hash):
         raise HTTPException(status_code=400, detail="New password must be different.")
 
-    user.password_hash = hash_password(payload.new_password)
+    user.password_hash = hash_password(new_password_normalized)
     db.add(user)
     db.commit()
     record_activity(db, user_id=user.id, action="Password reset completed", meta={})

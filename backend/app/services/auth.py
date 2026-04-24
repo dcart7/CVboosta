@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 import hashlib
+import unicodedata
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -18,6 +19,11 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, password_hash: str) -> bool:
     return pwd_context.verify(password, password_hash)
+
+
+def normalize_password_input(password: str) -> str:
+    # Normalize Unicode variants and trim accidental edge whitespace from mobile keyboards.
+    return unicodedata.normalize("NFKC", password or "").strip()
 
 
 def create_access_token(user: User) -> str:
