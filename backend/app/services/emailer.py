@@ -24,12 +24,12 @@ def build_password_reset_link(token: str) -> str:
     return f"{base}/reset-password?token={token}"
 
 
-def send_password_reset_email(*, to_email: str, reset_link: str) -> tuple[bool, str | None]:
+def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
     host = (settings.smtp_host or "").strip()
     if not host:
         # SMTP not configured; keep API flow successful to avoid email enumeration.
         print(f"[password-reset] SMTP_HOST missing. Link for {to_email}: {reset_link}")
-        return False, "smtp_host_missing"
+        return False
 
     message = EmailMessage()
     message["From"] = settings.smtp_from_email
@@ -53,7 +53,7 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> tuple[bool, 
                 if username:
                     server.login(username, password)
                 server.send_message(message)
-            return True, None
+            return True
 
         with smtplib.SMTP(host, port, timeout=20) as server:
             if settings.smtp_use_tls:
@@ -61,7 +61,7 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> tuple[bool, 
             if username:
                 server.login(username, password)
             server.send_message(message)
-        return True, None
+        return True
     except Exception as exc:
         error_text = str(exc)
         print(
@@ -76,4 +76,4 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> tuple[bool, 
                 "error": error_text,
             },
         )
-        return False, error_text
+        return False

@@ -74,7 +74,6 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = True
     smtp_use_ssl: bool = False
     smtp_from_email: str = "support@virelsolutions.com"
-    password_reset_debug_response: bool = False
 
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",
