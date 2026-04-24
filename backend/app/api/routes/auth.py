@@ -140,11 +140,19 @@ def forgot_password(
     try:
         token = create_password_reset_token(user)
         reset_link = build_password_reset_link(token)
-        if reset_link:
-            send_password_reset_email(to_email=user.email, reset_link=reset_link)
+        if not reset_link:
+            print(
+                "[password-reset] reset link is empty. Set PASSWORD_RESET_FRONTEND_URL or HTTPS CORS origin."
+            )
+            return response
+        sent = send_password_reset_email(to_email=user.email, reset_link=reset_link)
+        if sent:
             record_activity(db, user_id=user.id, action="Password reset requested", meta={})
+        else:
+            print(f"[password-reset] failed to send reset email to {user.email}")
     except Exception:
         # Keep response generic to avoid account/email leaks.
+        print(f"[password-reset] unexpected error while preparing reset for {user.email}")
         return response
     return response
 

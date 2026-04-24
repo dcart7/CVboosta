@@ -43,20 +43,36 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
     )
 
     username = (settings.smtp_username or "").strip()
-    password = settings.smtp_password or ""
+    # Gmail app-passwords are often copied with spaces; strip them safely.
+    password = (settings.smtp_password or "").replace(" ", "")
     port = settings.smtp_port
 
-    if settings.smtp_use_ssl:
-        with smtplib.SMTP_SSL(host, port, timeout=20) as server:
+    try:
+        if settings.smtp_use_ssl:
+            with smtplib.SMTP_SSL(host, port, timeout=20) as server:
+                if username:
+                    server.login(username, password)
+                server.send_message(message)
+            return True
+
+        with smtplib.SMTP(host, port, timeout=20) as server:
+            if settings.smtp_use_tls:
+                server.starttls()
             if username:
                 server.login(username, password)
             server.send_message(message)
         return True
-
-    with smtplib.SMTP(host, port, timeout=20) as server:
-        if settings.smtp_use_tls:
-            server.starttls()
-        if username:
-            server.login(username, password)
-        server.send_message(message)
-    return True
+    except Exception as exc:
+        print(
+            "[password-reset] SMTP send failed:",
+            {
+                "to": to_email,
+                "host": host,
+                "port": port,
+                "username_set": bool(username),
+                "tls": settings.smtp_use_tls,
+                "ssl": settings.smtp_use_ssl,
+                "error": str(exc),
+            },
+        )
+        return False
