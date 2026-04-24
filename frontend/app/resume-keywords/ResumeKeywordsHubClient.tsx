@@ -4,11 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
-import type { ResumeKeywordCluster, RoleCategory } from "../lib/resumeKeywordClusters";
+import type { RoleCategory } from "../lib/resumeKeywordClusters";
 import { getResumeKeywordsUi, getSectorLabel, localizeRoleName } from "../lib/resumeKeywordsI18n";
 
+type HubCluster = {
+  slug: string;
+  role: string;
+  category: RoleCategory;
+};
+
 type Props = {
-  clusters: ResumeKeywordCluster[];
+  clusters: HubCluster[];
 };
 
 const CATEGORY_ORDER: RoleCategory[] = [

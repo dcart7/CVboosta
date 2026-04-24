@@ -16,7 +16,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/blog",
     "/free-ats-resume-checker",
     "/resume-keywords",
-    "/share/result",
     "/ai.txt",
     "/llms.txt",
     "/pricing",

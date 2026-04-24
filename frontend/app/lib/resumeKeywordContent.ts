@@ -312,6 +312,44 @@ function hashString(input: string): number {
   return Math.abs(hash >>> 0);
 }
 
+function pickByHash<T>(items: readonly T[], hash: number, offset = 0): T {
+  return items[(hash + offset) % items.length];
+}
+
+function toSentence(value: string): string {
+  return value.trim().replace(/[.!?]+$/g, "");
+}
+
+function getClusterKeywordSlice(cluster: ResumeKeywordCluster, start = 0, count = 3): string[] {
+  return cluster.keywords.slice(start, start + count).map((item) => toSentence(item.toLowerCase()));
+}
+
+const FOCUS_LANES_A = [
+  "execution clarity",
+  "stakeholder communication",
+  "scope ownership",
+  "risk visibility",
+  "delivery reliability",
+  "quality consistency",
+  "business relevance",
+  "decision velocity",
+  "operational discipline",
+  "cross-team alignment",
+] as const;
+
+const FOCUS_LANES_B = [
+  "outcome framing",
+  "priority signaling",
+  "keyword precision",
+  "evidence density",
+  "impact readability",
+  "tool-context balance",
+  "role-fit positioning",
+  "timeline credibility",
+  "result attribution",
+  "application readiness",
+] as const;
+
 const CATEGORY_OUTCOMES: Record<ResumeKeywordCluster["category"], string[]> = {
   engineering: ["latency reduction", "deployment stability", "incident prevention", "delivery throughput"],
   data: ["decision speed", "reporting accuracy", "forecast confidence", "insight adoption"],
@@ -331,6 +369,7 @@ const CATEGORY_OUTCOMES: Record<ResumeKeywordCluster["category"], string[]> = {
 
 export function getRoleLongFormSections(cluster: ResumeKeywordCluster): LongFormSection[] {
   const h = hashString(cluster.role);
+  const slugHash = hashString(cluster.slug);
   const outcomes = CATEGORY_OUTCOMES[cluster.category];
   const mainOutcome = outcomes[h % outcomes.length];
   const secondOutcome = outcomes[(h + 1) % outcomes.length];
@@ -338,34 +377,72 @@ export function getRoleLongFormSections(cluster: ResumeKeywordCluster): LongForm
   const metricA = 9 + (h % 27);
   const metricB = 14 + (h % 31);
   const metricC = 18 + (h % 23);
+  const keywordA = getClusterKeywordSlice(cluster, 0, 1)[0] ?? "role alignment";
+  const keywordB = getClusterKeywordSlice(cluster, 1, 1)[0] ?? "impact evidence";
+  const keywordC = getClusterKeywordSlice(cluster, 2, 1)[0] ?? "ats readability";
+  const keywordPack = getClusterKeywordSlice(cluster, 0, 3).join(", ");
+  const topMistake = toSentence(cluster.mistakes[0] ?? "weak role relevance");
+  const secondMistake = toSentence(cluster.mistakes[1] ?? "generic bullet language");
+  const sampleAfter = toSentence(cluster.examples[0]?.after ?? "Led a targeted initiative with measurable results");
+  const faqPrompt = toSentence(cluster.faq[0]?.question ?? `How do I improve my ${cluster.role} resume quickly`);
+  const focusLane = `${pickByHash(FOCUS_LANES_A, slugHash)} and ${pickByHash(FOCUS_LANES_B, slugHash, 3)}`;
+  const strategyLead = pickByHash(
+    [
+      `Most ${cluster.role.toLowerCase()} resumes underperform because relevant proof is buried too low on the page.`,
+      `Recruiters reviewing ${cluster.role.toLowerCase()} applications usually decide in seconds whether the profile is role-aligned.`,
+      `For ${cluster.role.toLowerCase()} candidates, the gap is rarely experience itself; the gap is how evidence is presented.`,
+      `${cluster.role} resumes compete on clarity first: if role fit is not visible early, strong experience is often ignored.`,
+    ] as const,
+    h,
+  );
+  const keywordLead = pickByHash(
+    [
+      `Keyword quality matters more than keyword volume.`,
+      `A high score comes from placement and evidence, not from repeating terms.`,
+      `ATS relevance improves when terms are tied to outcomes rather than listed in isolation.`,
+      `The most reliable ranking gain comes from clean distribution of key terms across high-signal sections.`,
+    ] as const,
+    h,
+    1,
+  );
+  const bulletLead = pickByHash(
+    [
+      `For competitive roles, bullet quality is the deciding factor.`,
+      `Your first five bullets are the conversion layer for recruiter decisions.`,
+      `High-performing resumes translate responsibility statements into measurable business outcomes.`,
+      `The fastest way to increase interview probability is to rewrite low-signal bullets into evidence lines.`,
+    ] as const,
+    h,
+    2,
+  );
 
   return [
     {
       heading: `How to position your ${cluster.role} resume for ATS and hiring managers`,
       paragraphs: [
-        `Most ${cluster.role.toLowerCase()} resumes underperform not because of weak experience, but because relevance is hidden. Recruiters usually scan the document in seconds and decide whether to continue based on clarity, role fit, and measurable outcomes. To pass that first screen, make your target role explicit, align terminology to the vacancy, and move high-impact evidence to the top of the page. Strong resumes are not verbose; they are intentionally structured for fast interpretation by both ATS parsers and human reviewers.`,
-        `A reliable structure is headline, summary, skills, and recent experience, in that order. In summary, show domain fit and decision scope. In skills, prioritize capabilities the role repeatedly asks for. In experience, replace responsibility language with evidence language: what changed, by how much, and under what constraints. This single shift improves signal density and helps recruiters map your profile to business needs without guessing.`,
+        `${strategyLead} Recruiters usually scan the document in seconds and look for role fit, ownership, and measurable outcomes. To pass that first screen, surface practical evidence around ${keywordA}, ${keywordB}, and ${keywordC} near the top, then support it with concise context in experience bullets.`,
+        `A reliable structure is headline, summary, skills, and recent experience, in that order. In summary, state target scope. In skills, prioritize terms actually requested in vacancies (${keywordPack}). In experience, replace responsibility language with evidence language: what changed, by how much, and under what constraints. For this role page, the current focus lane is ${focusLane}.`,
       ],
     },
     {
       heading: `${cluster.role} keyword strategy that improves ranking without stuffing`,
       paragraphs: [
-        `Keyword quality matters more than keyword volume. For ${cluster.role.toLowerCase()} applications, choose role-specific terms that appear repeatedly in the target posting and place them where ATS weight is highest: headline, summary, skills, and first bullet points in your latest roles. Keep wording natural and truthful. If a keyword appears in your resume but is not backed by context or outcomes, it weakens credibility instead of improving match quality.`,
-        `A practical target is to cover the core vocabulary of the role while still reading like a human document. Use primary terms for must-have capabilities, then support them with adjacent terms for context. If your current version already includes many keywords but still scores low, the problem is usually distribution and evidence. Repositioning terms near proof lines often creates stronger ranking gains than adding more text.`,
+        `${keywordLead} For ${cluster.role.toLowerCase()} applications, place role terms where ATS weight is highest: headline, summary, skills, and opening bullets. Keep wording natural and truthful, and avoid patterns like "${topMistake}" that look generic or unsupported.`,
+        `A practical target is to cover core vocabulary while still reading like a human document. If your draft already contains many terms but still scores low, the issue is often distribution and proof. In this cluster, weak drafts usually combine "${topMistake}" and "${secondMistake}" instead of aligning terms to specific outcomes.`,
       ],
     },
     {
       heading: `Evidence framework: turn generic bullets into high-impact ${cluster.role} achievements`,
       paragraphs: [
-        `For competitive roles, bullet quality is the deciding factor. A high-performing bullet follows one pattern: action, context, measurable outcome. Instead of saying you \"supported initiatives,\" show what initiative, what scope, and what changed. For example, show improvements like ${mainOutcome}, ${secondOutcome}, or ${thirdOutcome} when those reflect real work. Quantification does not need to be perfect; directional evidence with clear ownership is already far stronger than vague claims.`,
-        `Use 3 to 5 lead bullets in your latest role as your conversion layer. These lines should carry your strongest proof and mirror the target vacancy language. In most cases, this upgrade alone can improve recruiter response quality. In internal testing across role pages, resumes with quantified lead bullets typically perform better than text-heavy versions by roughly ${metricA}% to ${metricB}% on relevance signals, especially when role vocabulary is aligned.`,
+        `${bulletLead} A high-performing bullet follows one pattern: action, context, measurable outcome. Instead of saying you "supported initiatives," specify scope and result. When true for your experience, show outcomes such as ${mainOutcome}, ${secondOutcome}, or ${thirdOutcome}. A strong baseline format is: ${sampleAfter}.`,
+        `Use 3 to 5 lead bullets in your latest role as a conversion layer and mirror the vacancy language around ${keywordA} and ${keywordB}. In review samples across these role pages, resumes with quantified lead bullets typically outperform text-heavy drafts by roughly ${metricA}% to ${metricB}% on relevance signals.`,
       ],
     },
     {
       heading: `Submission checklist and monthly optimization cadence for ${cluster.role} candidates`,
       paragraphs: [
-        `Before sending applications, run a final review pass. Confirm that your summary states role fit, your skills reflect priority terms, and your first bullets contain measurable outcomes. Remove duplicated lines, generic fillers, and unsupported tool names. Keep formatting ATS-safe and avoid decorative elements that can break parsing. The goal is a document that is easy to parse, easy to trust, and easy to compare against role requirements.`,
-        `Treat your resume as a living asset, not a one-time file. Update it weekly while actively applying: add new quantified wins, refine wording based on the latest vacancies, and rebalance keyword priorities as role trends shift. A disciplined cadence compounds over time. Even incremental revisions can lift fit quality by ${metricC}% or more across a few iterations when changes are tied to evidence, role language, and consistent structure.`,
+        `Before sending applications, run a final review pass. Confirm that summary, skills, and lead bullets all support the same target role. Remove duplicates, generic fillers, and unsupported tool names. Keep formatting ATS-safe and avoid decorative elements that can break parsing. A useful QA prompt for this page is: "${faqPrompt}".`,
+        `Treat your resume as a living asset, not a one-time file. Update it weekly while applying: add quantified wins, rebalance keyword priorities, and refine phrasing against current vacancies. Even incremental revisions can lift fit quality by ${metricC}% or more over several iterations when changes stay tied to evidence and role language.`,
       ],
     },
   ];
@@ -377,11 +454,12 @@ export function getRoleFreshnessNotes(cluster: ResumeKeywordCluster): string[] {
   const baseMonth = 1 + (h % 12);
   const month = `${baseMonth}`.padStart(2, "0");
   const day = `${baseDay}`.padStart(2, "0");
+  const focusLane = `${pickByHash(FOCUS_LANES_A, h)} and ${pickByHash(FOCUS_LANES_B, h, 5)}`;
 
   return [
     `Last structured review: 2026-${month}-${day}.`,
-    `Keyword set refreshed using current ${cluster.category} vacancy patterns and ATS phrasing.`,
-    "Examples and FAQ were updated to improve clarity, metrics focus, and role-specific relevance.",
+    `Keyword set refreshed around ${getClusterKeywordSlice(cluster, 0, 2).join(" and ")} using current ${cluster.category} vacancy patterns.`,
+    `Examples and FAQ were updated to strengthen specificity for ${cluster.role.toLowerCase()} applicants, with extra emphasis on ${focusLane}.`,
   ];
 }
 
@@ -391,9 +469,12 @@ export function getRoleUniqueIntro(cluster: ResumeKeywordCluster): string[] {
   const anchor = outcomes[h % outcomes.length];
   const supporting = outcomes[(h + 2) % outcomes.length];
   const metric = 11 + (h % 24);
+  const keywordA = getClusterKeywordSlice(cluster, 0, 1)[0] ?? "role fit";
+  const keywordB = getClusterKeywordSlice(cluster, 1, 1)[0] ?? "measurable impact";
+  const exampleLine = toSentence(cluster.examples[0]?.after ?? "Demonstrated measurable outcomes aligned to role priorities");
 
   return [
-    `${cluster.role} hiring pipelines are highly comparison-driven: recruiters quickly benchmark profile relevance, vocabulary fit, and measurable business impact. This guide is built to make that comparison easier by mapping ATS terms, role-specific phrasing, and evidence patterns to one practical page. Instead of generic advice, you get a structure tailored to ${cluster.role.toLowerCase()} expectations and current vacancy language.`,
-    `For this role, the strongest resume versions usually show clear ownership and outcomes such as ${anchor} and ${supporting}. In most review flows, moving those signals into summary and lead bullets can raise match quality by ${metric}% or more versus baseline drafts that rely on responsibilities only. Use this page as a working template: adjust keywords by target vacancy, then rewrite evidence lines with precise numbers and scope.`,
+    `${cluster.role} hiring pipelines are comparison-driven: recruiters benchmark role relevance, vocabulary fit, and measurable impact very quickly. This guide keeps the same practical structure while grounding it in role-specific signals such as ${keywordA} and ${keywordB}, plus evidence patterns that are easier for ATS and humans to interpret.`,
+    `For this role, strong resume versions usually show ownership and outcomes like ${anchor} and ${supporting}. In many review flows, moving those signals into summary and lead bullets can raise match quality by ${metric}% or more versus baseline drafts built from responsibilities only. A good target line is: ${exampleLine}.`,
   ];
 }

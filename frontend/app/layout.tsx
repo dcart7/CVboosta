@@ -14,9 +14,6 @@ export const metadata: Metadata = {
   keywords: ["CV optimization", "ATS resume", "AI resume builder", "career feedback", "CVboosta"],
   authors: [{ name: "CVboosta Team" }],
   metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: "/",
-  },
   robots: {
     index: true,
     follow: true,

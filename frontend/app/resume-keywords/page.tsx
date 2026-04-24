@@ -14,6 +14,11 @@ export const metadata: Metadata = {
 };
 
 export default function ResumeKeywordsHubPage() {
-  const clusters = getPublishedResumeKeywordClusters();
+  // Keep hub payload lean: this page only needs role label, category, and slug.
+  const clusters = getPublishedResumeKeywordClusters().map((item) => ({
+    slug: item.slug,
+    role: item.role,
+    category: item.category,
+  }));
   return <ResumeKeywordsHubClient clusters={clusters} />;
 }

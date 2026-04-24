@@ -1,5 +1,13 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import ShareResultClient from "./ShareResultClient";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function ShareResultPage() {
   return (
