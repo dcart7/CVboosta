@@ -3018,6 +3018,8 @@ a {
   padding: 80px 24px 40px;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  height: 100vh;
   height: 100dvh;
   overflow: hidden;
 }
@@ -3031,13 +3033,13 @@ a {
 
 .mobile-shutter-auth {
   position: fixed;
-  left: max(20px, env(safe-area-inset-left));
-  right: max(20px, env(safe-area-inset-right));
-  bottom: max(14px, env(safe-area-inset-bottom));
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
   border-radius: 16px;
   border: 1px solid var(--line);
   background: linear-gradient(
