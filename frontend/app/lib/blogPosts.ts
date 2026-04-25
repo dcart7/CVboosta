@@ -213,6 +213,84 @@ const BLOG_POSTS: BlogPost[] = [
       "A high-quality resume is specific, role-aligned, and evidence-driven from the first screen to the final bullet.",
   },
   {
+    slug: "how-to-choose-a-profession",
+    publishAt: "2026-04-24",
+    title: "How to Choose a Profession: Practical Career Direction Guide",
+    excerpt:
+      "A clear framework to choose a career path based on strengths, market demand, and realistic first steps.",
+    lead: "You do not need a perfect choice on day one. You need a direction you can test quickly.",
+    tags: ["Career", "Beginner"],
+    sections: [
+      {
+        title: "1) Start from strengths and energy, not only trends",
+        body: "List tasks that give you energy, skills you learn fast, and problems you enjoy solving. This creates a realistic shortlist of roles you can actually sustain.",
+      },
+      {
+        title: "2) Validate the market before committing",
+        body: "Review real vacancies in your target region and check required tools, salary ranges, and entry-level expectations. Pick a role where demand and your interests overlap.",
+      },
+      {
+        title: "3) Build your first role-focused resume with CVboosta",
+        body: "Use [Resume Keywords by Role](/resume-keywords) to collect the right terms for your target profession, then run CVboosta to adapt your resume for that role without keyword stuffing.",
+      },
+    ],
+    takeawayTitle: "Key takeaway",
+    takeawayBody:
+      "Choose a profession by testing fit and demand in parallel, then tailor your resume to one clear target role.",
+  },
+  {
+    slug: "how-to-write-a-resume-step-by-step",
+    publishAt: "2026-04-24",
+    title: "How to Write a Resume Step by Step",
+    excerpt:
+      "A beginner-friendly resume structure that works for ATS and human recruiters.",
+    lead: "A strong resume is a structured story of impact, not a full autobiography.",
+    tags: ["Resume", "How-to"],
+    sections: [
+      {
+        title: "1) Build the core structure first",
+        body: "Create clear sections: summary, skills, experience, education, and links. Keep layout simple and single-column so ATS can parse it correctly.",
+      },
+      {
+        title: "2) Turn responsibilities into measurable results",
+        body: "For each experience bullet, use action + context + result. Add numbers where possible to show scope, speed, growth, or cost impact.",
+      },
+      {
+        title: "3) Match wording to your target role with CVboosta",
+        body: "Open [Resume Keywords by Role](/resume-keywords), choose your role, and add relevant terms naturally into summary and experience. Then use CVboosta to check gaps and improve ATS alignment before sending.",
+      },
+    ],
+    takeawayTitle: "Key takeaway",
+    takeawayBody:
+      "A good resume combines clear structure, evidence-based bullets, and role-specific wording.",
+  },
+  {
+    slug: "how-to-find-your-first-job",
+    publishAt: "2026-04-24",
+    title: "How to Find Your First Job: A Realistic Starter Plan",
+    excerpt:
+      "A practical weekly system for beginners to get interviews faster without burnout.",
+    lead: "Your first job search should be a repeatable process, not random applications.",
+    tags: ["Career", "First Job"],
+    sections: [
+      {
+        title: "1) Choose one target role and one backup role",
+        body: "Do not apply to everything. Focus on one main role and one nearby backup role so your resume and portfolio stay coherent.",
+      },
+      {
+        title: "2) Apply with quality and consistency every week",
+        body: "Set a weekly cadence: shortlist roles, tailor resume, submit, track outcomes, and improve based on responses.",
+      },
+      {
+        title: "3) Use CVboosta to improve conversion",
+        body: "Before each application batch, review [Resume Keywords by Role](/resume-keywords) for target terms, then optimize your resume in CVboosta to increase ATS relevance and interview chances.",
+      },
+    ],
+    takeawayTitle: "Key takeaway",
+    takeawayBody:
+      "First-job success comes from focus, weekly consistency, and targeted resume optimization.",
+  },
+  {
     slug: "quantify-achievements-resume",
     publishAt: "2026-04-26",
     title: "How to Quantify Achievements on Your Resume",

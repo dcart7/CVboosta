@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import TopNav from "../../components/TopNav";
 import { useTranslation } from "../../lib/LanguageContext";
@@ -12,6 +12,48 @@ type BlogPostClientProps = {
   post: BlogPost;
   relatedRoles: Array<{ slug: string; role: string }>;
 };
+
+function renderTextWithLinks(text: string): ReactNode[] {
+  const pattern = /\[([^\]]+)\]\((\/[^\s)]+|https?:\/\/[^\s)]+)\)/g;
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    const [fullMatch, label, href] = match;
+    const start = match.index;
+
+    if (start > lastIndex) {
+      nodes.push(text.slice(lastIndex, start));
+    }
+
+    if (href.startsWith("/")) {
+      nodes.push(
+        <Link key={`${href}-${start}`} href={href}>
+          {label}
+        </Link>,
+      );
+    } else {
+      nodes.push(
+        <a key={`${href}-${start}`} href={href} target="_blank" rel="noopener noreferrer">
+          {label}
+        </a>,
+      );
+    }
+
+    lastIndex = start + fullMatch.length;
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex));
+  }
+
+  if (nodes.length === 0) {
+    return [text];
+  }
+
+  return nodes;
+}
 
 export default function BlogPostClient({ post, relatedRoles }: BlogPostClientProps) {
   const { t, language } = useTranslation();
@@ -59,7 +101,7 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
             return (
               <div className="blog-post-section card" key={`${post.slug}-${index}`}>
                 <h2>{sectionTitle}</h2>
-                <p>{sectionBody}</p>
+                <p>{renderTextWithLinks(sectionBody)}</p>
               </div>
             );
           })}

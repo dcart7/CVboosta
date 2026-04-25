@@ -272,6 +272,75 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Якісне резюме - це конкретика, релевантність до ролі та докази результатів від першого до останнього блоку.",
     },
+    "how-to-choose-a-profession": {
+      title: "Як обрати професію: практичний гайд з кар'єрного напряму",
+      excerpt:
+        "Чіткий фреймворк, як обрати кар'єрний шлях за сильними сторонами, попитом ринку та реалістичними першими кроками.",
+      lead: "Вам не потрібен ідеальний вибір з першого дня. Потрібен напрям, який можна швидко перевірити.",
+      sections: [
+        {
+          title: "1) Почніть із сильних сторін та енергії, а не лише трендів",
+          body: "Складіть список задач, які вас заряджають, навичок, які ви швидко опановуєте, і проблем, які вам цікаво вирішувати. Так ви отримаєте реалістичний шортлист ролей.",
+        },
+        {
+          title: "2) Перевірте ринок до того, як фіксуватися на виборі",
+          body: "Перегляньте реальні вакансії у вашому регіоні: інструменти, рівні зарплат і вимоги до junior. Обирайте роль там, де перетинаються попит і ваш інтерес.",
+        },
+        {
+          title: "3) Зберіть перше role-focused резюме з CVboosta",
+          body: "Використайте [Resume Keywords by Role](/resume-keywords), щоб зібрати потрібні терміни для цільової професії, а потім запустіть CVboosta, щоб адаптувати резюме під роль без keyword stuffing.",
+        },
+      ],
+      takeawayTitle: "Ключова думка",
+      takeawayBody:
+        "Професію варто обирати через паралельну перевірку власної відповідності й ринкового попиту, а далі точково адаптувати резюме під одну роль.",
+    },
+    "how-to-write-a-resume-step-by-step": {
+      title: "Як скласти резюме крок за кроком",
+      excerpt:
+        "Дружня для початківців структура резюме, яка добре працює і для ATS, і для рекрутерів.",
+      lead: "Сильне резюме - це структурована історія впливу, а не повна автобіографія.",
+      sections: [
+        {
+          title: "1) Спочатку зберіть базову структуру",
+          body: "Створіть чіткі секції: summary, skills, experience, education і посилання. Тримайте макет простим та одноколонковим, щоб ATS коректно парсив документ.",
+        },
+        {
+          title: "2) Перетворіть обов'язки на вимірювані результати",
+          body: "Для кожного bullet використовуйте модель дія + контекст + результат. Додавайте цифри, коли можливо, щоб показати масштаб, швидкість, зростання або економію.",
+        },
+        {
+          title: "3) Узгодьте формулювання з роллю через CVboosta",
+          body: "Відкрийте [Resume Keywords by Role](/resume-keywords), оберіть роль і природно додайте релевантні терміни в summary та experience. Потім перевірте прогалини у CVboosta і підвищіть ATS alignment перед відправкою.",
+        },
+      ],
+      takeawayTitle: "Ключова думка",
+      takeawayBody:
+        "Якісне резюме поєднує зрозумілу структуру, доказові bullets і wording, прив'язаний до конкретної ролі.",
+    },
+    "how-to-find-your-first-job": {
+      title: "Як знайти першу роботу: реалістичний стартовий план",
+      excerpt:
+        "Практична щотижнева система для початківців, щоб швидше виходити на співбесіди без вигорання.",
+      lead: "Пошук першої роботи має бути повторюваним процесом, а не випадковою розсилкою заявок.",
+      sections: [
+        {
+          title: "1) Оберіть одну цільову роль і одну резервну",
+          body: "Не подавайтеся на все підряд. Тримайте фокус на одній основній ролі та одній суміжній, щоб резюме і портфоліо залишалися цілісними.",
+        },
+        {
+          title: "2) Подавайтеся якісно й стабільно щотижня",
+          body: "Побудуйте ритм: shortlist вакансій, адаптація резюме, відправка, трекінг результатів і покращення на основі фідбеку.",
+        },
+        {
+          title: "3) Використовуйте CVboosta для зростання конверсії",
+          body: "Перед кожним батчем заявок переглядайте [Resume Keywords by Role](/resume-keywords), а потім оптимізуйте резюме в CVboosta, щоб підвищити ATS-релевантність і шанси на інтерв'ю.",
+        },
+      ],
+      takeawayTitle: "Ключова думка",
+      takeawayBody:
+        "Успіх першої роботи будується на фокусі, щотижневій дисципліні та точковій оптимізації резюме.",
+    },
   },
   pl: {
     "how-to-pass-ats-screening": {
@@ -351,6 +420,75 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayTitle: "Najważniejszy wniosek",
       takeawayBody:
         "Wysokiej jakości CV jest konkretne, dopasowane do roli i oparte na dowodach od pierwszej do ostatniej sekcji.",
+    },
+    "how-to-choose-a-profession": {
+      title: "Jak wybrać zawód: praktyczny przewodnik kierunku kariery",
+      excerpt:
+        "Jasny framework wyboru ścieżki kariery na podstawie mocnych stron, popytu rynkowego i realistycznych pierwszych kroków.",
+      lead: "Nie potrzebujesz idealnej decyzji pierwszego dnia. Potrzebujesz kierunku, który da się szybko przetestować.",
+      sections: [
+        {
+          title: "1) Zacznij od mocnych stron i energii, nie tylko od trendów",
+          body: "Wypisz zadania, które dodają Ci energii, umiejętności, których szybko się uczysz, oraz problemy, które lubisz rozwiązywać. To tworzy realistyczną shortlistę ról.",
+        },
+        {
+          title: "2) Zweryfikuj rynek zanim się zdecydujesz",
+          body: "Przejrzyj realne oferty w Twoim regionie: wymagane narzędzia, widełki płacowe i oczekiwania dla juniorów. Wybierz rolę, w której spotykają się popyt i Twoje zainteresowania.",
+        },
+        {
+          title: "3) Zbuduj pierwsze role-focused CV z CVboosta",
+          body: "Użyj [Resume Keywords by Role](/resume-keywords), aby zebrać właściwe terminy dla wybranego zawodu, a potem uruchom CVboosta, by dopasować CV do roli bez keyword stuffing.",
+        },
+      ],
+      takeawayTitle: "Najważniejszy wniosek",
+      takeawayBody:
+        "Wybór zawodu to równoległe testowanie dopasowania i popytu rynkowego, a następnie dopracowanie CV pod jedną konkretną rolę.",
+    },
+    "how-to-write-a-resume-step-by-step": {
+      title: "Jak napisać CV krok po kroku",
+      excerpt:
+        "Przyjazna dla początkujących struktura CV, która działa zarówno dla ATS, jak i dla rekruterów.",
+      lead: "Mocne CV to uporządkowana historia wpływu, a nie pełna autobiografia.",
+      sections: [
+        {
+          title: "1) Najpierw zbuduj podstawową strukturę",
+          body: "Przygotuj czytelne sekcje: summary, skills, experience, education i linki. Utrzymaj prosty, jednokolumnowy układ, aby ATS poprawnie parsował dokument.",
+        },
+        {
+          title: "2) Zamieniaj obowiązki na mierzalne wyniki",
+          body: "W każdym bulletu stosuj model działanie + kontekst + rezultat. Gdzie to możliwe, dodawaj liczby pokazujące skalę, tempo, wzrost lub oszczędności.",
+        },
+        {
+          title: "3) Dopasuj wording do roli z CVboosta",
+          body: "Otwórz [Resume Keywords by Role](/resume-keywords), wybierz rolę i naturalnie dodaj kluczowe terminy do summary oraz experience. Następnie użyj CVboosta, aby znaleźć luki i podnieść ATS alignment przed wysłaniem.",
+        },
+      ],
+      takeawayTitle: "Najważniejszy wniosek",
+      takeawayBody:
+        "Dobre CV łączy czytelną strukturę, bullet points z dowodami i słownictwo dopasowane do docelowej roli.",
+    },
+    "how-to-find-your-first-job": {
+      title: "Jak znaleźć pierwszą pracę: realistyczny plan startowy",
+      excerpt:
+        "Praktyczny tygodniowy system dla początkujących, który przyspiesza zaproszenia na rozmowy bez wypalenia.",
+      lead: "Szukanie pierwszej pracy powinno być powtarzalnym procesem, a nie losowym wysyłaniem aplikacji.",
+      sections: [
+        {
+          title: "1) Wybierz jedną rolę docelową i jedną zapasową",
+          body: "Nie aplikuj na wszystko. Skup się na jednej głównej roli i jednej pokrewnej, aby CV i portfolio były spójne.",
+        },
+        {
+          title: "2) Aplikuj jakościowo i konsekwentnie co tydzień",
+          body: "Ustal rytm tygodnia: shortlist ofert, dopasowanie CV, wysyłka, analiza wyników i poprawki na bazie odpowiedzi.",
+        },
+        {
+          title: "3) Użyj CVboosta, by poprawić konwersję",
+          body: "Przed każdym batch'em aplikacji sprawdzaj [Resume Keywords by Role](/resume-keywords), a potem optymalizuj CV w CVboosta, aby podnieść trafność ATS i szanse na rozmowę.",
+        },
+      ],
+      takeawayTitle: "Najważniejszy wniosek",
+      takeawayBody:
+        "Sukces w pierwszej pracy buduje fokus, tygodniowa konsekwencja i celowana optymalizacja CV.",
     },
   },
   sk: {
@@ -432,6 +570,75 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Kvalitný životopis je konkrétny, zladený s rolou a postavený na dôkazoch od prvého po posledný blok.",
     },
+    "how-to-choose-a-profession": {
+      title: "Ako si vybrať profesiu: praktický sprievodca kariérnym smerom",
+      excerpt:
+        "Jasný framework na výber kariérnej cesty podľa silných stránok, dopytu trhu a realistických prvých krokov.",
+      lead: "Nepotrebujete perfektné rozhodnutie v prvý deň. Potrebujete smer, ktorý viete rýchlo otestovať.",
+      sections: [
+        {
+          title: "1) Začnite silnými stránkami a energiou, nie iba trendmi",
+          body: "Spíšte si úlohy, ktoré vám dávajú energiu, skills, ktoré sa učíte rýchlo, a problémy, ktoré radi riešite. Tak vznikne realistický shortlist rolí.",
+        },
+        {
+          title: "2) Overte trh ešte pred finálnym rozhodnutím",
+          body: "Pozrite si reálne vacancy vo vašom regióne: požadované nástroje, platové rozpätia a očakávania pre juniorov. Vyberte rolu, kde sa pretína dopyt a váš záujem.",
+        },
+        {
+          title: "3) Vytvorte prvý role-focused životopis cez CVboosta",
+          body: "Použite [Resume Keywords by Role](/resume-keywords), aby ste získali správne termíny pre cieľovú profesiu, a potom spustite CVboosta na úpravu životopisu bez keyword stuffing.",
+        },
+      ],
+      takeawayTitle: "Hlavná myšlienka",
+      takeawayBody:
+        "Profesiu vyberajte cez paralelné testovanie fitu a dopytu, potom životopis prispôsobte jednej jasnej cieľovej role.",
+    },
+    "how-to-write-a-resume-step-by-step": {
+      title: "Ako napísať životopis krok za krokom",
+      excerpt:
+        "Začiatočnícky friendly štruktúra životopisu, ktorá funguje pre ATS aj recruiterov.",
+      lead: "Silný životopis je štruktúrovaný príbeh dopadu, nie úplná autobiografia.",
+      sections: [
+        {
+          title: "1) Najprv postavte základnú štruktúru",
+          body: "Vytvorte jasné sekcie: summary, skills, experience, education a odkazy. Držte layout jednoduchý a jednokolónový, aby ATS dokument správne parsoval.",
+        },
+        {
+          title: "2) Zmeňte povinnosti na merateľné výsledky",
+          body: "V každom bullet pointe použite model akcia + kontext + výsledok. Kde sa dá, pridajte čísla pre rozsah, rýchlosť, rast alebo úsporu.",
+        },
+        {
+          title: "3) Zlaďte wording s rolou cez CVboosta",
+          body: "Otvorte [Resume Keywords by Role](/resume-keywords), vyberte rolu a prirodzene doplňte relevantné termíny do summary a experience. Potom použite CVboosta na odhalenie medzier a zlepšenie ATS alignment pred odoslaním.",
+        },
+      ],
+      takeawayTitle: "Hlavná myšlienka",
+      takeawayBody:
+        "Dobrý životopis kombinuje jasnú štruktúru, dôkazové bullet points a wording zladený s cieľovou rolou.",
+    },
+    "how-to-find-your-first-job": {
+      title: "Ako nájsť prvú prácu: realistický štartovací plán",
+      excerpt:
+        "Praktický týždenný systém pre začiatočníkov, ktorý urýchli pozvánky na pohovor bez vyhorenia.",
+      lead: "Hľadanie prvej práce má byť opakovateľný proces, nie náhodné posielanie žiadostí.",
+      sections: [
+        {
+          title: "1) Vyberte jednu cieľovú rolu a jednu záložnú",
+          body: "Neaplikujte na všetko. Sústreďte sa na jednu hlavnú rolu a jednu blízku záložnú, aby životopis aj portfólio ostali konzistentné.",
+        },
+        {
+          title: "2) Aplikujte kvalitne a konzistentne každý týždeň",
+          body: "Nastavte týždenný rytmus: shortlist rolí, úprava životopisu, odoslanie, tracking výsledkov a zlepšenia podľa odpovedí.",
+        },
+        {
+          title: "3) Použite CVboosta na vyššiu konverziu",
+          body: "Pred každým batchom žiadostí si prejdite [Resume Keywords by Role](/resume-keywords) a potom optimalizujte životopis v CVboosta, aby ste zvýšili ATS relevantnosť aj šancu na interview.",
+        },
+      ],
+      takeawayTitle: "Hlavná myšlienka",
+      takeawayBody:
+        "Úspech pri prvej práci stojí na fokuse, týždennej konzistentnosti a cielenej optimalizácii životopisu.",
+    },
   },
   cs: {
     "how-to-pass-ats-screening": {
@@ -512,6 +719,75 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Kvalitní životopis je konkrétní, sladěný s rolí a postavený na důkazech od první do poslední části.",
     },
+    "how-to-choose-a-profession": {
+      title: "Jak si vybrat profesi: praktický průvodce kariérním směrem",
+      excerpt:
+        "Jasný framework pro výběr kariérní cesty podle silných stránek, poptávky trhu a realistických prvních kroků.",
+      lead: "Nepotřebujete perfektní volbu hned první den. Potřebujete směr, který lze rychle otestovat.",
+      sections: [
+        {
+          title: "1) Začněte silnými stránkami a energií, ne jen trendy",
+          body: "Sepište si úkoly, které vám dávají energii, skills, které se učíte rychle, a problémy, které vás baví řešit. Tím vznikne realistický shortlist rolí.",
+        },
+        {
+          title: "2) Ověřte trh dřív, než se definitivně rozhodnete",
+          body: "Projděte reálné vacancy ve vašem regionu: požadované nástroje, mzdová rozpětí a očekávání pro juniory. Vyberte roli, kde se potkává poptávka a váš zájem.",
+        },
+        {
+          title: "3) Postavte první role-focused životopis s CVboosta",
+          body: "Použijte [Resume Keywords by Role](/resume-keywords) pro správné termíny k cílové profesi a pak spusťte CVboosta, který životopis upraví pro konkrétní roli bez keyword stuffing.",
+        },
+      ],
+      takeawayTitle: "Hlavní myšlenka",
+      takeawayBody:
+        "Profesní směr vybírejte paralelním testováním osobního fitu a poptávky, pak životopis přizpůsobte jedné jasné cílové roli.",
+    },
+    "how-to-write-a-resume-step-by-step": {
+      title: "Jak napsat životopis krok za krokem",
+      excerpt:
+        "Začátečnicky friendly struktura životopisu, která funguje pro ATS i pro recruitery.",
+      lead: "Silný životopis je strukturovaný příběh dopadu, ne kompletní autobiografie.",
+      sections: [
+        {
+          title: "1) Nejprve postavte základní strukturu",
+          body: "Vytvořte jasné sekce: summary, skills, experience, education a odkazy. Držte layout jednoduchý a jednokolónový, aby ATS dokument správně parsoval.",
+        },
+        {
+          title: "2) Převádějte povinnosti na měřitelné výsledky",
+          body: "V každém bullet pointu použijte model akce + kontext + výsledek. Kde to jde, přidejte čísla pro rozsah, rychlost, růst nebo úsporu.",
+        },
+        {
+          title: "3) Slaďte wording s rolí přes CVboosta",
+          body: "Otevřete [Resume Keywords by Role](/resume-keywords), zvolte roli a přirozeně doplňte relevantní termíny do summary a experience. Poté použijte CVboosta na odhalení mezer a zvýšení ATS alignment před odesláním.",
+        },
+      ],
+      takeawayTitle: "Hlavní myšlenka",
+      takeawayBody:
+        "Dobrý životopis spojuje jasnou strukturu, důkazové bullet points a wording sladěný s cílovou rolí.",
+    },
+    "how-to-find-your-first-job": {
+      title: "Jak najít první práci: realistický startovní plán",
+      excerpt:
+        "Praktický týdenní systém pro začátečníky, který urychlí pozvánky na pohovor bez vyhoření.",
+      lead: "Hledání první práce má být opakovatelný proces, ne náhodné rozesílání žádostí.",
+      sections: [
+        {
+          title: "1) Vyberte jednu cílovou roli a jednu záložní",
+          body: "Neaplikujte na všechno. Držte fokus na jedné hlavní roli a jedné blízké záložní, aby životopis i portfolio zůstaly konzistentní.",
+        },
+        {
+          title: "2) Aplikujte kvalitně a konzistentně každý týden",
+          body: "Nastavte týdenní rytmus: shortlist rolí, úprava životopisu, odeslání, tracking výsledků a zlepšování podle odpovědí.",
+        },
+        {
+          title: "3) Použijte CVboosta pro vyšší konverzi",
+          body: "Před každým batchem žádostí projděte [Resume Keywords by Role](/resume-keywords) a pak optimalizujte životopis v CVboosta, abyste zvýšili ATS relevanci i šanci na interview.",
+        },
+      ],
+      takeawayTitle: "Hlavní myšlenka",
+      takeawayBody:
+        "Úspěch první práce stojí na fokusu, týdenní konzistenci a cílené optimalizaci životopisu.",
+    },
   },
   es: {
     "how-to-pass-ats-screening": {
@@ -591,6 +867,75 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayTitle: "Idea clave",
       takeawayBody:
         "Un CV de alta calidad es específico, alineado al rol y basado en evidencia desde la primera línea hasta el último bloque.",
+    },
+    "how-to-choose-a-profession": {
+      title: "Cómo elegir una profesión: guía práctica de dirección profesional",
+      excerpt:
+        "Un framework claro para elegir un camino profesional según fortalezas, demanda del mercado y primeros pasos realistas.",
+      lead: "No necesitas una decisión perfecta el primer día. Necesitas una dirección que puedas probar rápido.",
+      sections: [
+        {
+          title: "1) Empieza por fortalezas y energía, no solo por tendencias",
+          body: "Lista tareas que te dan energía, skills que aprendes rápido y problemas que disfrutas resolver. Así construyes una shortlist realista de roles sostenibles.",
+        },
+        {
+          title: "2) Valida el mercado antes de comprometerte",
+          body: "Revisa vacantes reales en tu región: herramientas solicitadas, rangos salariales y expectativas para nivel inicial. Elige un rol donde se crucen demanda e interés personal.",
+        },
+        {
+          title: "3) Crea tu primer CV role-focused con CVboosta",
+          body: "Usa [Resume Keywords by Role](/resume-keywords) para reunir términos clave de tu profesión objetivo y luego ejecuta CVboosta para adaptar tu CV sin keyword stuffing.",
+        },
+      ],
+      takeawayTitle: "Idea clave",
+      takeawayBody:
+        "Elige profesión probando en paralelo tu fit y la demanda de mercado, y después adapta tu CV a un rol objetivo claro.",
+    },
+    "how-to-write-a-resume-step-by-step": {
+      title: "Cómo escribir un CV paso a paso",
+      excerpt:
+        "Una estructura beginner-friendly que funciona tanto para ATS como para recruiters.",
+      lead: "Un CV fuerte es una historia estructurada de impacto, no una autobiografía completa.",
+      sections: [
+        {
+          title: "1) Construye primero la estructura base",
+          body: "Crea secciones claras: summary, skills, experience, education y enlaces. Mantén un layout simple de una sola columna para que ATS lo procese bien.",
+        },
+        {
+          title: "2) Convierte responsabilidades en resultados medibles",
+          body: "En cada bullet point usa acción + contexto + resultado. Añade números cuando sea posible para mostrar alcance, velocidad, crecimiento o ahorro.",
+        },
+        {
+          title: "3) Ajusta el wording al rol con CVboosta",
+          body: "Abre [Resume Keywords by Role](/resume-keywords), elige tu rol y añade términos relevantes de forma natural en summary y experience. Luego usa CVboosta para detectar gaps y mejorar el ATS alignment antes de enviar.",
+        },
+      ],
+      takeawayTitle: "Idea clave",
+      takeawayBody:
+        "Un buen CV combina estructura clara, bullets con evidencia y wording específico del rol.",
+    },
+    "how-to-find-your-first-job": {
+      title: "Cómo encontrar tu primer trabajo: plan realista para empezar",
+      excerpt:
+        "Un sistema semanal práctico para principiantes que acelera entrevistas sin caer en burnout.",
+      lead: "Tu búsqueda del primer empleo debe ser un proceso repetible, no aplicaciones aleatorias.",
+      sections: [
+        {
+          title: "1) Elige un rol objetivo y un rol backup",
+          body: "No apliques a todo. Enfócate en un rol principal y uno cercano de respaldo para mantener coherencia entre CV y portafolio.",
+        },
+        {
+          title: "2) Aplica con calidad y constancia cada semana",
+          body: "Define una rutina semanal: shortlist de vacantes, adaptación del CV, envío, seguimiento de resultados y mejora según respuestas.",
+        },
+        {
+          title: "3) Usa CVboosta para subir conversión",
+          body: "Antes de cada batch de aplicaciones, revisa [Resume Keywords by Role](/resume-keywords) y luego optimiza tu CV en CVboosta para aumentar relevancia ATS y probabilidad de entrevista.",
+        },
+      ],
+      takeawayTitle: "Idea clave",
+      takeawayBody:
+        "El éxito del primer trabajo viene de foco, constancia semanal y optimización dirigida del CV.",
     },
   },
 };
