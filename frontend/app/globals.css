@@ -3009,7 +3009,29 @@ a {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
+}
+
+.mobile-shutter-scroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+.mobile-shutter-auth {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0 max(16px, env(safe-area-inset-bottom));
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg-page-base) 90%, transparent) 72%,
+    transparent
+  );
+  z-index: 2;
 }
 
 @keyframes slideDownContent {

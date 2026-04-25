@@ -180,56 +180,60 @@ export default function TopNav() {
       {isMenuOpen && (
         <div className="mobile-shutter">
           <div className="mobile-shutter-content">
-            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
-              <button
-                className="btn ghost"
-                onClick={() => setIsMenuOpen(false)}
-                type="button"
-                aria-label="Close menu"
-                style={{ padding: "8px 12px", fontSize: "20px", lineHeight: 1 }}
-              >
-                ✕
-              </button>
-            </div>
-            {/* Navigation links */}
-            <nav style={{ display: "flex", flexDirection: "column" }}>
-              <Link href="/app" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
-              <Link href="/results" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.results")}</Link>
-              <Link href="/history" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.history")}</Link>
-              <Link href="/pricing" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.pricing")}</Link>
-              <Link href="/about" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.about")}</Link>
-              <Link href="/blog" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.blog")}</Link>
-            </nav>
+            <div className="mobile-shutter-scroll">
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
+                <button
+                  className="btn ghost"
+                  onClick={() => setIsMenuOpen(false)}
+                  type="button"
+                  aria-label="Close menu"
+                  style={{ padding: "8px 12px", fontSize: "20px", lineHeight: 1 }}
+                >
+                  ✕
+                </button>
+              </div>
+              {/* Navigation links */}
+              <nav style={{ display: "flex", flexDirection: "column" }}>
+                <Link href="/app" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
+                <Link href="/results" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.results")}</Link>
+                <Link href="/history" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.history")}</Link>
+                <Link href="/pricing" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.pricing")}</Link>
+                <Link href="/about" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.about")}</Link>
+                <Link href="/blog" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.blog")}</Link>
+              </nav>
 
-            {/* Language switcher */}
-            <div style={{ marginTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--muted)" }}>Language</span>
-              <div className="lang-switcher">
-                <div className="lang-slider-track" style={{ position: "relative" }}>
-                  {languages.map((l) => (
-                    <button
-                      key={l.code}
-                      className={`lang-btn${language === l.code ? " active" : ""}`}
-                      onClick={() => { setLanguage(l.code); setIsMenuOpen(false); }}
-                      type="button"
-                    >
-                      {l.flag}
-                    </button>
-                  ))}
+              {/* Language switcher */}
+              <div style={{ marginTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--muted)" }}>Language</span>
+                <div className="lang-switcher">
+                  <div className="lang-slider-track" style={{ position: "relative" }}>
+                    {languages.map((l) => (
+                      <button
+                        key={l.code}
+                        className={`lang-btn${language === l.code ? " active" : ""}`}
+                        onClick={() => { setLanguage(l.code); setIsMenuOpen(false); }}
+                        type="button"
+                      >
+                        {l.flag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Auth actions pushed to bottom */}
-            <div style={{
-              marginTop: "auto",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-              paddingTop: "24px",
-            }}>
+            {/* Auth actions fixed at bottom on mobile */}
+            <div className="mobile-shutter-auth">
               {email ? (
-                <button className="btn primary" onClick={logout} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}>
+                <button
+                  className="btn primary"
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    logout();
+                  }}
+                  style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}
+                >
                   {t("nav.logout")}
                 </button>
               ) : (
