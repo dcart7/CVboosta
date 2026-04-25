@@ -23,20 +23,6 @@ declare global {
         };
       };
     };
-    AppleID?: {
-      auth?: {
-        init: (config: {
-          clientId: string;
-          scope: string;
-          redirectURI: string;
-          usePopup: boolean;
-        }) => void;
-        signIn: () => Promise<{
-          authorization?: { id_token?: string };
-          user?: { name?: { firstName?: string; lastName?: string } };
-        }>;
-      };
-    };
   }
 }
 
@@ -65,33 +51,27 @@ export default function SocialAuthButtons({
   const apiBase = getApiBase();
   const googleBtnRef = useRef<HTMLDivElement | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
-  const [appleReady, setAppleReady] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<"google" | "apple" | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<"google" | null>(null);
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
-  const appleClientId = process.env.NEXT_PUBLIC_APPLE_CLIENT_ID || "";
-  const appleRedirectUri =
-    process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI || (typeof window !== "undefined" ? `${window.location.origin}/${mode}` : "");
   const hasGoogle = Boolean(googleClientId);
-  const hasApple = Boolean(appleClientId);
-  const hasAnyProvider = hasGoogle || hasApple;
 
   const labels = useMemo(
     () => {
       const map = {
-        en: { or: "Or continue with", apple: "Continue with Apple", loading: "Please wait..." },
-        uk: { or: "Або продовжити через", apple: "Продовжити через Apple", loading: "Зачекайте..." },
-        pl: { or: "Lub kontynuuj przez", apple: "Kontynuuj przez Apple", loading: "Proszę czekać..." },
-        sk: { or: "Alebo pokračovať cez", apple: "Pokračovať cez Apple", loading: "Počkajte..." },
-        cs: { or: "Nebo pokračovat přes", apple: "Pokračovat přes Apple", loading: "Počkejte..." },
-        es: { or: "O continuar con", apple: "Continuar con Apple", loading: "Espera..." },
+        en: { or: "Or continue with" },
+        uk: { or: "Або продовжити через" },
+        pl: { or: "Lub kontynuuj przez" },
+        sk: { or: "Alebo pokračovať cez" },
+        cs: { or: "Nebo pokračovat přes" },
+        es: { or: "O continuar con" },
       } as const;
       return map[language] || map.en;
     },
     [language],
   );
 
-  const finishOAuth = async (provider: "google" | "apple", idToken: string, fullName?: string) => {
+  const finishOAuth = async (provider: "google", idToken: string, fullName?: string) => {
     setLoadingProvider(provider);
     try {
       const response = await fetchWithRetry(
@@ -116,24 +96,6 @@ export default function SocialAuthButtons({
     }
   };
 
-  const handleAppleSignIn = async () => {
-    if (!window.AppleID?.auth || !appleClientId) return;
-    setLoadingProvider("apple");
-    try {
-      const result = await window.AppleID.auth.signIn();
-      const idToken = result?.authorization?.id_token;
-      if (!idToken) throw new Error("Apple token is missing");
-      const firstName = result?.user?.name?.firstName || "";
-      const lastName = result?.user?.name?.lastName || "";
-      const fullName = `${firstName} ${lastName}`.trim();
-      await finishOAuth("apple", idToken, fullName || undefined);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Apple sign in failed";
-      onError(message);
-      setLoadingProvider(null);
-    }
-  };
-
   useEffect(() => {
     if (!googleReady || !hasGoogle || !googleBtnRef.current || !window.google?.accounts?.id) {
       return;
@@ -144,6 +106,9 @@ export default function SocialAuthButtons({
     window.google.accounts.id.initialize({
       client_id: googleClientId,
       callback: (response) => {
+        if (disabled || loadingProvider) {
+          return;
+        }
         const token = response?.credential || "";
         if (!token) {
           onError("Google token is missing");
@@ -161,52 +126,23 @@ export default function SocialAuthButtons({
       text: mode === "login" ? "signin_with" : "signup_with",
       logo_alignment: "left",
     });
-  }, [googleReady, hasGoogle, mode, onError]);
+  }, [googleReady, hasGoogle, mode, onError, disabled, loadingProvider, googleClientId]);
 
-  useEffect(() => {
-    if (!appleReady || !hasApple || !appleRedirectUri || !window.AppleID?.auth) return;
-    window.AppleID.auth.init({
-      clientId: appleClientId,
-      scope: "name email",
-      redirectURI: appleRedirectUri,
-      usePopup: true,
-    });
-  }, [appleReady, hasApple, appleClientId, appleRedirectUri]);
-
-  if (!hasAnyProvider) {
+  if (!hasGoogle) {
     return null;
   }
 
   return (
     <div className="social-auth-wrap">
-      {hasGoogle && (
-        <Script
-          src="https://accounts.google.com/gsi/client"
-          strategy="afterInteractive"
-          onLoad={() => setGoogleReady(true)}
-        />
-      )}
-      {hasApple && (
-        <Script
-          src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
-          strategy="afterInteractive"
-          onLoad={() => setAppleReady(true)}
-        />
-      )}
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="afterInteractive"
+        onLoad={() => setGoogleReady(true)}
+      />
 
       <div className="social-auth-divider">{labels.or}</div>
       <div className="social-auth-grid">
-        {hasGoogle && <div className="social-google-slot" ref={googleBtnRef} />}
-        {hasApple && (
-          <button
-            type="button"
-            className="btn ghost social-apple-btn"
-            onClick={() => void handleAppleSignIn()}
-            disabled={disabled || loadingProvider !== null}
-          >
-            {loadingProvider === "apple" ? labels.loading : labels.apple}
-          </button>
-        )}
+        <div className="social-google-slot" ref={googleBtnRef} />
       </div>
     </div>
   );

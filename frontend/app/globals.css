@@ -1701,13 +1701,6 @@ a {
   width: 100%;
 }
 
-.social-apple-btn {
-  width: 100%;
-  justify-content: center;
-  min-height: 44px;
-  font-weight: 700;
-}
-
 @media (max-width: 900px) {
   .split {
     grid-template-columns: 1fr;
