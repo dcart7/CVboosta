@@ -1065,26 +1065,10 @@ function isTechnicalRoleName(role: string): boolean {
 }
 
 export function localizeRoleName(role: string, language: Language): string {
-  if (language === "en") {
-    return role;
-  }
-  if (isTechnicalRoleName(role)) {
-    return role;
-  }
-
-  let translated = role;
-
-  for (const [from, to] of ROLE_PHRASE_MAP[language]) {
-    const pattern = new RegExp(`\\b${escapeRegExp(from)}\\b`, "gi");
-    translated = translated.replace(pattern, to);
-  }
-
-  const tokenMap = ROLE_TOKEN_MAP[language];
-  const tokenPattern = /\b[A-Za-z][A-Za-z.&-]*\b/g;
-
-  translated = translated.replace(tokenPattern, (token) => tokenMap[token] || token);
-
-  return translated.replace(/\s+/g, " ").trim();
+  // Keep role titles in original English to avoid mixed-language role names
+  // such as "Навчання and Development Спеціаліст".
+  void language;
+  return role;
 }
 
 function getLocalizedRoleTerm(role: string, language: Language): string {

@@ -272,6 +272,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Якісне резюме - це конкретика, релевантність до ролі та докази результатів від першого до останнього блоку.",
     },
+    "resume-summary-for-career-switch": {
+      title: "Resume Summary для Career Switch: швидка формула",
+      excerpt:
+        "Як написати summary для переходу в нову сферу так, щоб зберегти ваші сильні сторони й підсвітити релевантність до нової ролі.",
+      lead: "Резюме для зміни кар'єри працює краще, коли спочатку показує переносимі навички, а не старі назви посад.",
+      sections: [
+        {
+          title: "1) Почніть із language цільової ролі",
+          body: "Назвіть роль, у яку переходите, і додайте 2-3 релевантні компетенції. Це допомагає ATS і рекрутеру швидко зрозуміти ваш напрям.",
+        },
+        {
+          title: "2) Додайте доказ із попередньої сфери",
+          body: "Дайте один вимірюваний приклад із минулого досвіду, який напряму переноситься в нову роль.",
+        },
+        {
+          title: "3) Перевірте терміни через CVboosta",
+          body: "Візьміть рольові терміни з [Resume Keywords by Role](/resume-keywords), додайте їх у summary природно, а потім прогоніть CVboosta, щоб закрити keyword gaps.",
+        },
+      ],
+      takeawayTitle: "Порада",
+      takeawayBody:
+        "Сильне summary для career switch - конкретне, орієнтоване на роль і підкріплене доказами.",
+    },
     "how-to-choose-a-profession": {
       title: "Як обрати професію: практичний гайд з кар'єрного напряму",
       excerpt:
@@ -420,6 +443,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayTitle: "Najważniejszy wniosek",
       takeawayBody:
         "Wysokiej jakości CV jest konkretne, dopasowane do roli i oparte na dowodach od pierwszej do ostatniej sekcji.",
+    },
+    "resume-summary-for-career-switch": {
+      title: "Resume Summary dla Career Switch: szybka formuła",
+      excerpt:
+        "Jak napisać summary do zmiany kariery tak, aby zachować Twoje mocne strony i jednocześnie dopasować się do nowej roli.",
+      lead: "CV przy zmianie kariery działa najlepiej, gdy najpierw pokazuje umiejętności transferowalne, a dopiero potem wcześniejsze stanowiska.",
+      sections: [
+        {
+          title: "1) Zacznij od language roli docelowej",
+          body: "Nazwij rolę, do której przechodzisz, i dodaj 2-3 kluczowe kompetencje. To pomaga ATS i rekruterowi szybko zrozumieć kierunek.",
+        },
+        {
+          title: "2) Dodaj dowód z poprzedniej branży",
+          body: "Podaj jeden mierzalny przykład z wcześniejszego doświadczenia, który bezpośrednio przenosi się na nową rolę.",
+        },
+        {
+          title: "3) Sprawdź terminy przez CVboosta",
+          body: "Weź terminy roli z [Resume Keywords by Role](/resume-keywords), dodaj je naturalnie do summary i uruchom CVboosta, żeby domknąć keyword gaps.",
+        },
+      ],
+      takeawayTitle: "Wskazówka",
+      takeawayBody:
+        "Mocne summary dla career switch jest konkretne, ukierunkowane na rolę i oparte na dowodach.",
     },
     "how-to-choose-a-profession": {
       title: "Jak wybrać zawód: praktyczny przewodnik kierunku kariery",
@@ -570,6 +616,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Kvalitný životopis je konkrétny, zladený s rolou a postavený na dôkazoch od prvého po posledný blok.",
     },
+    "resume-summary-for-career-switch": {
+      title: "Resume Summary pre Career Switch: rýchly vzorec",
+      excerpt:
+        "Ako napísať transition-friendly summary, ktoré zachová vaše silné stránky a zároveň sa zladí s novou rolou.",
+      lead: "Životopis pri zmene kariéry funguje lepšie, keď najprv ukáže prenositeľné schopnosti a až potom minulé job title.",
+      sections: [
+        {
+          title: "1) Začnite language cieľovej roly",
+          body: "Pomenujte rolu, do ktorej prechádzate, a doplňte 2-3 relevantné kompetencie. ATS aj recruiter tak rýchlo pochopia váš smer.",
+        },
+        {
+          title: "2) Pridajte dôkaz z predchádzajúceho odboru",
+          body: "Uveďte jeden merateľný výsledok z minulých skúseností, ktorý sa priamo prenáša do novej role.",
+        },
+        {
+          title: "3) Skontrolujte termíny cez CVboosta",
+          body: "Použite [Resume Keywords by Role](/resume-keywords) na výber správnych termínov, prirodzene ich vložte do summary a potom spustite CVboosta na uzavretie keyword gaps.",
+        },
+      ],
+      takeawayTitle: "Tip",
+      takeawayBody:
+        "Silné summary pre career switch je konkrétne, role-focused a podložené dôkazmi.",
+    },
     "how-to-choose-a-profession": {
       title: "Ako si vybrať profesiu: praktický sprievodca kariérnym smerom",
       excerpt:
@@ -719,6 +788,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Kvalitní životopis je konkrétní, sladěný s rolí a postavený na důkazech od první do poslední části.",
     },
+    "resume-summary-for-career-switch": {
+      title: "Resume Summary pro Career Switch: rychlý vzorec",
+      excerpt:
+        "Jak napsat transition-friendly summary, které zachová vaše silné stránky a zároveň se sladí s novou rolí.",
+      lead: "Životopis při změně kariéry funguje lépe, když nejdřív ukáže přenositelné schopnosti a až potom dřívější job titles.",
+      sections: [
+        {
+          title: "1) Začněte language cílové role",
+          body: "Pojmenujte roli, do které přecházíte, a doplňte 2-3 relevantní kompetence. ATS i recruiter tak rychle pochopí váš směr.",
+        },
+        {
+          title: "2) Přidejte důkaz z předchozího oboru",
+          body: "Uveďte jeden měřitelný výsledek z předchozí zkušenosti, který se přímo přenáší do nové role.",
+        },
+        {
+          title: "3) Ověřte termíny přes CVboosta",
+          body: "Vezměte role terms z [Resume Keywords by Role](/resume-keywords), přirozeně je vložte do summary a pak spusťte CVboosta pro uzavření keyword gaps.",
+        },
+      ],
+      takeawayTitle: "Tip",
+      takeawayBody:
+        "Silné summary pro career switch je konkrétní, orientované na roli a podložené důkazy.",
+    },
     "how-to-choose-a-profession": {
       title: "Jak si vybrat profesi: praktický průvodce kariérním směrem",
       excerpt:
@@ -867,6 +959,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayTitle: "Idea clave",
       takeawayBody:
         "Un CV de alta calidad es específico, alineado al rol y basado en evidencia desde la primera línea hasta el último bloque.",
+    },
+    "resume-summary-for-career-switch": {
+      title: "Resume Summary para Career Switch: fórmula rápida",
+      excerpt:
+        "Cómo redactar un summary transition-friendly que mantenga tus fortalezas y al mismo tiempo se alinee con un rol nuevo.",
+      lead: "Un CV para cambio de carrera funciona mejor cuando primero muestra habilidades transferibles y después tus job titles anteriores.",
+      sections: [
+        {
+          title: "1) Empieza con el language del rol objetivo",
+          body: "Nombra el rol al que quieres transicionar y añade 2-3 capacidades relevantes. Así ATS y recruiters entienden tu dirección en segundos.",
+        },
+        {
+          title: "2) Añade evidencia de tu campo anterior",
+          body: "Incluye un resultado medible de tu experiencia previa que se transfiera de forma directa al nuevo rol.",
+        },
+        {
+          title: "3) Valida términos con CVboosta",
+          body: "Toma los términos del rol en [Resume Keywords by Role](/resume-keywords), intégralos de forma natural en el summary y luego usa CVboosta para cerrar keyword gaps.",
+        },
+      ],
+      takeawayTitle: "Consejo",
+      takeawayBody:
+        "Un summary fuerte para career switch es específico, orientado al rol y respaldado por evidencia.",
     },
     "how-to-choose-a-profession": {
       title: "Cómo elegir una profesión: guía práctica de dirección profesional",
