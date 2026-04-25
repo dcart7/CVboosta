@@ -77,6 +77,15 @@ export default function TopNav() {
     };
   }, [apiBase]);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMenuOpen]);
+
   const logout = () => {
     // Clear only CV-related data, keep theme and language
     const keysToKeep = ["theme", "app_lang"];
