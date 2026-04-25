@@ -1713,9 +1713,9 @@ a {
   width: 100%;
   min-height: 46px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.04);
-  color: #f4f8ff;
+  border: 1px solid rgba(12, 12, 14, 0.18);
+  background: rgba(255, 255, 255, 0.94);
+  color: #111111;
   font-weight: 600;
   font-size: 15px;
   letter-spacing: 0.01em;
@@ -1724,8 +1724,8 @@ a {
 }
 
 .social-google-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(12, 12, 14, 0.28);
 }
 
 .social-google-btn:active:not(:disabled) {
@@ -1735,6 +1735,17 @@ a {
 .social-google-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+[data-theme="dark"] .social-google-btn {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f4f8ff;
+}
+
+[data-theme="dark"] .social-google-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 @media (max-width: 900px) {
