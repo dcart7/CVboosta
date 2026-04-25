@@ -723,6 +723,33 @@ a {
     border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
+.btn.primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.btn.primary::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-120%);
+  background: linear-gradient(
+    110deg,
+    transparent 28%,
+    rgba(255, 255, 255, 0.3) 47%,
+    transparent 66%
+  );
+}
+
+.btn.primary:hover::after {
+  opacity: 1;
+  animation: ctaSweep 1.05s ease;
+}
+
 /* Dark: translucent surface so text stays visible */
 [data-theme="dark"] .btn {
   background: rgba(255, 255, 255, 0.10);
@@ -1934,7 +1961,9 @@ a {
 }
 
 .fade-up {
-  animation: fadeUp 0.6s ease both;
+  --reveal-delay: 0ms;
+  animation: fadeUp 0.68s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--reveal-delay);
 }
 
 @keyframes fadeUp {
@@ -1946,6 +1975,137 @@ a {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.shell > .hero.fade-up,
+.shell > .blog-hero.fade-up {
+  --reveal-delay: 40ms;
+}
+
+.shell > .section.fade-up:nth-of-type(1) {
+  --reveal-delay: 90ms;
+}
+
+.shell > .section.fade-up:nth-of-type(2) {
+  --reveal-delay: 140ms;
+}
+
+.shell > .section.fade-up:nth-of-type(3) {
+  --reveal-delay: 190ms;
+}
+
+.shell > .section.fade-up:nth-of-type(4) {
+  --reveal-delay: 240ms;
+}
+
+.shell > .section.fade-up:nth-of-type(5),
+.shell > .section.fade-up:nth-of-type(n + 6) {
+  --reveal-delay: 280ms;
+}
+
+.fade-up .kpi,
+.fade-up .card,
+.fade-up .step,
+.fade-up .rk-role-card,
+.fade-up .rk-panel,
+.fade-up .blog-card {
+  animation: cardLift 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--reveal-delay) + 70ms);
+}
+
+.route-transition {
+  position: relative;
+  animation: routeEnter 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.route-transition::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: 130;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: translateX(-120%);
+  animation: routeSweep 0.62s ease-out both;
+}
+
+@keyframes routeEnter {
+  from {
+    opacity: 0.98;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes routeSweep {
+  from {
+    transform: translateX(-120%);
+    opacity: 0.2;
+  }
+
+  40% {
+    opacity: 0.95;
+  }
+
+  to {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+@keyframes cardLift {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.986);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ctaSweep {
+  from {
+    transform: translateX(-120%);
+  }
+
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-transition,
+  .route-transition::before,
+  .fade-up,
+  .fade-up .kpi,
+  .fade-up .card,
+  .fade-up .step,
+  .fade-up .rk-role-card,
+  .fade-up .rk-panel,
+  .fade-up .blog-card,
+  .btn.primary::after {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .btn,
+  .card,
+  .step,
+  .history-row,
+  .theme-toggle,
+  .lang-slider-pill {
+    transition: none !important;
   }
 }
 

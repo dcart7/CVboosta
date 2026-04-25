@@ -2,6 +2,7 @@ import { LanguageProvider } from "./lib/LanguageContext";
 import Footer from "./components/Footer";
 import CookieBanner from "./components/CookieBanner";
 import GoogleAnalytics from "./components/GoogleAnalytics";
+import RouteTransition from "./components/RouteTransition";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
@@ -106,7 +107,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <LanguageProvider>
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            {children}
+            <RouteTransition>{children}</RouteTransition>
           </div>
           <Analytics />
           <Footer />
