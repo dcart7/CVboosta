@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    app_env: str = "production"
     database_url: str | None = None
     
     @field_validator("database_url", mode="before")
@@ -28,6 +29,8 @@ class Settings(BaseSettings):
     rate_limit_enabled: bool = True
     rate_limit_requests: int = 60
     rate_limit_window_seconds: int = 60
+    auth_rate_limit_requests: int = 8
+    auth_rate_limit_window_seconds: int = 300
     api_key_enabled: bool = False
     api_key: str | None = None
     request_logging_enabled: bool = False
@@ -38,6 +41,10 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(..., min_length=32)
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
+    auth_cookie_name: str = "cvboosta_session"
+    auth_cookie_secure: bool = True
+    auth_cookie_samesite: str = "lax"
+    auth_cookie_domain: str | None = None
     google_oauth_client_id: str | None = None
     apple_oauth_client_id: str | None = None
     trusted_proxy_ips: list[str] = Field(default_factory=lambda: ["127.0.0.1", "::1"])
@@ -132,10 +139,15 @@ def get_cors_origins() -> list[str]:
         "https://cvboosta.com",
         "https://www.cvboosta.com",
         "https://cv-ai-optimizer-eta.vercel.app",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
     ]
+    if settings.app_env.lower() in {"local", "dev", "development", "test"}:
+        default_allowed.extend(
+            [
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+                "http://localhost:8000",
+            ]
+        )
 
     if not v or v.strip() == "*":
         return default_allowed

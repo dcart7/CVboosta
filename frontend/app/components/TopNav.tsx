@@ -46,17 +46,12 @@ export default function TopNav() {
   }, [activeIndex]);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      setEmail(null);
-      return;
-    }
     let cancelled = false;
     (async () => {
       try {
         const res = await fetchWithRetry(
           `${apiBase}/auth/me`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          undefined,
           { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
         );
         if (cancelled) return;
@@ -86,7 +81,18 @@ export default function TopNav() {
     };
   }, [isMenuOpen]);
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetchWithRetry(
+        `${apiBase}/auth/logout`,
+        {
+          method: "POST",
+        },
+        { attempts: 2, baseDelayMs: 250, timeoutMs: 10_000 },
+      );
+    } catch {
+      // Continue with local cleanup even if network failed.
+    }
     // Clear only CV-related data, keep theme and language
     const keysToKeep = ["theme", "app_lang"];
     const allKeys = Object.keys(localStorage);
@@ -195,9 +201,9 @@ export default function TopNav() {
                   <button
                     className="btn primary"
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       setIsMenuOpen(false);
-                      logout();
+                      await logout();
                     }}
                     style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}
                   >

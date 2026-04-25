@@ -50,7 +50,6 @@ export default function RegisterPage() {
         throw new Error(payload.detail || "Registration failed");
       }
       const data = await response.json();
-      localStorage.setItem("auth_token", data.access_token);
       localStorage.setItem("user_email", email.trim().toLowerCase());
       trackEvent("sign_up", { method: "email" });
       window.dispatchEvent(new Event("auth-change"));
@@ -130,7 +129,6 @@ export default function RegisterPage() {
               disabled={loading}
               onError={(message) => setError(message || t("auth.registerFailed"))}
               onSuccess={(data) => {
-                localStorage.setItem("auth_token", data.access_token);
                 if (data.email) {
                   localStorage.setItem("user_email", data.email.trim().toLowerCase());
                 }

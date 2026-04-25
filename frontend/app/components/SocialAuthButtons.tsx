@@ -10,6 +10,15 @@ declare global {
   interface Window {
     google?: {
       accounts?: {
+        oauth2?: {
+          initTokenClient: (config: {
+            client_id: string;
+            scope: string;
+            callback: (response: { access_token?: string; error?: string }) => void;
+          }) => {
+            requestAccessToken: (options?: { prompt?: string }) => void;
+          };
+        };
         id?: {
           initialize: (config: {
             client_id: string;
@@ -55,8 +64,8 @@ export default function SocialAuthButtons({
   const apiBase = getApiBase();
   const [googleReady, setGoogleReady] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<"google" | null>(null);
-  const googleInitialized = useRef(false);
-  const promptInFlight = useRef(false);
+  const tokenClientRef = useRef<{ requestAccessToken: (options?: { prompt?: string }) => void } | null>(null);
+  const pendingClickRef = useRef(false);
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
   const hasGoogle = Boolean(googleClientId);
@@ -64,19 +73,22 @@ export default function SocialAuthButtons({
   const labels = useMemo(
     () => {
       const map = {
-        en: { or: "Or continue with", unavailable: "Google sign-in is not available right now" },
-        uk: { or: "Або продовжити через", unavailable: "Вхід через Google зараз недоступний" },
-        pl: { or: "Lub kontynuuj przez", unavailable: "Logowanie przez Google jest teraz niedostępne" },
-        sk: { or: "Alebo pokračovať cez", unavailable: "Prihlásenie cez Google je teraz nedostupné" },
-        cs: { or: "Nebo pokračovat přes", unavailable: "Přihlášení přes Google je teď nedostupné" },
-        es: { or: "O continuar con", unavailable: "El inicio de sesión con Google no está disponible ahora" },
+        en: { or: "Or continue with", unavailable: "Google sign-in failed. Please try again." },
+        uk: { or: "Або продовжити через", unavailable: "Не вдалося увійти через Google. Спробуйте ще раз." },
+        pl: { or: "Lub kontynuuj przez", unavailable: "Logowanie przez Google nie powiodło się. Spróbuj ponownie." },
+        sk: { or: "Alebo pokračovať cez", unavailable: "Prihlásenie cez Google zlyhalo. Skúste to znova." },
+        cs: { or: "Nebo pokračovat přes", unavailable: "Přihlášení přes Google selhalo. Zkuste to znovu." },
+        es: { or: "O continuar con", unavailable: "El inicio de sesión con Google falló. Inténtalo de nuevo." },
       } as const;
       return map[language] || map.en;
     },
     [language],
   );
 
-  const finishOAuth = async (provider: "google", idToken: string, fullName?: string) => {
+  const finishOAuth = async (
+    provider: "google",
+    options: { idToken?: string; accessToken?: string; fullName?: string },
+  ) => {
     setLoadingProvider(provider);
     try {
       const response = await fetchWithRetry(
@@ -84,7 +96,11 @@ export default function SocialAuthButtons({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id_token: idToken, full_name: fullName || null }),
+          body: JSON.stringify({
+            id_token: options.idToken || null,
+            access_token: options.accessToken || null,
+            full_name: options.fullName || null,
+          }),
         },
         { attempts: 3, baseDelayMs: 300, timeoutMs: 20_000 },
       );
@@ -102,48 +118,41 @@ export default function SocialAuthButtons({
   };
 
   useEffect(() => {
-    if (!googleReady || !hasGoogle || !window.google?.accounts?.id) {
+    if (!googleReady || !hasGoogle || !window.google?.accounts?.oauth2?.initTokenClient) {
       return;
     }
-    if (googleInitialized.current) {
-      return;
-    }
-    googleInitialized.current = true;
-    window.google.accounts.id.initialize({
+    tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
       client_id: googleClientId,
-      auto_select: false,
       callback: (response) => {
-        if (!promptInFlight.current || disabled) {
+        if (!pendingClickRef.current || disabled) {
           return;
         }
-        promptInFlight.current = false;
-        const token = response?.credential || "";
+        pendingClickRef.current = false;
+        const token = response?.access_token || "";
         if (!token) {
           setLoadingProvider(null);
-          onError("Google token is missing");
+          onError(labels.unavailable);
           return;
         }
-        void finishOAuth("google", token);
+        void finishOAuth("google", { accessToken: token });
       },
-      ux_mode: "popup",
+      scope: "openid email profile",
     });
-  }, [googleReady, hasGoogle, onError, disabled, googleClientId]);
+  }, [googleReady, hasGoogle, onError, disabled, googleClientId, labels.unavailable]);
 
   const handleGoogleClick = () => {
-    if (!hasGoogle || disabled || loadingProvider || !window.google?.accounts?.id) {
+    if (!hasGoogle || disabled || loadingProvider || !tokenClientRef.current) {
       return;
     }
     setLoadingProvider("google");
-    promptInFlight.current = true;
-    window.google.accounts.id.prompt((notification) => {
-      if (notification?.isNotDisplayed?.() || notification?.isSkippedMoment?.() || notification?.isDismissedMoment?.()) {
-        if (promptInFlight.current) {
-          promptInFlight.current = false;
-          setLoadingProvider(null);
-          onError(labels.unavailable);
-        }
-      }
-    });
+    pendingClickRef.current = true;
+    try {
+      tokenClientRef.current.requestAccessToken({ prompt: "select_account" });
+    } catch {
+      pendingClickRef.current = false;
+      setLoadingProvider(null);
+      onError(labels.unavailable);
+    }
   };
 
   if (!hasGoogle) {

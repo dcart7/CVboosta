@@ -27,7 +27,7 @@ export async function fetchWithRetry(
   const timeoutMs = options?.timeoutMs ?? 20_000;
 
   if (init?.signal) {
-    return fetch(input, init);
+    return fetch(input, { credentials: init.credentials ?? "include", ...init });
   }
 
   let lastError: unknown;
@@ -35,7 +35,11 @@ export async function fetchWithRetry(
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const res = await fetch(input, { ...init, signal: controller.signal });
+      const res = await fetch(input, {
+        credentials: init?.credentials ?? "include",
+        ...init,
+        signal: controller.signal,
+      });
       clearTimeout(timer);
 
       if (res.status === 401 || res.status === 403) {

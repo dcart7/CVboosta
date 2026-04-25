@@ -74,7 +74,6 @@ export default function LoginPage() {
         throw new Error(extractErrorMessage(payload) || "Login failed");
       }
       const data = await response.json();
-      localStorage.setItem("auth_token", data.access_token);
       localStorage.setItem("user_email", email.trim().toLowerCase());
       trackEvent("login", { method: "email" });
       window.dispatchEvent(new Event("auth-change"));
@@ -152,7 +151,6 @@ export default function LoginPage() {
               disabled={loading}
               onError={(message) => setError(message || t("auth.loginFailed"))}
               onSuccess={(data) => {
-                localStorage.setItem("auth_token", data.access_token);
                 if (data.email) {
                   localStorage.setItem("user_email", data.email.trim().toLowerCase());
                 }

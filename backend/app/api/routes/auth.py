@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import (
@@ -33,15 +34,59 @@ from app.services.auth import (
 from app.services.activity_logger import record_activity
 from app.models.activity import ActivityLog
 from app.services.emailer import build_password_reset_link, send_password_reset_email
-from app.services.oauth import verify_oauth_id_token
+from app.services.oauth import verify_google_access_token, verify_oauth_id_token
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 optional_bearer = HTTPBearer(auto_error=False)
 
 
+def _set_auth_cookie(response: Response, token: str) -> None:
+    env = settings.app_env.lower()
+    secure = settings.auth_cookie_secure and env not in {"local", "dev", "development", "test"}
+    samesite = settings.auth_cookie_samesite.lower().strip() if settings.auth_cookie_samesite else "lax"
+    if samesite not in {"lax", "strict", "none"}:
+        samesite = "lax"
+    if samesite == "none" and not secure:
+        samesite = "lax"
+
+    response.set_cookie(
+        key=settings.auth_cookie_name,
+        value=token,
+        httponly=True,
+        secure=secure,
+        samesite=samesite,
+        max_age=settings.jwt_exp_minutes * 60,
+        domain=settings.auth_cookie_domain,
+        path="/",
+    )
+
+
+def _clear_auth_cookie(response: Response) -> None:
+    response.delete_cookie(
+        key=settings.auth_cookie_name,
+        domain=settings.auth_cookie_domain,
+        path="/",
+    )
+
+
+def _extract_token(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None,
+) -> str:
+    header_token = (credentials.credentials if credentials else "") or ""
+    header_token = header_token.strip()
+    if header_token and header_token.lower() not in {"null", "undefined"}:
+        return header_token
+    cookie_token = (request.cookies.get(settings.auth_cookie_name) or "").strip()
+    return cookie_token
+
+
 @router.post("/auth/register", response_model=AuthResponse)
-def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> AuthResponse:
+def register(
+    payload: RegisterRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> AuthResponse:
     normalized_password = normalize_password_input(payload.password)
     if len(normalized_password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
@@ -60,11 +105,16 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> AuthRes
 
     record_activity(db, user_id=user.id, action="Account created", meta={})
     token = create_access_token(user)
+    _set_auth_cookie(response, token)
     return AuthResponse(access_token=token, email=user.email)
 
 
 @router.post("/auth/login", response_model=AuthResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> AuthResponse:
+def login(
+    payload: LoginRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> AuthResponse:
     user = db.query(User).filter(User.email == payload.email.lower().strip()).first()
     provided_password = payload.password
     normalized_password = normalize_password_input(provided_password)
@@ -82,6 +132,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> AuthResponse:
 
     record_activity(db, user_id=user.id, action="Signed in", meta={})
     token = create_access_token(user)
+    _set_auth_cookie(response, token)
     return AuthResponse(access_token=token, email=user.email)
 
 
@@ -89,6 +140,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> AuthResponse:
 def oauth_login(
     provider: str,
     payload: OAuthLoginRequest,
+    response: Response,
     db: Session = Depends(get_db),
 ) -> AuthResponse:
     provider_name = provider.strip().lower()
@@ -96,7 +148,14 @@ def oauth_login(
         raise HTTPException(status_code=400, detail="Unsupported OAuth provider")
 
     try:
-        claims = verify_oauth_id_token(provider_name, payload.id_token)
+        if provider_name == "google" and payload.access_token:
+            claims = verify_google_access_token(payload.access_token)
+        elif payload.id_token:
+            claims = verify_oauth_id_token(provider_name, payload.id_token)
+        else:
+            raise HTTPException(status_code=400, detail="OAuth token is missing")
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=401, detail="Invalid OAuth token") from exc
 
@@ -138,13 +197,24 @@ def oauth_login(
 
     record_activity(db, user_id=user.id, action="Signed in", meta={"method": provider_name})
     token = create_access_token(user)
+    _set_auth_cookie(response, token)
     return AuthResponse(access_token=token, email=user.email)
 
 
+@router.post("/auth/logout")
+def logout(response: Response) -> dict[str, str]:
+    _clear_auth_cookie(response)
+    return {"status": "ok"}
+
+
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(optional_bearer),
     db: Session = Depends(get_db),
 ) -> User:
+    token = _extract_token(request, credentials)
+    if not token:
+        raise HTTPException(status_code=401, detail="Invalid token")
     try:
         payload = decode_access_token(token)
         user_id = int(payload.get("sub", "0"))
@@ -158,13 +228,15 @@ def get_current_user(
 
 
 def get_current_user_optional(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(optional_bearer),
     db: Session = Depends(get_db),
 ) -> User | None:
-    if not credentials or not credentials.credentials:
+    token = _extract_token(request, credentials)
+    if not token:
         return None
     try:
-        payload = decode_access_token(credentials.credentials)
+        payload = decode_access_token(token)
         user_id = int(payload.get("sub", "0"))
     except Exception:
         return None

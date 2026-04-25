@@ -66,8 +66,8 @@ async def request_logger_middleware(request: Request, call_next):  # type: ignor
         "form-action 'self'; "
         "img-src 'self' data: https:; "
         "font-src 'self' data: https://fonts.gstatic.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com; "
+        "style-src 'self' https://fonts.googleapis.com; "
+        "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com; "
         "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com;"
     )
     if request.headers.get("x-forwarded-proto", "").lower() == "https":

@@ -77,22 +77,16 @@ export default function AccountPage() {
   };
 
   const loadAccount = useCallback(async () => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
     setLoading(true);
     setProfileError(null);
     setActivityLoading(true);
     try {
       const meRes = await fetchWithRetry(
         `${apiBase}/auth/me`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        undefined,
         { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
       );
       if (meRes.status === 401) {
-        localStorage.removeItem("auth_token");
         setUser(null);
         setProfileError("unauthorized");
         setSubscriptionTier(null);
@@ -124,7 +118,7 @@ export default function AccountPage() {
       try {
         const billingRes = await fetchWithRetry(
           `${apiBase}/billing/status`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          undefined,
           { attempts: 4, baseDelayMs: 350, timeoutMs: 20_000 },
         );
         if (billingRes.ok) {
@@ -145,7 +139,7 @@ export default function AccountPage() {
       try {
         const actRes = await fetchWithRetry(
           `${apiBase}/auth/activity`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          undefined,
           { attempts: 4, baseDelayMs: 350, timeoutMs: 20_000 },
         );
         const actData = actRes.ok ? await actRes.json() : { items: [] };
@@ -163,7 +157,7 @@ export default function AccountPage() {
       setLoading(false);
       setActivityLoading(false);
     }
-  }, [apiBase, router]);
+  }, [apiBase]);
 
   useEffect(() => {
     void loadAccount();
@@ -177,16 +171,12 @@ export default function AccountPage() {
     if (finalizedSessionRef.current === sessionId) return;
     finalizedSessionRef.current = sessionId;
 
-    const token = localStorage.getItem("auth_token");
-    if (!token) return;
-
     (async () => {
       try {
         const response = await fetchWithRetry(
           `${apiBase}/billing/stripe/finalize-session?session_id=${encodeURIComponent(sessionId)}`,
           {
             method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
           },
           { attempts: 3, baseDelayMs: 300, timeoutMs: 20_000 },
         );
@@ -205,11 +195,6 @@ export default function AccountPage() {
   const changePassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage("");
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
     const form = new FormData(event.currentTarget);
     const current_password = String(form.get("current_password") || "");
     const new_password = String(form.get("new_password") || "");
@@ -223,10 +208,14 @@ export default function AccountPage() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
       body: JSON.stringify({ current_password, new_password }),
     });
+    if (response.status === 401) {
+      router.push("/login");
+      return;
+    }
     if (response.ok) {
       setMessageTone("ok");
       setMessage("Password updated.");
@@ -247,11 +236,6 @@ export default function AccountPage() {
     });
 
   const cancelSubscription = async () => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
     setCancelLoading(true);
     setMessage("");
     try {
@@ -259,7 +243,6 @@ export default function AccountPage() {
         `${apiBase}/billing/stripe/cancel-subscription`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
         },
         { attempts: 3, baseDelayMs: 350, timeoutMs: 20_000 },
       );

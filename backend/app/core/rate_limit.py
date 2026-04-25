@@ -42,6 +42,10 @@ _rate_limiter = RateLimiter(
     max_requests=settings.rate_limit_requests,
     window_seconds=settings.rate_limit_window_seconds,
 )
+_auth_rate_limiter = RateLimiter(
+    max_requests=settings.auth_rate_limit_requests,
+    window_seconds=settings.auth_rate_limit_window_seconds,
+)
 
 
 def _client_ip(request: Request) -> str:
@@ -98,20 +102,36 @@ async def rate_limit_middleware(request: Request, call_next):  # type: ignore[no
     if path in {"/health"} or path.startswith("/docs") or path == "/openapi.json":
         return await call_next(request)
 
-    allowed, remaining, reset = _rate_limiter.check(_client_ip(request))
+    client_ip = _client_ip(request)
+    is_auth_sensitive = (
+        path == "/auth/login"
+        or path.startswith("/auth/oauth/")
+        or path == "/auth/register"
+        or path == "/auth/forgot-password"
+    )
+
+    limiter = _auth_rate_limiter if is_auth_sensitive else _rate_limiter
+    limit_value = (
+        settings.auth_rate_limit_requests
+        if is_auth_sensitive
+        else settings.rate_limit_requests
+    )
+    key = f"auth:{client_ip}:{path}" if is_auth_sensitive else client_ip
+
+    allowed, remaining, reset = limiter.check(key)
     if not allowed:
         response = JSONResponse(
             status_code=429,
             content={"detail": "Rate limit exceeded. Try again later."},
         )
         response.headers["Retry-After"] = str(reset)
-        response.headers["X-RateLimit-Limit"] = str(settings.rate_limit_requests)
+        response.headers["X-RateLimit-Limit"] = str(limit_value)
         response.headers["X-RateLimit-Remaining"] = "0"
         response.headers["X-RateLimit-Reset"] = str(reset)
         return response
 
     response = await call_next(request)
-    response.headers["X-RateLimit-Limit"] = str(settings.rate_limit_requests)
+    response.headers["X-RateLimit-Limit"] = str(limit_value)
     response.headers["X-RateLimit-Remaining"] = str(remaining)
     response.headers["X-RateLimit-Reset"] = str(reset)
     return response

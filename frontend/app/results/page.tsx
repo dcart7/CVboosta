@@ -423,17 +423,12 @@ function ResultsContent() {
 
   const loadHistorySession = useCallback(async () => {
     if (!sessionId) return;
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      setSessionLoadError(t("results.sessionLoginRequired"));
-      return;
-    }
     setIsLoadingSession(true);
     setSessionLoadError(null);
     try {
       const res = await fetchWithRetry(
         `${apiBase}/history/${sessionId}`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        undefined,
         { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
       );
       if (res.status === 401) {
@@ -584,15 +579,10 @@ function ResultsContent() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        setSubscriptionTier("free");
-        return;
-      }
       try {
         const res = await fetchWithRetry(
           `${apiBase}/billing/status`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          undefined,
           { attempts: 3, baseDelayMs: 250, timeoutMs: 12_000 },
         );
         if (!res.ok) {
@@ -779,12 +769,6 @@ function ResultsContent() {
       return;
     }
 
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-    if (!token) {
-      console.warn("No auth token found for interview prep");
-      return;
-    }
-
     setIsLoadingPrep(true);
     setPrepError(null);
     try {
@@ -792,8 +776,8 @@ function ResultsContent() {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
         },
+        credentials: "include",
         body: JSON.stringify({
           job_text: jobText,
           missing_keywords: missing,
@@ -837,12 +821,6 @@ function ResultsContent() {
       return;
     }
 
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-    if (!token) {
-      console.warn("No auth token found for cover letter");
-      return;
-    }
-
     setIsLoadingCL(true);
     setClError(null);
     try {
@@ -850,8 +828,8 @@ function ResultsContent() {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
         },
+        credentials: "include",
         body: JSON.stringify({
           cv_text: cvText,
           job_text: jobText,

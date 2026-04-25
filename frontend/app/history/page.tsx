@@ -28,17 +28,10 @@ export default function HistoryPage() {
     setLoading(true);
     setError("");
     setErrorKind(null);
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      setError(t("history.loginRequired"));
-      setErrorKind("login");
-      setLoading(false);
-      return;
-    }
     try {
       const res = await fetchWithRetry(
         `${apiBase}/history`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        undefined,
         { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
       );
       if (res.status === 401) {

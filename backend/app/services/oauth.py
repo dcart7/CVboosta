@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import time
 import urllib.request
+import urllib.parse
 from typing import Any
 
 from jose import jwt
@@ -89,6 +90,29 @@ def verify_oauth_id_token(provider: str, token: str) -> dict[str, Any]:
     email = str(claims.get("email", "")).strip().lower()
     if not email:
         raise ValueError("Email is missing in provider token")
+
+    email_verified = claims.get("email_verified")
+    if isinstance(email_verified, str):
+        email_verified = email_verified.lower() == "true"
+    if email_verified is False:
+        raise ValueError("Provider email is not verified")
+
+    return claims
+
+
+def verify_google_access_token(token: str) -> dict[str, Any]:
+    audience = _get_provider_audience("google")
+    url = "https://www.googleapis.com/oauth2/v3/tokeninfo?" + urllib.parse.urlencode({"access_token": token})
+    with urllib.request.urlopen(url, timeout=8) as response:
+        claims = json.loads(response.read().decode("utf-8"))
+
+    token_audience = str(claims.get("aud", "")).strip()
+    if token_audience != audience:
+        raise ValueError("Google access token audience mismatch")
+
+    email = str(claims.get("email", "")).strip().lower()
+    if not email:
+        raise ValueError("Email is missing in Google access token")
 
     email_verified = claims.get("email_verified")
     if isinstance(email_verified, str):

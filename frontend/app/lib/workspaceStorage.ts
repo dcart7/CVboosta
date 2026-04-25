@@ -32,14 +32,10 @@ export function sessionCvParsedKey(workspaceId: string): string {
 }
 
 export async function fetchWorkspaceEmail(apiBase: string): Promise<string | null> {
-  const token = localStorage.getItem("auth_token");
-  if (!token) return null;
   try {
     const res = await fetchWithRetry(
       `${apiBase}/auth/me`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
+      undefined,
       { attempts: 5, baseDelayMs: 400, timeoutMs: 20_000 },
     );
     if (!res.ok) return null;

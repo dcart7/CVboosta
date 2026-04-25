@@ -36,17 +36,10 @@ export default function PricingPage() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      setActiveTier(null);
-      return;
-    }
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${apiBase}/billing/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(`${apiBase}/billing/status`, { credentials: "include" });
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled && typeof data?.tier === "string") {
@@ -72,19 +65,14 @@ export default function PricingPage() {
       billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : "one_time",
     });
 
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
     setCheckoutLoading(tierId);
     try {
       const response = await fetch(`${apiBase}/billing/stripe/checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           tier: tierId,
           billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : null,
@@ -93,6 +81,10 @@ export default function PricingPage() {
         }),
       });
       const data = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        router.push("/login");
+        return;
+      }
       if (!response.ok || !data?.checkout_url) {
         throw new Error(data?.detail || t("pricing.paddleLoading"));
       }

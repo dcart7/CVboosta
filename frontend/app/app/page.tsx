@@ -143,8 +143,7 @@ export default function WorkspacePage() {
   const loadWorkspace = useCallback(async () => {
     setWorkspaceReady(false);
     try {
-      const token = localStorage.getItem("auth_token");
-      const email = token ? await fetchWorkspaceEmail(apiBase) : null;
+      const email = await fetchWorkspaceEmail(apiBase);
       const wid = workspaceIdFromEmail(email);
       migrateLegacyGuestWorkspace(wid);
       setUserEmail(email);
@@ -420,7 +419,6 @@ export default function WorkspacePage() {
       wsFieldKey(workspaceId, "cv_text"),
       parsed.raw_text || "",
     );
-    const token = localStorage.getItem("auth_token") || "";
     setOptimizeStatus("Optimizing...");
     setIsOptimizing(true);
     try {
@@ -428,8 +426,8 @@ export default function WorkspacePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
+        credentials: "include",
         body: JSON.stringify({
           cv_text: parsed.raw_text || "",
           job_text: jobText,

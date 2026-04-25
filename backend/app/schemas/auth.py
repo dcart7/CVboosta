@@ -15,7 +15,8 @@ class LoginRequest(BaseModel):
 
 
 class OAuthLoginRequest(BaseModel):
-    id_token: str = Field(min_length=20, max_length=8000)
+    id_token: str | None = Field(default=None, min_length=20, max_length=8000)
+    access_token: str | None = Field(default=None, min_length=20, max_length=8000)
     full_name: str | None = None
 
 
