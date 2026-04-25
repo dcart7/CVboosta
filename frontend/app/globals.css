@@ -1688,17 +1688,25 @@ a {
 .social-auth-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .social-google-slot {
-  min-height: 42px;
+  min-height: 46px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border-radius: 999px;
+  background: transparent;
+  border: 0;
 }
 
 .social-google-slot > div {
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 @media (max-width: 900px) {

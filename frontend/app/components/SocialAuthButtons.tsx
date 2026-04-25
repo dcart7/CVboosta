@@ -15,6 +15,7 @@ declare global {
             client_id: string;
             callback: (response: { credential?: string }) => void;
             ux_mode?: "popup" | "redirect";
+            use_fedcm_for_button?: boolean;
           }) => void;
           renderButton: (
             parent: HTMLElement,
@@ -55,6 +56,18 @@ export default function SocialAuthButtons({
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
   const hasGoogle = Boolean(googleClientId);
+  const googleLocale = useMemo(() => {
+    const map: Record<string, string> = {
+      en: "en",
+      uk: "en",
+      pl: "en",
+      sk: "en",
+      cs: "en",
+      es: "en",
+      ru: "en",
+    };
+    return map[language] || "en";
+  }, [language]);
 
   const labels = useMemo(
     () => {
@@ -105,6 +118,7 @@ export default function SocialAuthButtons({
     parent.innerHTML = "";
     window.google.accounts.id.initialize({
       client_id: googleClientId,
+      use_fedcm_for_button: false,
       callback: (response) => {
         if (disabled || loadingProvider) {
           return;
@@ -119,14 +133,16 @@ export default function SocialAuthButtons({
       ux_mode: "popup",
     });
     window.google.accounts.id.renderButton(parent, {
-      theme: "outline",
+      type: "standard",
+      theme: "filled_black",
       size: "large",
       shape: "pill",
       width: Math.max(240, Math.floor(parent.getBoundingClientRect().width || 320)),
       text: mode === "login" ? "signin_with" : "signup_with",
       logo_alignment: "left",
+      locale: googleLocale,
     });
-  }, [googleReady, hasGoogle, mode, onError, disabled, loadingProvider, googleClientId]);
+  }, [googleReady, hasGoogle, mode, onError, disabled, loadingProvider, googleClientId, googleLocale]);
 
   if (!hasGoogle) {
     return null;
