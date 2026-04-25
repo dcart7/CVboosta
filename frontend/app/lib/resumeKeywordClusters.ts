@@ -198,6 +198,23 @@ const CATEGORY_KEYWORDS: Record<RoleCategory, string[]> = {
   ],
 };
 
+const CATEGORY_SKILL_KEYWORDS: Record<RoleCategory, string[]> = {
+  engineering: ["python", "javascript", "typescript", "java", "golang", "c#", "sql"],
+  data: ["python", "r", "sql", "scala", "pandas", "spark"],
+  product: ["sql", "python", "jira", "confluence", "figma", "amplitude"],
+  design: ["figma", "adobe xd", "html", "css", "design systems", "prototyping"],
+  marketing: ["google analytics", "google ads", "meta ads", "seo tools", "crm", "utm tracking"],
+  sales: ["salesforce", "hubspot", "linkedin sales navigator", "crm", "forecasting", "negotiation"],
+  operations: ["excel", "sql", "power bi", "erp", "sap", "process automation"],
+  finance: ["excel", "sql", "power bi", "financial modeling", "forecasting", "variance analysis"],
+  hr: ["workday", "greenhouse", "linkedin recruiter", "hris", "interviewing", "onboarding"],
+  customer: ["zendesk", "intercom", "salesforce", "sla management", "churn analysis", "nps"],
+  legal: ["contract lifecycle management", "legal research", "compliance", "risk assessment", "policy drafting", "negotiation"],
+  healthcare: ["ehr", "epic", "hl7", "clinical documentation", "care coordination", "hipaa"],
+  education: ["lms", "moodle", "canvas", "curriculum design", "assessment", "instructional design"],
+  security: ["python", "bash", "siem", "splunk", "incident response", "vulnerability management"],
+};
+
 const ROLE_SEEDS: RoleSeed[] = [
   { role: "Software Engineer", category: "engineering" },
   { role: "Senior Software Engineer", category: "engineering" },
@@ -375,8 +392,9 @@ function roleKeywords(role: string, category: RoleCategory): string[] {
     .filter((part) => part.length > 2)
     .slice(0, 3)
     .join(" ");
-  return [
+  const keywords = [
     ...base,
+    ...CATEGORY_SKILL_KEYWORDS[category],
     `${roleLower} resume`,
     `${roleLower} achievements`,
     `${roleLower} responsibilities`,
@@ -388,6 +406,107 @@ function roleKeywords(role: string, category: RoleCategory): string[] {
     `${roleWords} measurable impact`,
     `${roleLower} ${impactArea}`,
   ];
+
+  if (category === "engineering" && roleLower.includes("backend")) {
+    keywords.push(
+      "python",
+      "golang",
+      "go",
+      "rest api",
+      "grpc",
+      "postgresql",
+      "redis",
+      "docker",
+      "kubernetes",
+      "message queue",
+      "rabbitmq",
+      "kafka",
+      "async processing",
+      "database optimization",
+    );
+  }
+
+  if (category === "engineering" && roleLower.includes("frontend")) {
+    keywords.push(
+      "javascript",
+      "typescript",
+      "react",
+      "next.js",
+      "html",
+      "css",
+      "web performance",
+      "state management",
+      "testing",
+      "webpack",
+    );
+  }
+
+  if (category === "engineering" && roleLower.includes("full stack")) {
+    keywords.push(
+      "javascript",
+      "typescript",
+      "python",
+      "node.js",
+      "sql",
+      "postgresql",
+      "react",
+      "api design",
+      "docker",
+      "cloud deployment",
+    );
+  }
+
+  if (
+    category === "engineering" &&
+    (roleLower.includes("mobile") || roleLower.includes("ios") || roleLower.includes("android"))
+  ) {
+    keywords.push(
+      "swift",
+      "kotlin",
+      "dart",
+      "react native",
+      "flutter",
+      "mobile architecture",
+      "app performance",
+      "release management",
+    );
+  }
+
+  if (
+    category === "engineering" &&
+    (roleLower.includes("devops") || roleLower.includes("site reliability") || roleLower.includes("platform"))
+  ) {
+    keywords.push(
+      "bash",
+      "python",
+      "golang",
+      "terraform",
+      "kubernetes",
+      "docker",
+      "ci/cd",
+      "observability",
+      "prometheus",
+      "grafana",
+    );
+  }
+
+  if (
+    category === "engineering" &&
+    (roleLower.includes("machine learning") || roleLower.includes("ai "))
+  ) {
+    keywords.push(
+      "python",
+      "pytorch",
+      "tensorflow",
+      "sql",
+      "feature engineering",
+      "model deployment",
+      "mlops",
+      "experiment tracking",
+    );
+  }
+
+  return Array.from(new Set(keywords));
 }
 
 function roleMistakes(role: string, category: RoleCategory): string[] {

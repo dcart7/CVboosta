@@ -19,6 +19,23 @@ type LocalizedContentPack = {
   checklist: (role: string) => string[];
 };
 
+type DeepLocalizedCopy = {
+  strategyLead: (role: string) => string;
+  keywordLead: string;
+  bulletLead: string;
+  qaPromptLabel: string;
+  updatesRefreshed: (category: ResumeKeywordCluster["category"], kwA: string, kwB: string) => string;
+  updatesSpecificity: (role: string, lane: string) => string;
+  introParagraphA: (role: string, kwA: string, kwB: string) => string;
+  introParagraphB: (
+    role: string,
+    anchor: string,
+    supporting: string,
+    metric: number,
+    exampleLine: string,
+  ) => string;
+};
+
 const CONTENT: Record<Language, LocalizedContentPack> = {
   en: {
     expectations: (role) => [
@@ -280,6 +297,99 @@ const CONTENT: Record<Language, LocalizedContentPack> = {
   },
 };
 
+const DEEP_COPY: Record<Language, DeepLocalizedCopy> = {
+  en: {
+    strategyLead: (role) =>
+      `${role} hiring pipelines are comparison-driven: recruiters benchmark role relevance, vocabulary fit, and measurable impact very quickly.`,
+    keywordLead: "Keyword quality matters more than keyword volume.",
+    bulletLead: "For competitive roles, bullet quality is the deciding factor.",
+    qaPromptLabel: "A useful QA prompt for this page is",
+    updatesRefreshed: (category, kwA, kwB) =>
+      `Keyword set refreshed around ${kwA} and ${kwB} using current ${category} vacancy patterns.`,
+    updatesSpecificity: (role, lane) =>
+      `Examples and FAQ were updated to strengthen specificity for ${role.toLowerCase()} applicants, with extra emphasis on ${lane}.`,
+    introParagraphA: (role, kwA, kwB) =>
+      `${role} hiring pipelines are comparison-driven: recruiters benchmark role relevance, vocabulary fit, and measurable impact very quickly. This guide keeps the same practical structure while grounding it in role-specific signals such as ${kwA} and ${kwB}, plus evidence patterns that are easier for ATS and humans to interpret.`,
+    introParagraphB: (role, anchor, supporting, metric, exampleLine) =>
+      `For this role, strong resume versions usually show ownership and outcomes like ${anchor} and ${supporting}. In many review flows, moving those signals into summary and lead bullets can raise match quality by ${metric}% or more versus baseline drafts built from responsibilities only. A good target line is: ${exampleLine}.`,
+  },
+  uk: {
+    strategyLead: (role) =>
+      `Найм на роль ${role.toLowerCase()} дуже порівняльний: рекрутери швидко оцінюють релевантність, лексику ролі та вимірюваний вплив.`,
+    keywordLead: "Якість ключових слів важливіша за їх кількість.",
+    bulletLead: "Для конкурентних ролей ключовим фактором є якість bullet-пунктів.",
+    qaPromptLabel: "Корисне QA-запитання для цієї сторінки",
+    updatesRefreshed: (category, kwA, kwB) =>
+      `Набір ключових слів оновлено навколо ${kwA} і ${kwB} на основі актуальних патернів вакансій у сфері ${category}.`,
+    updatesSpecificity: (role, lane) =>
+      `Приклади й FAQ оновлено для більшої специфіки під кандидатів на ${role.toLowerCase()}, з додатковим фокусом на ${lane}.`,
+    introParagraphA: (role, kwA, kwB) =>
+      `Найм на роль ${role.toLowerCase()} дуже порівняльний: рекрутери швидко оцінюють релевантність профілю, лексику ролі та вимірюваний бізнес-вплив. Цей гайд зберігає практичну структуру, але підсилює її сигналами саме для цієї ролі, зокрема ${kwA} і ${kwB}.`,
+    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
+      `Для цієї ролі найсильніші резюме показують ownership і результати на кшталт ${anchor} та ${supporting}. У багатьох сценаріях перенесення цих сигналів у summary та перші bullet-пункти підвищує якість матчингу на ${metric}% і більше. Орієнтир формулювання: ${exampleLine}.`,
+  },
+  pl: {
+    strategyLead: (role) =>
+      `Rekrutacja na rolę ${role.toLowerCase()} jest silnie porównawcza: rekruterzy szybko oceniają trafność, język roli i mierzalny wpływ.`,
+    keywordLead: "Jakość słów kluczowych jest ważniejsza niż ich liczba.",
+    bulletLead: "W konkurencyjnych rolach jakość bullet pointów decyduje o wyniku.",
+    qaPromptLabel: "Przydatne pytanie QA dla tej strony",
+    updatesRefreshed: (category, kwA, kwB) =>
+      `Zestaw słów kluczowych odświeżono wokół ${kwA} i ${kwB} na bazie aktualnych wzorców ofert w obszarze ${category}.`,
+    updatesSpecificity: (role, lane) =>
+      `Przykłady i FAQ zaktualizowano, aby były bardziej konkretne dla kandydatów na ${role.toLowerCase()}, ze szczególnym naciskiem na ${lane}.`,
+    introParagraphA: (role, kwA, kwB) =>
+      `Proces rekrutacyjny dla ${role.toLowerCase()} jest porównawczy: rekruterzy szybko benchmarkują trafność profilu, słownictwo roli i mierzalny wpływ. Ten poradnik zachowuje praktyczną strukturę i wzmacnia ją sygnałami specyficznymi dla roli, takimi jak ${kwA} i ${kwB}.`,
+    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
+      `W tej roli najlepsze CV pokazują ownership i wyniki takie jak ${anchor} oraz ${supporting}. W wielu przeglądach przesunięcie tych sygnałów do podsumowania i lead bulletów podnosi jakość dopasowania o ${metric}% lub więcej. Dobra linia docelowa: ${exampleLine}.`,
+  },
+  sk: {
+    strategyLead: (role) =>
+      `Hiring na rolu ${role.toLowerCase()} je výrazne porovnávací: recruiteri rýchlo hodnotia relevanciu, slovník role a merateľný dopad.`,
+    keywordLead: "Kvalita kľúčových slov je dôležitejšia než ich množstvo.",
+    bulletLead: "Pri konkurenčných rolách rozhoduje kvalita bullet bodov.",
+    qaPromptLabel: "Užitočná QA otázka pre túto stránku",
+    updatesRefreshed: (category, kwA, kwB) =>
+      `Sada kľúčových slov bola aktualizovaná okolo ${kwA} a ${kwB} podľa aktuálnych vzorov pozícií v oblasti ${category}.`,
+    updatesSpecificity: (role, lane) =>
+      `Príklady a FAQ boli upravené pre vyššiu špecificitu pre kandidátov na ${role.toLowerCase()}, s dôrazom na ${lane}.`,
+    introParagraphA: (role, kwA, kwB) =>
+      `Hiring pipeline pre ${role.toLowerCase()} je porovnávací: recruiteri rýchlo porovnávajú relevanciu profilu, slovník role a merateľný dopad. Tento návod zachováva praktickú štruktúru a opiera ju o role-signály ako ${kwA} a ${kwB}.`,
+    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
+      `Pri tejto role najsilnejšie životopisy ukazujú ownership a výsledky ako ${anchor} a ${supporting}. V mnohých review flow presun týchto signálov do summary a lead bulletov zvýši match kvalitu o ${metric}% a viac. Dobrý cieľový riadok: ${exampleLine}.`,
+  },
+  cs: {
+    strategyLead: (role) =>
+      `Nábor na roli ${role.toLowerCase()} je výrazně porovnávací: recruiteri rychle hodnotí relevanci, jazyk role a měřitelný dopad.`,
+    keywordLead: "Kvalita klíčových slov je důležitější než jejich množství.",
+    bulletLead: "U konkurenčních rolí rozhoduje kvalita bullet bodů.",
+    qaPromptLabel: "Užitečná QA otázka pro tuto stránku",
+    updatesRefreshed: (category, kwA, kwB) =>
+      `Sada klíčových slov byla aktualizována kolem ${kwA} a ${kwB} podle aktuálních vzorů pozic v oblasti ${category}.`,
+    updatesSpecificity: (role, lane) =>
+      `Příklady a FAQ byly upraveny pro vyšší specifičnost pro kandidáty na ${role.toLowerCase()}, s důrazem na ${lane}.`,
+    introParagraphA: (role, kwA, kwB) =>
+      `Hiring pipeline pro ${role.toLowerCase()} je porovnávací: recruiteri rychle porovnávají relevanci profilu, slovník role a měřitelný dopad. Tento průvodce zachovává praktickou strukturu a opírá ji o role-signály jako ${kwA} a ${kwB}.`,
+    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
+      `U této role nejsilnější životopisy ukazují ownership a výsledky jako ${anchor} a ${supporting}. V mnoha review flow přesun těchto signálů do summary a lead bulletů zvyšuje kvalitu shody o ${metric}% a více. Dobrý cílový řádek: ${exampleLine}.`,
+  },
+  es: {
+    strategyLead: (role) =>
+      `La contratación para el rol ${role.toLowerCase()} es muy comparativa: los reclutadores evalúan rápido relevancia, vocabulario del rol e impacto medible.`,
+    keywordLead: "La calidad de las palabras clave importa más que el volumen.",
+    bulletLead: "En roles competitivos, la calidad de los bullets decide el resultado.",
+    qaPromptLabel: "Una pregunta útil de QA para esta página es",
+    updatesRefreshed: (category, kwA, kwB) =>
+      `El set de keywords se actualizó alrededor de ${kwA} y ${kwB} usando patrones actuales de vacantes en ${category}.`,
+    updatesSpecificity: (role, lane) =>
+      `Se actualizaron ejemplos y FAQ para mayor especificidad para candidatos de ${role.toLowerCase()}, con énfasis adicional en ${lane}.`,
+    introParagraphA: (role, kwA, kwB) =>
+      `Los procesos de contratación para ${role.toLowerCase()} son comparativos: los reclutadores benchmarkean muy rápido la relevancia del perfil, el vocabulario del rol y el impacto medible. Esta guía mantiene una estructura práctica y la aterriza con señales específicas del rol como ${kwA} y ${kwB}.`,
+    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
+      `En este rol, los CV más sólidos muestran ownership y resultados como ${anchor} y ${supporting}. En muchos flujos de revisión, mover esas señales al resumen y a los primeros bullets puede elevar la calidad de match en ${metric}% o más. Una línea objetivo útil es: ${exampleLine}.`,
+  },
+};
+
 export function getRoleExpectations(cluster: ResumeKeywordCluster, language: Language): string[] {
   return CONTENT[language]?.expectations(cluster.role) ?? CONTENT.en.expectations(cluster.role);
 }
@@ -367,9 +477,13 @@ const CATEGORY_OUTCOMES: Record<ResumeKeywordCluster["category"], string[]> = {
   security: ["MTTD/MTTR improvement", "vulnerability closure", "control coverage", "audit readiness"],
 };
 
-export function getRoleLongFormSections(cluster: ResumeKeywordCluster): LongFormSection[] {
+export function getRoleLongFormSections(
+  cluster: ResumeKeywordCluster,
+  language: Language = "en",
+): LongFormSection[] {
   const h = hashString(cluster.role);
   const slugHash = hashString(cluster.slug);
+  const copy = DEEP_COPY[language] ?? DEEP_COPY.en;
   const outcomes = CATEGORY_OUTCOMES[cluster.category];
   const mainOutcome = outcomes[h % outcomes.length];
   const secondOutcome = outcomes[(h + 1) % outcomes.length];
@@ -386,70 +500,209 @@ export function getRoleLongFormSections(cluster: ResumeKeywordCluster): LongForm
   const sampleAfter = toSentence(cluster.examples[0]?.after ?? "Led a targeted initiative with measurable results");
   const faqPrompt = toSentence(cluster.faq[0]?.question ?? `How do I improve my ${cluster.role} resume quickly`);
   const focusLane = `${pickByHash(FOCUS_LANES_A, slugHash)} and ${pickByHash(FOCUS_LANES_B, slugHash, 3)}`;
-  const strategyLead = pickByHash(
-    [
-      `Most ${cluster.role.toLowerCase()} resumes underperform because relevant proof is buried too low on the page.`,
-      `Recruiters reviewing ${cluster.role.toLowerCase()} applications usually decide in seconds whether the profile is role-aligned.`,
-      `For ${cluster.role.toLowerCase()} candidates, the gap is rarely experience itself; the gap is how evidence is presented.`,
-      `${cluster.role} resumes compete on clarity first: if role fit is not visible early, strong experience is often ignored.`,
-    ] as const,
-    h,
-  );
-  const keywordLead = pickByHash(
-    [
-      `Keyword quality matters more than keyword volume.`,
-      `A high score comes from placement and evidence, not from repeating terms.`,
-      `ATS relevance improves when terms are tied to outcomes rather than listed in isolation.`,
-      `The most reliable ranking gain comes from clean distribution of key terms across high-signal sections.`,
-    ] as const,
-    h,
-    1,
-  );
-  const bulletLead = pickByHash(
-    [
-      `For competitive roles, bullet quality is the deciding factor.`,
-      `Your first five bullets are the conversion layer for recruiter decisions.`,
-      `High-performing resumes translate responsibility statements into measurable business outcomes.`,
-      `The fastest way to increase interview probability is to rewrite low-signal bullets into evidence lines.`,
-    ] as const,
-    h,
-    2,
-  );
+  if (language === "uk") {
+    return [
+      {
+        heading: `Як позиціонувати резюме ${cluster.role} для ATS і рекрутерів`,
+        paragraphs: [
+          `${copy.strategyLead(cluster.role)} Щоб пройти перший скрин, винесіть ключові сигнали ${keywordA}, ${keywordB} і ${keywordC} у верхню частину резюме та підкріпіть їх конкретними прикладами.`,
+          `Опорна структура: headline, summary, skills, recent experience. У skills покажіть найбільш релевантні терміни (${keywordPack}), а в досвіді замініть загальні фрази на чіткі результати. Поточний фокус цієї сторінки: ${focusLane}.`,
+        ],
+      },
+      {
+        heading: `Стратегія ключових слів для ${cluster.role} без keyword stuffing`,
+        paragraphs: [
+          `${copy.keywordLead} Для ролі ${cluster.role.toLowerCase()} розміщуйте ключові терміни в headline, summary, skills і перших bullet-пунктах.`,
+          `Якщо ключових слів багато, а match низький, проблема зазвичай у розподілі та доказах. Типова помилка: "${topMistake}" замість конкретного результату.`,
+        ],
+      },
+      {
+        heading: `Фреймворк сильних bullet-пунктів для ${cluster.role}`,
+        paragraphs: [
+          `${copy.bulletLead} Формула: дія + контекст + вимірюваний результат. Для цієї ролі корисно підсвічувати результати на кшталт ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
+          `Оновіть 3-5 перших bullet-пунктів і синхронізуйте їх з термінами вакансії (${keywordA}, ${keywordB}). Це часто підвищує релевантність на ${metricA}-${metricB}%.`,
+        ],
+      },
+      {
+        heading: `Фінальний чекліст і місячний цикл оновлення для ${cluster.role}`,
+        paragraphs: [
+          `Перед відправкою перевірте: summary, skills і lead bullets мають підтримувати одну цільову роль. ${copy.qaPromptLabel}: "${faqPrompt}".`,
+          `Оновлюйте резюме щотижня: додавайте нові результати, коригуйте ключові слова та прибирайте слабкі формулювання. Навіть невеликі ітерації можуть дати +${metricC}% до якості матчингу.`,
+        ],
+      },
+    ];
+  }
+
+  if (language === "pl") {
+    return [
+      {
+        heading: `Jak pozycjonować CV ${cluster.role} pod ATS i rekruterów`,
+        paragraphs: [
+          `${copy.strategyLead(cluster.role)} Aby przejść pierwszy screening, przenieś sygnały ${keywordA}, ${keywordB} i ${keywordC} na górę CV i podeprzyj je dowodami.`,
+          `Skuteczny układ: headline, summary, skills, recent experience. W skills pokaż priorytetowe terminy (${keywordPack}), a w doświadczeniu zamień ogólne opisy na mierzalne efekty. Aktualny fokus strony: ${focusLane}.`,
+        ],
+      },
+      {
+        heading: `Strategia słów kluczowych dla ${cluster.role} bez upychania`,
+        paragraphs: [
+          `${copy.keywordLead} Dla roli ${cluster.role.toLowerCase()} umieszczaj kluczowe terminy w headline, summary, skills i pierwszych bulletach.`,
+          `Jeśli masz dużo keywordów, a wynik jest słaby, problem zwykle dotyczy dystrybucji i dowodów. Częsty błąd: "${topMistake}".`,
+        ],
+      },
+      {
+        heading: `Framework mocnych bullet pointów dla ${cluster.role}`,
+        paragraphs: [
+          `${copy.bulletLead} Najlepszy schemat to: działanie + kontekst + mierzalny rezultat. Dla tej roli warto eksponować efekty jak ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
+          `Popraw 3-5 pierwszych bulletów i dopasuj je do języka oferty (${keywordA}, ${keywordB}). To często podnosi trafność o ${metricA}-${metricB}%.`,
+        ],
+      },
+      {
+        heading: `Końcowa checklista i miesięczny rytm aktualizacji dla ${cluster.role}`,
+        paragraphs: [
+          `Przed wysyłką sprawdź, czy summary, skills i lead bullets wspierają ten sam target role. ${copy.qaPromptLabel}: "${faqPrompt}".`,
+          `Aktualizuj CV co tydzień: dodawaj wyniki, koryguj słowa kluczowe i usuwaj słabe sformułowania. Nawet małe iteracje mogą dać +${metricC}% jakości dopasowania.`,
+        ],
+      },
+    ];
+  }
+
+  if (language === "sk") {
+    return [
+      {
+        heading: `Ako nastaviť ${cluster.role} životopis pre ATS a recruiterov`,
+        paragraphs: [
+          `${copy.strategyLead(cluster.role)} Pre prvý screening vytiahnite signály ${keywordA}, ${keywordB} a ${keywordC} vyššie v dokumente a podložte ich dôkazmi.`,
+          `Overená štruktúra: headline, summary, skills, recent experience. V skills zvýraznite prioritné termíny (${keywordPack}) a v skúsenostiach používajte merateľné výsledky. Aktuálny fokus stránky: ${focusLane}.`,
+        ],
+      },
+      {
+        heading: `Keyword stratégia pre ${cluster.role} bez keyword stuffingu`,
+        paragraphs: [
+          `${copy.keywordLead} Pre rolu ${cluster.role.toLowerCase()} umiestňujte dôležité výrazy do headline, summary, skills a prvých bullet bodov.`,
+          `Ak máte veľa keywordov a nízky match, problém je často v rozložení a dôkazoch. Častá chyba: "${topMistake}".`,
+        ],
+      },
+      {
+        heading: `Framework silných bullet bodov pre ${cluster.role}`,
+        paragraphs: [
+          `${copy.bulletLead} Najlepší vzorec: akcia + kontext + merateľný výsledok. Pri tejto role fungujú výsledky ako ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
+          `Upravte 3-5 lead bulletov a prepojte ich s jazykom pozície (${keywordA}, ${keywordB}). To často zlepší relevanciu o ${metricA}-${metricB}%.`,
+        ],
+      },
+      {
+        heading: `Finálny checklist a mesačný update cyklus pre ${cluster.role}`,
+        paragraphs: [
+          `Pred odoslaním skontrolujte, že summary, skills a lead bullets podporujú tú istú cieľovú rolu. ${copy.qaPromptLabel}: "${faqPrompt}".`,
+          `Aktualizujte životopis týždenne: pridajte nové výsledky, dolaďte keywordy a odstráňte slabé formulácie. Aj malé iterácie môžu priniesť +${metricC}% quality matchu.`,
+        ],
+      },
+    ];
+  }
+
+  if (language === "cs") {
+    return [
+      {
+        heading: `Jak nastavit životopis ${cluster.role} pro ATS a recruitery`,
+        paragraphs: [
+          `${copy.strategyLead(cluster.role)} Pro první screening vytáhněte signály ${keywordA}, ${keywordB} a ${keywordC} výš v dokumentu a podložte je důkazy.`,
+          `Osvědčená struktura: headline, summary, skills, recent experience. Ve skills zvýrazněte prioritní termíny (${keywordPack}) a v zkušenostech používejte měřitelné výsledky. Aktuální fokus stránky: ${focusLane}.`,
+        ],
+      },
+      {
+        heading: `Strategie klíčových slov pro ${cluster.role} bez keyword stuffingu`,
+        paragraphs: [
+          `${copy.keywordLead} Pro roli ${cluster.role.toLowerCase()} dávejte klíčové výrazy do headline, summary, skills a prvních bullet bodů.`,
+          `Pokud máte hodně keywordů a nízký match, problém bývá v distribuci a důkazech. Častá chyba: "${topMistake}".`,
+        ],
+      },
+      {
+        heading: `Framework silných bullet bodů pro ${cluster.role}`,
+        paragraphs: [
+          `${copy.bulletLead} Nejlepší vzorec: akce + kontext + měřitelný výsledek. Pro tuto roli fungují výsledky jako ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
+          `Upravte 3-5 lead bulletů a slaďte je s jazykem inzerátu (${keywordA}, ${keywordB}). To často zvýší relevanci o ${metricA}-${metricB}%.`,
+        ],
+      },
+      {
+        heading: `Finální checklist a měsíční rytmus aktualizace pro ${cluster.role}`,
+        paragraphs: [
+          `Před odesláním ověřte, že summary, skills a lead bullets podporují stejnou cílovou roli. ${copy.qaPromptLabel}: "${faqPrompt}".`,
+          `Aktualizujte životopis každý týden: přidávejte nové výsledky, upravujte keywordy a odstraňujte slabé formulace. I malé iterace mohou přinést +${metricC}% kvalitnější match.`,
+        ],
+      },
+    ];
+  }
+
+  if (language === "es") {
+    return [
+      {
+        heading: `Cómo posicionar tu CV de ${cluster.role} para ATS y reclutadores`,
+        paragraphs: [
+          `${copy.strategyLead(cluster.role)} Para pasar el primer filtro, sube al inicio del CV las señales ${keywordA}, ${keywordB} y ${keywordC} y respáldalas con evidencia.`,
+          `Estructura recomendada: headline, summary, skills y recent experience. En skills prioriza términos clave (${keywordPack}) y en experiencia usa resultados medibles. Enfoque actual de esta página: ${focusLane}.`,
+        ],
+      },
+      {
+        heading: `Estrategia de keywords para ${cluster.role} sin keyword stuffing`,
+        paragraphs: [
+          `${copy.keywordLead} Para el rol ${cluster.role.toLowerCase()}, coloca términos críticos en headline, summary, skills y primeros bullets.`,
+          `Si tienes muchos keywords pero bajo match, el problema suele ser distribución y evidencia. Error típico: "${topMistake}".`,
+        ],
+      },
+      {
+        heading: `Framework de bullets de alto impacto para ${cluster.role}`,
+        paragraphs: [
+          `${copy.bulletLead} Fórmula recomendada: acción + contexto + resultado medible. Para este rol, destaca impactos como ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
+          `Reescribe 3-5 bullets principales y alínealos con el lenguaje de la vacante (${keywordA}, ${keywordB}). Esto suele mejorar la relevancia entre ${metricA}% y ${metricB}%.`,
+        ],
+      },
+      {
+        heading: `Checklist final y cadencia mensual de optimización para ${cluster.role}`,
+        paragraphs: [
+          `Antes de enviar, valida que summary, skills y lead bullets soporten el mismo target role. ${copy.qaPromptLabel}: "${faqPrompt}".`,
+          `Actualiza tu CV cada semana: añade resultados nuevos, ajusta keywords y elimina frases débiles. Incluso iteraciones pequeñas pueden aportar +${metricC}% en calidad de match.`,
+        ],
+      },
+    ];
+  }
 
   return [
     {
       heading: `How to position your ${cluster.role} resume for ATS and hiring managers`,
       paragraphs: [
-        `${strategyLead} Recruiters usually scan the document in seconds and look for role fit, ownership, and measurable outcomes. To pass that first screen, surface practical evidence around ${keywordA}, ${keywordB}, and ${keywordC} near the top, then support it with concise context in experience bullets.`,
+        `${copy.strategyLead(cluster.role)} Recruiters usually scan the document in seconds and look for role fit, ownership, and measurable outcomes. To pass that first screen, surface practical evidence around ${keywordA}, ${keywordB}, and ${keywordC} near the top, then support it with concise context in experience bullets.`,
         `A reliable structure is headline, summary, skills, and recent experience, in that order. In summary, state target scope. In skills, prioritize terms actually requested in vacancies (${keywordPack}). In experience, replace responsibility language with evidence language: what changed, by how much, and under what constraints. For this role page, the current focus lane is ${focusLane}.`,
       ],
     },
     {
       heading: `${cluster.role} keyword strategy that improves ranking without stuffing`,
       paragraphs: [
-        `${keywordLead} For ${cluster.role.toLowerCase()} applications, place role terms where ATS weight is highest: headline, summary, skills, and opening bullets. Keep wording natural and truthful, and avoid patterns like "${topMistake}" that look generic or unsupported.`,
+        `${copy.keywordLead} For ${cluster.role.toLowerCase()} applications, place role terms where ATS weight is highest: headline, summary, skills, and opening bullets. Keep wording natural and truthful, and avoid patterns like "${topMistake}" that look generic or unsupported.`,
         `A practical target is to cover core vocabulary while still reading like a human document. If your draft already contains many terms but still scores low, the issue is often distribution and proof. In this cluster, weak drafts usually combine "${topMistake}" and "${secondMistake}" instead of aligning terms to specific outcomes.`,
       ],
     },
     {
       heading: `Evidence framework: turn generic bullets into high-impact ${cluster.role} achievements`,
       paragraphs: [
-        `${bulletLead} A high-performing bullet follows one pattern: action, context, measurable outcome. Instead of saying you "supported initiatives," specify scope and result. When true for your experience, show outcomes such as ${mainOutcome}, ${secondOutcome}, or ${thirdOutcome}. A strong baseline format is: ${sampleAfter}.`,
+        `${copy.bulletLead} A high-performing bullet follows one pattern: action, context, measurable outcome. Instead of saying you "supported initiatives," specify scope and result. When true for your experience, show outcomes such as ${mainOutcome}, ${secondOutcome}, or ${thirdOutcome}. A strong baseline format is: ${sampleAfter}.`,
         `Use 3 to 5 lead bullets in your latest role as a conversion layer and mirror the vacancy language around ${keywordA} and ${keywordB}. In review samples across these role pages, resumes with quantified lead bullets typically outperform text-heavy drafts by roughly ${metricA}% to ${metricB}% on relevance signals.`,
       ],
     },
     {
       heading: `Submission checklist and monthly optimization cadence for ${cluster.role} candidates`,
       paragraphs: [
-        `Before sending applications, run a final review pass. Confirm that summary, skills, and lead bullets all support the same target role. Remove duplicates, generic fillers, and unsupported tool names. Keep formatting ATS-safe and avoid decorative elements that can break parsing. A useful QA prompt for this page is: "${faqPrompt}".`,
+        `Before sending applications, run a final review pass. Confirm that summary, skills, and lead bullets all support the same target role. Remove duplicates, generic fillers, and unsupported tool names. Keep formatting ATS-safe and avoid decorative elements that can break parsing. ${copy.qaPromptLabel}: "${faqPrompt}".`,
         `Treat your resume as a living asset, not a one-time file. Update it weekly while applying: add quantified wins, rebalance keyword priorities, and refine phrasing against current vacancies. Even incremental revisions can lift fit quality by ${metricC}% or more over several iterations when changes stay tied to evidence and role language.`,
       ],
     },
   ];
 }
 
-export function getRoleFreshnessNotes(cluster: ResumeKeywordCluster): string[] {
+export function getRoleFreshnessNotes(
+  cluster: ResumeKeywordCluster,
+  language: Language = "en",
+): string[] {
   const h = hashString(cluster.slug);
+  const copy = DEEP_COPY[language] ?? DEEP_COPY.en;
   const baseDay = 2 + (h % 25);
   const baseMonth = 1 + (h % 12);
   const month = `${baseMonth}`.padStart(2, "0");
@@ -458,13 +711,21 @@ export function getRoleFreshnessNotes(cluster: ResumeKeywordCluster): string[] {
 
   return [
     `Last structured review: 2026-${month}-${day}.`,
-    `Keyword set refreshed around ${getClusterKeywordSlice(cluster, 0, 2).join(" and ")} using current ${cluster.category} vacancy patterns.`,
-    `Examples and FAQ were updated to strengthen specificity for ${cluster.role.toLowerCase()} applicants, with extra emphasis on ${focusLane}.`,
+    copy.updatesRefreshed(
+      cluster.category,
+      getClusterKeywordSlice(cluster, 0, 1)[0] ?? "keywords",
+      getClusterKeywordSlice(cluster, 1, 1)[0] ?? "signals",
+    ),
+    copy.updatesSpecificity(cluster.role, focusLane),
   ];
 }
 
-export function getRoleUniqueIntro(cluster: ResumeKeywordCluster): string[] {
+export function getRoleUniqueIntro(
+  cluster: ResumeKeywordCluster,
+  language: Language = "en",
+): string[] {
   const h = hashString(cluster.slug);
+  const copy = DEEP_COPY[language] ?? DEEP_COPY.en;
   const outcomes = CATEGORY_OUTCOMES[cluster.category];
   const anchor = outcomes[h % outcomes.length];
   const supporting = outcomes[(h + 2) % outcomes.length];
@@ -474,7 +735,7 @@ export function getRoleUniqueIntro(cluster: ResumeKeywordCluster): string[] {
   const exampleLine = toSentence(cluster.examples[0]?.after ?? "Demonstrated measurable outcomes aligned to role priorities");
 
   return [
-    `${cluster.role} hiring pipelines are comparison-driven: recruiters benchmark role relevance, vocabulary fit, and measurable impact very quickly. This guide keeps the same practical structure while grounding it in role-specific signals such as ${keywordA} and ${keywordB}, plus evidence patterns that are easier for ATS and humans to interpret.`,
-    `For this role, strong resume versions usually show ownership and outcomes like ${anchor} and ${supporting}. In many review flows, moving those signals into summary and lead bullets can raise match quality by ${metric}% or more versus baseline drafts built from responsibilities only. A good target line is: ${exampleLine}.`,
+    copy.introParagraphA(cluster.role, keywordA, keywordB),
+    copy.introParagraphB(cluster.role, anchor, supporting, metric, exampleLine),
   ];
 }
