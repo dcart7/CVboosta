@@ -3028,18 +3028,15 @@ a {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-bottom: 220px;
+  padding-bottom: 24px;
 }
 
-.mobile-shutter-auth {
-  position: fixed;
-  left: 16px;
-  right: 16px;
-  bottom: 14px;
+.mobile-shutter-auth-inline {
+  margin-bottom: 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  padding: 12px;
   border-radius: 16px;
   border: 1px solid var(--line);
   background: linear-gradient(
@@ -3047,7 +3044,6 @@ a {
     color-mix(in srgb, var(--bg-page-base) 92%, transparent),
     color-mix(in srgb, var(--bg-page-base) 74%, transparent)
   );
-  z-index: 100005;
 }
 
 @keyframes slideDownContent {

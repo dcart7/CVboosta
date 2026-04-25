@@ -190,16 +190,29 @@ export default function TopNav() {
         <div className="mobile-shutter">
           <div className="mobile-shutter-content">
             <div className="mobile-shutter-scroll">
-              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
-                <button
-                  className="btn ghost"
-                  onClick={() => setIsMenuOpen(false)}
-                  type="button"
-                  aria-label="Close menu"
-                  style={{ padding: "8px 12px", fontSize: "20px", lineHeight: 1 }}
-                >
-                  ✕
-                </button>
+              <div className="mobile-shutter-auth-inline">
+                {email ? (
+                  <button
+                    className="btn primary"
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      logout();
+                    }}
+                    style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}
+                  >
+                    {t("nav.logout")}
+                  </button>
+                ) : (
+                  <>
+                    <Link className="btn primary" href="/register" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
+                      {t("nav.register")}
+                    </Link>
+                    <Link className="btn ghost" href="/login" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
+                      {t("nav.login")}
+                    </Link>
+                  </>
+                )}
               </div>
               {/* Navigation links */}
               <nav style={{ display: "flex", flexDirection: "column" }}>
@@ -230,32 +243,6 @@ export default function TopNav() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Auth actions pinned to viewport bottom on mobile */}
-          <div className="mobile-shutter-auth">
-            {email ? (
-              <button
-                className="btn primary"
-                type="button"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  logout();
-                }}
-                style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}
-              >
-                {t("nav.logout")}
-              </button>
-            ) : (
-              <>
-                <Link className="btn primary" href="/register" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
-                  {t("nav.register")}
-                </Link>
-                <Link className="btn ghost" href="/login" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
-                  {t("nav.login")}
-                </Link>
-              </>
-            )}
           </div>
         </div>
       )}
