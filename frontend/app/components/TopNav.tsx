@@ -230,32 +230,32 @@ export default function TopNav() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Auth actions fixed at bottom on mobile */}
-            <div className="mobile-shutter-auth">
-              {email ? (
-                <button
-                  className="btn primary"
-                  type="button"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    logout();
-                  }}
-                  style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}
-                >
-                  {t("nav.logout")}
-                </button>
-              ) : (
-                <>
-                  <Link className="btn primary" href="/register" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
-                    {t("nav.register")}
-                  </Link>
-                  <Link className="btn ghost" href="/login" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
-                    {t("nav.login")}
-                  </Link>
-                </>
-              )}
-            </div>
+          {/* Auth actions pinned to viewport bottom on mobile */}
+          <div className="mobile-shutter-auth">
+            {email ? (
+              <button
+                className="btn primary"
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  logout();
+                }}
+                style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}
+              >
+                {t("nav.logout")}
+              </button>
+            ) : (
+              <>
+                <Link className="btn primary" href="/register" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
+                  {t("nav.register")}
+                </Link>
+                <Link className="btn ghost" href="/login" onClick={() => setIsMenuOpen(false)} style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px", textAlign: "center" }}>
+                  {t("nav.login")}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -48,6 +48,16 @@
   --pdf-muted: rgba(15, 23, 42, 0.75);
 }
 
+@media (max-width: 768px) {
+  .nav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100010 !important;
+  }
+}
+
 [data-theme="dark"] {
   color-scheme: dark;
   background: #0b0e14;
@@ -3016,11 +3026,11 @@ a {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-bottom: 176px;
+  padding-bottom: 220px;
 }
 
 .mobile-shutter-auth {
-  position: absolute;
+  position: fixed;
   left: max(20px, env(safe-area-inset-left));
   right: max(20px, env(safe-area-inset-right));
   bottom: max(14px, env(safe-area-inset-bottom));
@@ -3035,7 +3045,7 @@ a {
     color-mix(in srgb, var(--bg-page-base) 92%, transparent),
     color-mix(in srgb, var(--bg-page-base) 74%, transparent)
   );
-  z-index: 2;
+  z-index: 100005;
 }
 
 @keyframes slideDownContent {
