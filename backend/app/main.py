@@ -1,4 +1,5 @@
 import time
+import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -14,6 +15,8 @@ from app.core.api_key import api_key_middleware
 from app.core.rate_limit import rate_limit_middleware
 from app.services.request_logger import capture_response_body, log_request_response
 from app.services.llm import LLMServiceError
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Smart CV Optimizer API")
 
@@ -34,6 +37,14 @@ async def llm_service_error_handler(request: Request, exc: LLMServiceError):
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception(
+        "Unhandled server exception",
+        extra={
+            "path": request.url.path,
+            "method": request.method,
+            "client_ip": request.client.host if request.client else None,
+        },
+    )
     return JSONResponse(
         status_code=500,
         content={"detail": "An unexpected server error occurred. We are looking into it."},
