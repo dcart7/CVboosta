@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TopNav from "../components/TopNav";
+import SocialAuthButtons from "../components/SocialAuthButtons";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
 import { fetchWithRetry } from "../lib/fetchRetry";
@@ -146,6 +147,20 @@ export default function LoginPage() {
               </div>
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
+            <SocialAuthButtons
+              mode="login"
+              disabled={loading}
+              onError={(message) => setError(message || t("auth.loginFailed"))}
+              onSuccess={(data) => {
+                localStorage.setItem("auth_token", data.access_token);
+                if (data.email) {
+                  localStorage.setItem("user_email", data.email.trim().toLowerCase());
+                }
+                trackEvent("login", { method: "oauth" });
+                window.dispatchEvent(new Event("auth-change"));
+                router.push("/account");
+              }}
+            />
             <button className="btn primary" type="button" onClick={submit}>
               {loading ? t("auth.signingIn") : t("auth.logIn")}
             </button>

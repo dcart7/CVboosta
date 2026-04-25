@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TopNav from "../components/TopNav";
+import SocialAuthButtons from "../components/SocialAuthButtons";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
 import { fetchWithRetry } from "../lib/fetchRetry";
@@ -124,6 +125,20 @@ export default function RegisterPage() {
               </ul>
             </div>
             {error && <p style={{ color: "#b42318" }}>{error}</p>}
+            <SocialAuthButtons
+              mode="register"
+              disabled={loading}
+              onError={(message) => setError(message || t("auth.registerFailed"))}
+              onSuccess={(data) => {
+                localStorage.setItem("auth_token", data.access_token);
+                if (data.email) {
+                  localStorage.setItem("user_email", data.email.trim().toLowerCase());
+                }
+                trackEvent("sign_up", { method: "oauth" });
+                window.dispatchEvent(new Event("auth-change"));
+                router.push("/account");
+              }}
+            />
             <button className="btn secondary" type="button" onClick={submit}>
               {loading ? t("auth.creating") : t("auth.createBtn")}
             </button>

@@ -14,9 +14,15 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
+class OAuthLoginRequest(BaseModel):
+    id_token: str = Field(min_length=20, max_length=8000)
+    full_name: str | None = None
+
+
 class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    email: EmailStr | None = None
 
 
 class UserResponse(BaseModel):

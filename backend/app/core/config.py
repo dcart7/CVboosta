@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(..., min_length=32)
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
+    google_oauth_client_id: str | None = None
+    apple_oauth_client_id: str | None = None
     trusted_proxy_ips: list[str] = Field(default_factory=lambda: ["127.0.0.1", "::1"])
     trusted_proxy_cidrs: list[str] = Field(
         default_factory=lambda: [

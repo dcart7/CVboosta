@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import secrets
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
 from sqlalchemy.exc import IntegrityError
@@ -13,6 +15,7 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
     LoginRequest,
+    OAuthLoginRequest,
     RegisterRequest,
     ResetPasswordRequest,
     UserResponse,
@@ -30,6 +33,7 @@ from app.services.auth import (
 from app.services.activity_logger import record_activity
 from app.models.activity import ActivityLog
 from app.services.emailer import build_password_reset_link, send_password_reset_email
+from app.services.oauth import verify_oauth_id_token
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -56,7 +60,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> AuthRes
 
     record_activity(db, user_id=user.id, action="Account created", meta={})
     token = create_access_token(user)
-    return AuthResponse(access_token=token)
+    return AuthResponse(access_token=token, email=user.email)
 
 
 @router.post("/auth/login", response_model=AuthResponse)
@@ -78,7 +82,63 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> AuthResponse:
 
     record_activity(db, user_id=user.id, action="Signed in", meta={})
     token = create_access_token(user)
-    return AuthResponse(access_token=token)
+    return AuthResponse(access_token=token, email=user.email)
+
+
+@router.post("/auth/oauth/{provider}", response_model=AuthResponse)
+def oauth_login(
+    provider: str,
+    payload: OAuthLoginRequest,
+    db: Session = Depends(get_db),
+) -> AuthResponse:
+    provider_name = provider.strip().lower()
+    if provider_name not in {"google", "apple"}:
+        raise HTTPException(status_code=400, detail="Unsupported OAuth provider")
+
+    try:
+        claims = verify_oauth_id_token(provider_name, payload.id_token)
+    except Exception as exc:
+        raise HTTPException(status_code=401, detail="Invalid OAuth token") from exc
+
+    email = str(claims.get("email", "")).strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="OAuth email is missing")
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        display_name = (payload.full_name or "").strip() or str(claims.get("name", "")).strip() or None
+        random_password = secrets.token_urlsafe(48)
+        user = User(
+            email=email,
+            password_hash=hash_password(random_password),
+            full_name=display_name,
+        )
+        try:
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+        except IntegrityError:
+            db.rollback()
+            user = db.query(User).filter(User.email == email).first()
+            if not user:
+                raise HTTPException(status_code=500, detail="Failed to create OAuth user")
+        record_activity(
+            db,
+            user_id=user.id,
+            action="Account created",
+            meta={"method": provider_name},
+        )
+    else:
+        if not user.full_name:
+            display_name = (payload.full_name or "").strip() or str(claims.get("name", "")).strip()
+            if display_name:
+                user.full_name = display_name
+                db.add(user)
+                db.commit()
+
+    record_activity(db, user_id=user.id, action="Signed in", meta={"method": provider_name})
+    token = create_access_token(user)
+    return AuthResponse(access_token=token, email=user.email)
 
 
 def get_current_user(
