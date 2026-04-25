@@ -15,11 +15,14 @@ declare global {
             client_id: string;
             callback: (response: { credential?: string }) => void;
             ux_mode?: "popup" | "redirect";
-            use_fedcm_for_button?: boolean;
+            auto_select?: boolean;
           }) => void;
-          renderButton: (
-            parent: HTMLElement,
-            options: Record<string, string | number | boolean>,
+          prompt: (
+            momentListener?: (notification: {
+              isNotDisplayed?: () => boolean;
+              isSkippedMoment?: () => boolean;
+              isDismissedMoment?: () => boolean;
+            }) => void,
           ) => void;
         };
       };
@@ -50,34 +53,23 @@ export default function SocialAuthButtons({
 }: Props) {
   const { language } = useTranslation();
   const apiBase = getApiBase();
-  const googleBtnRef = useRef<HTMLDivElement | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<"google" | null>(null);
+  const googleInitialized = useRef(false);
+  const promptInFlight = useRef(false);
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
   const hasGoogle = Boolean(googleClientId);
-  const googleLocale = useMemo(() => {
-    const map: Record<string, string> = {
-      en: "en",
-      uk: "en",
-      pl: "en",
-      sk: "en",
-      cs: "en",
-      es: "en",
-      ru: "en",
-    };
-    return map[language] || "en";
-  }, [language]);
 
   const labels = useMemo(
     () => {
       const map = {
-        en: { or: "Or continue with" },
-        uk: { or: "Або продовжити через" },
-        pl: { or: "Lub kontynuuj przez" },
-        sk: { or: "Alebo pokračovať cez" },
-        cs: { or: "Nebo pokračovat přes" },
-        es: { or: "O continuar con" },
+        en: { or: "Or continue with", unavailable: "Google sign-in is not available right now" },
+        uk: { or: "Або продовжити через", unavailable: "Вхід через Google зараз недоступний" },
+        pl: { or: "Lub kontynuuj przez", unavailable: "Logowanie przez Google jest teraz niedostępne" },
+        sk: { or: "Alebo pokračovať cez", unavailable: "Prihlásenie cez Google je teraz nedostupné" },
+        cs: { or: "Nebo pokračovat přes", unavailable: "Přihlášení přes Google je teď nedostupné" },
+        es: { or: "O continuar con", unavailable: "El inicio de sesión con Google no está disponible ahora" },
       } as const;
       return map[language] || map.en;
     },
@@ -110,21 +102,24 @@ export default function SocialAuthButtons({
   };
 
   useEffect(() => {
-    if (!googleReady || !hasGoogle || !googleBtnRef.current || !window.google?.accounts?.id) {
+    if (!googleReady || !hasGoogle || !window.google?.accounts?.id) {
       return;
     }
-
-    const parent = googleBtnRef.current;
-    parent.innerHTML = "";
+    if (googleInitialized.current) {
+      return;
+    }
+    googleInitialized.current = true;
     window.google.accounts.id.initialize({
       client_id: googleClientId,
-      use_fedcm_for_button: false,
+      auto_select: false,
       callback: (response) => {
-        if (disabled || loadingProvider) {
+        if (!promptInFlight.current || disabled) {
           return;
         }
+        promptInFlight.current = false;
         const token = response?.credential || "";
         if (!token) {
+          setLoadingProvider(null);
           onError("Google token is missing");
           return;
         }
@@ -132,17 +127,24 @@ export default function SocialAuthButtons({
       },
       ux_mode: "popup",
     });
-    window.google.accounts.id.renderButton(parent, {
-      type: "standard",
-      theme: "filled_black",
-      size: "large",
-      shape: "pill",
-      width: Math.max(240, Math.floor(parent.getBoundingClientRect().width || 320)),
-      text: mode === "login" ? "signin_with" : "signup_with",
-      logo_alignment: "left",
-      locale: googleLocale,
+  }, [googleReady, hasGoogle, onError, disabled, googleClientId]);
+
+  const handleGoogleClick = () => {
+    if (!hasGoogle || disabled || loadingProvider || !window.google?.accounts?.id) {
+      return;
+    }
+    setLoadingProvider("google");
+    promptInFlight.current = true;
+    window.google.accounts.id.prompt((notification) => {
+      if (notification?.isNotDisplayed?.() || notification?.isSkippedMoment?.() || notification?.isDismissedMoment?.()) {
+        if (promptInFlight.current) {
+          promptInFlight.current = false;
+          setLoadingProvider(null);
+          onError(labels.unavailable);
+        }
+      }
     });
-  }, [googleReady, hasGoogle, mode, onError, disabled, loadingProvider, googleClientId, googleLocale]);
+  };
 
   if (!hasGoogle) {
     return null;
@@ -158,7 +160,14 @@ export default function SocialAuthButtons({
 
       <div className="social-auth-divider">{labels.or}</div>
       <div className="social-auth-grid">
-        <div className="social-google-slot" ref={googleBtnRef} />
+        <button
+          type="button"
+          className="social-google-btn"
+          disabled={disabled || loadingProvider !== null}
+          onClick={handleGoogleClick}
+        >
+          {mode === "login" ? "Sign in with Google" : "Sign up with Google"}
+        </button>
       </div>
     </div>
   );
