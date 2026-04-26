@@ -40,9 +40,15 @@ router = APIRouter()
 optional_bearer = HTTPBearer(auto_error=False)
 
 
-def _set_auth_cookie(response: Response, token: str) -> None:
-    env = settings.app_env.lower()
-    secure = settings.auth_cookie_secure and env not in {"local", "dev", "development", "test"}
+def _request_is_https(request: Request) -> bool:
+    forwarded_proto = (request.headers.get("x-forwarded-proto") or "").split(",")[0].strip().lower()
+    if forwarded_proto == "https":
+        return True
+    return request.url.scheme.lower() == "https"
+
+
+def _set_auth_cookie(request: Request, response: Response, token: str) -> None:
+    secure = settings.auth_cookie_secure and _request_is_https(request)
     samesite = settings.auth_cookie_samesite.lower().strip() if settings.auth_cookie_samesite else "lax"
     if samesite not in {"lax", "strict", "none"}:
         samesite = "lax"
@@ -84,6 +90,7 @@ def _extract_token(
 @router.post("/auth/register", response_model=AuthResponse)
 def register(
     payload: RegisterRequest,
+    request: Request,
     response: Response,
     db: Session = Depends(get_db),
 ) -> AuthResponse:
@@ -105,13 +112,14 @@ def register(
 
     record_activity(db, user_id=user.id, action="Account created", meta={})
     token = create_access_token(user)
-    _set_auth_cookie(response, token)
+    _set_auth_cookie(request, response, token)
     return AuthResponse(access_token=token, email=user.email)
 
 
 @router.post("/auth/login", response_model=AuthResponse)
 def login(
     payload: LoginRequest,
+    request: Request,
     response: Response,
     db: Session = Depends(get_db),
 ) -> AuthResponse:
@@ -132,7 +140,7 @@ def login(
 
     record_activity(db, user_id=user.id, action="Signed in", meta={})
     token = create_access_token(user)
-    _set_auth_cookie(response, token)
+    _set_auth_cookie(request, response, token)
     return AuthResponse(access_token=token, email=user.email)
 
 
@@ -140,6 +148,7 @@ def login(
 def oauth_login(
     provider: str,
     payload: OAuthLoginRequest,
+    request: Request,
     response: Response,
     db: Session = Depends(get_db),
 ) -> AuthResponse:
@@ -197,7 +206,7 @@ def oauth_login(
 
     record_activity(db, user_id=user.id, action="Signed in", meta={"method": provider_name})
     token = create_access_token(user)
-    _set_auth_cookie(response, token)
+    _set_auth_cookie(request, response, token)
     return AuthResponse(access_token=token, email=user.email)
 
 
