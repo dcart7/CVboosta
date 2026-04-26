@@ -41,6 +41,7 @@ from app.db.session import get_db
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
 from app.services.fair_use import enforce_fair_use_or_raise
+from app.services.analysis_crypto import encrypt_json_for_user
 
 router = APIRouter()
 
@@ -335,12 +336,12 @@ def interview_prep_route(
             ).first()
             if analysis:
                 new_result = dict(analysis.result_json or {})
-                new_result["interview_questions"] = questions
+                new_result["interview_questions_enc"] = encrypt_json_for_user(current_user.id, questions)
                 analysis.result_json = new_result
                 flag_modified(analysis, "result_json")
                 db.add(analysis)
                 db.commit()
-                
+
         if current_user.subscription_tier == "single":
             current_user.daily_prep_count = max(0, current_user.daily_prep_count - 1)
         else:

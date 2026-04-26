@@ -26,8 +26,21 @@ export async function fetchWithRetry(
   const baseDelayMs = options?.baseDelayMs ?? 400;
   const timeoutMs = options?.timeoutMs ?? 20_000;
 
+  const headers = new Headers(init?.headers || {});
+  if (!headers.has("Authorization") && typeof window !== "undefined") {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+  }
+
+  const mergedInit: RequestInit = {
+    ...init,
+    headers,
+  };
+
   if (init?.signal) {
-    return fetch(input, { credentials: init.credentials ?? "include", ...init });
+    return fetch(input, { credentials: mergedInit.credentials ?? "include", ...mergedInit });
   }
 
   let lastError: unknown;
@@ -36,8 +49,8 @@ export async function fetchWithRetry(
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const res = await fetch(input, {
-        credentials: init?.credentials ?? "include",
-        ...init,
+        credentials: mergedInit.credentials ?? "include",
+        ...mergedInit,
         signal: controller.signal,
       });
       clearTimeout(timer);

@@ -28,6 +28,9 @@ from app.core.config import settings
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
 from app.services.fair_use import enforce_fair_use_or_raise
+from app.services.analysis_crypto import (
+    encrypt_text_for_user,
+)
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.models.analysis import Analysis
@@ -132,11 +135,13 @@ async def optimize_cv(
     if current_user:
         analysis = Analysis(
             user_id=current_user.id,
-            original_cv=payload.cv_text,
-            job_description=payload.job_text,
+            # Do not persist plaintext CV/JD in columns.
+            original_cv="",
+            job_description="",
             score=match_after,
             result_json={
-                "optimized_cv": result.optimized_cv,
+                "optimized_cv_enc": encrypt_text_for_user(current_user.id, result.optimized_cv),
+                "job_description_enc": encrypt_text_for_user(current_user.id, payload.job_text),
                 "missing_skills": missing_skills,
                 "added_keywords": added_keywords,
                 "recommendations": recommendations,
@@ -193,14 +198,13 @@ def optimize_cover_letter(
     if current_user:
         if payload.analysis_id:
             from sqlalchemy.orm.attributes import flag_modified
-            # Update the analysis record with the cover letter
             analysis = db.query(Analysis).filter(
-                Analysis.id == payload.analysis_id, 
+                Analysis.id == payload.analysis_id,
                 Analysis.user_id == current_user.id
             ).first()
             if analysis:
                 new_result = dict(analysis.result_json or {})
-                new_result["cover_letter"] = content
+                new_result["cover_letter_enc"] = encrypt_text_for_user(current_user.id, content)
                 analysis.result_json = new_result
                 flag_modified(analysis, "result_json")
                 db.add(analysis)

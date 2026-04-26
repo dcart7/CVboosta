@@ -75,6 +75,9 @@ export default function LoginPage() {
       }
       const data = await response.json();
       localStorage.setItem("user_email", email.trim().toLowerCase());
+      if (data?.access_token) {
+        localStorage.setItem("access_token", String(data.access_token));
+      }
       trackEvent("login", { method: "email" });
       window.dispatchEvent(new Event("auth-change"));
       router.push("/account");
@@ -153,6 +156,9 @@ export default function LoginPage() {
               onSuccess={(data) => {
                 if (data.email) {
                   localStorage.setItem("user_email", data.email.trim().toLowerCase());
+                }
+                if (data.access_token) {
+                  localStorage.setItem("access_token", String(data.access_token));
                 }
                 trackEvent("login", { method: "oauth" });
                 window.dispatchEvent(new Event("auth-change"));
