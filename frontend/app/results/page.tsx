@@ -772,19 +772,22 @@ function ResultsContent() {
     setIsLoadingPrep(true);
     setPrepError(null);
     try {
-      const response = await fetch(`${apiBase}/analyze/interview-prep`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
+      const response = await fetchWithRetry(
+        `${apiBase}/analyze/interview-prep`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            job_text: jobText,
+            missing_keywords: missing,
+            ui_language: language,
+            analysis_id: sessionId ? parseInt(sessionId, 10) : null,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          job_text: jobText,
-          missing_keywords: missing,
-          ui_language: language,
-          analysis_id: sessionId ? parseInt(sessionId, 10) : null,
-        }),
-      });
+        { attempts: 3, baseDelayMs: 300, timeoutMs: 20_000 },
+      );
 
       if (response.status === 402) {
         setShowUpgradeModal(true);
@@ -824,19 +827,22 @@ function ResultsContent() {
     setIsLoadingCL(true);
     setClError(null);
     try {
-      const response = await fetch(`${apiBase}/optimize/cover-letter`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
+      const response = await fetchWithRetry(
+        `${apiBase}/optimize/cover-letter`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cv_text: cvText,
+            job_text: jobText,
+            ui_language: language,
+            analysis_id: sessionId ? parseInt(sessionId, 10) : null,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          cv_text: cvText,
-          job_text: jobText,
-          ui_language: language,
-          analysis_id: sessionId ? parseInt(sessionId, 10) : null,
-        }),
-      });
+        { attempts: 3, baseDelayMs: 300, timeoutMs: 20_000 },
+      );
 
       if (response.status === 402) {
         setShowUpgradeModal(true);

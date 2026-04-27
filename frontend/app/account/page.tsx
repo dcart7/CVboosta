@@ -204,14 +204,17 @@ export default function AccountPage() {
       setMessage("Passwords do not match.");
       return;
     }
-    const response = await fetch(`${apiBase}/auth/change-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetchWithRetry(
+      `${apiBase}/auth/change-password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ current_password, new_password }),
       },
-      credentials: "include",
-      body: JSON.stringify({ current_password, new_password }),
-    });
+      { attempts: 2, baseDelayMs: 250, timeoutMs: 20_000 },
+    );
     if (response.status === 401) {
       router.push("/login");
       return;

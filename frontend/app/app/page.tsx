@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
+import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 import {
   clearWorkspaceDraftData,
@@ -422,21 +423,24 @@ export default function WorkspacePage() {
     setOptimizeStatus("Optimizing...");
     setIsOptimizing(true);
     try {
-      const response = await fetch(`${apiBase}/optimize`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetchWithRetry(
+        `${apiBase}/optimize`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cv_text: parsed.raw_text || "",
+            job_text: jobText,
+            cv_analysis: "",
+            job_analysis: "",
+            target_role: targetRole,
+            target_company: targetCompany,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          cv_text: parsed.raw_text || "",
-          job_text: jobText,
-          cv_analysis: "",
-          job_analysis: "",
-          target_role: targetRole,
-          target_company: targetCompany,
-        }),
-      });
+        { attempts: 3, baseDelayMs: 300, timeoutMs: 25_000 },
+      );
       const data = await response.json();
       if (response.status === 402) {
         setShowUpgradeModal(true);
