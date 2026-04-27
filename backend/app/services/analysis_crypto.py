@@ -13,9 +13,19 @@ from app.core.config import settings
 _ENC_PREFIX = "enc:v1:"
 
 
-def _fernet_for_user(user_id: int) -> Fernet:
+def _key_materials() -> list[str]:
+    primary = (settings.analysis_encryption_key or settings.jwt_secret or "").strip()
+    legacy = [str(item).strip() for item in (settings.analysis_encryption_legacy_keys or []) if str(item).strip()]
+    materials = [primary] if primary else []
+    for item in legacy:
+        if item not in materials:
+            materials.append(item)
+    return materials
+
+
+def _fernet_for_user(user_id: int, key_material: str) -> Fernet:
     digest = hmac.new(
-        settings.jwt_secret.encode("utf-8"),
+        key_material.encode("utf-8"),
         f"analysis:{user_id}".encode("utf-8"),
         hashlib.sha256,
     ).digest()
@@ -26,7 +36,10 @@ def _fernet_for_user(user_id: int) -> Fernet:
 def encrypt_text_for_user(user_id: int, plaintext: str | None) -> str | None:
     if not plaintext:
         return None
-    token = _fernet_for_user(user_id).encrypt(plaintext.encode("utf-8")).decode("utf-8")
+    materials = _key_materials()
+    if not materials:
+        return None
+    token = _fernet_for_user(user_id, materials[0]).encrypt(plaintext.encode("utf-8")).decode("utf-8")
     return f"{_ENC_PREFIX}{token}"
 
 
@@ -37,10 +50,12 @@ def decrypt_text_for_user(user_id: int, ciphertext: str | None) -> str | None:
         # Backward compatibility with legacy plaintext rows.
         return ciphertext
     token = ciphertext[len(_ENC_PREFIX) :]
-    try:
-        return _fernet_for_user(user_id).decrypt(token.encode("utf-8")).decode("utf-8")
-    except (InvalidToken, ValueError):
-        return None
+    for material in _key_materials():
+        try:
+            return _fernet_for_user(user_id, material).decrypt(token.encode("utf-8")).decode("utf-8")
+        except (InvalidToken, ValueError):
+            continue
+    return None
 
 
 def encrypt_json_for_user(user_id: int, value: Any) -> str | None:

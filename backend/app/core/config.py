@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(..., min_length=32)
     jwt_algorithm: str = "HS256"
     jwt_exp_minutes: int = 60 * 24 * 7
+    analysis_encryption_key: str | None = None
+    analysis_encryption_legacy_keys: list[str] = Field(default_factory=list)
     auth_cookie_name: str = "cvboosta_session"
     auth_cookie_secure: bool = True
     auth_cookie_samesite: str = "lax"
@@ -89,7 +91,12 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    @field_validator("trusted_proxy_ips", "trusted_proxy_cidrs", mode="before")
+    @field_validator(
+        "trusted_proxy_ips",
+        "trusted_proxy_cidrs",
+        "analysis_encryption_legacy_keys",
+        mode="before",
+    )
     @classmethod
     def parse_list_values(cls, v: object) -> list[str]:
         if v is None:
