@@ -364,6 +364,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Успіх першої роботи будується на фокусі, щотижневій дисципліні та точковій оптимізації резюме.",
     },
+    "quantify-achievements-resume": {
+      title: "Як кількісно описати досягнення в резюме",
+      excerpt:
+        "Практичний фреймворк, як перетворити загальні bullet points на формулювання з вимірюваним впливом.",
+      lead: "Цифри роблять ваш досвід більш переконливим і легшим для порівняння.",
+      sections: [
+        {
+          title: "1) Додайте точку старту і фінальний результат",
+          body: "Де можливо, показуйте, з чого починалася ситуація і чим вона завершилася після вашого внеску.",
+        },
+        {
+          title: "2) Використовуйте діапазон, якщо точні цифри конфіденційні",
+          body: "Навіть із діапазонами на кшталт 15-20% або 30k-40k активних користувачів на місяць ви зберігаєте достовірність.",
+        },
+        {
+          title: "3) Перевіряйте релевантність через CVboosta",
+          body: "Після додавання метрик повторно запустіть оптимізацію, щоб у bullet points залишилися і вимірюваний вплив, і ключові слова з вакансії.",
+        },
+      ],
+      takeawayTitle: "Порада",
+      takeawayBody:
+        "Сильний bullet point поєднує дію, контекст і вимірюваний результат.",
+    },
   },
   pl: {
     "how-to-pass-ats-screening": {
@@ -535,6 +558,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayTitle: "Najważniejszy wniosek",
       takeawayBody:
         "Sukces w pierwszej pracy buduje fokus, tygodniowa konsekwencja i celowana optymalizacja CV.",
+    },
+    "quantify-achievements-resume": {
+      title: "Jak kwantyfikować osiągnięcia w CV",
+      excerpt:
+        "Praktyczny framework, który zamienia ogólne bullet points w opisy mierzalnego wpływu.",
+      lead: "Liczby sprawiają, że Twoje doświadczenie jest bardziej wiarygodne i łatwiejsze do porównania.",
+      sections: [
+        {
+          title: "1) Dodaj punkt wyjścia i wynik końcowy",
+          body: "Gdzie to możliwe, pokaż od czego sytuacja startowała i gdzie skończyła się po Twoim wkładzie.",
+        },
+        {
+          title: "2) Użyj zakresu, gdy dokładne liczby są poufne",
+          body: "Nadal możesz brzmieć wiarygodnie, używając zakresów takich jak 15-20% lub 30k-40k użytkowników miesięcznie.",
+        },
+        {
+          title: "3) Sprawdź relewantność w CVboosta",
+          body: "Po dodaniu metryk uruchom ponownie optymalizację, aby bullet points zachowały zarówno wpływ, jak i słowa kluczowe z oferty.",
+        },
+      ],
+      takeawayTitle: "Wskazówka",
+      takeawayBody:
+        "Mocny bullet point łączy działanie, kontekst i mierzalny rezultat.",
     },
   },
   sk: {
@@ -708,6 +754,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Úspech pri prvej práci stojí na fokuse, týždennej konzistentnosti a cielenej optimalizácii životopisu.",
     },
+    "quantify-achievements-resume": {
+      title: "Ako kvantifikovať výsledky v životopise",
+      excerpt:
+        "Praktický framework, ako zmeniť všeobecné bullet points na formulácie s merateľným dopadom.",
+      lead: "Čísla robia vaše skúsenosti dôveryhodnejšími a ľahšie porovnateľnými.",
+      sections: [
+        {
+          title: "1) Pridajte východiskový stav a výsledok",
+          body: "Ak sa dá, ukážte kde situácia začínala a kde skončila po vašom prínose.",
+        },
+        {
+          title: "2) Použite interval, ak sú presné čísla dôverné",
+          body: "Stále môžete pôsobiť dôveryhodne s intervalmi ako 15-20% alebo 30k-40k mesačných používateľov.",
+        },
+        {
+          title: "3) Overte relevantnosť v CVboosta",
+          body: "Po doplnení metrík znova spustite optimalizáciu, aby bullet points obsahovali merateľný dopad aj kľúčové slová z vacancy.",
+        },
+      ],
+      takeawayTitle: "Tip",
+      takeawayBody:
+        "Silný bullet point spája akciu, kontext a merateľný výsledok.",
+    },
   },
   cs: {
     "how-to-pass-ats-screening": {
@@ -880,6 +949,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayBody:
         "Úspěch první práce stojí na fokusu, týdenní konzistenci a cílené optimalizaci životopisu.",
     },
+    "quantify-achievements-resume": {
+      title: "Jak kvantifikovat výsledky v životopise",
+      excerpt:
+        "Praktický framework, jak proměnit obecné bullet points na formulace s měřitelným dopadem.",
+      lead: "Čísla dělají vaše zkušenosti důvěryhodnější a snadněji porovnatelné.",
+      sections: [
+        {
+          title: "1) Přidejte výchozí stav a cílový výsledek",
+          body: "Kde to jde, ukažte odkud situace startovala a kam se posunula po vašem přínosu.",
+        },
+        {
+          title: "2) Použijte rozmezí, když jsou přesná čísla důvěrná",
+          body: "Důvěryhodně můžete působit i s rozmezími jako 15-20% nebo 30k-40k měsíčních uživatelů.",
+        },
+        {
+          title: "3) Znovu ověřte relevanci v CVboosta",
+          body: "Po doplnění metrik spusťte optimalizaci znovu, aby bullet points obsahovaly měřitelný dopad i klíčová slova z inzerátu.",
+        },
+      ],
+      takeawayTitle: "Tip",
+      takeawayBody:
+        "Silný bullet point kombinuje akci, kontext a měřitelný výsledek.",
+    },
   },
   es: {
     "how-to-pass-ats-screening": {
@@ -1051,6 +1143,29 @@ const BLOG_OVERRIDES: Record<Exclude<Language, "en">, Record<string, LocalizedPo
       takeawayTitle: "Idea clave",
       takeawayBody:
         "El éxito del primer trabajo viene de foco, constancia semanal y optimización dirigida del CV.",
+    },
+    "quantify-achievements-resume": {
+      title: "Cómo cuantificar logros en tu CV",
+      excerpt:
+        "Un framework práctico para convertir bullet points genéricos en declaraciones de impacto medible.",
+      lead: "Los números hacen que tu experiencia sea más creíble y más fácil de comparar.",
+      sections: [
+        {
+          title: "1) Añade línea base y resultado final",
+          body: "Siempre que puedas, muestra dónde empezó la situación y dónde terminó después de tu contribución.",
+        },
+        {
+          title: "2) Usa rangos si las cifras exactas son confidenciales",
+          body: "Puedes mantener credibilidad con rangos como 15-20% o 30k-40k usuarios mensuales.",
+        },
+        {
+          title: "3) Revalida la relevancia en CVboosta",
+          body: "Después de añadir métricas, vuelve a ejecutar la optimización para asegurar que los bullet points mantengan impacto y palabras clave de la vacante.",
+        },
+      ],
+      takeawayTitle: "Consejo",
+      takeawayBody:
+        "Un bullet point sólido combina acción, contexto y resultado medible.",
     },
   },
 };
