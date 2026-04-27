@@ -6,6 +6,7 @@ import { useTranslation } from "../lib/LanguageContext";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
+import { fetchWithRetry } from "../lib/fetchRetry";
 
 export default function PricingPage() {
   const { t, language } = useTranslation();
@@ -39,7 +40,11 @@ export default function PricingPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${apiBase}/billing/status`, { credentials: "include" });
+        const res = await fetchWithRetry(
+          `${apiBase}/billing/status`,
+          undefined,
+          { attempts: 4, baseDelayMs: 300, timeoutMs: 20_000 },
+        );
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled && typeof data?.tier === "string") {
@@ -67,19 +72,22 @@ export default function PricingPage() {
 
     setCheckoutLoading(tierId);
     try {
-      const response = await fetch(`${apiBase}/billing/stripe/checkout-session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetchWithRetry(
+        `${apiBase}/billing/stripe/checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tier: tierId,
+            billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : null,
+            success_url: `${window.location.origin}/account?billing=success&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${window.location.origin}/pricing?billing=cancel`,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          tier: tierId,
-          billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : null,
-          success_url: `${window.location.origin}/account?billing=success&session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${window.location.origin}/pricing?billing=cancel`,
-        }),
-      });
+        { attempts: 3, baseDelayMs: 300, timeoutMs: 20_000 },
+      );
       const data = await response.json().catch(() => ({}));
       if (response.status === 401) {
         router.push("/login");
