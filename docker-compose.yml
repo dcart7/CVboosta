@@ -17,7 +17,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile
     container_name: cvboosta_backend
     restart: unless-stopped
     env_file: .env
@@ -26,6 +26,7 @@ services:
       # or override the host to point to 'postgres' inside docker network.
       # The user's .env uses localhost string, so we force-override the URL here:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      PORT: "8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -33,6 +34,19 @@ services:
     # but we can optionally allow it for debug
     expose:
       - "8000"
+
+  ai_core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cvboosta_ai_core
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "8001"
+    command: ["sh", "-c", "uvicorn app.internal_main:app --host 0.0.0.0 --port ${PORT:-8001} --proxy-headers"]
+    expose:
+      - "8001"
 
   frontend:
     build:
@@ -60,6 +74,7 @@ services:
     depends_on:
       - backend
       - frontend
+      - ai_core
 
 volumes:
   postgres_data:

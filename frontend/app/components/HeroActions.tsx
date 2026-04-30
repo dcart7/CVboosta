@@ -35,6 +35,9 @@ export default function HeroActions() {
       <Link className="btn primary hero-cta-primary" href="/app">
         {t("hero.startWithCv")}
       </Link>
+      <Link className="btn ghost hero-cta-cases" href="/cases">
+        {t("cases.navCta")}
+      </Link>
       <Link className="btn ghost hero-cta-secondary" href="/free-ats-resume-checker">
         Free ATS checker
       </Link>

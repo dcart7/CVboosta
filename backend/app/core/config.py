@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     llm_provider: str = "gemini"
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-2.5-flash"
+    internal_api_key: str | None = None
+    internal_allowed_cidrs: list[str] = Field(default_factory=list)
     max_cv_chars: int = 12000
     max_job_chars: int = 12000
     rate_limit_enabled: bool = True
@@ -95,6 +97,7 @@ class Settings(BaseSettings):
         "trusted_proxy_ips",
         "trusted_proxy_cidrs",
         "analysis_encryption_legacy_keys",
+        "internal_allowed_cidrs",
         mode="before",
     )
     @classmethod
