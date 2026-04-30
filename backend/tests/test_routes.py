@@ -5,7 +5,8 @@ from app.services.llm import LLMResult
 def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    payload = response.json()
+    assert payload["status"] == "ok"
 
 
 def test_upload_cv_text(client):
@@ -77,7 +78,7 @@ def test_optimize_route(client, monkeypatch):
     monkeypatch.setattr(
         optimize_routes,
         "generate_optimized_cv",
-        lambda **_: LLMResult(optimized_cv="OK", feedback="done"),
+        lambda *_, **__: LLMResult(optimized_cv="OK", feedback="done"),
     )
     monkeypatch.setattr(
         optimize_routes,
@@ -89,6 +90,13 @@ def test_optimize_route(client, monkeypatch):
         "build_recommendations",
         lambda missing: [f"Learn {m}" for m in missing],
     )
+
+    reg = client.post(
+        "/auth/register",
+        json={"email": "u@example.com", "password": "password123", "full_name": "U"},
+    )
+    assert reg.status_code == 200
+    token = reg.json()["access_token"]
     response = client.post(
         "/optimize",
         json={
@@ -97,7 +105,73 @@ def test_optimize_route(client, monkeypatch):
             "cv_analysis": "a",
             "job_analysis": "b",
         },
+        headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
     payload = response.json()
     assert payload["optimized_cv"] == "OK"
+
+    # Free tier is limited to 1 scan/day.
+    response2 = client.post(
+        "/optimize",
+        json={
+            "cv_text": "Python",
+            "job_text": "Job",
+            "cv_analysis": "a",
+            "job_analysis": "b",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response2.status_code == 402
+
+
+def test_csrf_blocks_cookie_auth_without_origin(client, monkeypatch):
+    from app.api.routes import optimize as optimize_routes
+    from app.schemas.keywords import KeywordExtractionResult
+    from app.services.llm import LLMResult
+
+    monkeypatch.setattr(
+        optimize_routes,
+        "generate_optimized_cv",
+        lambda *_, **__: LLMResult(optimized_cv="OK", feedback="done"),
+    )
+    monkeypatch.setattr(
+        optimize_routes,
+        "extract_job_keywords",
+        lambda text: KeywordExtractionResult(skills=["Python", "SQL"], requirements=[]),
+    )
+    monkeypatch.setattr(
+        optimize_routes,
+        "build_recommendations",
+        lambda missing: [f"Learn {m}" for m in missing],
+    )
+
+    reg = client.post(
+        "/auth/register",
+        json={"email": "csrf@example.com", "password": "password123", "full_name": "U"},
+    )
+    assert reg.status_code == 200
+
+    # Cookie-based auth is now protected by Origin/Referer checks.
+    blocked = client.post(
+        "/optimize",
+        json={
+            "cv_text": "Python",
+            "job_text": "Job",
+            "cv_analysis": "a",
+            "job_analysis": "b",
+        },
+    )
+    assert blocked.status_code == 403
+
+    allowed = client.post(
+        "/optimize",
+        json={
+            "cv_text": "Python",
+            "job_text": "Job",
+            "cv_analysis": "a",
+            "job_analysis": "b",
+        },
+        headers={"Origin": "http://localhost:3000"},
+    )
+    assert allowed.status_code == 200

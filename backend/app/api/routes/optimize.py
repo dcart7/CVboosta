@@ -28,6 +28,7 @@ from app.core.config import settings
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
 from app.services.fair_use import enforce_fair_use_or_raise
+from app.services.usage import consume_feature_or_raise, refund_feature_best_effort
 from app.services.analysis_crypto import (
     encrypt_text_for_user,
 )
@@ -45,10 +46,16 @@ async def optimize_cv(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user_optional),
 ) -> OptimizeResponse:
+    consumed_scan = False
     if current_user:
         enforce_fair_use_or_raise(db, current_user)
-        if not current_user.can_use("scan"):
-            raise HTTPException(status_code=402, detail="Daily scan limit reached. Please upgrade your plan.")
+        consume_feature_or_raise(
+            db,
+            user_id=current_user.id,
+            feature="scan",
+            exhausted_detail="Daily scan limit reached. Please upgrade your plan.",
+        )
+        consumed_scan = True
     else:
         # For guests, we could either block or allow 1 based on IP, 
         # but for now let's require login for optimization or treat as free with 0 scans allowed if not logged in.
@@ -125,11 +132,13 @@ async def optimize_cv(
 
 
         recommendations = await run_in_threadpool(build_recommendations, missing_skills)
-    except LLMServiceError:
-        raise
-    except RuntimeError as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
     except Exception as exc:
+        if consumed_scan:
+            refund_feature_best_effort(db, user_id=current_user.id, feature="scan")
+        if isinstance(exc, LLMServiceError):
+            raise
+        if isinstance(exc, RuntimeError):
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
         raise HTTPException(status_code=500, detail="Unexpected server error") from exc
 
     if current_user:
@@ -151,11 +160,6 @@ async def optimize_cv(
                 "match_after": match_after,
             },
         )
-        if current_user.subscription_tier == "single":
-            current_user.daily_scans_count = max(0, current_user.daily_scans_count - 1)
-        else:
-            current_user.daily_scans_count += 1
-        db.add(current_user)
         db.add(analysis)
         db.commit()
         record_activity(db, user_id=current_user.id, action="CV optimized", meta={})
@@ -181,8 +185,12 @@ def optimize_cover_letter(
         raise HTTPException(status_code=401, detail="Authentication required.")
 
     enforce_fair_use_or_raise(db, current_user)
-    if not current_user.can_use("cl"):
-        raise HTTPException(status_code=402, detail="Daily Cover Letter limit reached. Please upgrade your plan.")
+    consume_feature_or_raise(
+        db,
+        user_id=current_user.id,
+        feature="cl",
+        exhausted_detail="Daily Cover Letter limit reached. Please upgrade your plan.",
+    )
 
     try:
         content = generate_cover_letter(
@@ -191,8 +199,10 @@ def optimize_cover_letter(
             ui_language=payload.ui_language,
         )
     except LLMServiceError:
+        refund_feature_best_effort(db, user_id=current_user.id, feature="cl")
         raise
     except Exception as exc:
+        refund_feature_best_effort(db, user_id=current_user.id, feature="cl")
         raise HTTPException(status_code=500, detail="Failed to generate cover letter") from exc
 
     if current_user:
@@ -209,13 +219,6 @@ def optimize_cover_letter(
                 flag_modified(analysis, "result_json")
                 db.add(analysis)
                 db.commit()
-        
-        if current_user.subscription_tier == "single":
-            current_user.daily_cl_count = max(0, current_user.daily_cl_count - 1)
-        else:
-            current_user.daily_cl_count += 1
-        db.add(current_user)
-        db.commit()
         record_activity(db, user_id=current_user.id, action="Cover letter generated", meta={"analysis_id": payload.analysis_id})
 
     return CoverLetterResponse(content=content)

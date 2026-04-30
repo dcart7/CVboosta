@@ -31,6 +31,7 @@ from app.services.keyword_transformer import extract_keywords_transformer
 from app.services.lang_detect import is_english_text
 from app.services.llm import (
     LLMServiceError,
+    analyze_cv_text,
     analyze_job_text,
     extract_job_keywords,
     generate_interview_prep,
@@ -41,6 +42,7 @@ from app.db.session import get_db
 from app.api.routes.auth import get_current_user_optional
 from app.services.activity_logger import record_activity
 from app.services.fair_use import enforce_fair_use_or_raise
+from app.services.usage import consume_feature_or_raise, refund_feature_best_effort
 from app.services.analysis_crypto import encrypt_json_for_user
 
 router = APIRouter()
@@ -312,8 +314,12 @@ def interview_prep_route(
         raise HTTPException(status_code=401, detail="Authentication required.")
 
     enforce_fair_use_or_raise(db, current_user)
-    if not current_user.can_use("prep"):
-        raise HTTPException(status_code=402, detail="Daily Interview Prep limit reached. Please upgrade your plan.")
+    consume_feature_or_raise(
+        db,
+        user_id=current_user.id,
+        feature="prep",
+        exhausted_detail="Daily Interview Prep limit reached. Please upgrade your plan.",
+    )
 
     try:
         questions = generate_interview_prep(
@@ -322,8 +328,10 @@ def interview_prep_route(
             ui_language=payload.ui_language,
         )
     except LLMServiceError as exc:
+        refund_feature_best_effort(db, user_id=current_user.id, feature="prep")
         raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
     except Exception as exc:
+        refund_feature_best_effort(db, user_id=current_user.id, feature="prep")
         raise HTTPException(status_code=500, detail="Unexpected server error") from exc
 
     if current_user:
@@ -342,12 +350,6 @@ def interview_prep_route(
                 db.add(analysis)
                 db.commit()
 
-        if current_user.subscription_tier == "single":
-            current_user.daily_prep_count = max(0, current_user.daily_prep_count - 1)
-        else:
-            current_user.daily_prep_count += 1
-        db.add(current_user)
-        db.commit()
         record_activity(db, user_id=current_user.id, action="Interview prep", meta={"analysis_id": payload.analysis_id})
 
     return InterviewPrepResponse(

@@ -10,7 +10,10 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-import stripe
+try:
+    import stripe  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover
+    stripe = None  # type: ignore
 
 from app.api.routes.auth import get_current_user
 from app.core.config import get_cors_origins, settings

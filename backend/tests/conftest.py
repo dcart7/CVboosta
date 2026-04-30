@@ -16,6 +16,8 @@ os.environ["DATABASE_URL"] = f"sqlite:///{_db_path}"
 os.environ["API_KEY_ENABLED"] = "false"
 os.environ["RATE_LIMIT_ENABLED"] = "false"
 os.environ["REQUEST_LOGGING_ENABLED"] = "false"
+os.environ.setdefault("JWT_SECRET", "unit_test_jwt_secret_0123456789abcdef")
+os.environ.setdefault("APP_ENV", "test")
 
 from app.main import app  # noqa: E402
 

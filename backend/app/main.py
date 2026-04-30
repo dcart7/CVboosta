@@ -12,6 +12,7 @@ from app.api.routes.logs import router as logs_router
 from app.api.routes.optimize import router as optimize_router
 from app.api.routes.billing import router as billing_router
 from app.core.api_key import api_key_middleware
+from app.core.csrf import csrf_protect_middleware
 from app.core.rate_limit import rate_limit_middleware
 from app.services.request_logger import capture_response_body, log_request_response
 from app.services.llm import LLMServiceError
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Smart CV Optimizer API")
 
+app.middleware("http")(csrf_protect_middleware)
 app.middleware("http")(rate_limit_middleware)
 app.middleware("http")(api_key_middleware)
 
