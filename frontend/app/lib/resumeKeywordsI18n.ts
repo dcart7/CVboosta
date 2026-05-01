@@ -1075,7 +1075,7 @@ function getLocalizedRoleTerm(role: string, language: Language): string {
   if (language === "en") {
     return role;
   }
-  return localizeRoleName(role, language).toLowerCase();
+  return localizeRoleName(role, language);
 }
 
 function localizeGeneratedKeyword(keyword: string, role: string, language: Language): string {
@@ -1430,6 +1430,90 @@ function localizeFaq(role: string, language: Language): ResumeKeywordCluster["fa
 
 export function getResumeKeywordsUi(language: Language): UiTexts {
   return UI[language] || UI.en;
+}
+
+export type ResumeKeywordsLandingUi = {
+  hookTitle: string;
+  keywordsTitle: (role: string) => string;
+  keywordsLead: string;
+  bulletsTitle: string;
+  bulletsLead: string;
+  tipsTitle: string;
+  mistakesTitle: string;
+  proTipsTitle: string;
+};
+
+const LANDING_UI: Record<Language, ResumeKeywordsLandingUi> = {
+  en: {
+    hookTitle: "1. Hook",
+    keywordsTitle: (role) => `2. Top ${role} Resume Keywords (Grouped)`,
+    keywordsLead:
+      "Use these groups to mirror how job descriptions are structured (skills, tools, domain, and senior signals).",
+    bulletsTitle: "3. Real Resume Bullet Examples",
+    bulletsLead: "Copy the structure (action → scope/context → result). Replace numbers with your truth.",
+    tipsTitle: "4. ATS Optimization Tips (Role-Specific)",
+    mistakesTitle: "5. Common Mistakes",
+    proTipsTitle: "6. Pro Tips",
+  },
+  uk: {
+    hookTitle: "1. Хук",
+    keywordsTitle: (role) => `2. Ключові слова для резюме ${role} (групами)`,
+    keywordsLead:
+      "Використовуйте ці групи, щоб повторити структуру вакансій (навички, інструменти, домен і senior-сигнали).",
+    bulletsTitle: "3. Реальні приклади bullet-пунктів",
+    bulletsLead: "Копіюйте структуру (дія → контекст/масштаб → результат). Цифри замініть на свої реальні.",
+    tipsTitle: "4. ATS-поради (для цієї ролі)",
+    mistakesTitle: "5. Типові помилки",
+    proTipsTitle: "6. Pro tips",
+  },
+  pl: {
+    hookTitle: "1. Hook",
+    keywordsTitle: (role) => `2. Słowa kluczowe CV dla ${role} (grupy)`,
+    keywordsLead:
+      "Użyj tych grup, aby odzwierciedlić strukturę ogłoszeń (umiejętności, narzędzia, domena i sygnały seniority).",
+    bulletsTitle: "3. Przykłady prawdziwych bulletów",
+    bulletsLead: "Kopiuj strukturę (działanie → kontekst/skala → wynik). Zastąp liczby swoimi prawdziwymi.",
+    tipsTitle: "4. ATS tipy (pod rolę)",
+    mistakesTitle: "5. Typowe błędy",
+    proTipsTitle: "6. Pro tipy",
+  },
+  sk: {
+    hookTitle: "1. Hook",
+    keywordsTitle: (role) => `2. Kľúčové slová do životopisu pre ${role} (skupiny)`,
+    keywordsLead:
+      "Použi tieto skupiny tak, aby kopírovali štruktúru inzerátov (skills, nástroje, doména a senior signály).",
+    bulletsTitle: "3. Reálne príklady bullet bodov",
+    bulletsLead: "Skopíruj štruktúru (akcia → kontext/rozsah → výsledok). Čísla nahraď vlastnými.",
+    tipsTitle: "4. ATS tipy (role-specific)",
+    mistakesTitle: "5. Najčastejšie chyby",
+    proTipsTitle: "6. Pro tipy",
+  },
+  cs: {
+    hookTitle: "1. Hook",
+    keywordsTitle: (role) => `2. Klíčová slova do životopisu pro ${role} (skupiny)`,
+    keywordsLead:
+      "Použijte tyto skupiny tak, aby kopírovaly strukturu inzerátů (skills, nástroje, doména a senior signály).",
+    bulletsTitle: "3. Reálné příklady bullet bodů",
+    bulletsLead: "Kopírujte strukturu (akce → kontext/rozsah → výsledek). Čísla nahraďte vlastními.",
+    tipsTitle: "4. ATS tipy (pro roli)",
+    mistakesTitle: "5. Časté chyby",
+    proTipsTitle: "6. Pro tipy",
+  },
+  es: {
+    hookTitle: "1. Hook",
+    keywordsTitle: (role) => `2. Palabras clave de CV para ${role} (por grupos)`,
+    keywordsLead:
+      "Usa estos grupos para reflejar cómo están escritas las vacantes (skills, herramientas, dominio y señales senior).",
+    bulletsTitle: "3. Ejemplos reales de bullets",
+    bulletsLead: "Copia la estructura (acción → contexto/alcance → resultado). Sustituye números por los tuyos reales.",
+    tipsTitle: "4. Tips ATS (por rol)",
+    mistakesTitle: "5. Errores comunes",
+    proTipsTitle: "6. Pro tips",
+  },
+};
+
+export function getResumeKeywordsLandingUi(language: Language): ResumeKeywordsLandingUi {
+  return LANDING_UI[language] || LANDING_UI.en;
 }
 
 export function getSectorLabel(language: Language, category: RoleCategory): string {

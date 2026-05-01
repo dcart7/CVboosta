@@ -3296,6 +3296,33 @@ a {
   box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
 }
 
+.rk-keyword-groups {
+  margin-top: 16px;
+  display: grid;
+  gap: 18px;
+}
+
+.rk-subtitle {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rk-bullet-list {
+  margin: 16px 0 0;
+  padding-left: 18px;
+  color: var(--ink);
+  display: grid;
+  gap: 10px;
+}
+
+.rk-bullet-item {
+  line-height: 1.65;
+}
+
 .rk-mistakes-list {
   margin: 16px 0 0;
   padding: 0;

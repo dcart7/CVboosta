@@ -7,18 +7,15 @@ import { useTranslation } from "../../lib/LanguageContext";
 import type { ResumeKeywordCluster } from "../../lib/resumeKeywordClusters";
 import {
   getResumeKeywordsUi,
+  getResumeKeywordsLandingUi,
   localizeRoleName,
   localizeResumeKeywordCluster,
 } from "../../lib/resumeKeywordsI18n";
 import {
   getFinalChecklist,
   getRoleFreshnessNotes,
-  getRoleExpectations,
-  getRoleImpactBullets,
-  getRoleUniqueIntro,
+  getRoleLandingContent,
   getRoleLongFormSections,
-  getRoleToolStack,
-  getSectionBlueprint,
 } from "../../lib/resumeKeywordContent";
 
 type Props = {
@@ -30,6 +27,7 @@ type Props = {
 export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, relatedRoles }: Props) {
   const { language } = useTranslation();
   const ui = getResumeKeywordsUi(language);
+  const landingUi = getResumeKeywordsLandingUi(language);
   const sectionText = {
     en: {
       strategySnapshot: "resume strategy snapshot",
@@ -146,12 +144,11 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
     }
     return longTailPhrases;
   }, [language, localized.role, longTailPhrases]);
-  const expectations = useMemo(() => getRoleExpectations(cluster, language), [cluster, language]);
-  const impactBullets = useMemo(() => getRoleImpactBullets(cluster, language), [cluster, language]);
-  const toolStack = useMemo(() => getRoleToolStack(localized), [localized]);
-  const blueprint = useMemo(() => getSectionBlueprint(cluster, language), [cluster, language]);
+  const landingLocalized = useMemo(
+    () => getRoleLandingContent(localized, language, localized.role),
+    [localized, language],
+  );
   const checklist = useMemo(() => getFinalChecklist(cluster, language), [cluster, language]);
-  const uniqueIntro = useMemo(() => getRoleUniqueIntro(cluster, language), [cluster, language]);
   const longFormSections = useMemo(() => getRoleLongFormSections(cluster, language), [cluster, language]);
   const freshnessNotes = useMemo(() => getRoleFreshnessNotes(cluster, language), [cluster, language]);
 
@@ -177,8 +174,8 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
-            <h2 className="section-title">{localized.role} {sectionText.strategySnapshot}</h2>
-            {uniqueIntro.map((paragraph) => (
+            <h2 className="section-title">{landingUi.hookTitle}</h2>
+            {landingLocalized.hook.map((paragraph) => (
               <p key={paragraph} className="rk-copy" style={{ marginTop: "8px" }}>{paragraph}</p>
             ))}
           </div>
@@ -186,12 +183,19 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
-            <h2 className="section-title">{ui.topKeywordsTitle(localized.role)}</h2>
-            <p className="rk-copy">{ui.topKeywordsText(localized.role)}</p>
-            <div className="rk-chip-grid">
-              {localized.keywords.map((item) => (
-                <div key={item} className="rk-chip">
-                  {item}
+            <h2 className="section-title">{landingUi.keywordsTitle(localized.role)}</h2>
+            <p className="rk-copy">{landingUi.keywordsLead}</p>
+            <div className="rk-keyword-groups">
+              {landingLocalized.keywordGroups.map((group) => (
+                <div key={group.title} className="rk-keyword-group">
+                  <h3 className="rk-subtitle">{group.title}</h3>
+                  <div className="rk-chip-grid">
+                    {group.keywords.map((item) => (
+                      <div key={item} className="rk-chip">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
@@ -200,96 +204,54 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
-            <h2 className="section-title">{ui.mistakesTitle(localized.role)}</h2>
-            <p className="rk-copy">{ui.mistakesText(localized.role)}</p>
-            <ol className="rk-mistakes-list">
-              {localized.mistakes.map((mistake) => (
-                <li key={mistake} className="rk-mistake-item">
-                  {mistake}
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section className="section fade-up rk-section">
-          <div className="card rk-panel">
-            <h2 className="section-title">{ui.expectationsTitle(localized.role)}</h2>
-            <p className="rk-copy">{ui.expectationsText}</p>
-            <ol className="rk-mistakes-list">
-              {expectations.map((item) => (
-                <li key={item} className="rk-mistake-item">
+            <h2 className="section-title">{landingUi.bulletsTitle}</h2>
+            <p className="rk-copy">{landingUi.bulletsLead}</p>
+            <ul className="rk-bullet-list">
+              {landingLocalized.resumeBullets.map((item) => (
+                <li key={item} className="rk-bullet-item">
                   {item}
                 </li>
               ))}
-            </ol>
+            </ul>
           </div>
         </section>
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
-            <h2 className="section-title">{ui.examplesTitle(localized.role)}</h2>
-            <p className="rk-copy">{ui.examplesText}</p>
-            <div className="grid rk-example-grid">
-              {localized.examples.map((example, index) => (
-                <article key={`${localized.slug}-${index}`} className="card rk-example-card">
-                  <p className="rk-example-line rk-before">
-                    <strong>{ui.before}</strong>
-                    {" "}
-                    {example.before}
-                  </p>
-                  <p className="rk-example-line rk-after">
-                    <strong>{ui.after}</strong>
-                    {" "}
-                    {example.after}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section fade-up rk-section">
-          <div className="card rk-panel">
-            <h2 className="section-title">{ui.impactTitle(localized.role)}</h2>
-            <p className="rk-copy">{ui.impactText}</p>
-            <ol className="rk-mistakes-list">
-              {impactBullets.map((item) => (
-                <li key={item} className="rk-mistake-item">
+            <h2 className="section-title">{landingUi.tipsTitle}</h2>
+            <ul className="rk-bullet-list">
+              {landingLocalized.atsTips.map((item) => (
+                <li key={item} className="rk-bullet-item">
                   {item}
                 </li>
               ))}
-            </ol>
+            </ul>
           </div>
         </section>
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
-            <h2 className="section-title">{ui.toolStackTitle}</h2>
-            <p className="rk-copy">{ui.toolStackText}</p>
-            <div className="rk-chip-grid">
-              {toolStack.map((tool) => (
-                <div key={tool} className="rk-chip">
-                  {tool}
-                </div>
+            <h2 className="section-title">{landingUi.mistakesTitle}</h2>
+            <ul className="rk-bullet-list">
+              {landingLocalized.commonMistakes.map((item) => (
+                <li key={item} className="rk-bullet-item">
+                  {item}
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </section>
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel">
-            <h2 className="section-title">{ui.blueprintTitle(localized.role)}</h2>
-            <p className="rk-copy">{ui.blueprintText}</p>
-            <div className="grid rk-blueprint-grid">
-              {blueprint.map((item) => (
-                <article key={item.section} className="card rk-blueprint-card">
-                  <h3>{item.section}</h3>
-                  <p><strong>{ui.blueprintPurposeLabel}:</strong> {item.purpose}</p>
-                  <p><strong>{ui.blueprintKeywordPlacementLabel}:</strong> {item.keywordPlacement}</p>
-                </article>
+            <h2 className="section-title">{landingUi.proTipsTitle}</h2>
+            <ul className="rk-bullet-list">
+              {landingLocalized.proTips.map((item) => (
+                <li key={item} className="rk-bullet-item">
+                  {item}
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </section>
 

@@ -66,7 +66,7 @@ const CATEGORY_TRACKS: Record<RoleCategory, string[]> = {
   security: ["SOC", "Cloud Security", "IAM", "Threat Detection", "Risk"],
 };
 
-const CATEGORY_IMPACT_AREAS: Record<RoleCategory, string[]> = {
+export const CATEGORY_IMPACT_AREAS: Record<RoleCategory, string[]> = {
   engineering: ["delivery speed", "system reliability", "latency", "release quality", "incident reduction"],
   data: ["decision speed", "data accuracy", "reporting quality", "forecast quality", "insight adoption"],
   product: ["activation", "retention", "conversion", "time-to-value", "roadmap impact"],
@@ -83,7 +83,7 @@ const CATEGORY_IMPACT_AREAS: Record<RoleCategory, string[]> = {
   security: ["MTTD", "MTTR", "vulnerability closure", "control coverage", "audit readiness"],
 };
 
-const CATEGORY_KEYWORDS: Record<RoleCategory, string[]> = {
+export const CATEGORY_KEYWORDS: Record<RoleCategory, string[]> = {
   engineering: [
     "system design",
     "api development",
@@ -198,7 +198,7 @@ const CATEGORY_KEYWORDS: Record<RoleCategory, string[]> = {
   ],
 };
 
-const CATEGORY_SKILL_KEYWORDS: Record<RoleCategory, string[]> = {
+export const CATEGORY_SKILL_KEYWORDS: Record<RoleCategory, string[]> = {
   engineering: ["python", "javascript", "typescript", "java", "golang", "c#", "sql"],
   data: ["python", "r", "sql", "scala", "pandas", "spark"],
   product: ["sql", "python", "jira", "confluence", "figma", "amplitude"],
