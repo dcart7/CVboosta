@@ -2,7 +2,7 @@
 
 import HeroActions from "./components/HeroActions";
 import { useTranslation } from "./lib/LanguageContext";
-import AnimatedHeadline from "./components/AnimatedHeadline";
+import HeroHeadline from "./components/HeroHeadline";
 
 export default function HomePage() {
   const { t, language } = useTranslation();
@@ -602,18 +602,13 @@ export default function HomePage() {
     <main className="page">
       <div className="shell">
         <section className="hero fade-up">
-          <div style={{ maxWidth: "1200px", width: "100%" }}>
-            <p className="pill">{conversionContent.hookLabel}</p>
-            <AnimatedHeadline
-              className="hero-title hero-title-conversion"
-              text={conversionContent.hookTitle}
-              delayMs={20}
-              staggerMs={55}
-            />
-            <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
-            <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
-              {localizedFreeCheckerLine}
-            </p>
+            <div style={{ maxWidth: "1200px", width: "100%" }}>
+              <p className="pill">{conversionContent.hookLabel}</p>
+            <HeroHeadline className="hero-title hero-title-conversion" text={conversionContent.hookTitle} />
+              <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
+              <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
+                {localizedFreeCheckerLine}
+              </p>
             <HeroActions />
             <div className="hero-mini-block">
               <p className="hero-mini-title">{conversionUi.ctaAction}</p>
