@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
@@ -41,6 +42,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <section className="split auth-split fade-up">
           <div className="auth-header">

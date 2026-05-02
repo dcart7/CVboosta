@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import TopNav from "./components/TopNav";
 
 export default function Error({
   error,
@@ -15,6 +16,7 @@ export default function Error({
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh" }}>
         <div className="fade-up" style={{ textAlign: "center" }}>
           <div style={{ fontSize: "64px", marginBottom: "24px" }}>⚠️</div>

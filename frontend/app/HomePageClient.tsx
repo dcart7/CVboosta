@@ -1,5 +1,6 @@
 "use client";
 
+import TopNav from "./components/TopNav";
 import HeroActions from "./components/HeroActions";
 import { useTranslation } from "./lib/LanguageContext";
 
@@ -315,7 +316,7 @@ export default function HomePage() {
   const conversionContent = {
     en: {
       hookLabel: "Stop getting ignored by recruiters",
-      hookTitle: "Get more interviews— without changing your experience.",
+      hookTitle: "Get more interviews — without changing your experience.",
       hookSubtitle:
         "Most candidates fail ATS pre-screening. Upload your CV and role now to turn weak bullets into interview-ready proof.",
       kpiA: "average ATS score lift",
@@ -599,6 +600,7 @@ export default function HomePage() {
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <section className="hero fade-up">
           <div style={{ maxWidth: "1200px", width: "100%" }}>

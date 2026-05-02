@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import TopNav from "../../components/TopNav";
 import { useTranslation } from "../../lib/LanguageContext";
 import type { ResumeKeywordCluster } from "../../lib/resumeKeywordClusters";
 import {
@@ -153,6 +154,7 @@ export default function ResumeKeywordRoleClient({ cluster, longTailPhrases, rela
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <section className="hero fade-up blog-hero rk-hero">
           <div className="blog-hero-panel rk-hero-panel">

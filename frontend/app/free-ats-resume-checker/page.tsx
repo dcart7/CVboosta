@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import TopNav from "../components/TopNav";
 import FreeAtsCtasClient from "./FreeAtsCtasClient";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 export default function FreeAtsResumeCheckerPage() {
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <section className="hero fade-up">
           <div style={{ maxWidth: "900px", width: "100%" }}>

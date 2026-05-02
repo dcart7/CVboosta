@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import TopNav from "../components/TopNav";
 import SocialAuthButtons from "../components/SocialAuthButtons";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
@@ -103,6 +104,7 @@ export default function LoginPage() {
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <section className="split auth-split fade-up">
           <div className="auth-header">

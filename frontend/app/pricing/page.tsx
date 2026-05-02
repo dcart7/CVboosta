@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "../lib/LanguageContext";
+import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
 import { fetchWithRetry } from "../lib/fetchRetry";
@@ -183,6 +184,8 @@ export default function PricingPage() {
 
   return (
     <main className="pricing-container">
+      <TopNav />
+      
       <div className="pricing-content">
         <header className="pricing-header">
           <h1 className="gradient-text">{t("pricing.title")}</h1>

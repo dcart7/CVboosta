@@ -177,193 +177,6 @@ a {
   height: 80px;
 }
 
-/* --- Motion system (fast, conversion-focused) --- */
-.btn {
-  transition:
-    transform 180ms ease-out,
-    box-shadow 180ms ease-out,
-    filter 180ms ease-out;
-  will-change: transform;
-}
-
-.btn:hover {
-  transform: translateY(-1px) scale(1.05);
-  box-shadow:
-    0 14px 40px rgba(59, 130, 246, 0.18),
-    0 8px 24px rgba(15, 23, 42, 0.12);
-}
-
-.btn:active {
-  transform: translateY(0) scale(0.97);
-}
-
-.card {
-  transition:
-    transform 210ms ease-out,
-    box-shadow 210ms ease-out,
-    border-color 210ms ease-out;
-  will-change: transform;
-}
-
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow:
-    0 18px 46px rgba(15, 23, 42, 0.12),
-    0 10px 28px rgba(2, 6, 23, 0.16);
-}
-
-.card:active {
-  transform: translateY(-2px) scale(0.99);
-}
-
-.ripple-host {
-  position: relative;
-  overflow: hidden;
-}
-
-.ripple-ink {
-  position: absolute;
-  border-radius: 999px;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 62%);
-  transform: scale(0);
-  animation: rippleInk 620ms ease-out forwards;
-  mix-blend-mode: overlay;
-}
-
-@keyframes rippleInk {
-  to {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
-
-.reveal {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
-  transition:
-    opacity 520ms ease-out var(--reveal-delay, 0ms),
-    transform 520ms ease-out var(--reveal-delay, 0ms);
-  will-change: transform, opacity;
-}
-
-.reveal.is-revealed {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-.reveal-stagger .reveal-item {
-  opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  transition:
-    opacity 520ms ease-out calc(var(--reveal-delay, 0ms) + (var(--i, 0) * var(--stagger-step, 70ms))),
-    transform 520ms ease-out calc(var(--reveal-delay, 0ms) + (var(--i, 0) * var(--stagger-step, 70ms)));
-  will-change: transform, opacity;
-}
-
-.reveal-stagger.is-revealed .reveal-item {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 160px;
-  height: 160px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.46), rgba(59, 130, 246, 0.0) 68%);
-  filter: blur(18px);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 8;
-  transform: translate3d(-999px, -999px, 0);
-  will-change: transform, opacity;
-}
-
-.cursor-glow[data-active="interactive"] {
-  filter: blur(16px);
-}
-
-.ai-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.55;
-  background:
-    radial-gradient(900px 600px at 15% 10%, rgba(59, 130, 246, 0.12), transparent 55%),
-    radial-gradient(900px 700px at 90% 30%, rgba(34, 197, 94, 0.09), transparent 58%),
-    radial-gradient(700px 600px at 55% 90%, rgba(168, 85, 247, 0.08), transparent 55%);
-  animation: aiBgDrift 14s ease-in-out infinite alternate;
-}
-
-.ai-bg.ai-bg-static {
-  animation: none;
-}
-
-/* Second layer adds subtle “AI motion” without canvas */
-.ai-bg::before {
-  content: "";
-  position: absolute;
-  inset: -20%;
-  background:
-    radial-gradient(700px 520px at 20% 20%, rgba(56, 189, 248, 0.10), transparent 60%),
-    radial-gradient(760px 560px at 85% 35%, rgba(99, 102, 241, 0.07), transparent 62%),
-    radial-gradient(720px 600px at 55% 85%, rgba(236, 72, 153, 0.06), transparent 58%);
-  opacity: 0.8;
-  transform: translate3d(0, 0, 0);
-  animation: aiBgPulse 18s ease-in-out infinite alternate;
-  will-change: transform, opacity;
-}
-
-.ai-bg.ai-bg-static::before {
-  animation: none;
-}
-
-@keyframes aiBgDrift {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(0, -12px, 0) scale(1.03); }
-}
-
-@keyframes aiBgPulse {
-  0% { transform: translate3d(-8px, 6px, 0) rotate(-1deg) scale(1); opacity: 0.72; }
-  100% { transform: translate3d(10px, -8px, 0) rotate(1deg) scale(1.02); opacity: 0.86; }
-}
-
-[data-theme="dark"] .ai-bg {
-  opacity: 0.62;
-  background:
-    radial-gradient(900px 600px at 15% 10%, rgba(96, 165, 250, 0.16), transparent 60%),
-    radial-gradient(900px 700px at 90% 30%, rgba(34, 197, 94, 0.10), transparent 62%),
-    radial-gradient(700px 600px at 55% 90%, rgba(192, 132, 252, 0.12), transparent 60%);
-}
-
-[data-theme="dark"] .ai-bg::before {
-  opacity: 0.9;
-  background:
-    radial-gradient(740px 560px at 20% 20%, rgba(56, 189, 248, 0.12), transparent 62%),
-    radial-gradient(820px 620px at 85% 35%, rgba(129, 140, 248, 0.10), transparent 64%),
-    radial-gradient(760px 640px at 55% 85%, rgba(236, 72, 153, 0.07), transparent 60%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn,
-  .card,
-  .reveal,
-  .reveal-stagger .reveal-item,
-  .ai-bg {
-    transition: none !important;
-    animation: none !important;
-  }
-  .btn:hover,
-  .card:hover {
-    transform: none !important;
-  }
-}
-
 .nav-inner {
   width: min(1200px, 100%);
   margin: 0 auto;
@@ -2243,15 +2056,9 @@ a {
   margin-bottom: 24px;
 }
 
-.motion-ready .fade-up {
+.fade-up {
   --reveal-delay: 0ms;
-  opacity: 0;
-  transform: translateY(16px);
-  will-change: transform, opacity;
-}
-
-.motion-ready .fade-up.is-inview {
-  animation: fadeUp 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeUp 0.68s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: var(--reveal-delay);
 }
 
@@ -2269,48 +2076,38 @@ a {
 
 .shell > .hero.fade-up,
 .shell > .blog-hero.fade-up {
-  --reveal-delay: 10ms;
+  --reveal-delay: 40ms;
 }
 
 .shell > .section.fade-up:nth-of-type(1) {
-  --reveal-delay: 30ms;
+  --reveal-delay: 90ms;
 }
 
 .shell > .section.fade-up:nth-of-type(2) {
-  --reveal-delay: 55ms;
+  --reveal-delay: 140ms;
 }
 
 .shell > .section.fade-up:nth-of-type(3) {
-  --reveal-delay: 80ms;
+  --reveal-delay: 190ms;
 }
 
 .shell > .section.fade-up:nth-of-type(4) {
-  --reveal-delay: 105ms;
+  --reveal-delay: 240ms;
 }
 
 .shell > .section.fade-up:nth-of-type(5),
 .shell > .section.fade-up:nth-of-type(n + 6) {
-  --reveal-delay: 120ms;
+  --reveal-delay: 280ms;
 }
 
-.motion-ready .fade-up .kpi,
-.motion-ready .fade-up .card,
-.motion-ready .fade-up .step,
-.motion-ready .fade-up .rk-role-card,
-.motion-ready .fade-up .rk-panel,
-.motion-ready .fade-up .blog-card {
-  opacity: 0;
-  transform: translateY(10px) scale(0.986);
-}
-
-.motion-ready .fade-up.is-inview .kpi,
-.motion-ready .fade-up.is-inview .card,
-.motion-ready .fade-up.is-inview .step,
-.motion-ready .fade-up.is-inview .rk-role-card,
-.motion-ready .fade-up.is-inview .rk-panel,
-.motion-ready .fade-up.is-inview .blog-card {
-  animation: cardLift 0.44s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  animation-delay: calc(var(--reveal-delay) + 40ms);
+.fade-up .kpi,
+.fade-up .card,
+.fade-up .step,
+.fade-up .rk-role-card,
+.fade-up .rk-panel,
+.fade-up .blog-card {
+  animation: cardLift 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--reveal-delay) + 70ms);
 }
 
 .route-transition {

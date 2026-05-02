@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
 import type { RoleCategory } from "../lib/resumeKeywordClusters";
 import { getResumeKeywordsUi, getSectorLabel, localizeRoleName } from "../lib/resumeKeywordsI18n";
@@ -87,6 +88,7 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <section className="hero fade-up blog-hero rk-hero">
           <div className="blog-hero-panel rk-hero-panel">

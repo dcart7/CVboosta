@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
@@ -72,6 +73,7 @@ export default function HistoryPage() {
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <section className="form-card fade-up">
           <div className="nav-actions">

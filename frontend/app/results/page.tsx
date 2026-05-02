@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
+import TopNav from "../components/TopNav";
 import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
@@ -1183,6 +1184,7 @@ function ResultsContent() {
 
   return (
     <main className="page">
+      <TopNav />
       {sessionId && sessionLoadError && !isLoadingSession && (
         <div className="shell" style={{ paddingTop: "1rem" }}>
           <div

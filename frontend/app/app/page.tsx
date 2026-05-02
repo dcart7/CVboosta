@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import TopNav from "../components/TopNav";
 import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
@@ -524,6 +525,7 @@ export default function WorkspacePage() {
 
   return (
     <main className="page">
+      <TopNav />
       <div className="shell">
         <div className="mobile-dash-tabs" role="tablist" aria-label="Dashboard sections">
           <button
