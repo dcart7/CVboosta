@@ -266,73 +266,6 @@ a {
   transform: translate3d(0, 0, 0);
 }
 
-.hh {
-  position: relative;
-}
-
-.hh-main,
-.hh-dash,
-.hh-sub {
-  display: inline-block;
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
-  filter: blur(1.5px);
-  will-change: transform, opacity, filter;
-}
-
-.hh.is-inview .hh-main {
-  animation: hhIn 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.hh.is-inview .hh-dash {
-  animation: hhIn 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 90ms;
-}
-
-.hh.is-inview .hh-sub {
-  animation: hhIn 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 140ms;
-}
-
-@keyframes hhIn {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 12px, 0);
-    filter: blur(1.5px);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    filter: blur(0);
-  }
-}
-
-.hh-sheen {
-  position: absolute;
-  inset: -10px -16px;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(110deg, transparent 15%, rgba(255, 255, 255, 0.20), transparent 55%);
-  transform: translateX(-120%);
-  mix-blend-mode: overlay;
-}
-
-[data-theme="dark"] .hh-sheen {
-  background: linear-gradient(110deg, transparent 15%, rgba(255, 255, 255, 0.10), transparent 55%);
-}
-
-.hh.is-inview .hh-sheen {
-  opacity: 1;
-  animation: hhSheen 880ms ease-out 1;
-  animation-delay: 220ms;
-}
-
-@keyframes hhSheen {
-  from { transform: translateX(-120%); opacity: 0; }
-  25% { opacity: 1; }
-  to { transform: translateX(120%); opacity: 0; }
-}
-
 .cursor-glow {
   position: fixed;
   top: 0;
@@ -2310,14 +2243,14 @@ a {
   margin-bottom: 24px;
 }
 
-.fade-up {
+.motion-ready .fade-up {
   --reveal-delay: 0ms;
   opacity: 0;
   transform: translateY(16px);
   will-change: transform, opacity;
 }
 
-.fade-up.is-inview {
+.motion-ready .fade-up.is-inview {
   animation: fadeUp 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: var(--reveal-delay);
 }
@@ -2360,22 +2293,22 @@ a {
   --reveal-delay: 120ms;
 }
 
-.fade-up .kpi,
-.fade-up .card,
-.fade-up .step,
-.fade-up .rk-role-card,
-.fade-up .rk-panel,
-.fade-up .blog-card {
+.motion-ready .fade-up .kpi,
+.motion-ready .fade-up .card,
+.motion-ready .fade-up .step,
+.motion-ready .fade-up .rk-role-card,
+.motion-ready .fade-up .rk-panel,
+.motion-ready .fade-up .blog-card {
   opacity: 0;
   transform: translateY(10px) scale(0.986);
 }
 
-.fade-up.is-inview .kpi,
-.fade-up.is-inview .card,
-.fade-up.is-inview .step,
-.fade-up.is-inview .rk-role-card,
-.fade-up.is-inview .rk-panel,
-.fade-up.is-inview .blog-card {
+.motion-ready .fade-up.is-inview .kpi,
+.motion-ready .fade-up.is-inview .card,
+.motion-ready .fade-up.is-inview .step,
+.motion-ready .fade-up.is-inview .rk-role-card,
+.motion-ready .fade-up.is-inview .rk-panel,
+.motion-ready .fade-up.is-inview .blog-card {
   animation: cardLift 0.44s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: calc(var(--reveal-delay) + 40ms);
 }

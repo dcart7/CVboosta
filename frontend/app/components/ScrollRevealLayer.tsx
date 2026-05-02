@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useMotionEnabled } from "../lib/motion";
 
 /**
@@ -10,32 +11,54 @@ import { useMotionEnabled } from "../lib/motion";
  */
 export default function ScrollRevealLayer() {
   const enabled = useMotionEnabled();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!enabled) return;
-    const elements = Array.from(document.querySelectorAll<HTMLElement>(".fade-up"));
-    if (elements.length === 0) return;
+    // Progressive enhancement: only hide `.fade-up` content after JS is live.
+    document.documentElement.classList.add("motion-ready");
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const el = entry.target as HTMLElement;
+    let raf = 0;
+    let observer: IntersectionObserver | null = null;
+
+    const scan = () => {
+      const elements = Array.from(
+        document.querySelectorAll<HTMLElement>(".fade-up:not(.is-inview)"),
+      );
+      if (elements.length === 0) return;
+
+      observer?.disconnect();
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            el.classList.add("is-inview");
+            observer?.unobserve(el);
+          }
+        },
+        { threshold: 0.08, rootMargin: "0px 0px -18% 0px" },
+      );
+
+      const viewportHeight = window.innerHeight || 0;
+      for (const el of elements) {
+        // Reveal immediately when already in viewport after navigation.
+        const rect = el.getBoundingClientRect();
+        if (rect.top < viewportHeight * 0.9) {
           el.classList.add("is-inview");
-          observer.unobserve(el);
+          continue;
         }
-      },
-      // Faster perceived reveal: trigger slightly earlier with a lower threshold.
-      { threshold: 0.08, rootMargin: "0px 0px -18% 0px" },
-    );
+        observer.observe(el);
+      }
+    };
 
-    for (const el of elements) {
-      // Skip if already revealed (e.g., above the fold on initial paint)
-      if (el.classList.contains("is-inview")) continue;
-      observer.observe(el);
-    }
-    return () => observer.disconnect();
-  }, [enabled]);
+    // Defer one frame so route content is mounted before scanning.
+    raf = window.requestAnimationFrame(scan);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      observer?.disconnect();
+    };
+  }, [enabled, pathname]);
 
   return null;
 }

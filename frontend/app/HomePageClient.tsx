@@ -2,7 +2,6 @@
 
 import HeroActions from "./components/HeroActions";
 import { useTranslation } from "./lib/LanguageContext";
-import HeroHeadline from "./components/HeroHeadline";
 
 export default function HomePage() {
   const { t, language } = useTranslation();
@@ -316,7 +315,7 @@ export default function HomePage() {
   const conversionContent = {
     en: {
       hookLabel: "Stop getting ignored by recruiters",
-      hookTitle: "Get more interviews — without changing your experience.",
+      hookTitle: "Get more interviews— without changing your experience.",
       hookSubtitle:
         "Most candidates fail ATS pre-screening. Upload your CV and role now to turn weak bullets into interview-ready proof.",
       kpiA: "average ATS score lift",
@@ -602,13 +601,13 @@ export default function HomePage() {
     <main className="page">
       <div className="shell">
         <section className="hero fade-up">
-            <div style={{ maxWidth: "1200px", width: "100%" }}>
-              <p className="pill">{conversionContent.hookLabel}</p>
-            <HeroHeadline className="hero-title hero-title-conversion" text={conversionContent.hookTitle} />
-              <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
-              <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
-                {localizedFreeCheckerLine}
-              </p>
+          <div style={{ maxWidth: "1200px", width: "100%" }}>
+            <p className="pill">{conversionContent.hookLabel}</p>
+            <h1 className="hero-title hero-title-conversion">{conversionContent.hookTitle}</h1>
+            <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
+            <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
+              {localizedFreeCheckerLine}
+            </p>
             <HeroActions />
             <div className="hero-mini-block">
               <p className="hero-mini-title">{conversionUi.ctaAction}</p>
