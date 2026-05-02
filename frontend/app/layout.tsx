@@ -4,6 +4,11 @@ import CookieBanner from "./components/CookieBanner";
 import RouteTransition from "./components/RouteTransition";
 import BehaviorTracking from "./components/BehaviorTracking";
 import GoogleTagManager from "./components/GoogleTagManager";
+import TopNav from "./components/TopNav";
+import CursorGlow from "./components/CursorGlow";
+import AiBackground from "./components/AiBackground";
+import RippleLayer from "./components/RippleLayer";
+import ScrollRevealLayer from "./components/ScrollRevealLayer";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
@@ -107,8 +112,13 @@ export default function RootLayout({
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <GoogleTagManager />
         <BehaviorTracking />
+        <AiBackground />
+        <CursorGlow />
+        <RippleLayer />
+        <ScrollRevealLayer />
         <LanguageProvider>
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <TopNav />
             <RouteTransition>{children}</RouteTransition>
           </div>
           <Analytics />

@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
 import type { BlogPost } from "../lib/blogPosts";
 import { localizeBlogPost } from "../lib/blogLocalize";
@@ -25,7 +24,6 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
 
   return (
     <main className="page">
-      <TopNav />
       <div className="shell">
         <section className="hero fade-up blog-hero">
           <div className="blog-hero-panel">

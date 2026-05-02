@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
 
 type CaseStudy = {
@@ -74,7 +73,6 @@ export default function CasesPage() {
 
   return (
     <main className="page cases-page">
-      <TopNav />
       <div className="shell">
         <section className="hero cases-hero fade-up">
           <div className="cases-hero-copy">

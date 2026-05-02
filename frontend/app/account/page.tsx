@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
@@ -278,7 +277,6 @@ export default function AccountPage() {
 
   return (
     <main className="page">
-      <TopNav />
       <div className="shell">
         <section className="form-card fade-up">
           <h1 className="hero-title">{t("account.title")}</h1>

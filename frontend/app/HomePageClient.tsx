@@ -1,6 +1,5 @@
 "use client";
 
-import TopNav from "./components/TopNav";
 import HeroActions from "./components/HeroActions";
 import { useTranslation } from "./lib/LanguageContext";
 
@@ -600,7 +599,6 @@ export default function HomePage() {
 
   return (
     <main className="page">
-      <TopNav />
       <div className="shell">
         <section className="hero fade-up">
           <div style={{ maxWidth: "1200px", width: "100%" }}>

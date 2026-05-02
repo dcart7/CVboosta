@@ -1,6 +1,5 @@
 "use client";
 
-import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
 
 export default function AboutPage() {
@@ -8,7 +7,6 @@ export default function AboutPage() {
 
   return (
     <main className="page">
-      <TopNav />
       <div className="shell">
         <section className="hero fade-up">
           <div>

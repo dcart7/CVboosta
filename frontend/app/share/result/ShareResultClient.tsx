@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import TopNav from "../../components/TopNav";
 import { useTranslation } from "../../lib/LanguageContext";
 
 function parsePercent(raw: string | null): number | null {
@@ -41,7 +40,6 @@ export default function ShareResultClient() {
 
   return (
     <main className="page">
-      <TopNav />
       <div className="shell" style={{ maxWidth: "920px" }}>
         <section className="hero-card fade-up" style={{ textAlign: "center" }}>
           <p className="pill">CVboosta</p>

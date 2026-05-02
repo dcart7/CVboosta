@@ -1,6 +1,5 @@
 "use client";
 
-import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
 
 export default function PrivacyPage() {
@@ -173,7 +172,6 @@ export default function PrivacyPage() {
 
   return (
     <main className="page">
-      <TopNav />
       <div className="shell legal-page-shell">
         <section className="legal-section fade-up" style={{ padding: "80px 0 56px" }}>
           <div className="legal-hero">
