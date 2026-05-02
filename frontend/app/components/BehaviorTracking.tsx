@@ -24,6 +24,7 @@ export default function BehaviorTracking() {
     firedScroll.current = new Set();
     firedTime.current = false;
     firedExit.current = false;
+    trackEvent("page_view", { page_path: pathname, page_type: pageType });
   }, [pathname]);
 
   useEffect(() => {
@@ -69,4 +70,3 @@ export default function BehaviorTracking() {
 
   return null;
 }
-
