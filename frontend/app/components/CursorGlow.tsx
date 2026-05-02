@@ -26,8 +26,8 @@ export default function CursorGlow() {
 
     const tick = () => {
       // Fast, smooth follow without layout thrash (GPU transform only).
-      currentX += (targetX - currentX) * 0.14;
-      currentY += (targetY - currentY) * 0.14;
+      currentX += (targetX - currentX) * 0.22;
+      currentY += (targetY - currentY) * 0.22;
       node.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate3d(-50%, -50%, 0)`;
       node.style.opacity = active ? String(0.16 * intensity) : "0";
       raf = window.requestAnimationFrame(tick);
@@ -64,4 +64,3 @@ export default function CursorGlow() {
 
   return <div ref={ref} className="cursor-glow" aria-hidden="true" />;
 }
-

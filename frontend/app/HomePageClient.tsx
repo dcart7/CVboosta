@@ -2,6 +2,7 @@
 
 import HeroActions from "./components/HeroActions";
 import { useTranslation } from "./lib/LanguageContext";
+import AnimatedHeadline from "./components/AnimatedHeadline";
 
 export default function HomePage() {
   const { t, language } = useTranslation();
@@ -603,7 +604,12 @@ export default function HomePage() {
         <section className="hero fade-up">
           <div style={{ maxWidth: "1200px", width: "100%" }}>
             <p className="pill">{conversionContent.hookLabel}</p>
-            <h1 className="hero-title hero-title-conversion">{conversionContent.hookTitle}</h1>
+            <AnimatedHeadline
+              className="hero-title hero-title-conversion"
+              text={conversionContent.hookTitle}
+              delayMs={20}
+              staggerMs={55}
+            />
             <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
             <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
               {localizedFreeCheckerLine}

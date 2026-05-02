@@ -25,7 +25,8 @@ export default function ScrollRevealLayer() {
           observer.unobserve(el);
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" },
+      // Faster perceived reveal: trigger slightly earlier with a lower threshold.
+      { threshold: 0.08, rootMargin: "0px 0px -18% 0px" },
     );
 
     for (const el of elements) {
@@ -38,4 +39,3 @@ export default function ScrollRevealLayer() {
 
   return null;
 }
-

@@ -266,6 +266,48 @@ a {
   transform: translate3d(0, 0, 0);
 }
 
+.headline-anim {
+  position: relative;
+}
+
+.headline-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition:
+    opacity 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--headline-delay, 20ms) + (var(--i, 0) * var(--headline-step, 55ms)));
+  will-change: transform, opacity;
+}
+
+.headline-anim.is-inview .headline-word {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.headline-sheen {
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.25), transparent 60%);
+  transform: translateX(-120%);
+  opacity: 0;
+}
+
+.headline-anim.is-inview .headline-sheen {
+  opacity: 1;
+  animation: headlineSheen 980ms ease-out 1;
+  animation-delay: calc(var(--headline-delay, 20ms) + 220ms);
+}
+
+@keyframes headlineSheen {
+  from { transform: translateX(-120%); opacity: 0; }
+  25% { opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+
 .cursor-glow {
   position: fixed;
   top: 0;
@@ -297,16 +339,56 @@ a {
     radial-gradient(900px 600px at 15% 10%, rgba(59, 130, 246, 0.12), transparent 55%),
     radial-gradient(900px 700px at 90% 30%, rgba(34, 197, 94, 0.09), transparent 58%),
     radial-gradient(700px 600px at 55% 90%, rgba(168, 85, 247, 0.08), transparent 55%);
-  animation: aiBgDrift 16s ease-in-out infinite alternate;
+  animation: aiBgDrift 14s ease-in-out infinite alternate;
 }
 
 .ai-bg.ai-bg-static {
   animation: none;
 }
 
+/* Second layer adds subtle “AI motion” without canvas */
+.ai-bg::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(700px 520px at 20% 20%, rgba(56, 189, 248, 0.10), transparent 60%),
+    radial-gradient(760px 560px at 85% 35%, rgba(99, 102, 241, 0.07), transparent 62%),
+    radial-gradient(720px 600px at 55% 85%, rgba(236, 72, 153, 0.06), transparent 58%);
+  opacity: 0.8;
+  transform: translate3d(0, 0, 0);
+  animation: aiBgPulse 18s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.ai-bg.ai-bg-static::before {
+  animation: none;
+}
+
 @keyframes aiBgDrift {
   0% { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(0, -10px, 0) scale(1.02); }
+  100% { transform: translate3d(0, -12px, 0) scale(1.03); }
+}
+
+@keyframes aiBgPulse {
+  0% { transform: translate3d(-8px, 6px, 0) rotate(-1deg) scale(1); opacity: 0.72; }
+  100% { transform: translate3d(10px, -8px, 0) rotate(1deg) scale(1.02); opacity: 0.86; }
+}
+
+[data-theme="dark"] .ai-bg {
+  opacity: 0.62;
+  background:
+    radial-gradient(900px 600px at 15% 10%, rgba(96, 165, 250, 0.16), transparent 60%),
+    radial-gradient(900px 700px at 90% 30%, rgba(34, 197, 94, 0.10), transparent 62%),
+    radial-gradient(700px 600px at 55% 90%, rgba(192, 132, 252, 0.12), transparent 60%);
+}
+
+[data-theme="dark"] .ai-bg::before {
+  opacity: 0.9;
+  background:
+    radial-gradient(740px 560px at 20% 20%, rgba(56, 189, 248, 0.12), transparent 62%),
+    radial-gradient(820px 620px at 85% 35%, rgba(129, 140, 248, 0.10), transparent 64%),
+    radial-gradient(760px 640px at 55% 85%, rgba(236, 72, 153, 0.07), transparent 60%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2211,7 +2293,7 @@ a {
 }
 
 .fade-up.is-inview {
-  animation: fadeUp 0.68s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeUp 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: var(--reveal-delay);
 }
 
@@ -2229,28 +2311,28 @@ a {
 
 .shell > .hero.fade-up,
 .shell > .blog-hero.fade-up {
-  --reveal-delay: 40ms;
+  --reveal-delay: 10ms;
 }
 
 .shell > .section.fade-up:nth-of-type(1) {
-  --reveal-delay: 90ms;
+  --reveal-delay: 30ms;
 }
 
 .shell > .section.fade-up:nth-of-type(2) {
-  --reveal-delay: 140ms;
+  --reveal-delay: 55ms;
 }
 
 .shell > .section.fade-up:nth-of-type(3) {
-  --reveal-delay: 190ms;
+  --reveal-delay: 80ms;
 }
 
 .shell > .section.fade-up:nth-of-type(4) {
-  --reveal-delay: 240ms;
+  --reveal-delay: 105ms;
 }
 
 .shell > .section.fade-up:nth-of-type(5),
 .shell > .section.fade-up:nth-of-type(n + 6) {
-  --reveal-delay: 280ms;
+  --reveal-delay: 120ms;
 }
 
 .fade-up .kpi,
@@ -2269,8 +2351,8 @@ a {
 .fade-up.is-inview .rk-role-card,
 .fade-up.is-inview .rk-panel,
 .fade-up.is-inview .blog-card {
-  animation: cardLift 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  animation-delay: calc(var(--reveal-delay) + 70ms);
+  animation: cardLift 0.44s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--reveal-delay) + 40ms);
 }
 
 .route-transition {
