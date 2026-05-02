@@ -7,6 +7,7 @@ import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
+import { trackEvent } from "../lib/analytics";
 
 type MeResponse = {
   email: string;
@@ -182,6 +183,11 @@ export default function AccountPage() {
         );
         const payload = await response.json().catch(() => ({}));
         if (response.ok) {
+          trackEvent("payment_success", {
+            product_type: "optimization",
+            plan: String(payload?.billing_cycle || payload?.plan || payload?.tier || "unknown"),
+            price: typeof payload?.price === "number" ? payload.price : null,
+          });
           setMessageTone("ok");
           setMessage("Payment confirmed. Your plan was activated.");
           await loadAccount();

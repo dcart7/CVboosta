@@ -9,6 +9,7 @@ import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
+import { trackEvent } from "../lib/analytics";
 import {
   fetchWorkspaceEmail,
   migrateLegacyGuestWorkspace,
@@ -475,6 +476,7 @@ function ResultsContent() {
   }, [apiBase, sessionId, t]);
 
   useEffect(() => {
+    trackEvent("ats_view_results", { page_type: "results" });
     if (sessionId) void loadHistorySession();
   }, [sessionId, loadHistorySession]);
 
@@ -867,6 +869,7 @@ function ResultsContent() {
   const downloadCoverLetterPdf = () => {
     if (!coverLetter) return;
     try {
+      trackEvent("optimization_download", { asset_type: "cover_letter_pdf" });
       const doc = new jsPDF({
         orientation: "portrait",
         unit: "pt",
@@ -926,6 +929,7 @@ function ResultsContent() {
       return;
     }
     try {
+      trackEvent("optimization_download", { asset_type: "resume_pdf" });
       const template = activeTemplate;
       const accent = template.accent;
       const doc = new jsPDF({ unit: "pt", format: "a4" });

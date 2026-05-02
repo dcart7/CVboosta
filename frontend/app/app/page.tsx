@@ -8,6 +8,7 @@ import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
+import { trackEvent } from "../lib/analytics";
 import {
   clearWorkspaceDraftData,
   fetchWorkspaceEmail,
@@ -118,6 +119,7 @@ export default function WorkspacePage() {
 
   const handleFileSelect = (selected: File | null) => {
     if (!selected) return;
+    trackEvent("ats_upload_cv", { file_type: selected.type || "unknown" });
     setFile(selected);
     setStatus("");
     setParsed(null);
@@ -251,6 +253,7 @@ export default function WorkspacePage() {
       return;
     }
     setAnalysisStatus("Extracting keywords...");
+    trackEvent("ats_analysis_started", { stage: "keyword_extraction" });
     setIsExtracting(true);
     try {
       const response = await fetch(`${apiBase}/analyze/keywords`, {
@@ -284,6 +287,7 @@ export default function WorkspacePage() {
       setKeywordSource(sourceText);
       localStorage.setItem(srcKey, sourceText);
       setAnalysisStatus(sourceText);
+      trackEvent("ats_analysis_completed", { stage: "keyword_extraction" });
     } catch (err) {
       setAnalysisStatus(
         err instanceof Error ? err.message : "Keyword extraction failed.",
@@ -370,6 +374,7 @@ export default function WorkspacePage() {
       parsed.raw_text || "",
     );
     setAnalysisStatus("Analyzing...");
+    trackEvent("ats_analysis_started", { stage: "match" });
     setIsAnalyzing(true);
     try {
       const response = await fetch(`${apiBase}/analyze/match`, {
@@ -394,6 +399,7 @@ export default function WorkspacePage() {
       setMatchPercent(data.match_percent ?? null);
       setMissingKeywords(data.missing_keywords || []);
       setAnalysisStatus("Analysis complete.");
+      trackEvent("ats_analysis_completed", { stage: "match" });
     } catch (err) {
       setAnalysisStatus(err instanceof Error ? err.message : "Analysis failed.");
     } finally {
@@ -421,6 +427,7 @@ export default function WorkspacePage() {
       parsed.raw_text || "",
     );
     setOptimizeStatus("Optimizing...");
+    trackEvent("optimization_started", { product_type: "optimization" });
     setIsOptimizing(true);
     try {
       const response = await fetchWithRetry(
@@ -474,6 +481,15 @@ export default function WorkspacePage() {
       setOptimizedSummary((data.optimized_cv || "").split("\n")[0] || "—");
       setRecommendations(data.recommendations || []);
       setOptimizeStatus("Optimization complete.");
+      trackEvent("optimization_completed", { product_type: "optimization" });
+
+      if (typeof data.match_before === "number" && typeof data.match_after === "number") {
+        trackEvent("score_improvement", {
+          score_before: data.match_before,
+          score_after: data.match_after,
+          improvement: Math.max(0, data.match_after - data.match_before),
+        });
+      }
 
       // Reset workspace input state after successful scan so dashboard starts clean.
       setFile(null);
@@ -491,8 +507,10 @@ export default function WorkspacePage() {
       if (data.analysis_id) {
         // Automatically inject the ID into localStorage so when /results mounts, it has a fallback if search params fail
         localStorage.setItem("current_analysis_id", String(data.analysis_id));
+        trackEvent("ats_view_results", { location: "auto_redirect" });
         router.push(`/results?id=${data.analysis_id}`);
       } else {
+        trackEvent("ats_view_results", { location: "auto_redirect" });
         router.push("/results");
       }
     } catch (err) {

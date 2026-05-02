@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import TopNav from "../components/TopNav";
+import FreeAtsCtasClient from "./FreeAtsCtasClient";
 
 export const metadata: Metadata = {
   title: "Free ATS Resume Checker (No Signup) | CVboosta",
@@ -24,14 +25,7 @@ export default function FreeAtsResumeCheckerPage() {
               Run CV analysis and ATS match scoring with no signup required.
               Upload your CV, paste the job description, and see missing keywords in minutes.
             </p>
-            <div className="nav-actions">
-              <Link className="btn primary" href="/app">
-                Start free analysis
-              </Link>
-              <Link className="btn ghost" href="/app">
-                Open dashboard
-              </Link>
-            </div>
+            <FreeAtsCtasClient />
           </div>
         </section>
       </div>

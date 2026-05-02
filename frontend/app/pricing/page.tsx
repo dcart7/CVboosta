@@ -34,6 +34,7 @@ export default function PricingPage() {
 
   useEffect(() => {
     setMounted(true);
+    trackEvent("pricing_view", { page_type: "pricing" });
   }, []);
 
   useEffect(() => {
@@ -65,9 +66,17 @@ export default function PricingPage() {
   }, [apiBase]);
 
   const openCheckout = async (tierId: string) => {
-    trackEvent("checkout_click", {
-      tier: tierId,
-      billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : "one_time",
+    const plan = tierId === "go" || tierId === "pro" ? billingCycle : "one_time";
+    const price =
+      tierId === "single" ? 1
+        : tierId === "go" ? (billingCycle === "week" ? 3 : 8)
+          : tierId === "pro" ? (billingCycle === "week" ? 10 : 20)
+            : 119.99;
+
+    trackEvent("payment_started", {
+      product_type: "optimization",
+      plan,
+      price,
     });
 
     setCheckoutLoading(tierId);
