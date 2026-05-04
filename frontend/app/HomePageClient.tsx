@@ -209,6 +209,7 @@ export default function HomePage() {
     en: {
       ctaAction: "Upload your CV — get results in 60 seconds",
       freeScore: "Free ATS score instantly",
+      firstTryFree: "First scan is free",
       control: "You stay in control — edit before export. Nothing is auto-submitted.",
       verified: "Verified beta user",
       caseProof: "Case study details available on request.",
@@ -217,6 +218,7 @@ export default function HomePage() {
     uk: {
       ctaAction: "Завантажте CV — отримайте результат за 60 секунд",
       freeScore: "Безкоштовний ATS score одразу",
+      firstTryFree: "Перша спроба безкоштовна",
       control: "Ви контролюєте результат — редагуєте перед експортом. Нічого не надсилається автоматично.",
       verified: "Перевірений beta-користувач",
       caseProof: "Деталі кейсів доступні за запитом.",
@@ -225,6 +227,7 @@ export default function HomePage() {
     pl: {
       ctaAction: "Prześlij CV — otrzymaj wynik w 60 sekund",
       freeScore: "Darmowy ATS score od razu",
+      firstTryFree: "Pierwszy skan za darmo",
       control: "Masz pełną kontrolę — edytujesz przed eksportem. Nic nie wysyła się automatycznie.",
       verified: "Zweryfikowany użytkownik beta",
       caseProof: "Szczegóły case study dostępne na życzenie.",
@@ -233,6 +236,7 @@ export default function HomePage() {
     sk: {
       ctaAction: "Nahrajte CV — výsledok získate za 60 sekúnd",
       freeScore: "Bezplatný ATS score okamžite",
+      firstTryFree: "Prvý sken je zadarmo",
       control: "Máte kontrolu — upravíte pred exportom. Nič sa neodosiela automaticky.",
       verified: "Overený beta používateľ",
       caseProof: "Detaily case study sú dostupné na požiadanie.",
@@ -241,6 +245,7 @@ export default function HomePage() {
     cs: {
       ctaAction: "Nahrajte CV — výsledek získáte za 60 sekund",
       freeScore: "Free ATS score okamžitě",
+      firstTryFree: "První sken zdarma",
       control: "Máte kontrolu — upravíte před exportem. Nic se neodesílá automaticky.",
       verified: "Ověřený beta uživatel",
       caseProof: "Detaily case study jsou dostupné na vyžádání.",
@@ -249,6 +254,7 @@ export default function HomePage() {
     es: {
       ctaAction: "Sube tu CV — obtén resultados en 60 segundos",
       freeScore: "ATS score gratis al instante",
+      firstTryFree: "Primer escaneo gratis",
       control: "Tú mantienes el control: editas antes de exportar. Nada se envía automáticamente.",
       verified: "Usuario beta verificado",
       caseProof: "Detalles de casos disponibles bajo solicitud.",
@@ -616,6 +622,7 @@ export default function HomePage() {
               <p className="hero-mini-text">{conversionUi.control}</p>
               <div className="hero-proof-chips">
                 <span className="tag">{conversionUi.freeScore}</span>
+                <span className="tag">{conversionUi.firstTryFree}</span>
               </div>
             </div>
           </div>

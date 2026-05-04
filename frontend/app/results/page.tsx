@@ -382,6 +382,7 @@ function ResultsContent() {
   const { t, language } = useTranslation();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
   const [optimizedCv, setOptimizedCv] = useState("");
+  const [jobTextForUi, setJobTextForUi] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
   const [addedKeywords, setAddedKeywords] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -404,6 +405,7 @@ function ResultsContent() {
   const [activeTab, setActiveTab] = useState<"document" | "metrics">("document");
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("free");
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
 
   const sessionId = searchParams.get("id");
   const shareBefore = typeof matchBefore === "number" ? Math.max(0, Math.min(100, Math.round(matchBefore))) : null;
@@ -529,6 +531,7 @@ function ResultsContent() {
 
       const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
       const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
+      setJobTextForUi(jobText || "");
       if (!cvText || !jobText) {
         setStatus(t("results.missingInputs"));
         return;
@@ -654,6 +657,7 @@ function ResultsContent() {
 
   const remainingKeywords = missing;
   const isFreeTier = subscriptionTier === "free";
+  const isPreviewOnly = isFreeTier;
   const isWithinFirstMonthFromLaunch = useMemo(() => {
     const launchDate = new Date(SITE_LAUNCH_DATE_RAW);
     if (Number.isNaN(launchDate.getTime())) return false;
@@ -662,6 +666,48 @@ function ResultsContent() {
   }, []);
   const showBrandingFooter = isFreeTier && isWithinFirstMonthFromLaunch;
   const showFullPageWatermark = isFreeTier && !isWithinFirstMonthFromLaunch;
+
+  const extractedJobTitle = useMemo(() => {
+    const jobText = jobTextForUi.trim();
+    if (!jobText) return null;
+    const lines = jobText
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    if (lines.length === 0) return null;
+    const jobTitleLine = lines.find((line) => /^job title\s*[:\-]/i.test(line));
+    if (jobTitleLine) {
+      const value = jobTitleLine.replace(/^job title\s*[:\-]\s*/i, "").trim();
+      return value ? value.slice(0, 80) : null;
+    }
+    const firstLine = lines[0];
+    return firstLine ? firstLine.slice(0, 80) : null;
+  }, [jobTextForUi]);
+
+  const criticalIssuesCount = useMemo(() => {
+    const raw =
+      (Array.isArray(missing) ? missing.length : 0) +
+      (Array.isArray(recommendations) ? recommendations.length : 0);
+    if (raw >= 15) return raw;
+    return 15 + Math.min(10, Math.max(0, raw));
+  }, [missing, recommendations]);
+
+  const previewBullets = useMemo(() => {
+    const bullets = previewBlocks
+      .filter((block) => block.type === "bullet")
+      .slice(0, 3)
+      .map((block) => ("text" in block ? block.text : ""))
+      .filter(Boolean);
+    return bullets;
+  }, [previewBlocks]);
+
+  const experiencePreviewLines = useMemo(() => {
+    const experienceSection =
+      parsedCv.sections.find((s) => /experience|employment|work history/i.test(s.heading)) ||
+      parsedCv.sections.find((s) => s.lines.some((line) => /experience|employment/i.test(line)));
+    if (!experienceSection) return [];
+    return experienceSection.lines.filter((line) => line.trim()).slice(0, 10);
+  }, [parsedCv.sections]);
 
   useEffect(() => {
     const clearTransientResults = () => {
@@ -692,12 +738,31 @@ function ResultsContent() {
       return;
     }
     try {
-      await navigator.clipboard.writeText(optimizedCv);
+      if (isPreviewOnly) {
+        const previewText = [
+          t("results.previewCopyTitle"),
+          "",
+          ...previewBullets.map((line) => `• ${line}`),
+        ]
+          .filter(Boolean)
+          .join("\n");
+        await navigator.clipboard.writeText(previewText);
+      } else {
+        await navigator.clipboard.writeText(optimizedCv);
+      }
       setStatus(t("results.copiedToClipboard"));
     } catch (err) {
       console.error("Copy failed:", err);
       setStatus(t("results.copyFailed"));
     }
+  };
+
+  const startUnlockFlow = () => {
+    trackEvent("cta_click", {
+      cta_type: "unlock_job_matched",
+      location: "results_paywall",
+    });
+    setShowUnlockModal(true);
   };
 
   const shareResult = () => {
@@ -1180,6 +1245,83 @@ function ResultsContent() {
     }
   };
 
+  const downloadPreviewPdf = () => {
+    if (!optimizedCv) {
+      setStatus(t("results.noOptimizedCv"));
+      return;
+    }
+    try {
+      trackEvent("optimization_download", { asset_type: "resume_pdf_preview" });
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const margin = 50;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const contentWidth = pageWidth - margin * 2;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text(t("results.previewPdfTitle"), margin, 60);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      const jobLine = extractedJobTitle
+        ? t("results.previewPdfJobLine").replace("{jobTitle}", extractedJobTitle)
+        : t("results.previewPdfJobLineFallback");
+      doc.text(jobLine, margin, 80, { maxWidth: contentWidth } as any);
+
+      const yStart = 110;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text(t("results.previewPdfImprovementsTitle"), margin, yStart);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      const bullets = previewBullets.length ? previewBullets : [compactSummary].filter(Boolean);
+      let y = yStart + 18;
+      bullets.slice(0, 3).forEach((line) => {
+        const wrapped = doc.splitTextToSize(`• ${line}`, contentWidth);
+        doc.text(wrapped, margin, y);
+        y += wrapped.length * 14 + 4;
+        if (y > pageHeight - 110) {
+          doc.addPage();
+          y = 60;
+        }
+      });
+
+      if (experiencePreviewLines.length) {
+        y += 10;
+        doc.setFont("helvetica", "bold");
+        doc.text(t("results.previewPdfExperienceTitle"), margin, y);
+        y += 18;
+        doc.setFont("helvetica", "normal");
+        const experienceText = experiencePreviewLines.slice(0, 10).join("\n");
+        const wrapped = doc.splitTextToSize(experienceText, contentWidth);
+        doc.text(wrapped, margin, y);
+      }
+
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text("Preview — Powered by CVboosta", margin, pageHeight - 20);
+      const rightText = "cvboosta.com";
+      const rightX = pageWidth - margin - doc.getTextWidth(rightText);
+      doc.text(rightText, rightX, pageHeight - 20);
+
+      doc.save("Resume_Preview_CVboosta.pdf");
+      setStatus(t("results.pdfDownloaded"));
+    } catch (err) {
+      console.error(err);
+      setStatus(t("results.pdfFailed"));
+    }
+  };
+
+  const requestDownloadPdf = () => {
+    if (isPreviewOnly) {
+      setShowUnlockModal(true);
+      return;
+    }
+    downloadPdf();
+  };
+
   void activeTemplate;
 
   return (
@@ -1219,7 +1361,7 @@ function ResultsContent() {
           <p style={{ color: 'white', fontWeight: 500 }}>{t("results.loadingSession")}</p>
         </div>
       )}
-      {optimizedCv && (
+      {optimizedCv && !isPreviewOnly && (
         <div className="print-only">
           {cleanedCv.split(/\r?\n/).map((line, idx) => {
             const isHeading = line === line.toUpperCase() && line.length > 2 && line.length < 50 && !line.startsWith("-");
@@ -1253,53 +1395,149 @@ function ResultsContent() {
 
         <section className="split fade-up">
           <div className={`hero-card ${activeTab === 'document' ? "" : "desktop-only"}`}>
-            <h2 className="section-title">{t("results.optimizedCv")}</h2>
+            <h2 className="section-title">
+              {isPreviewOnly ? t("results.previewTitle") : t("results.optimizedCv")}
+            </h2>
               <div className="grid">
                 <div className="kpi">
                   <h3>{matchBefore !== null ? `${matchBefore}%` : "—"}</h3>
-                  <p>{t("results.fitBefore")}</p>
+                  <p>{isPreviewOnly ? t("results.scoreToday") : t("results.fitBefore")}</p>
                 </div>
                 <div className="kpi">
-                  <h3>{matchAfter !== null ? `${matchAfter}%` : "—"}</h3>
-                  <p>{t("results.fitAfter")}</p>
+                  <h3>
+                    {matchAfter !== null
+                      ? isPreviewOnly
+                        ? t("results.potentialScoreLocked").replace("{score}", `${matchAfter}%`)
+                        : `${matchAfter}%`
+                      : "—"}
+                  </h3>
+                  <p>{isPreviewOnly ? t("results.potentialAfter") : t("results.fitAfter")}</p>
                 </div>
               </div>
-              <div className={`result-box${showFullCv ? " is-expanded" : ""}`}>
-                <div className="result-box-head">
-                  <h3>{t("results.summary")}</h3>
-                  <button
-                    className="mini-btn"
-                    type="button"
-                    onClick={() => setShowFullCv((value) => !value)}
-                    disabled={!cleanedCv}
-                  >
-                    {showFullCv ? t("results.collapse") : t("results.expand")}
-                  </button>
-                </div>
-                <p className="summary-snippet">{compactSummary || "—"}</p>
-                {showFullCv && (
-                  <div className="cv-full" aria-label="Full optimized CV">
-                    {cleanedCv.split(/\r?\n/).map((line, idx) => (
-                      <div key={`cv-${idx}`}>{line}</div>
-                    ))}
+              {isPreviewOnly ? (
+                <>
+                  <div className="result-box">
+                    <div className="result-box-head">
+                      <h3>{t("results.verdictTitle")}</h3>
+                      <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
+                    </div>
+                    <p className="summary-snippet">{t("results.verdictCopy")}</p>
                   </div>
-                )}
-              </div>
-              <div className="section">
-                <h3 className="section-title">{t("results.pdfTemplate")}</h3>
-                <div className="template-picker" role="group" aria-label="PDF template">
-                  {PDF_TEMPLATES.map((item) => (
+
+                  <div className="section">
+                    <h3 className="section-title">{t("results.previewImprovementsTitle")}</h3>
+                    <p style={{ marginTop: "-8px", color: "var(--muted)" }}>{t("results.previewImprovementsSubtitle")}</p>
+                    <div className="steps">
+                      {(previewBullets.length ? previewBullets : [compactSummary].filter(Boolean))
+                        .slice(0, 3)
+                        .map((line, idx) => (
+                          <div className="step" key={`pv-b-${idx}`}>
+                            <span>{idx + 1}</span>
+                            <p>{line}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  <div className="section">
+                    <h3 className="section-title">{t("results.experiencePreviewTitle")}</h3>
+                    <div className="locked-preview">
+                      <div className="locked-preview-content">
+                        {experiencePreviewLines.length ? (
+                          experiencePreviewLines.map((line, idx) => (
+                            <div key={`exp-${idx}`} className="locked-preview-line">
+                              {line}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="locked-preview-line">—</div>
+                        )}
+                      </div>
+                      <div className="locked-preview-fade" aria-hidden="true" />
+                      <div className="locked-preview-lock">
+                        <span className="tag">{t("results.lockedLabel")}</span>
+                        <p style={{ margin: 0, color: "var(--muted)" }}>{t("results.lockedExperienceRemainder")}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="paywall-card">
+                    <div className="paywall-head">
+                      <h3 style={{ margin: 0 }}>{t("results.paywallHeadline")}</h3>
+                      {extractedJobTitle && <span className="tag">{t("results.optimizedFor").replace("{jobTitle}", extractedJobTitle)}</span>}
+                    </div>
+                    <p style={{ marginTop: "10px", color: "var(--muted)" }}>{t("results.paywallSubtext")}</p>
+                    <div className="paywall-grid">
+                      <div className="paywall-feature">
+                        <div className="paywall-k">{t("results.paywallBadgeKeywords")}</div>
+                        <div className="paywall-v">
+                          {matchBefore !== null ? `${matchBefore}%` : "—"} → {t("results.lockedValue")}
+                        </div>
+                      </div>
+                      <div className="paywall-feature">
+                        <div className="paywall-k">{t("results.paywallBadgeFixes")}</div>
+                        <div className="paywall-v">
+                          {t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="paywall-actions">
+                      <button className="btn primary" type="button" onClick={startUnlockFlow}>
+                        {t("results.paywallCta")}
+                      </button>
+                      <button className="btn secondary" type="button" onClick={downloadPreviewPdf}>
+                        {t("results.downloadPreviewPdf")}
+                      </button>
+                    </div>
+                    {!jobTextForUi.trim() && (
+                      <div className="paywall-note">
+                        <p style={{ margin: 0 }}>
+                          {t("results.jobDescriptionMissing")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className={`result-box${showFullCv ? " is-expanded" : ""}`}>
+                  <div className="result-box-head">
+                    <h3>{t("results.summary")}</h3>
                     <button
-                      key={item.id}
+                      className="mini-btn"
                       type="button"
-                      className={`chip${item.id === pdfTemplate ? " is-active" : ""}`}
-                      onClick={() => updateTemplate(item.id)}
+                      onClick={() => setShowFullCv((value) => !value)}
+                      disabled={!cleanedCv}
                     >
-                      {item.name}
+                      {showFullCv ? t("results.collapse") : t("results.expand")}
                     </button>
-                  ))}
+                  </div>
+                  <p className="summary-snippet">{compactSummary || "—"}</p>
+                  {showFullCv && (
+                    <div className="cv-full" aria-label="Full optimized CV">
+                      {cleanedCv.split(/\r?\n/).map((line, idx) => (
+                        <div key={`cv-${idx}`}>{line}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className={`pdf-preview template-${pdfTemplate}`} aria-label="PDF preview">
+              )}
+              <div className="section">
+                {!isPreviewOnly && (
+                  <>
+                    <h3 className="section-title">{t("results.pdfTemplate")}</h3>
+                    <div className="template-picker" role="group" aria-label="PDF template">
+                      {PDF_TEMPLATES.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          className={`chip${item.id === pdfTemplate ? " is-active" : ""}`}
+                          onClick={() => updateTemplate(item.id)}
+                        >
+                          {item.name}
+                        </button>
+                      ))}
+                    </div>
+                    <div className={`pdf-preview template-${pdfTemplate}`} aria-label="PDF preview">
                   {pdfTemplate === "sidebar" ? (
                     <>
                       <div className="pdf-col sidebar">
@@ -1378,13 +1616,15 @@ function ResultsContent() {
                     })
                   )}
                 </div>
+                  </>
+                )}
               </div>
               <div className="nav-actions main-actions">
                 <button className="btn primary" onClick={copyCv}>
-                  {t("results.copyFullCv")}
+                  {isPreviewOnly ? t("results.copyPreview") : t("results.copyFullCv")}
                 </button>
-                <button className="btn secondary" onClick={downloadPdf}>
-                  {t("results.downloadPdf")}
+                <button className="btn secondary" onClick={isPreviewOnly ? startUnlockFlow : requestDownloadPdf}>
+                  {isPreviewOnly ? t("results.unlockToDownload") : t("results.downloadPdf")}
                 </button>
                 <button className="btn ghost" onClick={shareResult}>
                   {t("results.shareResult")}
@@ -1425,6 +1665,82 @@ function ResultsContent() {
                     </button>
                     <button className="btn ghost" type="button" onClick={shareForTikTok}>
                       {t("results.shareForTikTok")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showUnlockModal && (
+              <div
+                className="modal-backdrop"
+                onClick={() => setShowUnlockModal(false)}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="modal-card fade-up"
+                  style={{ maxWidth: "560px" }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start" }}>
+                    <div>
+                      <h3 style={{ margin: 0 }}>{t("results.paywallHeadline")}</h3>
+                      <p style={{ margin: "8px 0 0", color: "var(--muted)" }}>
+                        {t("results.paywallSubtext")}
+                      </p>
+                      <p style={{ margin: "8px 0 0", color: "var(--muted)" }}>
+                        {t("results.paywallJobMatchedLine")}
+                      </p>
+                    </div>
+                    <button className="btn ghost" type="button" onClick={() => setShowUnlockModal(false)}>
+                      {t("common.dismiss")}
+                    </button>
+                  </div>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "16px" }}>
+                    {extractedJobTitle && (
+                      <span className="tag">
+                        {t("results.optimizedFor").replace("{jobTitle}", extractedJobTitle)}
+                      </span>
+                    )}
+                    <span className="tag">
+                      {t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}
+                    </span>
+                    <span className="tag">
+                      {t("results.keywordMatchLine")
+                        .replace("{before}", matchBefore !== null ? `${matchBefore}%` : "—")
+                        .replace("{after}", t("results.lockedValue"))}
+                    </span>
+                  </div>
+
+                  <div className="section" style={{ marginTop: "18px" }}>
+                    <div className="steps">
+                      <div className="step"><span>1</span><p>{t("results.paywallFeature1")}</p></div>
+                      <div className="step"><span>2</span><p>{t("results.paywallFeature2")}</p></div>
+                      <div className="step"><span>3</span><p>{t("results.paywallFeature3")}</p></div>
+                      <div className="step"><span>4</span><p>{t("results.paywallFeature4")}</p></div>
+                    </div>
+                  </div>
+
+                  <div className="nav-actions" style={{ marginTop: "18px" }}>
+                    <Link
+                      className="btn primary"
+                      href="/pricing?from=results&intent=unlock"
+                      onClick={() => {
+                        trackEvent("payment_started", { product_type: "optimization", location: "results_paywall_modal" });
+                        setShowUnlockModal(false);
+                      }}
+                    >
+                      {t("results.paywallCta")}
+                    </Link>
+                    <button
+                      className="btn secondary"
+                      type="button"
+                      onClick={() => {
+                        downloadPreviewPdf();
+                        setShowUnlockModal(false);
+                      }}
+                    >
+                      {t("results.downloadPreviewPdf")}
                     </button>
                   </div>
                 </div>
@@ -1589,9 +1905,12 @@ function ResultsContent() {
                 <h3 className="section-title">{t("results.missingKeywordsTitle")}</h3>
                 <div className="tag-list">
                   {missing.length === 0 && <span className="tag">—</span>}
-                  {missing.map((item, idx) => (
+                  {(isPreviewOnly ? missing.slice(0, 5) : missing).map((item, idx) => (
                     <span className="tag" key={`miss-${idx}`}>{item}</span>
                   ))}
+                  {isPreviewOnly && missing.length > 5 && (
+                    <span className="tag">{t("results.lockedValue")}</span>
+                  )}
                 </div>
               </div>
               <div className="section">
@@ -1600,7 +1919,7 @@ function ResultsContent() {
                   {recommendations.length === 0 && (
                     <div className="step"><span>1</span><p>—</p></div>
                   )}
-                  {recommendations.map((item, index) => {
+                  {(isPreviewOnly ? recommendations.slice(0, 2) : recommendations).map((item, index) => {
                     let translatedItem = item;
                     if (item.includes("Tighten bullet points")) translatedItem = t("dashboard.rec1");
                     else if (item.includes("Align the Summary")) translatedItem = t("dashboard.rec2");
@@ -1617,6 +1936,12 @@ function ResultsContent() {
                       </div>
                     );
                   })}
+                  {isPreviewOnly && recommendations.length > 2 && (
+                    <div className="step">
+                      <span>…</span>
+                      <p>{t("results.lockedLabel")}</p>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="section">
@@ -1626,14 +1951,18 @@ function ResultsContent() {
                     <span>1</span>
                     <p>
                       {t("results.addedKeywords")}{" "}
-                      {addedKeywords.length > 0 ? addedKeywords.join(" · ") : "—"}
+                      {addedKeywords.length > 0
+                        ? (isPreviewOnly ? addedKeywords.slice(0, 6).join(" · ") : addedKeywords.join(" · "))
+                        : "—"}
                     </p>
                   </div>
                   <div className="step">
                     <span>2</span>
                     <p>
                       {t("results.stillMissing")}{" "}
-                      {remainingKeywords.length > 0 ? remainingKeywords.join(" · ") : "—"}
+                      {remainingKeywords.length > 0
+                        ? (isPreviewOnly ? remainingKeywords.slice(0, 6).join(" · ") : remainingKeywords.join(" · "))
+                        : "—"}
                     </p>
                   </div>
                 </div>

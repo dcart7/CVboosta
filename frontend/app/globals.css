@@ -1864,6 +1864,126 @@ a {
   justify-content: center;
 }
 
+.locked-preview {
+  position: relative;
+  border-radius: 22px;
+  padding: 18px 18px 56px;
+  border: 1px solid var(--glass-border);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.locked-preview-content {
+  display: grid;
+  gap: 8px;
+  font-family: "Manrope", sans-serif;
+  color: var(--ink);
+  opacity: 0.92;
+}
+
+.locked-preview-line {
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.locked-preview-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 40%,
+    color-mix(in srgb, var(--surface-2) 85%, transparent) 78%,
+    var(--surface-2) 100%
+  );
+  pointer-events: none;
+}
+
+.locked-preview-lock {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.paywall-card {
+  margin-top: 18px;
+  border-radius: 22px;
+  padding: 22px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--glass-border));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 10%, var(--surface-2)),
+    var(--surface-2)
+  );
+}
+
+.paywall-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.paywall-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .paywall-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.paywall-feature {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .paywall-feature {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.paywall-k {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.paywall-v {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.paywall-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.paywall-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px dashed var(--glass-border);
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .tag-list {
   display: flex;
   flex-wrap: wrap;
