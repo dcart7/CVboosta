@@ -533,7 +533,7 @@ function ResultsContent() {
 
       const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
       const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
-      setJobTextForUi(jobText || "");
+      setJobTextForUi(sanitizeCvText(jobText || ""));
       if (!cvText || !jobText) {
         setStatus(t("results.missingInputs"));
         return;
