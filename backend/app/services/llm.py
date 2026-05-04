@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 import json
 import logging
+import re
 import typing
 import tenacity
 
@@ -15,6 +16,19 @@ from app.schemas.keywords import KeywordExtractionResult
 logger = logging.getLogger(__name__)
 
 _GEMINI_FALLBACK_MODELS = ("gemini-2.0-flash", "gemini-flash-latest")
+
+
+def _cleanup_cv_text(text: str) -> str:
+    if not text:
+        return ""
+    cleaned = text
+    # Some models wrap keywords in inline-code backticks; strip them.
+    cleaned = cleaned.replace("`", "")
+    # Remove orphan bullet lines that render as empty "•" items.
+    cleaned = re.sub(r"(?m)^\s*[•·]\s*$", "", cleaned)
+    # Collapse excessive blank lines.
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
 
 # BCP-47-style codes from the frontend LanguageContext
 _UI_LANGUAGE_NAMES: dict[str, str] = {
@@ -302,7 +316,7 @@ def _generate_with_gemini(
                 "ATS KEYWORDS (prioritize these where truthful):\n"
                 + " · ".join(cleaned)
                 + "\n\n"
-                "Requirement: If a keyword is already supported by the CV, ensure it appears verbatim at least once.\n"
+                "Requirement: If a keyword is supported by the CV, ensure it appears verbatim at least once (avoid repetition).\n"
                 "Do not invent experience; if a keyword can't be supported, omit it.\n\n"
             )
 
@@ -327,21 +341,22 @@ def _generate_with_gemini(
 
     prompt = (
         "You are an elite ATS (Applicant Tracking System) CV optimization assistant.\n"
-        "Your ONLY goal is to rewrite the input CV so that it achieves a guaranteed >90% match score against the ATS KEYWORDS.\n\n"
+        "Your goal is to rewrite the CV so it matches the JOB DESCRIPTION with high ATS readability and recruiter credibility.\n\n"
         "CRITICAL INSTRUCTIONS:\n"
-        "1. EXACT KEYWORD MATCHING (NON-NEGOTIABLE): You MUST insert 100% of the provided ATS KEYWORDS into the CV.\n"
-        "2. DO NOT PARAPHRASE KEYWORDS: The ATS scanner uses exact string matching. If a keyword is 'Agile Methodologies', do NOT write 'Agile methods'. Use the EXACT phrase.\n"
-        "3. NATURAL WEAVING: Integrate these exact phrases gracefully into bullet points, summary, or an expanded 'Skills' section. If a keyword doesn't fit in a sentence, add it to a comma-separated skills list.\n"
-        "4. NO HALLUCINATION: Only use keywords if they can reasonably relate to the candidate's existing experience. Do not invent new degrees or fictional companies.\n"
-        "5. PROFESSIONAL TONE: Use strong action verbs and maintain a high-impact professional style.\n"
-        "6. HEADER RULE: The first line must contain only the candidate's full name. Do NOT include phone, email, links, address, or any other contact details on that first line.\n"
-        "7. FORMAT: Output ONLY the final optimized CV text. Do not provide commentary, intro, or markdown blocks. Just the CV text.\n\n"
+        "1. JOB-SPECIFIC OPTIMIZATION: Prioritize relevance to the provided JOB DESCRIPTION over generic ATS advice.\n"
+        "2. KEYWORDS (NO STUFFING): Use ATS KEYWORDS only where truthful. Insert them naturally (ideally once each) and do NOT repeat keywords just to inflate matching.\n"
+        "3. EXACT PHRASES WHEN USED: If you include a keyword/phrase, keep it verbatim (no paraphrase). If it cannot be supported, omit it.\n"
+        "4. NO HALLUCINATION: Do not invent roles, companies, degrees, or tools that aren't supported by the input CV.\n"
+        "5. NO MARKUP: Do NOT use backticks, markdown, code blocks, or keyword highlighting.\n"
+        "6. PROFESSIONAL STYLE: Use strong action verbs, quantified outcomes, and role-relevant terminology.\n"
+        "7. HEADER RULE: The first line must contain only the candidate's full name. Do NOT include phone/email/links/address on that first line.\n"
+        "8. FORMAT: Output ONLY the final CV text.\n\n"
         f"{target_block}"
         f"{keyword_block}"
         f"{forced_block}"
         f"INPUT CV:\n{cv_text}\n\n"
         f"JOB DESCRIPTION:\n{job_text}\n\n"
-        "OPTIMIZED CV (MUST CONTAIN ALL EXACT ATS KEYWORDS):"
+        "OPTIMIZED CV:"
     )
 
     try:
@@ -350,7 +365,7 @@ def _generate_with_gemini(
             model=settings.gemini_model,
             contents=prompt,
         )
-        optimized_cv = (getattr(response, "text", "") or "").strip()
+        optimized_cv = _cleanup_cv_text((getattr(response, "text", "") or "").strip())
         if not optimized_cv:
             raise LLMServiceError("GEMINI_ERROR: empty response", status_code=502)
         return LLMResult(
