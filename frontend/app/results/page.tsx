@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
 import TopNav from "../components/TopNav";
-import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
@@ -403,7 +402,6 @@ function ResultsContent() {
   const [coverLetter, setCoverLetter] = useState("");
   const [isLoadingCL, setIsLoadingCL] = useState(false);
   const [clError, setClError] = useState<string | null>(null);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"document" | "metrics">("document");
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("free");
@@ -873,7 +871,7 @@ function ResultsContent() {
       );
 
       if (response.status === 402) {
-        setShowUpgradeModal(true);
+        setShowUnlockModal(true);
         setIsLoadingPrep(false);
         return;
       }
@@ -928,7 +926,7 @@ function ResultsContent() {
       );
 
       if (response.status === 402) {
-        setShowUpgradeModal(true);
+        setShowUnlockModal(true);
         setIsLoadingCL(false);
         return;
       }
@@ -1970,10 +1968,6 @@ function ResultsContent() {
           </Link>
         </div>
       </div>
-      <PremiumModal 
-        isOpen={showUpgradeModal} 
-        onClose={() => setShowUpgradeModal(false)} 
-      />
     </main>
   );
 }
