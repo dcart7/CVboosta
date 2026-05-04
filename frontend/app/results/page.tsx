@@ -669,6 +669,20 @@ function ResultsContent() {
   const showBrandingFooter = isFreeTier && isWithinFirstMonthFromLaunch;
   const showFullPageWatermark = isFreeTier && !isWithinFirstMonthFromLaunch;
 
+  useEffect(() => {
+    if (!isPreviewOnly) return;
+    if (!optimizedCv) return;
+    if (sessionLoadError) return;
+    try {
+      const key = `results_paywall_seen:${sessionId || "latest"}`;
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, "1");
+      setShowUnlockModal(true);
+    } catch {
+      setShowUnlockModal(true);
+    }
+  }, [isPreviewOnly, optimizedCv, sessionLoadError, sessionId]);
+
   const extractedJobTitle = useMemo(() => {
     const jobText = jobTextForUi.trim();
     if (!jobText) return null;
@@ -1462,43 +1476,6 @@ function ResultsContent() {
                       </div>
                     </div>
                   </div>
-
-                  <div className="paywall-card">
-                    <div className="paywall-head">
-                      <h3 style={{ margin: 0 }}>{t("results.paywallHeadline")}</h3>
-                      {extractedJobTitle && <span className="tag">{t("results.optimizedFor").replace("{jobTitle}", extractedJobTitle)}</span>}
-                    </div>
-                    <p style={{ marginTop: "10px", color: "var(--muted)" }}>{t("results.paywallSubtext")}</p>
-                    <div className="paywall-grid">
-                      <div className="paywall-feature">
-                        <div className="paywall-k">{t("results.paywallBadgeKeywords")}</div>
-                        <div className="paywall-v">
-                          {matchBefore !== null ? `${matchBefore}%` : "—"} → {t("results.lockedValue")}
-                        </div>
-                      </div>
-                      <div className="paywall-feature">
-                        <div className="paywall-k">{t("results.paywallBadgeFixes")}</div>
-                        <div className="paywall-v">
-                          {t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="paywall-actions">
-                      <button className="btn primary" type="button" onClick={startUnlockFlow}>
-                        {t("results.paywallCta")}
-                      </button>
-                      <button className="btn secondary" type="button" onClick={downloadPreviewPdf}>
-                        {t("results.downloadPreviewPdf")}
-                      </button>
-                    </div>
-                    {!jobTextForUi.trim() && (
-                      <div className="paywall-note">
-                        <p style={{ margin: 0 }}>
-                          {t("results.jobDescriptionMissing")}
-                        </p>
-                      </div>
-                    )}
-                  </div>
                 </>
               ) : (
                 <div className={`result-box${showFullCv ? " is-expanded" : ""}`}>
@@ -1680,25 +1657,25 @@ function ResultsContent() {
               >
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="modal-card fade-up"
-                  style={{ maxWidth: "560px" }}
+                  className="modal-card fade-up paywall-modal-card"
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start" }}>
-                    <div>
-                      <h3 style={{ margin: 0 }}>{t("results.paywallHeadline")}</h3>
-                      <p style={{ margin: "8px 0 0", color: "var(--muted)" }}>
-                        {t("results.paywallSubtext")}
-                      </p>
-                      <p style={{ margin: "8px 0 0", color: "var(--muted)" }}>
-                        {t("results.paywallJobMatchedLine")}
-                      </p>
-                    </div>
-                    <button className="btn ghost" type="button" onClick={() => setShowUnlockModal(false)}>
-                      {t("common.dismiss")}
-                    </button>
+                  <button
+                    className="paywall-modal-close"
+                    type="button"
+                    onClick={() => setShowUnlockModal(false)}
+                    aria-label={t("common.dismiss")}
+                  >
+                    ×
+                  </button>
+
+                  <div className="paywall-modal-hero">
+                    <div className="paywall-modal-icon" aria-hidden="true">✨</div>
+                    <h3 className="paywall-modal-title">{t("results.paywallHeadline")}</h3>
+                    <p className="paywall-modal-sub">{t("results.paywallSubtext")}</p>
+                    <p className="paywall-modal-sub">{t("results.paywallJobMatchedLine")}</p>
                   </div>
 
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "16px" }}>
+                  <div className="paywall-modal-tags">
                     {extractedJobTitle && (
                       <span className="tag">
                         {t("results.optimizedFor").replace("{jobTitle}", extractedJobTitle)}
@@ -1714,16 +1691,14 @@ function ResultsContent() {
                     </span>
                   </div>
 
-                  <div className="section" style={{ marginTop: "18px" }}>
-                    <div className="steps">
-                      <div className="step"><span>1</span><p>{t("results.paywallFeature1")}</p></div>
-                      <div className="step"><span>2</span><p>{t("results.paywallFeature2")}</p></div>
-                      <div className="step"><span>3</span><p>{t("results.paywallFeature3")}</p></div>
-                      <div className="step"><span>4</span><p>{t("results.paywallFeature4")}</p></div>
-                    </div>
-                  </div>
+                  <ul className="paywall-modal-list">
+                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature1")}</li>
+                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature2")}</li>
+                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature3")}</li>
+                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature4")}</li>
+                  </ul>
 
-                  <div className="nav-actions" style={{ marginTop: "18px" }}>
+                  <div className="paywall-modal-actions">
                     <Link
                       className="btn primary"
                       href="/pricing?from=results&intent=unlock"
@@ -1737,6 +1712,16 @@ function ResultsContent() {
                     <button
                       className="btn secondary"
                       type="button"
+                      onClick={() => setShowUnlockModal(false)}
+                    >
+                      {t("results.paywallMaybeLater")}
+                    </button>
+                  </div>
+
+                  <div className="paywall-modal-actions" style={{ marginTop: "10px" }}>
+                    <button
+                      className="btn ghost"
+                      type="button"
                       onClick={() => {
                         downloadPreviewPdf();
                         setShowUnlockModal(false);
@@ -1745,6 +1730,12 @@ function ResultsContent() {
                       {t("results.downloadPreviewPdf")}
                     </button>
                   </div>
+
+                  {!jobTextForUi.trim() && (
+                    <div className="paywall-note" style={{ marginTop: "14px" }}>
+                      <p style={{ margin: 0 }}>{t("results.jobDescriptionMissing")}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

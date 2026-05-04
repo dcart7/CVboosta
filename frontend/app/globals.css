@@ -1984,6 +1984,117 @@ a {
   font-size: 14px;
 }
 
+.paywall-modal-card {
+  position: relative;
+  text-align: center;
+  padding: 30px 26px;
+}
+
+.paywall-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .paywall-modal-close {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.paywall-modal-hero {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.paywall-modal-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 30%, transparent),
+    color-mix(in srgb, var(--accent) 12%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--glass-border));
+  font-size: 24px;
+}
+
+.paywall-modal-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.paywall-modal-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.paywall-modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.paywall-modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 18px auto 0;
+  width: min(420px, 100%);
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.paywall-modal-list li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  align-items: start;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.paywall-modal-check {
+  color: #22c55e;
+  font-weight: 900;
+  margin-top: 1px;
+}
+
+.paywall-modal-actions {
+  margin-top: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.paywall-modal-actions .btn.primary {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+}
+
+.paywall-modal-actions .btn.secondary,
+.paywall-modal-actions .btn.ghost {
+  width: 100%;
+}
+
 .tag-list {
   display: flex;
   flex-wrap: wrap;
