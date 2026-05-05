@@ -2181,6 +2181,15 @@ a {
   }
 }
 
+@media (max-width: 768px) {
+  .paywall-actions .btn.secondary {
+    display: none;
+  }
+  .paywall-actions .btn.ghost.mobile-only {
+    display: inline-flex;
+  }
+}
+
 @media (max-width: 480px) {
   .paywall-box {
     width: 92vw;

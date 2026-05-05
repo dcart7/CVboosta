@@ -1805,34 +1805,32 @@ function ResultsContent() {
                       {t("results.paywallCta")}
                     </Link>
                     <p className="paywall-microcopy">{t("results.paywallMicrocopy")}</p>
+                    <button className="btn secondary" type="button" onClick={() => setShowUnlockModal(false)}>
+                      {t("results.paywallMaybeLater")}
+                    </button>
                     <button className="btn ghost mobile-only" type="button" onClick={() => setShowUnlockModal(false)}>
                       {t("results.paywallMaybeLater")}
                     </button>
-                    <div className="desktop-only">
-                      <button className="btn secondary" type="button" onClick={() => setShowUnlockModal(false)}>
-                        {t("results.paywallMaybeLater")}
-                      </button>
-                      <button
-                        className="btn ghost"
-                        type="button"
-                        onClick={() => {
-                          downloadPreviewPdf();
-                          setShowUnlockModal(false);
-                        }}
-                      >
-                        {t("results.downloadPreviewPdf")}
-                      </button>
-                      <button
-                        className="btn ghost"
-                        type="button"
-                        onClick={() => {
-                          trackEvent("cta_click", { cta_type: "view_demo_results", location: "results_paywall_modal" });
-                          void openDemoResults();
-                        }}
-                      >
-                        {t("results.viewDemoResults")}
-                      </button>
-                    </div>
+                    <button
+                      className="btn ghost desktop-only"
+                      type="button"
+                      onClick={() => {
+                        downloadPreviewPdf();
+                        setShowUnlockModal(false);
+                      }}
+                    >
+                      {t("results.downloadPreviewPdf")}
+                    </button>
+                    <button
+                      className="btn ghost desktop-only"
+                      type="button"
+                      onClick={() => {
+                        trackEvent("cta_click", { cta_type: "view_demo_results", location: "results_paywall_modal" });
+                        void openDemoResults();
+                      }}
+                    >
+                      {t("results.viewDemoResults")}
+                    </button>
                   </>
                 }
               >
