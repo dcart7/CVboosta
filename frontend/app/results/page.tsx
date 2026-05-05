@@ -681,6 +681,15 @@ function ResultsContent() {
     }
   }, [isPreviewOnly, optimizedCv, sessionLoadError, sessionId]);
 
+  useEffect(() => {
+    if (!showUnlockModal) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [showUnlockModal]);
+
   const extractedJobTitle = useMemo(() => {
     const jobText = jobTextForUi.trim();
     if (!jobText) return null;
@@ -1727,6 +1736,16 @@ function ResultsContent() {
                     >
                       {t("results.downloadPreviewPdf")}
                     </button>
+                    <Link
+                      className="btn ghost"
+                      href="/cases?from=results_paywall"
+                      onClick={() => {
+                        trackEvent("cta_click", { cta_type: "view_demo_results", location: "results_paywall_modal" });
+                        setShowUnlockModal(false);
+                      }}
+                    >
+                      {t("results.viewDemoResults")}
+                    </Link>
                   </div>
 
                   {!jobTextForUi.trim() && (
