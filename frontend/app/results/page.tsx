@@ -1426,6 +1426,83 @@ function ResultsContent() {
     downloadPdf();
   };
 
+  const downloadDocx = async () => {
+    if (!cleanedCv) {
+      setStatus(t("results.noOptimizedCv"));
+      return;
+    }
+    try {
+      trackEvent("optimization_download", { asset_type: "resume_docx" });
+      const docx = await import("docx");
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
+
+      const lines = cleanedCv.split(/\r?\n/);
+      const children: any[] = [];
+
+      const bulletRegex = /^(?:[•\-\*]+)\s+(.*)$/;
+      for (const raw of lines) {
+        const line = raw.trimEnd();
+        if (!line.trim()) {
+          children.push(new Paragraph({ children: [new TextRun({ text: "" })] }));
+          continue;
+        }
+
+        const trimmed = line.trim();
+        const bulletMatch = trimmed.match(bulletRegex);
+        if (bulletMatch?.[1]) {
+          children.push(
+            new Paragraph({
+              text: bulletMatch[1].trim(),
+              bullet: { level: 0 },
+            }),
+          );
+          continue;
+        }
+
+        if (isSectionHeading(trimmed)) {
+          children.push(
+            new Paragraph({
+              text: trimmed.replace(/:$/, ""),
+              heading: HeadingLevel.HEADING_2,
+            }),
+          );
+          continue;
+        }
+
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: trimmed })],
+          }),
+        );
+      }
+
+      const doc = new Document({
+        sections: [{ properties: {}, children }],
+      });
+
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Optimized_CV.docx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      setStatus(t("results.pdfFailed"));
+    }
+  };
+
+  const requestDownloadDocx = () => {
+    if (isPreviewOnly) {
+      setShowUnlockModal(true);
+      return;
+    }
+    void downloadDocx();
+  };
+
   const openDemoResults = async () => {
     setShowUnlockModal(false);
     setIsLoadingDemo(true);
@@ -1740,6 +1817,9 @@ function ResultsContent() {
                 </button>
                 <button className="btn secondary" onClick={isPreviewOnly ? startUnlockFlow : requestDownloadPdf}>
                   {isPreviewOnly ? t("results.unlockToDownload") : t("results.downloadPdf")}
+                </button>
+                <button className="btn ghost desktop-only" onClick={requestDownloadDocx}>
+                  {t("results.downloadDocx")}
                 </button>
                 <button className="btn ghost" onClick={shareResult}>
                   {t("results.shareResult")}

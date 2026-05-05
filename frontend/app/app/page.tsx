@@ -515,7 +515,7 @@ export default function WorkspacePage() {
       }
     } catch (err) {
       console.error("Optimization error:", err);
-      setOptimizeStatus(t("dashboard.optimizationFailedTryAgain"));
+      setOptimizeStatus(t("optimize.optimizationFailedTryAgain"));
     } finally {
       setIsOptimizing(false);
     }
