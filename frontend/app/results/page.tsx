@@ -1804,33 +1804,54 @@ function ResultsContent() {
                     >
                       {t("results.paywallCta")}
                     </Link>
-                    <button className="btn secondary" type="button" onClick={() => setShowUnlockModal(false)}>
+                    <p className="paywall-microcopy">{t("results.paywallMicrocopy")}</p>
+                    <button className="btn ghost mobile-only" type="button" onClick={() => setShowUnlockModal(false)}>
                       {t("results.paywallMaybeLater")}
                     </button>
-                    <button
-                      className="btn ghost"
-                      type="button"
-                      onClick={() => {
-                        downloadPreviewPdf();
-                        setShowUnlockModal(false);
-                      }}
-                    >
-                      {t("results.downloadPreviewPdf")}
-                    </button>
-                    <button
-                      className="btn ghost"
-                      type="button"
-                      onClick={() => {
-                        trackEvent("cta_click", { cta_type: "view_demo_results", location: "results_paywall_modal" });
-                        void openDemoResults();
-                      }}
-                    >
-                      {t("results.viewDemoResults")}
-                    </button>
-                    <p className="paywall-microcopy">{t("results.paywallMicrocopy")}</p>
+                    <div className="desktop-only">
+                      <button className="btn secondary" type="button" onClick={() => setShowUnlockModal(false)}>
+                        {t("results.paywallMaybeLater")}
+                      </button>
+                      <button
+                        className="btn ghost"
+                        type="button"
+                        onClick={() => {
+                          downloadPreviewPdf();
+                          setShowUnlockModal(false);
+                        }}
+                      >
+                        {t("results.downloadPreviewPdf")}
+                      </button>
+                      <button
+                        className="btn ghost"
+                        type="button"
+                        onClick={() => {
+                          trackEvent("cta_click", { cta_type: "view_demo_results", location: "results_paywall_modal" });
+                          void openDemoResults();
+                        }}
+                      >
+                        {t("results.viewDemoResults")}
+                      </button>
+                    </div>
                   </>
                 }
               >
+                <div className="mobile-only">
+                  <ul className="paywall-mobile-points">
+                    <li>✔ {t("results.paywallMobilePoint1")}</li>
+                    <li>✔ {t("results.paywallMobilePoint2")}</li>
+                    <li>✔ {t("results.paywallMobilePoint3")}</li>
+                  </ul>
+                  <div className="paywall-mobile-locked">
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                      <p style={{ margin: 0, fontWeight: 900 }}>{t("results.lockedPreviewTitle")}</p>
+                      <span className="tag">{t("results.lockedLabel")}</span>
+                    </div>
+                    <div className="paywall-locked-row is-long" style={{ marginTop: "10px" }} />
+                  </div>
+                </div>
+
+                <div className="desktop-only">
                 <div className="paywall-section" style={{ textAlign: "center" }}>
                   {extractedJobTitle && (
                     <span className="tag">
@@ -1894,6 +1915,7 @@ function ResultsContent() {
                     <p style={{ margin: 0 }}>{t("results.jobDescriptionMissing")}</p>
                   </div>
                 )}
+                </div>
               </PaywallModal>
             )}
 

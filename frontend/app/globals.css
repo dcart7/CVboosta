@@ -2110,6 +2110,14 @@ a {
   backdrop-filter: blur(10px) saturate(140%);
 }
 
+.paywall-sheet-handle {
+  width: 42px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 18%, transparent);
+  margin: -2px auto 10px;
+}
+
 .paywall-box {
   position: relative;
   width: min(92vw, 460px);
@@ -2128,11 +2136,53 @@ a {
   animation: paywallIn 180ms ease-out both;
 }
 
+/* Mobile bottom-sheet */
+@media (max-width: 768px) {
+  .paywall-overlay {
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .paywall-box {
+    width: 100%;
+    max-width: none;
+    max-height: 85vh;
+    border-radius: 20px 20px 0 0;
+    padding: 16px 16px 12px;
+    animation: paywallSheetIn 260ms ease-out both;
+  }
+
+  .paywall-close {
+    top: 10px;
+    right: 10px;
+  }
+
+  .paywall-actions {
+    position: sticky;
+    bottom: 0;
+    padding: 12px 0 6px;
+    background: linear-gradient(180deg, transparent, var(--paper) 35%);
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 480px) {
   .paywall-box {
     width: 92vw;
     padding: 18px;
     border-radius: 18px;
+  }
+}
+
+@keyframes paywallSheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -2404,6 +2454,25 @@ a {
 .paywall-actions .btn.primary:hover {
   transform: scale(1.02);
   box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Mobile-specific, minimal content */
+.paywall-mobile-points {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.paywall-mobile-locked {
+  margin-top: 12px;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  background: var(--surface-2);
+  padding: 12px;
 }
 
 @keyframes paywallIn {

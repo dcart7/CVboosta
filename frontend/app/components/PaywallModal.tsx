@@ -21,6 +21,8 @@ export default function PaywallModal({
   actions,
 }: PaywallModalProps) {
   const [mounted, setMounted] = useState(false);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [touchDeltaY, setTouchDeltaY] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -44,7 +46,30 @@ export default function PaywallModal({
       aria-modal="true"
       onClick={onClose}
     >
-      <div className="paywall-box" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="paywall-box"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => {
+          const y = e.touches[0]?.clientY;
+          if (typeof y === "number") {
+            setTouchStartY(y);
+            setTouchDeltaY(0);
+          }
+        }}
+        onTouchMove={(e) => {
+          if (touchStartY === null) return;
+          const y = e.touches[0]?.clientY;
+          if (typeof y !== "number") return;
+          setTouchDeltaY(Math.max(0, y - touchStartY));
+        }}
+        onTouchEnd={() => {
+          if (touchDeltaY > 90) onClose();
+          setTouchStartY(null);
+          setTouchDeltaY(0);
+        }}
+        style={touchDeltaY ? ({ transform: `translateY(${touchDeltaY}px)` } as any) : undefined}
+      >
+        <div className="paywall-sheet-handle mobile-only" aria-hidden="true" />
         <button
           className="paywall-close"
           type="button"
