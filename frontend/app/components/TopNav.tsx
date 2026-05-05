@@ -124,7 +124,7 @@ export default function TopNav() {
               priority
               sizes="40px"
             />
-            <span>CVboosta</span>
+            <span className="brand-text">CVboosta</span>
           </Link>
 
         {/* Desktop Links */}
