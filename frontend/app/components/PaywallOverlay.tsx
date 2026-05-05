@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 type PaywallOverlayProps = {
   isOpen: boolean;
@@ -19,11 +20,29 @@ export default function PaywallOverlay({
   children,
   actions,
 }: PaywallOverlayProps) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
-    <div className="paywall-overlay" role="dialog" aria-modal="true">
-      <div className="paywall-box">
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow || "";
+    };
+  }, [isOpen]);
+
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
+    <div
+      className="paywall-overlay"
+      role="dialog"
+      aria-modal="true"
+      onClick={() => onClose?.()}
+    >
+      <div className="paywall-box" onClick={(e) => e.stopPropagation()}>
         {onClose && (
           <button
             className="paywall-close"
@@ -41,6 +60,7 @@ export default function PaywallOverlay({
         {children && <div className="paywall-body">{children}</div>}
         {actions && <div className="paywall-actions">{actions}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
