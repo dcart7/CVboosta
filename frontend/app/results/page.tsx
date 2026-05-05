@@ -198,36 +198,6 @@ type PreviewBlock =
   | { type: "text"; text: string }
   | { type: "spacer" };
 
-const DEMO_RESULT = {
-  matchBefore: 46,
-  matchAfter: 88,
-  jobText:
-    "BI Engineer / Analytics Engineer\n\nResponsibilities:\n- Build data models and dashboards\n- Own KPI definitions and reporting\n- Optimize SQL + warehouse performance\n\nRequirements:\n- Python, SQL, dbt\n- Looker / Power BI\n- Stakeholder management",
-  optimizedCv:
-    [
-      "Alex Johnson",
-      "",
-      "SUMMARY",
-      "Analytics Engineer with 5+ years building reliable BI layers and decision-making dashboards. Owned KPI definitions, shipped dbt models, and improved data freshness across exec reporting.",
-      "",
-      "EXPERIENCE",
-      "Analytics Engineer — SaaS FinTech",
-      "• Built a dbt-driven metrics layer and standardized 25+ KPIs, reducing metric disputes and cutting time-to-answer from days to hours.",
-      "• Optimized warehouse queries (partitioning + indexing strategy) to reduce dashboard load time by 38% and improve peak-hour reliability.",
-      "• Partnered with Product and RevOps to define funnel instrumentation and launched 3 executive dashboards used weekly by leadership.",
-      "",
-      "SKILLS",
-      "Python · SQL · dbt · PostgreSQL · Looker · Power BI · Data modeling · KPI design · Stakeholder management",
-    ].join("\n"),
-  missing: ["dbt", "Looker", "Data modeling", "KPI design", "Warehouse optimization", "A/B testing", "Semantic layer"],
-  addedKeywords: ["dbt", "Looker", "KPI design", "Data modeling"],
-  recommendations: [
-    "Tighten bullet points to include metrics and scope.",
-    "Align the Summary with the top job requirements.",
-    "Ensure Skills section mirrors the most important keywords (truthfully).",
-  ],
-} as const;
-
 function sanitizeCvText(input: string): string {
   if (!input) return "";
   return (
@@ -429,6 +399,7 @@ function ResultsContent() {
   const [prepError, setPrepError] = useState<string | null>(null);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [sessionLoadError, setSessionLoadError] = useState<string | null>(null);
+  const [isLoadingDemo, setIsLoadingDemo] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
   const [isLoadingCL, setIsLoadingCL] = useState(false);
   const [clError, setClError] = useState<string | null>(null);
@@ -565,27 +536,27 @@ function ResultsContent() {
       setJobTextForUi(sanitizeCvText(jobText || ""));
 
       if (isDemo) {
-        // Demo results should work without requiring user inputs in workspace storage.
-        if (!storedCv) {
-          setOptimizedCv(DEMO_RESULT.optimizedCv);
-          setMissing(DEMO_RESULT.missing as unknown as string[]);
-          setAddedKeywords(DEMO_RESULT.addedKeywords as unknown as string[]);
-          setRecommendations(DEMO_RESULT.recommendations as unknown as string[]);
-          setMatchBefore(DEMO_RESULT.matchBefore);
-          setMatchAfter(DEMO_RESULT.matchAfter);
-          setJobTextForUi(DEMO_RESULT.jobText);
-          try {
-            localStorage.setItem("optimized_cv", DEMO_RESULT.optimizedCv);
-            localStorage.setItem("missing_skills", JSON.stringify(DEMO_RESULT.missing));
-            localStorage.setItem("added_keywords", JSON.stringify(DEMO_RESULT.addedKeywords));
-            localStorage.setItem("recommendations", JSON.stringify(DEMO_RESULT.recommendations));
-            localStorage.setItem("match_before", String(DEMO_RESULT.matchBefore));
-            localStorage.setItem("match_after", String(DEMO_RESULT.matchAfter));
-          } catch {
-            // ignore
-          }
-        } else if (!jobTextForUi.trim()) {
-          setJobTextForUi(DEMO_RESULT.jobText);
+        // Demo results are generated server-side via /demo/optimize (real pipeline).
+        setIsLoadingDemo(true);
+        try {
+          const res = await fetchWithRetry(
+            `${apiBase}/demo/optimize`,
+            undefined,
+            { attempts: 3, baseDelayMs: 300, timeoutMs: 25_000 },
+          );
+          if (!res.ok) throw new Error("demo_failed");
+          const data = await res.json();
+          setOptimizedCv(data.optimized_cv || "");
+          setMissing(data.missing_skills || []);
+          setAddedKeywords(data.added_keywords || []);
+          setRecommendations(data.recommendations || []);
+          setMatchBefore(typeof data.match_before === "number" ? data.match_before : null);
+          setMatchAfter(typeof data.match_after === "number" ? data.match_after : null);
+          setJobTextForUi(sanitizeCvText(data.job_description || ""));
+        } catch {
+          setStatus(t("results.sessionLoadFailed"));
+        } finally {
+          setIsLoadingDemo(false);
         }
       } else {
         if (!cvText || !jobText) {
@@ -729,6 +700,7 @@ function ResultsContent() {
     if (!isPreviewOnly) return;
     if (!optimizedCv) return;
     if (sessionLoadError) return;
+    if (isDemo) return;
     try {
       const key = `results_paywall_seen:${sessionId || "latest"}`;
       if (localStorage.getItem(key)) return;
@@ -739,14 +711,7 @@ function ResultsContent() {
     }
   }, [isPreviewOnly, optimizedCv, sessionLoadError, sessionId]);
 
-  useEffect(() => {
-    if (!showUnlockModal) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [showUnlockModal]);
+  // Keep modal centered with fixed overlay; allow background to scroll behind it.
 
   const extractedJobTitle = useMemo(() => {
     const jobText = jobTextForUi.trim();
@@ -1440,6 +1405,12 @@ function ResultsContent() {
         <div className="modal-backdrop" style={{ zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(9, 12, 18, 0.8)' }}>
           <div className="spinner" style={{ marginBottom: '16px' }}></div>
           <p style={{ color: 'white', fontWeight: 500 }}>{t("results.loadingSession")}</p>
+        </div>
+      )}
+      {isLoadingDemo && (
+        <div className="modal-backdrop" style={{ zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(9, 12, 18, 0.8)' }}>
+          <div className="spinner" style={{ marginBottom: '16px' }}></div>
+          <p style={{ color: 'white', fontWeight: 500 }}>{t("common.loading")}</p>
         </div>
       )}
       {optimizedCv && !isPreviewOnly && (

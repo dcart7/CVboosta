@@ -11,6 +11,7 @@ from app.api.routes.history import router as history_router
 from app.api.routes.logs import router as logs_router
 from app.api.routes.optimize import router as optimize_router
 from app.api.routes.billing import router as billing_router
+from app.api.routes.demo import router as demo_router
 from app.core.api_key import api_key_middleware
 from app.core.csrf import csrf_protect_middleware
 from app.core.rate_limit import rate_limit_middleware
@@ -108,6 +109,7 @@ app.add_middleware(
 
 app.include_router(analyze_router, prefix="/analyze", tags=["analyze"])
 app.include_router(optimize_router, prefix="/optimize", tags=["optimize"])
+app.include_router(demo_router, prefix="/demo", tags=["demo"])
 app.include_router(logs_router, tags=["logs"])
 app.include_router(auth_router, tags=["auth"])
 app.include_router(history_router, tags=["history"])
