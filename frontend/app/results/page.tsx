@@ -921,6 +921,11 @@ function ResultsContent() {
   };
 
   const fetchInterviewPrep = async () => {
+    if (isPreviewOnly) {
+      trackEvent("cta_click", { cta_type: "interview_prep_locked", location: "results" });
+      setShowUnlockModal(true);
+      return;
+    }
     const email = await fetchWorkspaceEmail(apiBase);
     const wid = workspaceIdFromEmail(email);
     migrateLegacyGuestWorkspace(wid);
@@ -975,6 +980,11 @@ function ResultsContent() {
   };
 
   const fetchCoverLetter = async () => {
+    if (isPreviewOnly) {
+      trackEvent("cta_click", { cta_type: "cover_letter_locked", location: "results" });
+      setShowUnlockModal(true);
+      return;
+    }
     const email = await fetchWorkspaceEmail(apiBase);
     const wid = workspaceIdFromEmail(email);
     const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
