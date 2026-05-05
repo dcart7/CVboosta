@@ -2136,6 +2136,75 @@ a {
   }
 }
 
+@media (max-width: 420px) {
+  .paywall-box {
+    padding: 14px;
+    max-height: 86vh;
+  }
+
+  .paywall-title {
+    font-size: 22px;
+  }
+
+  .paywall-subtitle {
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .paywall-body {
+    margin-top: 12px;
+  }
+
+  .paywall-section {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .paywall-benefits {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .paywall-benefit-card {
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .paywall-benefit-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .paywall-benefit-title {
+    font-size: 12px;
+  }
+
+  .paywall-benefit-desc {
+    font-size: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .paywall-locked {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  /* Reduce locked preview height on small screens */
+  .paywall-locked-row:nth-of-type(n + 3) {
+    display: none;
+  }
+
+  .paywall-actions {
+    gap: 8px;
+    padding-top: 10px;
+  }
+}
+
 .paywall-close {
   position: absolute;
   top: 12px;
