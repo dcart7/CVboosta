@@ -1988,6 +1988,8 @@ a {
   position: relative;
   text-align: center;
   padding: 30px 26px;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
 }
 
 .paywall-modal-close {

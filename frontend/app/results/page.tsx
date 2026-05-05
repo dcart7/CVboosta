@@ -198,6 +198,37 @@ type PreviewBlock =
   | { type: "text"; text: string }
   | { type: "spacer" };
 
+const DEMO_FALLBACK = {
+  matchBefore: 64,
+  matchAfter: 69,
+  jobText:
+    "Job Title: BI Engineer / Analytics Engineer\n\nWe are looking for a BI Engineer / Analytics Engineer.\n\nResponsibilities:\n- Build data models and dashboards\n- Own KPI definitions and reporting\n- Improve observability and alerting\n\nRequirements:\n- Python\n- SQL\n- Snowflake\n- ETL pipelines",
+  optimizedCv:
+    [
+      "Alex Johnson",
+      "",
+      "SUMMARY",
+      "Backend engineer focused on Python services, APIs, and analytics foundations. Strong emphasis on reliability, performance, and maintainable systems.",
+      "",
+      "EXPERIENCE",
+      "Independent / Consulting Projects",
+      "Burnout Risk Tracker | Feb 2026 - Present | Remote",
+      "• Engineered a production-ready backend system using Python, Django, and Django REST Framework, focusing on reusable code and scalability.",
+      "• Developed analytics services to calculate dimension scores and a Burnout Index using moving average techniques.",
+      "• Optimized data processing performance through Redis caching and PostgreSQL query optimization.",
+      "",
+      "SKILLS",
+      "Python · Django · Django REST Framework · PostgreSQL · Redis · Celery · Docker · JWT · REST APIs",
+    ].join("\n"),
+  missing: ["Monitoring", "Snowflake", "observability", "alerting", "ETL pipelines"],
+  addedKeywords: ["curated analytics datasets", "maintainable SQL transformations"],
+  recommendations: [
+    "Add a bullet that demonstrates hands-on experience with Monitoring.",
+    "Add a bullet that demonstrates hands-on experience with Snowflake.",
+    "Tighten bullet points to include metrics and scope.",
+  ],
+} as const;
+
 function sanitizeCvText(input: string): string {
   if (!input) return "";
   return (
@@ -554,7 +585,14 @@ function ResultsContent() {
           setMatchAfter(typeof data.match_after === "number" ? data.match_after : null);
           setJobTextForUi(sanitizeCvText(data.job_description || ""));
         } catch {
-          setStatus(t("results.sessionLoadFailed"));
+          // Fallback so demo never renders as blank if backend is down.
+          setOptimizedCv(DEMO_FALLBACK.optimizedCv);
+          setMissing(DEMO_FALLBACK.missing as unknown as string[]);
+          setAddedKeywords(DEMO_FALLBACK.addedKeywords as unknown as string[]);
+          setRecommendations(DEMO_FALLBACK.recommendations as unknown as string[]);
+          setMatchBefore(DEMO_FALLBACK.matchBefore);
+          setMatchAfter(DEMO_FALLBACK.matchAfter);
+          setJobTextForUi(sanitizeCvText(DEMO_FALLBACK.jobText));
         } finally {
           setIsLoadingDemo(false);
         }
