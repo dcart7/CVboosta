@@ -9,7 +9,7 @@ import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 import { trackEvent } from "../lib/analytics";
-import PaywallOverlay from "../components/PaywallOverlay";
+import PaywallModal from "../components/PaywallModal";
 import {
   fetchWorkspaceEmail,
   migrateLegacyGuestWorkspace,
@@ -1787,8 +1787,8 @@ function ResultsContent() {
             )}
 
             {showUnlockModal && (
-              <PaywallOverlay
-                isOpen={showUnlockModal}
+              <PaywallModal
+                open={showUnlockModal}
                 onClose={() => setShowUnlockModal(false)}
                 title={t("results.paywallHeadline")}
                 subtitle={`${t("results.paywallSubtext")}\n${t("results.paywallJobMatchedLine")}`}
@@ -1894,7 +1894,7 @@ function ResultsContent() {
                     <p style={{ margin: 0 }}>{t("results.jobDescriptionMissing")}</p>
                   </div>
                 )}
-              </PaywallOverlay>
+              </PaywallModal>
             )}
 
           <div className={`metrics-column ${activeTab === 'metrics' ? "" : "desktop-only"}`}>
