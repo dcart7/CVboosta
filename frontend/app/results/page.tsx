@@ -198,6 +198,36 @@ type PreviewBlock =
   | { type: "text"; text: string }
   | { type: "spacer" };
 
+const DEMO_RESULT = {
+  matchBefore: 46,
+  matchAfter: 88,
+  jobText:
+    "BI Engineer / Analytics Engineer\n\nResponsibilities:\n- Build data models and dashboards\n- Own KPI definitions and reporting\n- Optimize SQL + warehouse performance\n\nRequirements:\n- Python, SQL, dbt\n- Looker / Power BI\n- Stakeholder management",
+  optimizedCv:
+    [
+      "Alex Johnson",
+      "",
+      "SUMMARY",
+      "Analytics Engineer with 5+ years building reliable BI layers and decision-making dashboards. Owned KPI definitions, shipped dbt models, and improved data freshness across exec reporting.",
+      "",
+      "EXPERIENCE",
+      "Analytics Engineer — SaaS FinTech",
+      "• Built a dbt-driven metrics layer and standardized 25+ KPIs, reducing metric disputes and cutting time-to-answer from days to hours.",
+      "• Optimized warehouse queries (partitioning + indexing strategy) to reduce dashboard load time by 38% and improve peak-hour reliability.",
+      "• Partnered with Product and RevOps to define funnel instrumentation and launched 3 executive dashboards used weekly by leadership.",
+      "",
+      "SKILLS",
+      "Python · SQL · dbt · PostgreSQL · Looker · Power BI · Data modeling · KPI design · Stakeholder management",
+    ].join("\n"),
+  missing: ["dbt", "Looker", "Data modeling", "KPI design", "Warehouse optimization", "A/B testing", "Semantic layer"],
+  addedKeywords: ["dbt", "Looker", "KPI design", "Data modeling"],
+  recommendations: [
+    "Tighten bullet points to include metrics and scope.",
+    "Align the Summary with the top job requirements.",
+    "Ensure Skills section mirrors the most important keywords (truthfully).",
+  ],
+} as const;
+
 function sanitizeCvText(input: string): string {
   if (!input) return "";
   return (
@@ -408,6 +438,7 @@ function ResultsContent() {
   const [showUnlockModal, setShowUnlockModal] = useState(false);
 
   const sessionId = searchParams.get("id");
+  const isDemo = searchParams.get("demo") === "1";
   const shareBefore = typeof matchBefore === "number" ? Math.max(0, Math.min(100, Math.round(matchBefore))) : null;
   const shareAfter = typeof matchAfter === "number" ? Math.max(0, Math.min(100, Math.round(matchAfter))) : null;
   const shareUrl =
@@ -532,15 +563,42 @@ function ResultsContent() {
       const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
       const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
       setJobTextForUi(sanitizeCvText(jobText || ""));
-      if (!cvText || !jobText) {
-        setStatus(t("results.missingInputs"));
-        return;
+
+      if (isDemo) {
+        // Demo results should work without requiring user inputs in workspace storage.
+        if (!storedCv) {
+          setOptimizedCv(DEMO_RESULT.optimizedCv);
+          setMissing(DEMO_RESULT.missing as unknown as string[]);
+          setAddedKeywords(DEMO_RESULT.addedKeywords as unknown as string[]);
+          setRecommendations(DEMO_RESULT.recommendations as unknown as string[]);
+          setMatchBefore(DEMO_RESULT.matchBefore);
+          setMatchAfter(DEMO_RESULT.matchAfter);
+          setJobTextForUi(DEMO_RESULT.jobText);
+          try {
+            localStorage.setItem("optimized_cv", DEMO_RESULT.optimizedCv);
+            localStorage.setItem("missing_skills", JSON.stringify(DEMO_RESULT.missing));
+            localStorage.setItem("added_keywords", JSON.stringify(DEMO_RESULT.addedKeywords));
+            localStorage.setItem("recommendations", JSON.stringify(DEMO_RESULT.recommendations));
+            localStorage.setItem("match_before", String(DEMO_RESULT.matchBefore));
+            localStorage.setItem("match_after", String(DEMO_RESULT.matchAfter));
+          } catch {
+            // ignore
+          }
+        } else if (!jobTextForUi.trim()) {
+          setJobTextForUi(DEMO_RESULT.jobText);
+        }
+      } else {
+        if (!cvText || !jobText) {
+          setStatus(t("results.missingInputs"));
+          return;
+        }
       }
       if (storedBefore !== null && storedAfter !== null) {
         return;
       }
       const loadScores = async () => {
         try {
+          if (isDemo) return;
           const beforeRes = await fetch(`${apiBase}/analyze/match`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1738,7 +1796,7 @@ function ResultsContent() {
                     </button>
                     <Link
                       className="btn ghost"
-                      href="/cases?from=results_paywall"
+                      href="/results?demo=1"
                       onClick={() => {
                         trackEvent("cta_click", { cta_type: "view_demo_results", location: "results_paywall_modal" });
                         setShowUnlockModal(false);

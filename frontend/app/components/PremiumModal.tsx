@@ -65,7 +65,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
           <button className="btn secondary" type="button" onClick={onClose}>
             {t("results.paywallMaybeLater")}
           </button>
-          <Link className="btn ghost" href="/cases?from=paywall_modal" onClick={onClose}>
+          <Link className="btn ghost" href="/results?demo=1" onClick={onClose}>
             {t("results.viewDemoResults")}
           </Link>
         </div>
