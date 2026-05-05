@@ -515,9 +515,7 @@ export default function WorkspacePage() {
       }
     } catch (err) {
       console.error("Optimization error:", err);
-      setOptimizeStatus(
-        "Optimization failed. Check that backend is running and reachable.",
-      );
+      setOptimizeStatus(t("dashboard.optimizationFailedTryAgain"));
     } finally {
       setIsOptimizing(false);
     }

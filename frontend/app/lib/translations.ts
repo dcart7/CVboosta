@@ -249,6 +249,7 @@ export const translations = {
       needInputs: "Upload CV and job description first.",
       doneOpening: "Done. Opening results...",
       optimizationFailed: "Optimization failed.",
+      optimizationFailedTryAgain: "Optimization failed. Please try again.",
       backendUnavailable: "Cannot reach backend. Check that it is running.",
     },
     analyze: {
@@ -915,6 +916,7 @@ export const translations = {
       needInputs: "Спочатку завантажте резюме та опис вакансії.",
       doneOpening: "Готово. Відкриваємо результати...",
       optimizationFailed: "Оптимізація не вдалась.",
+      optimizationFailedTryAgain: "Оптимізація не вдалася. Спробуйте ще раз.",
       backendUnavailable: "Немає з'єднання з бекендом. Перевірте, що він запущений.",
     },
     analyze: {
@@ -1578,6 +1580,7 @@ export const translations = {
       needInputs: "Najpierw prześlij CV i opis stanowiska.",
       doneOpening: "Gotowe. Otwieramy wyniki...",
       optimizationFailed: "Optymalizacja nie powiodła się.",
+      optimizationFailedTryAgain: "Optymalizacja nie powiodła się. Spróbuj ponownie.",
       backendUnavailable: "Brak połączenia z backendem. Sprawdź, czy działa.",
     },
     analyze: {
@@ -2232,6 +2235,7 @@ export const translations = {
       needInputs: "Najprv nahrajte CV a popis práce.",
       doneOpening: "Hotovo. Otvárame výsledky...",
       optimizationFailed: "Optimalizácia zlyhala.",
+      optimizationFailedTryAgain: "Optimalizácia zlyhala. Skúste to znova.",
       backendUnavailable: "Nedá sa pripojiť k backendu. Skontrolujte, či beží.",
     },
     analyze: {
@@ -2890,6 +2894,7 @@ export const translations = {
       needInputs: "Nejprve nahrajte CV a popis pozice.",
       doneOpening: "Hotovo. Otevíráme výsledky...",
       optimizationFailed: "Optimalizace se nezdařila.",
+      optimizationFailedTryAgain: "Optimalizace se nezdařila. Zkuste to prosím znovu.",
       backendUnavailable: "Nelze se připojit k backendu. Zkontrolujte, že běží.",
     },
     analyze: {
@@ -3553,6 +3558,7 @@ export const translations = {
       needInputs: "Primero sube el CV y la descripción del puesto.",
       doneOpening: "Listo. Abriendo resultados...",
       optimizationFailed: "La optimización falló.",
+      optimizationFailedTryAgain: "La optimización falló. Inténtalo de nuevo.",
       backendUnavailable: "No se puede conectar con el backend. Verifica que esté activo.",
     },
     analyze: {
