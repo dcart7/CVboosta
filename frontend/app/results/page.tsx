@@ -740,6 +740,15 @@ function ResultsContent() {
     if (sessionLoadError) return;
     if (isDemo) return;
     try {
+      const skipOnce = localStorage.getItem("results_skip_paywall_once") === "1";
+      if (skipOnce) {
+        localStorage.removeItem("results_skip_paywall_once");
+        return;
+      }
+    } catch {
+      // ignore
+    }
+    try {
       const key = `results_paywall_seen:${sessionId || "latest"}`;
       if (localStorage.getItem(key)) return;
       localStorage.setItem(key, "1");
@@ -1406,6 +1415,48 @@ function ResultsContent() {
     downloadPdf();
   };
 
+  const openDemoResults = async () => {
+    setShowUnlockModal(false);
+    setIsLoadingDemo(true);
+    try {
+      const res = await fetchWithRetry(
+        `${apiBase}/demo/optimize`,
+        undefined,
+        { attempts: 3, baseDelayMs: 300, timeoutMs: 25_000 },
+      );
+      if (!res.ok) throw new Error("demo_failed");
+      const data = await res.json();
+      try {
+        localStorage.setItem("optimized_cv", data.optimized_cv || "");
+        localStorage.setItem("missing_skills", JSON.stringify(data.missing_skills || []));
+        localStorage.setItem("added_keywords", JSON.stringify(data.added_keywords || []));
+        localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
+        localStorage.setItem("match_before", String(data.match_before ?? ""));
+        localStorage.setItem("match_after", String(data.match_after ?? ""));
+        localStorage.setItem("results_skip_paywall_once", "1");
+      } catch {
+        // ignore
+      }
+      window.location.href = "/results";
+    } catch {
+      // If backend is down, still show something usable.
+      try {
+        localStorage.setItem("optimized_cv", DEMO_FALLBACK.optimizedCv);
+        localStorage.setItem("missing_skills", JSON.stringify(DEMO_FALLBACK.missing));
+        localStorage.setItem("added_keywords", JSON.stringify(DEMO_FALLBACK.addedKeywords));
+        localStorage.setItem("recommendations", JSON.stringify(DEMO_FALLBACK.recommendations));
+        localStorage.setItem("match_before", String(DEMO_FALLBACK.matchBefore));
+        localStorage.setItem("match_after", String(DEMO_FALLBACK.matchAfter));
+        localStorage.setItem("results_skip_paywall_once", "1");
+      } catch {
+        // ignore
+      }
+      window.location.href = "/results";
+    } finally {
+      setIsLoadingDemo(false);
+    }
+  };
+
   void activeTemplate;
 
   return (
@@ -1803,16 +1854,16 @@ function ResultsContent() {
                     >
                       {t("results.downloadPreviewPdf")}
                     </button>
-                    <Link
+                    <button
                       className="btn ghost"
-                      href="/results?demo=1"
+                      type="button"
                       onClick={() => {
                         trackEvent("cta_click", { cta_type: "view_demo_results", location: "results_paywall_modal" });
-                        setShowUnlockModal(false);
+                        void openDemoResults();
                       }}
                     >
                       {t("results.viewDemoResults")}
-                    </Link>
+                    </button>
                   </div>
 
                   {!jobTextForUi.trim() && (
