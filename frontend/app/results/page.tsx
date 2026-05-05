@@ -9,6 +9,7 @@ import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 import { trackEvent } from "../lib/analytics";
+import PaywallOverlay from "../components/PaywallOverlay";
 import {
   fetchWorkspaceEmail,
   migrateLegacyGuestWorkspace,
@@ -1776,54 +1777,13 @@ function ResultsContent() {
             )}
 
             {showUnlockModal && (
-              <div
-                className="modal-backdrop"
-                onClick={() => setShowUnlockModal(false)}
-              >
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="modal-card fade-up paywall-modal-card"
-                >
-                  <button
-                    className="paywall-modal-close"
-                    type="button"
-                    onClick={() => setShowUnlockModal(false)}
-                    aria-label={t("common.dismiss")}
-                  >
-                    ×
-                  </button>
-
-                  <div className="paywall-modal-hero">
-                    <div className="paywall-modal-icon" aria-hidden="true">✨</div>
-                    <h3 className="paywall-modal-title">{t("results.paywallHeadline")}</h3>
-                    <p className="paywall-modal-sub">{t("results.paywallSubtext")}</p>
-                    <p className="paywall-modal-sub">{t("results.paywallJobMatchedLine")}</p>
-                  </div>
-
-                  <div className="paywall-modal-tags">
-                    {extractedJobTitle && (
-                      <span className="tag">
-                        {t("results.optimizedFor").replace("{jobTitle}", extractedJobTitle)}
-                      </span>
-                    )}
-                    <span className="tag">
-                      {t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}
-                    </span>
-                    <span className="tag">
-                      {t("results.keywordMatchLine")
-                        .replace("{before}", matchBefore !== null ? `${matchBefore}%` : "—")
-                        .replace("{after}", t("results.lockedValue"))}
-                    </span>
-                  </div>
-
-                  <ul className="paywall-modal-list">
-                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature1")}</li>
-                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature2")}</li>
-                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature3")}</li>
-                    <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature4")}</li>
-                  </ul>
-
-                  <div className="paywall-modal-actions">
+              <PaywallOverlay
+                isOpen={showUnlockModal}
+                onClose={() => setShowUnlockModal(false)}
+                title={t("results.paywallHeadline")}
+                subtitle={`${t("results.paywallSubtext")}\n${t("results.paywallJobMatchedLine")}`}
+                actions={
+                  <>
                     <Link
                       className="btn primary"
                       href="/pricing?from=results&intent=unlock"
@@ -1834,16 +1794,9 @@ function ResultsContent() {
                     >
                       {t("results.paywallCta")}
                     </Link>
-                    <button
-                      className="btn secondary"
-                      type="button"
-                      onClick={() => setShowUnlockModal(false)}
-                    >
+                    <button className="btn secondary" type="button" onClick={() => setShowUnlockModal(false)}>
                       {t("results.paywallMaybeLater")}
                     </button>
-                  </div>
-
-                  <div className="paywall-modal-actions" style={{ marginTop: "10px" }}>
                     <button
                       className="btn ghost"
                       type="button"
@@ -1864,15 +1817,36 @@ function ResultsContent() {
                     >
                       {t("results.viewDemoResults")}
                     </button>
-                  </div>
-
-                  {!jobTextForUi.trim() && (
-                    <div className="paywall-note" style={{ marginTop: "14px" }}>
-                      <p style={{ margin: 0 }}>{t("results.jobDescriptionMissing")}</p>
-                    </div>
+                  </>
+                }
+              >
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center" }}>
+                  {extractedJobTitle && (
+                    <span className="tag">
+                      {t("results.optimizedFor").replace("{jobTitle}", extractedJobTitle)}
+                    </span>
                   )}
+                  <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
+                  <span className="tag">
+                    {t("results.keywordMatchLine")
+                      .replace("{before}", matchBefore !== null ? `${matchBefore}%` : "—")
+                      .replace("{after}", t("results.lockedValue"))}
+                  </span>
                 </div>
-              </div>
+
+                <ul className="paywall-modal-list" style={{ marginTop: "16px" }}>
+                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature1")}</li>
+                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature2")}</li>
+                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature3")}</li>
+                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature4")}</li>
+                </ul>
+
+                {!jobTextForUi.trim() && (
+                  <div className="paywall-note" style={{ marginTop: "14px" }}>
+                    <p style={{ margin: 0 }}>{t("results.jobDescriptionMissing")}</p>
+                  </div>
+                )}
+              </PaywallOverlay>
             )}
 
           <div className={`metrics-column ${activeTab === 'metrics' ? "" : "desktop-only"}`}>
