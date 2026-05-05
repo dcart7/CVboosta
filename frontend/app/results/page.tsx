@@ -1804,6 +1804,7 @@ function ResultsContent() {
                     >
                       {t("results.paywallCta")}
                     </Link>
+                    <p className="paywall-microcopy">{t("results.paywallMicrocopy")}</p>
                     <button className="btn secondary" type="button" onClick={() => setShowUnlockModal(false)}>
                       {t("results.paywallMaybeLater")}
                     </button>
@@ -1830,26 +1831,63 @@ function ResultsContent() {
                   </>
                 }
               >
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center" }}>
+                <div className="paywall-section" style={{ textAlign: "center" }}>
                   {extractedJobTitle && (
                     <span className="tag">
                       {t("results.optimizedFor").replace("{jobTitle}", extractedJobTitle)}
                     </span>
                   )}
-                  <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
-                  <span className="tag">
-                    {t("results.keywordMatchLine")
-                      .replace("{before}", matchBefore !== null ? `${matchBefore}%` : "—")
-                      .replace("{after}", t("results.lockedValue"))}
-                  </span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginTop: extractedJobTitle ? "10px" : 0 }}>
+                    <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
+                    <span className="tag">
+                      {t("results.keywordMatchLine")
+                        .replace("{before}", matchBefore !== null ? `${matchBefore}%` : "—")
+                        .replace("{after}", t("results.lockedValue"))}
+                    </span>
+                  </div>
                 </div>
 
-                <ul className="paywall-modal-list" style={{ marginTop: "16px" }}>
-                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature1")}</li>
-                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature2")}</li>
-                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature3")}</li>
-                  <li><span className="paywall-modal-check">✓</span>{t("results.paywallFeature4")}</li>
-                </ul>
+                <div className="paywall-benefits" aria-label="Paywall benefits">
+                  <div className="paywall-benefit-card">
+                    <div className="paywall-benefit-top">
+                      <div className="paywall-benefit-icon" aria-hidden="true">✍️</div>
+                      <p className="paywall-benefit-title">{t("results.paywallCard1Title")}</p>
+                    </div>
+                    <p className="paywall-benefit-desc">{t("results.paywallCard1Desc")}</p>
+                  </div>
+                  <div className="paywall-benefit-card">
+                    <div className="paywall-benefit-top">
+                      <div className="paywall-benefit-icon" aria-hidden="true">🎯</div>
+                      <p className="paywall-benefit-title">{t("results.paywallCard2Title")}</p>
+                    </div>
+                    <p className="paywall-benefit-desc">{t("results.paywallCard2Desc")}</p>
+                  </div>
+                  <div className="paywall-benefit-card">
+                    <div className="paywall-benefit-top">
+                      <div className="paywall-benefit-icon" aria-hidden="true">🧱</div>
+                      <p className="paywall-benefit-title">{t("results.paywallCard3Title")}</p>
+                    </div>
+                    <p className="paywall-benefit-desc">{t("results.paywallCard3Desc")}</p>
+                  </div>
+                  <div className="paywall-benefit-card">
+                    <div className="paywall-benefit-top">
+                      <div className="paywall-benefit-icon" aria-hidden="true">⬇️</div>
+                      <p className="paywall-benefit-title">{t("results.paywallCard4Title")}</p>
+                    </div>
+                    <p className="paywall-benefit-desc">{t("results.paywallCard4Desc")}</p>
+                  </div>
+                </div>
+
+                <div className="paywall-locked" aria-label="Locked content preview">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                    <p style={{ margin: 0, fontWeight: 900 }}>{t("results.lockedPreviewTitle")}</p>
+                    <span className="tag">{t("results.lockedLabel")}</span>
+                  </div>
+                  <div className="paywall-locked-row is-long" />
+                  <div className="paywall-locked-row is-mid" />
+                  <div className="paywall-locked-row is-long" />
+                  <div className="paywall-locked-row is-short" />
+                </div>
 
                 {!jobTextForUi.trim() && (
                   <div className="paywall-note" style={{ marginTop: "14px" }}>

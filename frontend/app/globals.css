@@ -2107,6 +2107,7 @@ a {
   justify-content: center;
   padding: 24px;
   background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px) saturate(140%);
 }
 
 .paywall-box {
@@ -2116,10 +2117,14 @@ a {
   overflow-y: auto;
   border-radius: 20px;
   padding: 24px;
-  background: #fff;
-  color: #0f172a;
-  border: 1px solid rgba(15, 23, 42, 0.10);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-soft) 36%, var(--paper)),
+    var(--paper)
+  );
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--glass-border));
+  box-shadow: var(--shadow);
   animation: paywallIn 180ms ease-out both;
 }
 
@@ -2138,9 +2143,9 @@ a {
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.14);
-  background: rgba(15, 23, 42, 0.04);
-  color: #0f172a;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
   font-size: 22px;
   line-height: 1;
   cursor: pointer;
@@ -2156,7 +2161,7 @@ a {
 
 .paywall-subtitle {
   margin: 10px 0 0;
-  color: rgba(15, 23, 42, 0.72);
+  color: var(--muted);
   font-size: 15px;
   line-height: 1.45;
   text-align: center;
@@ -2170,12 +2175,156 @@ a {
   margin-top: 18px;
   display: grid;
   gap: 10px;
+  position: sticky;
+  bottom: -1px;
+  padding-top: 14px;
+  background: linear-gradient(180deg, transparent, var(--paper) 38%);
 }
 
 .paywall-actions .btn.primary,
 .paywall-actions .btn.secondary,
 .paywall-actions .btn.ghost {
   width: 100%;
+}
+
+/* Paywall blocks (matches app cards) */
+.paywall-section {
+  border: 1px solid var(--glass-border);
+  background: var(--surface-2);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.paywall-benefits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+@media (max-width: 520px) {
+  .paywall-benefits {
+    grid-template-columns: 1fr;
+  }
+}
+
+.paywall-benefit-card {
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--paper) 40%, var(--surface-2));
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.paywall-benefit-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--glass-border));
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .paywall-benefit-card:hover {
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
+}
+
+.paywall-benefit-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.paywall-benefit-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+  flex: 0 0 auto;
+}
+
+.paywall-benefit-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.paywall-benefit-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.paywall-locked {
+  margin-top: 12px;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  background: var(--surface-2);
+  padding: 14px;
+  overflow: hidden;
+  position: relative;
+}
+
+.paywall-locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: translateX(-60%);
+  animation: paywallShimmer 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .paywall-locked::after {
+  background: linear-gradient(90deg, transparent, rgba(99, 166, 255, 0.10), transparent);
+}
+
+.paywall-locked-row {
+  height: 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
+  filter: blur(0.2px);
+  margin-top: 10px;
+}
+
+.paywall-locked-row.is-short {
+  width: 72%;
+}
+
+.paywall-locked-row.is-mid {
+  width: 86%;
+}
+
+.paywall-locked-row.is-long {
+  width: 100%;
+}
+
+@keyframes paywallShimmer {
+  0% { transform: translateX(-60%); opacity: 0; }
+  30% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { transform: translateX(60%); opacity: 0; }
+}
+
+.paywall-microcopy {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.paywall-actions .btn.primary {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.paywall-actions .btn.primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 @keyframes paywallIn {
