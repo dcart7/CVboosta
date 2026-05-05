@@ -1804,7 +1804,6 @@ function ResultsContent() {
                     >
                       {t("results.paywallCta")}
                     </Link>
-                    <p className="paywall-microcopy">{t("results.paywallMicrocopy")}</p>
                     <button className="btn secondary" type="button" onClick={() => setShowUnlockModal(false)}>
                       {t("results.paywallMaybeLater")}
                     </button>
@@ -1828,6 +1827,7 @@ function ResultsContent() {
                     >
                       {t("results.viewDemoResults")}
                     </button>
+                    <p className="paywall-microcopy">{t("results.paywallMicrocopy")}</p>
                   </>
                 }
               >

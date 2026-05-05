@@ -2179,6 +2179,14 @@ a {
   bottom: -1px;
   padding-top: 14px;
   background: linear-gradient(180deg, transparent, var(--paper) 38%);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 520px) {
+  .paywall-actions {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
 }
 
 .paywall-actions .btn.primary,
@@ -2316,6 +2324,8 @@ a {
   color: var(--muted);
   font-size: 12px;
   text-align: center;
+  grid-column: 1 / -1;
+  order: 99;
 }
 
 .paywall-actions .btn.primary {
