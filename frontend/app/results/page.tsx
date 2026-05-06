@@ -437,7 +437,7 @@ function ResultsContent() {
   const [clError, setClError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"document" | "metrics">("document");
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
-  const [subscriptionTier, setSubscriptionTier] = useState<string>("free");
+  const [subscriptionTier, setSubscriptionTier] = useState<string>("unknown");
   const [showUnlockModal, setShowUnlockModal] = useState(false);
 
   const sessionId = searchParams.get("id");
@@ -659,15 +659,15 @@ function ResultsContent() {
           { attempts: 3, baseDelayMs: 250, timeoutMs: 12_000 },
         );
         if (!res.ok) {
-          if (!cancelled) setSubscriptionTier("free");
+          if (!cancelled) setSubscriptionTier("unknown");
           return;
         }
         const data = await res.json();
         if (!cancelled) {
-          setSubscriptionTier(typeof data?.tier === "string" ? data.tier : "free");
+          setSubscriptionTier(typeof data?.tier === "string" ? data.tier : "unknown");
         }
       } catch {
-        if (!cancelled) setSubscriptionTier("free");
+        if (!cancelled) setSubscriptionTier("unknown");
       }
     })();
 
