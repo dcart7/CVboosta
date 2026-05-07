@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { jsPDF } from "jspdf";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
@@ -48,6 +47,12 @@ type InterviewQuestion = {
   question: string;
   why: string;
   tips: string;
+};
+
+let jsPdfImportPromise: Promise<typeof import("jspdf")> | null = null;
+const loadJsPdf = async () => {
+  if (!jsPdfImportPromise) jsPdfImportPromise = import("jspdf");
+  return jsPdfImportPromise;
 };
 
 const PDF_TEMPLATES: PdfTemplate[] = [
@@ -1035,10 +1040,11 @@ function ResultsContent() {
     }
   };
 
-  const downloadCoverLetterPdf = () => {
+  const downloadCoverLetterPdf = async () => {
     if (!coverLetter) return;
     try {
       trackEvent("optimization_download", { asset_type: "cover_letter_pdf" });
+      const { jsPDF } = await loadJsPdf();
       const doc = new jsPDF({
         orientation: "portrait",
         unit: "pt",
@@ -1092,7 +1098,7 @@ function ResultsContent() {
     }
   };
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     if (!cleanedCv) {
       setStatus(t("results.noOptimizedCv"));
       return;
@@ -1101,6 +1107,7 @@ function ResultsContent() {
       trackEvent("optimization_download", { asset_type: "resume_pdf" });
       const template = activeTemplate;
       const accent = template.accent;
+      const { jsPDF } = await loadJsPdf();
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
@@ -1349,13 +1356,14 @@ function ResultsContent() {
     }
   };
 
-  const downloadPreviewPdf = () => {
+  const downloadPreviewPdf = async () => {
     if (!optimizedCv) {
       setStatus(t("results.noOptimizedCv"));
       return;
     }
     try {
       trackEvent("optimization_download", { asset_type: "resume_pdf_preview" });
+      const { jsPDF } = await loadJsPdf();
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const margin = 50;
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -1423,7 +1431,7 @@ function ResultsContent() {
       setShowUnlockModal(true);
       return;
     }
-    downloadPdf();
+    void downloadPdf();
   };
 
   const downloadDocx = async () => {
@@ -1895,7 +1903,7 @@ function ResultsContent() {
                       className="btn ghost desktop-only"
                       type="button"
                       onClick={() => {
-                        downloadPreviewPdf();
+                        void downloadPreviewPdf();
                         setShowUnlockModal(false);
                       }}
                     >
@@ -2047,7 +2055,7 @@ function ResultsContent() {
                     }}>
                       {t("results.copyCoverLetter")}
                     </button>
-                    <button className="btn ghost" onClick={downloadCoverLetterPdf}>
+                    <button className="btn ghost" onClick={() => void downloadCoverLetterPdf()}>
                       {t("results.downloadCoverLetterPdf")}
                     </button>
                   </div>
