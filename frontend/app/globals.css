@@ -2981,13 +2981,21 @@ a {
   border-radius: 999px;
   border: 1px solid var(--glass-border);
   background: color-mix(in srgb, var(--surface-2) 86%, transparent);
-  color: color-mix(in srgb, var(--ink) 78%, var(--muted));
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: none;
+  color: color-mix(in srgb, var(--ink) 64%, var(--muted));
   user-select: none;
   -webkit-user-select: none;
   white-space: nowrap;
+}
+
+.logo-chip svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: currentColor;
+}
+
+.logo-chip:hover {
+  color: color-mix(in srgb, var(--ink) 88%, var(--muted));
 }
 
 .testi-card {

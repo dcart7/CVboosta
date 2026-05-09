@@ -2,26 +2,27 @@
 
 import TopNav from "./components/TopNav";
 import HeroActions from "./components/HeroActions";
+import BrandMarquee from "./components/BrandMarquee";
 import { useTranslation } from "./lib/LanguageContext";
 
 export default function HomePage() {
   const { t, language } = useTranslation();
 
   const optimizedForCompanies = [
-    "Apple",
-    "Google",
-    "Amazon",
-    "Meta",
-    "Spotify",
-    "IBM",
-    "OpenAI",
-    "Microsoft",
-    "Netflix",
-    "Nvidia",
-    "Salesforce",
-    "Uber",
-    "Virel Solutions",
-  ];
+    "apple",
+    "google",
+    "amazon",
+    "meta",
+    "spotify",
+    "ibm",
+    "openai",
+    "microsoft",
+    "netflix",
+    "nvidia",
+    "salesforce",
+    "uber",
+    "virel",
+  ] as const;
 
   const localizedProjectInfo = {
     en: {
@@ -632,23 +633,6 @@ export default function HomePage() {
             <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
               {localizedFreeCheckerLine}
             </p>
-            <div className="optimized-for-block" aria-label={t("home.optimizedForLine")}>
-              <p className="optimized-for-line">{t("home.optimizedForLine")}</p>
-              <div className="marquee-wrapper logo-marquee">
-                <div className="marquee-track">
-                  {[...optimizedForCompanies, ...optimizedForCompanies].map(
-                    (name, index) => (
-                      <span key={`${name}-${index}`} className="logo-chip">
-                        {name}
-                      </span>
-                    ),
-                  )}
-                </div>
-              </div>
-              <p className="optimized-for-disclaimer">
-                {t("home.optimizedForDisclaimer")}
-              </p>
-            </div>
             <HeroActions />
             <div className="hero-mini-block">
               <p className="hero-mini-title">{conversionUi.ctaAction}</p>
@@ -710,6 +694,12 @@ export default function HomePage() {
               <li>{conversionContent.demoImpact3}</li>
             </ul>
           </div>
+        </section>
+
+        <section className="section fade-up optimized-for-section" aria-label={t("home.optimizedForLine")}>
+          <p className="optimized-for-line">{t("home.optimizedForLine")}</p>
+          <BrandMarquee brands={[...optimizedForCompanies]} />
+          <p className="optimized-for-disclaimer">{t("home.optimizedForDisclaimer")}</p>
         </section>
 
         <section className="section fade-up" style={{ marginBottom: "6rem" }}>
