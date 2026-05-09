@@ -1440,7 +1440,7 @@ export const translations = {
       },
       caseStudies: {
         backend: {
-          role: "Junior Backend Developer",
+          role: "Młodszy programista backend",
           beforeOutcome: "30+ aplikacji → 0 odpowiedzi",
           afterOutcome: "3 rozmowy w 7 dni",
           change1: "Doświadczenie przepisane na mierzalny wpływ",
@@ -1449,7 +1449,7 @@ export const translations = {
           insight: "Kandydat nie miał braków w umiejętnościach. CV nie umiało ich zakomunikować.",
         },
         analyst: {
-          role: "Data Analyst",
+          role: "Analityk danych",
           beforeOutcome: "Niski poziom odpowiedzi",
           afterOutcome: "2 rozmowy w 5 dni",
           change1: "Słowa kluczowe dopasowane do realnych opisów ofert",
@@ -1458,7 +1458,7 @@ export const translations = {
           insight: "Widoczność w ATS bezpośrednio wpływa na liczbę zaproszeń na rozmowy.",
         },
         marketing: {
-          role: "Marketing Specialist",
+          role: "Specjalista ds. marketingu",
           beforeOutcome: "Brak telefonów zwrotnych",
           afterOutcome: "4 rozmowy w 10 dni",
           change1: "Dodane metryki wyników",
@@ -2118,7 +2118,7 @@ export const translations = {
       },
       caseStudies: {
         backend: {
-          role: "Junior Backend Developer",
+          role: "Junior backend vývojár",
           beforeOutcome: "30+ prihlášok → 0 odpovedí",
           afterOutcome: "3 pohovory za 7 dní",
           change1: "Skúsenosti prepísané na merateľný dopad",
@@ -2127,7 +2127,7 @@ export const translations = {
           insight: "Kandidátovi nechýbali zručnosti. CV ich nevedelo komunikovať.",
         },
         analyst: {
-          role: "Data Analyst",
+          role: "Dátový analytik",
           beforeOutcome: "Nízka miera odpovedí",
           afterOutcome: "2 pohovory za 5 dní",
           change1: "Kľúčové slová zladené s reálnymi popismi pozícií",
@@ -2136,7 +2136,7 @@ export const translations = {
           insight: "Viditeľnosť v ATS priamo ovplyvňuje šance na pohovor.",
         },
         marketing: {
-          role: "Marketing Specialist",
+          role: "Marketingový špecialista",
           beforeOutcome: "Žiadne spätné volania",
           afterOutcome: "4 pohovory za 10 dní",
           change1: "Pridané výkonnostné metriky",
@@ -2794,7 +2794,7 @@ export const translations = {
       },
       caseStudies: {
         backend: {
-          role: "Junior Backend Developer",
+          role: "Junior backend vývojář",
           beforeOutcome: "30+ žádostí → 0 odpovědí",
           afterOutcome: "3 pohovory za 7 dní",
           change1: "Zkušenosti přepsané do měřitelného dopadu",
@@ -2803,7 +2803,7 @@ export const translations = {
           insight: "Kandidátovi nechyběly dovednosti. Životopis je neuměl komunikovat.",
         },
         analyst: {
-          role: "Data Analyst",
+          role: "Datový analytik",
           beforeOutcome: "Nízká míra odpovědí",
           afterOutcome: "2 pohovory za 5 dní",
           change1: "Klíčová slova sladěná s reálnými popisy pozic",
@@ -2812,7 +2812,7 @@ export const translations = {
           insight: "Viditelnost v ATS přímo ovlivňuje šanci na pohovor.",
         },
         marketing: {
-          role: "Marketing Specialist",
+          role: "Marketingový specialista",
           beforeOutcome: "Žádná zpětná volání",
           afterOutcome: "4 pohovory za 10 dní",
           change1: "Doplněné výkonnostní metriky",
@@ -3478,7 +3478,7 @@ export const translations = {
       },
       caseStudies: {
         backend: {
-          role: "Junior Backend Developer",
+          role: "Desarrollador backend junior",
           beforeOutcome: "30+ solicitudes → 0 respuestas",
           afterOutcome: "3 entrevistas en 7 días",
           change1: "Experiencia reescrita en impacto medible",
@@ -3487,7 +3487,7 @@ export const translations = {
           insight: "Al candidato no le faltaban habilidades. El CV no sabía comunicarlas.",
         },
         analyst: {
-          role: "Data Analyst",
+          role: "Analista de datos",
           beforeOutcome: "Baja tasa de respuesta",
           afterOutcome: "2 entrevistas en 5 días",
           change1: "Keywords alineadas con descripciones reales de empleo",
@@ -3496,7 +3496,7 @@ export const translations = {
           insight: "La visibilidad en ATS impacta directamente tus oportunidades de entrevista.",
         },
         marketing: {
-          role: "Marketing Specialist",
+          role: "Especialista en marketing",
           beforeOutcome: "Sin devoluciones de llamada",
           afterOutcome: "4 entrevistas en 10 días",
           change1: "Métricas de rendimiento añadidas",
