@@ -672,11 +672,6 @@ export default function HomePage() {
           <p className="optimized-for-disclaimer">
             {t("home.optimizedForDisclaimer")}
           </p>
-          <div className="optimized-for-cta">
-            <Link className="btn primary" href="/app">
-              {t("home.optimizeCta")}
-            </Link>
-          </div>
         </section>
 
         <section className="section fade-up">
@@ -712,6 +707,11 @@ export default function HomePage() {
               <li>{conversionContent.demoImpact2}</li>
               <li>{conversionContent.demoImpact3}</li>
             </ul>
+          </div>
+          <div className="optimized-for-cta">
+            <Link className="btn primary" href="/app">
+              {t("home.optimizeCta")}
+            </Link>
           </div>
         </section>
 
