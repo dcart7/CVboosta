@@ -7,6 +7,22 @@ import { useTranslation } from "./lib/LanguageContext";
 export default function HomePage() {
   const { t, language } = useTranslation();
 
+  const optimizedForCompanies = [
+    "Apple",
+    "Google",
+    "Amazon",
+    "Meta",
+    "Spotify",
+    "IBM",
+    "OpenAI",
+    "Microsoft",
+    "Netflix",
+    "Nvidia",
+    "Salesforce",
+    "Uber",
+    "Virel Solutions",
+  ];
+
   const localizedProjectInfo = {
     en: {
       behindTitle: "What CVboosta does behind the scenes",
@@ -616,6 +632,23 @@ export default function HomePage() {
             <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
               {localizedFreeCheckerLine}
             </p>
+            <div className="optimized-for-block" aria-label={t("home.optimizedForLine")}>
+              <p className="optimized-for-line">{t("home.optimizedForLine")}</p>
+              <div className="marquee-wrapper logo-marquee">
+                <div className="marquee-track">
+                  {[...optimizedForCompanies, ...optimizedForCompanies].map(
+                    (name, index) => (
+                      <span key={`${name}-${index}`} className="logo-chip">
+                        {name}
+                      </span>
+                    ),
+                  )}
+                </div>
+              </div>
+              <p className="optimized-for-disclaimer">
+                {t("home.optimizedForDisclaimer")}
+              </p>
+            </div>
             <HeroActions />
             <div className="hero-mini-block">
               <p className="hero-mini-title">{conversionUi.ctaAction}</p>

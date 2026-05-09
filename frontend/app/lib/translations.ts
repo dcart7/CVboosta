@@ -96,6 +96,9 @@ export const translations = {
       heroTitle: "Your CV, tuned for real hiring teams.",
       heroSubtitle:
         "Upload a CV, paste a vacancy, and get an ATS-friendly rewrite with honest feedback.",
+      optimizedForLine: "Resumes optimized for applications to…",
+      optimizedForDisclaimer:
+        "Examples shown for familiarity; no affiliation or endorsement implied.",
       stats: {
         ats: "average ATS score lift",
         time: "from upload to ready draft",
@@ -783,6 +786,9 @@ export const translations = {
       heroTitle: "Ваше резюме, налаштоване для реальних команд.",
       heroSubtitle:
         "Завантажте резюме, додайте опис вакансії та отримайте ATS-оптимізований текст із чесним зворотним зв'язком.",
+      optimizedForLine: "Резюме оптимізовані для подачі в…",
+      optimizedForDisclaimer:
+        "Назви наведені для впізнаваності; без афіляції чи схвалення.",
       stats: {
         ats: "середнє зростання ATS-бала",
         time: "від завантаження до готової чернетки",
@@ -1461,6 +1467,9 @@ export const translations = {
       heroTitle: "Twoje CV, dopasowane do realnych zespołów.",
       heroSubtitle:
         "Prześlij CV, dodaj opis stanowiska i otrzymaj tekst zoptymalizowany pod ATS z rzetelną opinią.",
+      optimizedForLine: "CV zoptymalizowane pod aplikacje do…",
+      optimizedForDisclaimer:
+        "Nazwy podane dla rozpoznawalności; brak afiliacji ani poparcia.",
       stats: {
         ats: "średni wzrost wyniku ATS",
         time: "od przesłania do gotowego szkicu",
@@ -2133,6 +2142,9 @@ export const translations = {
       heroTitle: "Vaše CV, vyladené pre skutočné tímy.",
       heroSubtitle:
         "Nahrajte CV, pridajte popis práce a získajte text optimalizovaný pre ATS s úprimnou spätnou väzbou.",
+      optimizedForLine: "CV optimalizované pre prihlášky do…",
+      optimizedForDisclaimer:
+        "Názvy sú uvedené pre rozpoznateľnosť; bez afiliácie alebo schválenia.",
       stats: {
         ats: "priemerný nárast skóre ATS",
         time: "od nahratia po hotový návrh",
@@ -2803,6 +2815,9 @@ export const translations = {
       heroTitle: "Vaše CV, vyladěné pro skutečné týmy.",
       heroSubtitle:
         "Nahrajte CV, vložte pozici a získejte text optimalizovaný pro ATS s upřímnou zpětnou vazbou.",
+      optimizedForLine: "CV optimalizovaná pro přihlášky do…",
+      optimizedForDisclaimer:
+        "Názvy jsou uvedené pro rozpoznatelnost; bez afiliace nebo podpory.",
       stats: {
         ats: "průměrné zvýšení ATS skóre",
         time: "od nahrání po hotový návrh",
@@ -3481,6 +3496,9 @@ export const translations = {
       heroTitle: "Tu CV, ajustado para equipos de contratación reales.",
       heroSubtitle:
         "Sube un CV, añade la descripción del puesto y obtén una reescritura optimizada para ATS con comentarios honestos.",
+      optimizedForLine: "CV optimizados para aplicar a…",
+      optimizedForDisclaimer:
+        "Nombres mostrados por familiaridad; sin afiliación ni respaldo.",
       stats: {
         ats: "aumento medio de la puntuación ATS",
         time: "desde la carga hasta el borrador listo",

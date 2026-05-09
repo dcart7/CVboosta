@@ -2939,6 +2939,10 @@ a {
   -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
 
+.logo-marquee {
+  padding: 10px 0;
+}
+
 .marquee-track {
   display: flex;
   gap: 20px;
@@ -2948,6 +2952,42 @@ a {
 
 .marquee-track:hover {
   animation-play-state: paused;
+}
+
+.optimized-for-block {
+  margin-top: 14px;
+}
+
+.optimized-for-line {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.optimized-for-disclaimer {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.logo-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--surface-2) 86%, transparent);
+  color: color-mix(in srgb, var(--ink) 78%, var(--muted));
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
 }
 
 .testi-card {
