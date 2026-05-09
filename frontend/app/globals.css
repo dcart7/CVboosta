@@ -4798,7 +4798,8 @@ body {
 }
 
 .case-pane-before {
-  opacity: 0.86;
+  opacity: 0.8;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
 }
 
 .case-pane-after {
@@ -4917,6 +4918,28 @@ body {
   word-break: break-word;
 }
 
+.case-mini {
+  margin-top: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.case-mini-changes .case-list {
+  padding-left: 18px;
+}
+
+.case-mini-result,
+.case-mini-insight {
+  padding-top: 2px;
+}
+
+.case-result-text {
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 92%, var(--muted));
+  font-size: 13px;
+  line-height: 1.65;
+}
+
 .case-divider {
   height: 1px;
   background: var(--line);
@@ -4938,7 +4961,7 @@ body {
   font-size: 13px;
   line-height: 1.65;
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 .cases-list-compact {
@@ -4956,12 +4979,31 @@ body {
   margin-top: 28px;
   padding: 28px 26px;
   border-radius: 26px;
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(
       135deg,
       color-mix(in srgb, var(--accent-soft) 52%, transparent),
       color-mix(in srgb, var(--surface) 86%, transparent)
     );
   border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--glass-border));
+}
+
+.cases-cta-card::after {
+  content: "";
+  position: absolute;
+  inset: -30% -20% -30% 55%;
+  background: radial-gradient(
+    circle at 30% 45%,
+    rgba(10, 132, 255, 0.18),
+    rgba(10, 132, 255, 0) 62%
+  );
+  pointer-events: none;
+}
+
+.cases-cta-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .cases-cta-title {

@@ -148,10 +148,6 @@ export default function CasesPage() {
                       from={cs.before.ats}
                       to={cs.after.ats}
                     />
-                    <div className="cases-statline">
-                      <span className="cases-statlabel">{t("cases.labels.outcome")}</span>
-                      <span className="cases-outcome">{cs.before.outcome}</span>
-                    </div>
                   </div>
 
                   <div className="case-pane case-pane-after">
@@ -162,25 +158,26 @@ export default function CasesPage() {
                         <span className="cases-num cases-num-up">{cs.after.ats}</span>
                       </span>
                     </div>
-                    <div className="cases-statline">
-                      <span className="cases-statlabel">{t("cases.labels.outcome")}</span>
-                      <span className="cases-outcome">{cs.after.outcome}</span>
-                    </div>
                   </div>
                 </div>
 
-                <div className="case-changes">
-                  <div className="case-subhead">{t("cases.labels.whatChanged")}</div>
-                  <ul className="case-list">
-                    {cs.changes.map((x) => (
-                      <li key={x}>{x}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="case-insight">
-                  <div className="case-subhead">{t("cases.labels.insight")}</div>
-                  <p className="case-insight-text">{cs.insight}</p>
+                <div className="case-mini">
+                  <div className="case-mini-changes">
+                    <div className="case-subhead">{t("cases.labels.whatChanged")}</div>
+                    <ul className="case-list">
+                      {cs.changes.slice(0, 2).map((x) => (
+                        <li key={x}>{x}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="case-mini-result">
+                    <div className="case-subhead">{t("cases.labels.result")}</div>
+                    <p className="case-result-text">{cs.after.outcome}</p>
+                  </div>
+                  <div className="case-mini-insight">
+                    <div className="case-subhead">{t("cases.labels.insight")}</div>
+                    <p className="case-insight-text">{cs.insight}</p>
+                  </div>
                 </div>
               </article>
             ))}
