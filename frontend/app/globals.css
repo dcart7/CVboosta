@@ -2941,6 +2941,11 @@ a {
 
 .logo-marquee {
   padding: 10px 0;
+  /* Avoid edge-mask clipping on logo chips */
+  mask-image: none;
+  -webkit-mask-image: none;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .marquee-track {
@@ -3000,6 +3005,16 @@ a {
   width: auto;
   display: block;
   opacity: 0.82;
+}
+
+.logo-chip img {
+  /* Default (light theme): slightly increase contrast on light surfaces */
+  filter: saturate(1) contrast(1.05);
+}
+
+[data-theme="dark"] .logo-chip img {
+  /* Dark theme: lift brightness so dark wordmarks stay readable */
+  filter: saturate(1) brightness(1.08) contrast(1.05);
 }
 
 .logo-label {
