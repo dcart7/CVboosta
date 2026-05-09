@@ -666,22 +666,25 @@ export default function HomePage() {
         <section className="section fade-up">
           <h2 className="section-title">{conversionContent.demoTitle}</h2>
           <div className="score-proof">
-            <div className="score-proof-card">
+            <div className="score-proof-card before">
               <span className="score-proof-label">ATS</span>
               <strong>43</strong>
             </div>
             <span className="score-proof-arrow">→</span>
-            <div className="score-proof-card score-proof-card-up">
+            <div className="score-proof-card score-proof-card-up after">
               <span className="score-proof-label">ATS</span>
               <strong>93</strong>
+              <span className="score-proof-microcopy">
+                {t("home.atsMicrocopy")}
+              </span>
             </div>
           </div>
           <div className="before-after-grid">
-            <article className="card before-after-card">
+            <article className="card before-after-card before-card">
               <h3>{conversionContent.demoLeftTitle}</h3>
               <p>{conversionContent.beforeText}</p>
             </article>
-            <article className="card before-after-card">
+            <article className="card before-after-card after-card">
               <h3>{conversionContent.demoRightTitle}</h3>
               <p>{conversionContent.afterText}</p>
             </article>
