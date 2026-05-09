@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import TopNav from "./components/TopNav";
 import HeroActions from "./components/HeroActions";
 import BrandMarquee from "./components/BrandMarquee";
@@ -21,7 +22,6 @@ export default function HomePage() {
     "nvidia",
     "salesforce",
     "uber",
-    "virel",
   ] as const;
 
   const localizedProjectInfo = {
@@ -663,6 +663,22 @@ export default function HomePage() {
           <p className="kpi-proof-note">{conversionContent.kpiNote}</p>
         </section>
 
+        <section
+          className="section fade-up optimized-for-section"
+          aria-label={t("home.optimizedForLine")}
+        >
+          <p className="optimized-for-line">{t("home.optimizedForLine")}</p>
+          <BrandMarquee brands={[...optimizedForCompanies]} />
+          <p className="optimized-for-disclaimer">
+            {t("home.optimizedForDisclaimer")}
+          </p>
+          <div className="optimized-for-cta">
+            <Link className="btn primary" href="/app">
+              {t("home.optimizeCta")}
+            </Link>
+          </div>
+        </section>
+
         <section className="section fade-up">
           <h2 className="section-title">{conversionContent.demoTitle}</h2>
           <div className="score-proof">
@@ -697,12 +713,6 @@ export default function HomePage() {
               <li>{conversionContent.demoImpact3}</li>
             </ul>
           </div>
-        </section>
-
-        <section className="section fade-up optimized-for-section" aria-label={t("home.optimizedForLine")}>
-          <p className="optimized-for-line">{t("home.optimizedForLine")}</p>
-          <BrandMarquee brands={[...optimizedForCompanies]} />
-          <p className="optimized-for-disclaimer">{t("home.optimizedForDisclaimer")}</p>
         </section>
 
         <section className="section fade-up" style={{ marginBottom: "6rem" }}>

@@ -3031,6 +3031,12 @@ a {
   line-height: 1.4;
 }
 
+.optimized-for-cta {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
 .optimized-for-disclaimer {
   margin: 6px 0 0;
   color: var(--muted);

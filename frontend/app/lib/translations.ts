@@ -101,6 +101,7 @@ export const translations = {
       optimizedForDisclaimer:
         "Examples shown for familiarity; no affiliation or endorsement implied.",
       atsMicrocopy: "More likely to pass ATS screening",
+      optimizeCta: "Optimize My Resume",
       stats: {
         ats: "average ATS score lift",
         time: "from upload to ready draft",
@@ -793,6 +794,7 @@ export const translations = {
       optimizedForDisclaimer:
         "Назви наведені для впізнаваності; без афіляції чи схвалення.",
       atsMicrocopy: "Більше шансів пройти ATS-скринінг",
+      optimizeCta: "Оптимізувати моє резюме",
       stats: {
         ats: "середнє зростання ATS-бала",
         time: "від завантаження до готової чернетки",
@@ -1476,6 +1478,7 @@ export const translations = {
       optimizedForDisclaimer:
         "Nazwy podane dla rozpoznawalności; brak afiliacji ani poparcia.",
       atsMicrocopy: "Większa szansa przejścia ATS",
+      optimizeCta: "Zoptymalizuj moje CV",
       stats: {
         ats: "średni wzrost wyniku ATS",
         time: "od przesłania do gotowego szkicu",
@@ -2153,6 +2156,7 @@ export const translations = {
       optimizedForDisclaimer:
         "Názvy sú uvedené pre rozpoznateľnosť; bez afiliácie alebo schválenia.",
       atsMicrocopy: "Vyššia šanca prejsť ATS screeningom",
+      optimizeCta: "Optimalizovať moje CV",
       stats: {
         ats: "priemerný nárast skóre ATS",
         time: "od nahratia po hotový návrh",
@@ -2828,6 +2832,7 @@ export const translations = {
       optimizedForDisclaimer:
         "Názvy jsou uvedené pro rozpoznatelnost; bez afiliace nebo podpory.",
       atsMicrocopy: "Větší šance projít ATS screeningem",
+      optimizeCta: "Optimalizovat moje CV",
       stats: {
         ats: "průměrné zvýšení ATS skóre",
         time: "od nahrání po hotový návrh",
@@ -3511,6 +3516,7 @@ export const translations = {
       optimizedForDisclaimer:
         "Nombres mostrados por familiaridad; sin afiliación ni respaldo.",
       atsMicrocopy: "Más probabilidades de pasar el filtro ATS",
+      optimizeCta: "Optimizar mi CV",
       stats: {
         ats: "aumento medio de la puntuación ATS",
         time: "desde la carga hasta el borrador listo",
