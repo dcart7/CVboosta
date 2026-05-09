@@ -12,6 +12,11 @@ type CaseStudy = {
   insight: string;
 };
 
+function percentToInt(value: string) {
+  const n = parseInt(value.replace(/[^\d]/g, ""), 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
 function StatLine({
   label,
   from,
@@ -21,13 +26,23 @@ function StatLine({
   from: string;
   to: string;
 }) {
+  const fromInt = percentToInt(from);
+  const toInt = percentToInt(to);
+  const delta = toInt > 0 && fromInt > 0 ? toInt - fromInt : null;
   return (
     <div className="cases-statline">
       <span className="cases-statlabel">{label}</span>
       <span className="cases-statvalue">
-        <span className="cases-num">{from}</span>
-        <span className="cases-arrow">→</span>
-        <span className="cases-num">{to}</span>
+        <span className="cases-num cases-num-muted">{from}</span>
+        <span className="cases-arrow" aria-hidden="true">
+          →
+        </span>
+        <span className="cases-num cases-num-up">{to}</span>
+        {delta !== null ? (
+          <span className="cases-delta" aria-label={`Improved by ${delta} points`}>
+            +{delta}
+          </span>
+        ) : null}
       </span>
     </div>
   );
@@ -116,6 +131,7 @@ export default function CasesPage() {
 
         <section id="cases" className="section fade-up">
           <h2 className="section-title">{t("cases.sections.casesTitle")}</h2>
+          <p className="cases-section-subtitle">{t("cases.sections.casesSubtitle")}</p>
           <div className="cases-grid">
             {cases.map((cs) => (
               <article key={cs.role} className="card case-card">
@@ -125,7 +141,7 @@ export default function CasesPage() {
                 </div>
 
                 <div className="case-beforeafter">
-                  <div className="case-pane">
+                  <div className="case-pane case-pane-before">
                     <div className="case-pane-title">{t("cases.labels.before")}</div>
                     <StatLine
                       label={t("cases.labels.atsMatch")}
@@ -138,12 +154,12 @@ export default function CasesPage() {
                     </div>
                   </div>
 
-                  <div className="case-pane">
+                  <div className="case-pane case-pane-after">
                     <div className="case-pane-title">{t("cases.labels.after")}</div>
                     <div className="cases-statline">
                       <span className="cases-statlabel">{t("cases.labels.atsMatch")}</span>
                       <span className="cases-statvalue">
-                        <span className="cases-num">{cs.after.ats}</span>
+                        <span className="cases-num cases-num-up">{cs.after.ats}</span>
                       </span>
                     </div>
                     <div className="cases-statline">
@@ -152,8 +168,6 @@ export default function CasesPage() {
                     </div>
                   </div>
                 </div>
-
-                <div className="case-divider" aria-hidden="true" />
 
                 <div className="case-changes">
                   <div className="case-subhead">{t("cases.labels.whatChanged")}</div>
@@ -170,6 +184,16 @@ export default function CasesPage() {
                 </div>
               </article>
             ))}
+          </div>
+
+          <div className="cases-cta-card hero-card fade-up">
+            <h3 className="cases-cta-title">{t("cases.sections.ctaTitle")}</h3>
+            <p className="cases-cta-sub">{t("cases.sections.ctaSub")}</p>
+            <div className="nav-actions" style={{ marginTop: 16 }}>
+              <Link className="btn primary" href="/app">
+                {t("cases.sections.ctaButton")}
+              </Link>
+            </div>
           </div>
         </section>
 
