@@ -2994,6 +2994,18 @@ a {
   fill: currentColor;
 }
 
+.logo-chip img {
+  height: 22px;
+  width: auto;
+  display: block;
+  filter: grayscale(1) saturate(0) brightness(1.35);
+  opacity: 0.82;
+}
+
+.logo-chip:hover img {
+  opacity: 1;
+}
+
 .logo-chip:hover {
   color: color-mix(in srgb, var(--ink) 88%, var(--muted));
 }

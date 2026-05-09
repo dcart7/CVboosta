@@ -21,7 +21,6 @@ export default function HomePage() {
     "nvidia",
     "salesforce",
     "uber",
-    "virel",
   ] as const;
 
   const localizedProjectInfo = {
