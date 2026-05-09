@@ -95,12 +95,23 @@ export default function TopNav() {
         }
 
         // Hysteresis to prevent flicker during tiny scrolls.
-        const hideAfterY = 84;
-        const hideThreshold = 14;
+        const hideAfterY = 120;
+        const hideThreshold = 18;
         const showThreshold = 6;
+        const showOnUpDy = -4;
 
         if (y <= 0) {
           accDown = 0;
+          accUp = 0;
+          if (isHiddenRef.current) {
+            isHiddenRef.current = false;
+            setIsHidden(false);
+          }
+          return;
+        }
+
+        // Show immediately on slight upward scroll (feels instant on mobile).
+        if (dy <= showOnUpDy) {
           accUp = 0;
           if (isHiddenRef.current) {
             isHiddenRef.current = false;
