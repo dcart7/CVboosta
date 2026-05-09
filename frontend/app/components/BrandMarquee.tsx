@@ -62,6 +62,7 @@ export default function BrandMarquee({
               loading="lazy"
               decoding="async"
             />
+            <span className="logo-label">{asset.title}</span>
           </span>
         ))}
       </div>

@@ -2985,6 +2985,7 @@ a {
   user-select: none;
   -webkit-user-select: none;
   white-space: nowrap;
+  gap: 10px;
 }
 
 .logo-chip svg {
@@ -2999,6 +3000,13 @@ a {
   width: auto;
   display: block;
   opacity: 0.82;
+}
+
+.logo-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--ink) 78%, var(--muted));
 }
 
 .logo-chip:hover img {
