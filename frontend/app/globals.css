@@ -4717,11 +4717,12 @@ body {
 
 .case-beforeafter {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px;
 }
 
 .case-pane {
+  min-width: 0;
   border-radius: 16px;
   border: 1px solid var(--glass-border);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
@@ -4742,6 +4743,7 @@ body {
   justify-content: space-between;
   gap: 10px;
   margin-top: 8px;
+  min-width: 0;
 }
 
 .cases-statlabel {
@@ -4768,10 +4770,14 @@ body {
 }
 
 .cases-outcome {
+  min-width: 0;
   font-weight: 700;
   color: color-mix(in srgb, var(--ink) 92%, transparent);
   text-align: right;
   font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .case-divider {

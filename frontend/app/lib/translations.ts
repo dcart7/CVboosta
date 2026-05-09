@@ -756,7 +756,7 @@ export const translations = {
       },
       caseStudies: {
         backend: {
-          role: "Junior Backend Developer",
+          role: "Молодший бекенд-розробник",
           beforeOutcome: "30+ відгуків → 0 відповідей",
           afterOutcome: "3 співбесіди за 7 днів",
           change1: "Досвід переписано в термінах вимірюваного впливу",
@@ -765,7 +765,7 @@ export const translations = {
           insight: "Кандидату не бракувало навичок. Резюме не вміло їх показати.",
         },
         analyst: {
-          role: "Data Analyst",
+          role: "Аналітик даних",
           beforeOutcome: "Низький рівень відповідей",
           afterOutcome: "2 співбесіди за 5 днів",
           change1: "Ключові слова узгоджено з реальними описами вакансій",
@@ -774,7 +774,7 @@ export const translations = {
           insight: "Видимість в ATS напряму впливає на кількість запрошень на співбесіди.",
         },
         marketing: {
-          role: "Marketing Specialist",
+          role: "Маркетинговий спеціаліст",
           beforeOutcome: "Жодних відповідей",
           afterOutcome: "4 співбесіди за 10 днів",
           change1: "Додано метрики ефективності",
