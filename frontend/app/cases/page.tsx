@@ -17,37 +17,6 @@ function percentToInt(value: string) {
   return Number.isFinite(n) ? n : 0;
 }
 
-function StatLine({
-  label,
-  from,
-  to,
-}: {
-  label: string;
-  from: string;
-  to: string;
-}) {
-  const fromInt = percentToInt(from);
-  const toInt = percentToInt(to);
-  const delta = toInt > 0 && fromInt > 0 ? toInt - fromInt : null;
-  return (
-    <div className="cases-statline">
-      <span className="cases-statlabel">{label}</span>
-      <span className="cases-statvalue">
-        <span className="cases-num cases-num-muted">{from}</span>
-        <span className="cases-arrow" aria-hidden="true">
-          →
-        </span>
-        <span className="cases-num cases-num-up">{to}</span>
-        {delta !== null ? (
-          <span className="cases-delta" aria-label={`Improved by ${delta} points`}>
-            +{delta}
-          </span>
-        ) : null}
-      </span>
-    </div>
-  );
-}
-
 export default function CasesPage() {
   const { t } = useTranslation();
 
@@ -133,8 +102,13 @@ export default function CasesPage() {
           <h2 className="section-title">{t("cases.sections.casesTitle")}</h2>
           <p className="cases-section-subtitle">{t("cases.sections.casesSubtitle")}</p>
           <div className="cases-grid">
-            {cases.map((cs) => (
-              <article key={cs.role} className="card case-card">
+            {cases.map((cs) => {
+              const beforeInt = percentToInt(cs.before.ats);
+              const afterInt = percentToInt(cs.after.ats);
+              const delta = beforeInt > 0 && afterInt > 0 ? afterInt - beforeInt : null;
+
+              return (
+                <article key={cs.role} className="card case-card">
                 <div className="case-head">
                   <div className="case-badge">{t("cases.labels.caseBadge")}</div>
                   <h3 className="case-role">{cs.role}</h3>
@@ -143,20 +117,32 @@ export default function CasesPage() {
                 <div className="case-beforeafter">
                   <div className="case-pane case-pane-before">
                     <div className="case-pane-title">{t("cases.labels.before")}</div>
-                    <StatLine
-                      label={t("cases.labels.atsMatch")}
-                      from={cs.before.ats}
-                      to={cs.after.ats}
-                    />
+                    <div className="cases-metric">
+                      <div className="cases-statlabel">{t("cases.labels.atsMatch")}</div>
+                      <div className="cases-metric-value cases-num cases-num-muted">
+                        {cs.before.ats}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="case-between" aria-hidden="true">
+                    <div className="case-between-arrow">→</div>
+                    {delta !== null ? (
+                      <div className="case-between-delta">
+                        <span className="cases-delta">
+                          +{delta} {t("cases.labels.improvement")}
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="case-pane case-pane-after">
                     <div className="case-pane-title">{t("cases.labels.after")}</div>
-                    <div className="cases-statline">
-                      <span className="cases-statlabel">{t("cases.labels.atsMatch")}</span>
-                      <span className="cases-statvalue">
-                        <span className="cases-num cases-num-up">{cs.after.ats}</span>
-                      </span>
+                    <div className="cases-metric">
+                      <div className="cases-statlabel">{t("cases.labels.atsMatch")}</div>
+                      <div className="cases-metric-value cases-num cases-num-up">
+                        {cs.after.ats}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -180,7 +166,8 @@ export default function CasesPage() {
                   </div>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
 
           <div className="cases-cta-card hero-card fade-up">
