@@ -7,6 +7,7 @@ import TopNav from "../components/TopNav";
 import SocialAuthButtons from "../components/SocialAuthButtons";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
+import { errorDetailToMessage } from "../lib/errorDetail";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 
@@ -47,7 +48,8 @@ export default function RegisterPage() {
       );
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.detail || "Registration failed");
+        const message = errorDetailToMessage(payload.detail);
+        throw new Error(message || "Registration failed");
       }
       const data = await response.json();
       localStorage.setItem("user_email", email.trim().toLowerCase());
@@ -130,7 +132,13 @@ export default function RegisterPage() {
             <SocialAuthButtons
               mode="register"
               disabled={loading}
-              onError={(message) => setError(message || t("auth.registerFailed"))}
+              onError={(message) =>
+                setError(
+                  typeof message === "string"
+                    ? message
+                    : t("auth.registerFailed"),
+                )
+              }
               onSuccess={(data) => {
                 if (data.email) {
                   localStorage.setItem("user_email", data.email.trim().toLowerCase());

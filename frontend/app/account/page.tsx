@@ -7,6 +7,7 @@ import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
+import { errorDetailToMessage } from "../lib/errorDetail";
 import { trackEvent } from "../lib/analytics";
 
 type MeResponse = {
@@ -233,7 +234,7 @@ export default function AccountPage() {
     }
     const payload = await response.json().catch(() => ({}));
     setMessageTone("error");
-    setMessage(payload.detail || "Failed to update password.");
+    setMessage(errorDetailToMessage(payload.detail) || "Failed to update password.");
   };
 
   const formatDate = (value: string) =>
@@ -257,7 +258,7 @@ export default function AccountPage() {
       );
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(payload.detail || "Failed to cancel subscription.");
+        throw new Error(errorDetailToMessage(payload.detail) || "Failed to cancel subscription.");
       }
       setMessageTone("ok");
       if (payload.active_until) {

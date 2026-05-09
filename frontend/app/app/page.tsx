@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
+import { errorDetailToMessage } from "../lib/errorDetail";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 import { trackEvent } from "../lib/analytics";
@@ -95,7 +96,7 @@ export default function WorkspacePage() {
       });
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.detail || "Upload failed");
+        throw new Error(errorDetailToMessage(payload.detail) || "Upload failed");
       }
       const data = await response.json();
       setParsed(data);
