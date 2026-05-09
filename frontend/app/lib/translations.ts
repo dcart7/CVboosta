@@ -41,7 +41,7 @@ export const translations = {
         insight: "Insight",
       },
       sections: {
-        casesTitle: "Resume Transformations",
+        casesTitle: "Real Resume Results",
         casesSubtitle: "Real resume transformations optimized for modern ATS systems.",
         ctaTitle: "See how your resume performs before recruiters do.",
         ctaSub: "Analyze your ATS score and optimize your resume in minutes.",
@@ -740,7 +740,7 @@ export const translations = {
         insight: "Інсайт",
       },
       sections: {
-        casesTitle: "Трансформації резюме",
+        casesTitle: "Реальні результати резюме",
         casesSubtitle: "Реальні трансформації резюме, оптимізовані під сучасні ATS.",
         ctaTitle: "Подивіться, як ваше резюме виглядає до того, як його побачать рекрутери.",
         ctaSub: "Проаналізуйте ATS score та оптимізуйте резюме за лічені хвилини.",
@@ -1430,7 +1430,7 @@ export const translations = {
         insight: "Wniosek",
       },
       sections: {
-        casesTitle: "Transformacje CV",
+        casesTitle: "Realne wyniki CV",
         casesSubtitle: "Prawdziwe transformacje CV zoptymalizowane pod nowoczesne systemy ATS.",
         ctaTitle: "Zobacz, jak Twoje CV wypada zanim zobaczą je rekruterzy.",
         ctaSub: "Sprawdź wynik ATS i zoptymalizuj CV w kilka minut.",
@@ -2114,7 +2114,7 @@ export const translations = {
         insight: "Insight",
       },
       sections: {
-        casesTitle: "Transformácie CV",
+        casesTitle: "Reálne výsledky CV",
         casesSubtitle: "Skutočné transformácie CV optimalizované pre moderné ATS systémy.",
         ctaTitle: "Pozrite sa, ako vaše CV vyzerá skôr, než ho uvidia recruiteri.",
         ctaSub: "Skontrolujte ATS skóre a optimalizujte CV za pár minút.",
@@ -2796,7 +2796,7 @@ export const translations = {
         insight: "Poznatek",
       },
       sections: {
-        casesTitle: "Transformace životopisu",
+        casesTitle: "Reálné výsledky životopisu",
         casesSubtitle: "Skutečné transformace životopisu optimalizované pro moderní ATS systémy.",
         ctaTitle: "Uvidíte, jak si váš životopis vede ještě dřív, než ho uvidí náboráři.",
         ctaSub: "Zkontrolujte ATS skóre a optimalizujte životopis během pár minut.",
@@ -3486,7 +3486,7 @@ export const translations = {
         insight: "Insight",
       },
       sections: {
-        casesTitle: "Transformaciones de CV",
+        casesTitle: "Resultados reales del CV",
         casesSubtitle: "Transformaciones reales de CV optimizadas para sistemas ATS modernos.",
         ctaTitle: "Ve cómo rinde tu CV antes de que lo vean los reclutadores.",
         ctaSub: "Analiza tu puntuación ATS y optimiza tu CV en minutos.",
