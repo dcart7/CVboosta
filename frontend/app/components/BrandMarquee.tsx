@@ -34,7 +34,7 @@ const BRAND_ASSETS: Record<Exclude<BrandKey, "virel">, BrandAsset> = {
 
 const VIREL_ASSET: BrandAsset = {
   title: "Virel Solutions",
-  src: "/brand-logos/virel.svg",
+  src: "/brand-logos/virel.png",
 };
 
 export default function BrandMarquee({

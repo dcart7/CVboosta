@@ -2998,7 +2998,6 @@ a {
   height: 22px;
   width: auto;
   display: block;
-  filter: grayscale(1) saturate(0) brightness(1.35);
   opacity: 0.82;
 }
 

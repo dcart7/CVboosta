@@ -62,6 +62,7 @@ backend/dummy_cv.pdf
 temp_cv_*.pdf
 *.webp
 *.png
+!frontend/public/brand-logos/virel.png
 
 # Vercel & Production
 .vercel
