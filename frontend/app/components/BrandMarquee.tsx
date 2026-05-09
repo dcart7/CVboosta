@@ -67,10 +67,13 @@ export default function BrandMarquee({
   return (
     <div className="marquee-wrapper logo-marquee">
       <div className="marquee-track">
-        {[...assets, ...assets].map((asset, index) => (
+        {[...assets, ...assets].map((asset, index) => {
+          const brand = brands[index % brands.length];
+          return (
           <span
             key={`${asset.title}-${index}`}
             className="logo-chip"
+            data-brand={brand}
             aria-label={asset.title}
             title={asset.title}
           >
@@ -79,12 +82,14 @@ export default function BrandMarquee({
               alt={asset.title}
               loading="lazy"
               decoding="async"
+              data-brand={brand}
             />
-            {LABEL_SAFE[brands[index % brands.length]] ? (
+            {LABEL_SAFE[brand] ? (
               <span className="logo-label">{asset.title}</span>
             ) : null}
           </span>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -3017,6 +3017,24 @@ a {
   filter: saturate(1) brightness(1.08) contrast(1.05);
 }
 
+/* Force monochrome variants for specific brands:
+   light theme -> black, dark theme -> white */
+.logo-chip[data-brand="nvidia"] img,
+.logo-chip[data-brand="uber"] img,
+.logo-chip[data-brand="apple"] img,
+.logo-chip[data-brand="ibm"] img,
+.logo-chip[data-brand="openai"] img {
+  filter: none;
+}
+
+[data-theme="dark"] .logo-chip[data-brand="nvidia"] img,
+[data-theme="dark"] .logo-chip[data-brand="uber"] img,
+[data-theme="dark"] .logo-chip[data-brand="apple"] img,
+[data-theme="dark"] .logo-chip[data-brand="ibm"] img,
+[data-theme="dark"] .logo-chip[data-brand="openai"] img {
+  filter: invert(1);
+}
+
 .logo-label {
   font-size: 13px;
   font-weight: 700;
