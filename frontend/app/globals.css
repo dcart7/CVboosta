@@ -2887,12 +2887,12 @@ a {
 @keyframes routeEnter {
   from {
     opacity: 0.98;
-    transform: translateY(8px);
+    filter: blur(0.2px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    filter: blur(0px);
   }
 }
 
