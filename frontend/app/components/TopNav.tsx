@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import ThemeToggle from "./ThemeToggle";
@@ -10,9 +11,12 @@ import { useTranslation } from "../lib/LanguageContext";
 import { Language } from "../lib/translations";
 
 export default function TopNav() {
+  const pathname = usePathname();
   const [email, setEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const apiBase = getApiBase();
   const { t, language, setLanguage } = useTranslation();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -44,6 +48,59 @@ export default function TopNav() {
     const offset = btnRect.left - trackRect.left;
     setPillStyle({ transform: `translateX(${offset}px)` });
   }, [activeIndex]);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      setIsHidden(false);
+      return;
+    }
+    let raf = 0;
+    let lastY = window.scrollY || 0;
+    let accDown = 0;
+    let accUp = 0;
+
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const y = window.scrollY || 0;
+        const dy = y - lastY;
+        lastY = y;
+
+        const nowScrolled = y > 6;
+        if (nowScrolled !== isScrolled) setIsScrolled(nowScrolled);
+
+        if (dy > 0) {
+          accDown += dy;
+          accUp = 0;
+        } else if (dy < 0) {
+          accUp += -dy;
+          accDown = 0;
+        } else {
+          return;
+        }
+
+        // Hysteresis to prevent flicker during tiny scrolls.
+        const hideAfterY = 84;
+        const hideThreshold = 14;
+        const showThreshold = 6;
+
+        if (y > hideAfterY && accDown >= hideThreshold) {
+          setIsHidden(true);
+        }
+        if (accUp >= showThreshold) {
+          setIsHidden(false);
+        }
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMenuOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,9 +167,15 @@ export default function TopNav() {
     window.location.href = "/";
   };
 
+  const isActive = (href: string) => {
+    if (!pathname) return false;
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
     <>
-      <header className="nav">
+      <header className={`nav${isHidden ? " nav-hidden" : ""}${isScrolled ? " nav-scrolled" : ""}`}>
         <div className="nav-inner">
           <Link className="brand" href="/">
             <Image
@@ -129,12 +192,24 @@ export default function TopNav() {
 
         {/* Desktop Links */}
         <nav className="nav-links cv-desktop-only" style={desktopNavStyle}>
-          <Link href="/app">{t("nav.dashboard")}</Link>
-          <Link href="/results">{t("nav.results")}</Link>
-          <Link href="/history">{t("nav.history")}</Link>
-          <Link href="/pricing">{t("nav.pricing")}</Link>
-          <Link href="/about">{t("nav.about")}</Link>
-          <Link href="/blog">{t("nav.blog")}</Link>
+          <Link className={`nav-link${isActive("/app") ? " is-active" : ""}`} href="/app">
+            {t("nav.dashboard")}
+          </Link>
+          <Link className={`nav-link${isActive("/results") ? " is-active" : ""}`} href="/results">
+            {t("nav.results")}
+          </Link>
+          <Link className={`nav-link${isActive("/history") ? " is-active" : ""}`} href="/history">
+            {t("nav.history")}
+          </Link>
+          <Link className={`nav-link${isActive("/pricing") ? " is-active" : ""}`} href="/pricing">
+            {t("nav.pricing")}
+          </Link>
+          <Link className={`nav-link${isActive("/about") ? " is-active" : ""}`} href="/about">
+            {t("nav.about")}
+          </Link>
+          <Link className={`nav-link${isActive("/blog") ? " is-active" : ""}`} href="/blog">
+            {t("nav.blog")}
+          </Link>
         </nav>
 
         <div className="nav-actions">
@@ -178,11 +253,10 @@ export default function TopNav() {
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="btn ghost cv-mobile-only" 
+            className="btn ghost cv-mobile-only nav-menu-btn" 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             type="button"
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            style={{ padding: "8px 12px", fontSize: "20px" }}
           >
              {isMenuOpen ? "✕" : "☰"}
           </button>
@@ -222,12 +296,12 @@ export default function TopNav() {
               </div>
               {/* Navigation links */}
               <nav style={{ display: "flex", flexDirection: "column" }}>
-                <Link href="/app" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
-                <Link href="/results" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.results")}</Link>
-                <Link href="/history" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.history")}</Link>
-                <Link href="/pricing" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.pricing")}</Link>
-                <Link href="/about" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.about")}</Link>
-                <Link href="/blog" className="mobile-shutter-link" onClick={() => setIsMenuOpen(false)}>{t("nav.blog")}</Link>
+                <Link href="/app" className={`mobile-shutter-link${isActive("/app") ? " is-active" : ""}`} onClick={() => setIsMenuOpen(false)}>{t("nav.dashboard")}</Link>
+                <Link href="/results" className={`mobile-shutter-link${isActive("/results") ? " is-active" : ""}`} onClick={() => setIsMenuOpen(false)}>{t("nav.results")}</Link>
+                <Link href="/history" className={`mobile-shutter-link${isActive("/history") ? " is-active" : ""}`} onClick={() => setIsMenuOpen(false)}>{t("nav.history")}</Link>
+                <Link href="/pricing" className={`mobile-shutter-link${isActive("/pricing") ? " is-active" : ""}`} onClick={() => setIsMenuOpen(false)}>{t("nav.pricing")}</Link>
+                <Link href="/about" className={`mobile-shutter-link${isActive("/about") ? " is-active" : ""}`} onClick={() => setIsMenuOpen(false)}>{t("nav.about")}</Link>
+                <Link href="/blog" className={`mobile-shutter-link${isActive("/blog") ? " is-active" : ""}`} onClick={() => setIsMenuOpen(false)}>{t("nav.blog")}</Link>
               </nav>
 
               {/* Language switcher */}
