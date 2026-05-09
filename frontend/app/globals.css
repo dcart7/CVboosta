@@ -177,6 +177,7 @@ a {
     border-color 220ms ease,
     background-color 220ms ease;
   z-index: 120;
+  padding-top: env(safe-area-inset-top);
 }
 
 .nav.nav-hidden {
@@ -191,7 +192,7 @@ a {
 }
 
 .nav-spacer {
-  height: 80px;
+  height: calc(80px + env(safe-area-inset-top));
 }
 
 .nav-inner {
@@ -210,7 +211,7 @@ a {
   }
 
   .nav-spacer {
-    height: 66px;
+    height: calc(66px + env(safe-area-inset-top));
   }
 }
 

@@ -17,6 +17,8 @@ export default function TopNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const isHiddenRef = useRef(false);
+  const isScrolledRef = useRef(false);
   const apiBase = getApiBase();
   const { t, language, setLanguage } = useTranslation();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -37,6 +39,14 @@ export default function TopNav() {
 
   const activeIndex = languages.findIndex((l) => l.code === language);
 
+  useEffect(() => {
+    isHiddenRef.current = isHidden;
+  }, [isHidden]);
+
+  useEffect(() => {
+    isScrolledRef.current = isScrolled;
+  }, [isScrolled]);
+
   // Slide the pill to the active button
   useEffect(() => {
     if (!trackRef.current) return;
@@ -51,6 +61,7 @@ export default function TopNav() {
 
   useEffect(() => {
     if (isMenuOpen) {
+      isHiddenRef.current = false;
       setIsHidden(false);
       return;
     }
@@ -68,7 +79,10 @@ export default function TopNav() {
         lastY = y;
 
         const nowScrolled = y > 6;
-        if (nowScrolled !== isScrolled) setIsScrolled(nowScrolled);
+        if (nowScrolled !== isScrolledRef.current) {
+          isScrolledRef.current = nowScrolled;
+          setIsScrolled(nowScrolled);
+        }
 
         if (dy > 0) {
           accDown += dy;
@@ -85,11 +99,27 @@ export default function TopNav() {
         const hideThreshold = 14;
         const showThreshold = 6;
 
+        if (y <= 0) {
+          accDown = 0;
+          accUp = 0;
+          if (isHiddenRef.current) {
+            isHiddenRef.current = false;
+            setIsHidden(false);
+          }
+          return;
+        }
+
         if (y > hideAfterY && accDown >= hideThreshold) {
-          setIsHidden(true);
+          if (!isHiddenRef.current) {
+            isHiddenRef.current = true;
+            setIsHidden(true);
+          }
         }
         if (accUp >= showThreshold) {
-          setIsHidden(false);
+          if (isHiddenRef.current) {
+            isHiddenRef.current = false;
+            setIsHidden(false);
+          }
         }
       });
     };
