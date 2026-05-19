@@ -685,10 +685,29 @@ export default function WorkspacePage() {
             {analysisStatus && <p>{analysisStatus}</p>}
             <div className="card">
               <h3>{t("dashboard.analysisSnapshot")}</h3>
-              <p>
-                {t("dashboard.matchScore")}{" "}
-                {matchPercent !== null ? `${matchPercent}%` : "—"} · {t("dashboard.missingKeywords")} {missingKeywords.length}
-              </p>
+              <div className="analysis-snapshot">
+                <div className="analysis-snapshot-stats">
+                  <div className="analysis-snapshot-stat">
+                    <span className="analysis-snapshot-label">{t("dashboard.matchScore")}</span>
+                    <strong className="analysis-snapshot-value">
+                      {matchPercent !== null ? `${matchPercent}%` : "—"}
+                    </strong>
+                  </div>
+                  <div className="analysis-snapshot-stat">
+                    <span className="analysis-snapshot-label">{t("dashboard.missingKeywords")}</span>
+                    <strong className="analysis-snapshot-value">{missingKeywords.length}</strong>
+                  </div>
+                </div>
+
+                <div className="tag-list analysis-snapshot-tags">
+                  {missingKeywords.length === 0 && <span className="tag">—</span>}
+                  {missingKeywords.map((item) => (
+                    <span className="tag" key={item}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="nav-actions">
               <button

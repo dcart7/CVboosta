@@ -1328,6 +1328,49 @@ a {
   font-size: 14px;
 }
 
+.analysis-snapshot {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.analysis-snapshot-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.analysis-snapshot-stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.analysis-snapshot-label {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+.analysis-snapshot-value {
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.analysis-snapshot-tags {
+  margin-top: 0;
+}
+
+@media (max-width: 520px) {
+  .analysis-snapshot-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
 .before-after-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
