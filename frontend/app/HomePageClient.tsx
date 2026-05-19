@@ -226,7 +226,7 @@ export default function HomePage() {
     en: {
       ctaAction: "Upload your CV — get results in 60 seconds",
       freeScore: "Free ATS score instantly",
-      firstTryFree: "First scan is free",
+      firstTryFree: "First resume optimization is free",
       control: "You stay in control — edit before export. Nothing is auto-submitted.",
       verified: "Verified beta user",
       caseProof: "Case study details available on request.",
