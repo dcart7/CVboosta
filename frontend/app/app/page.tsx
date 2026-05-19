@@ -688,13 +688,23 @@ export default function WorkspacePage() {
               <div className="analysis-snapshot">
                 <div className="analysis-snapshot-stats">
                   <div className="analysis-snapshot-stat">
-                    <span className="analysis-snapshot-label">{t("dashboard.matchScore")}</span>
-                    <strong className="analysis-snapshot-value">
-                      {matchPercent !== null ? `${matchPercent}%` : "—"}
+                    <span className="analysis-snapshot-label">
+                      {(() => {
+                        const label = t("dashboard.matchScore").trimEnd();
+                        return label.endsWith(":") ? label : `${label}:`;
+                      })()}
+                    </span>
+                    <strong className="analysis-snapshot-value is-score">
+                      {matchPercent !== null ? `${matchPercent}` : "—"}
                     </strong>
                   </div>
                   <div className="analysis-snapshot-stat">
-                    <span className="analysis-snapshot-label">{t("dashboard.missingKeywords")}</span>
+                    <span className="analysis-snapshot-label">
+                      {(() => {
+                        const label = t("dashboard.missingKeywords").trimEnd();
+                        return label.endsWith(":") ? label : `${label}:`;
+                      })()}
+                    </span>
                     <strong className="analysis-snapshot-value">{missingKeywords.length}</strong>
                   </div>
                 </div>

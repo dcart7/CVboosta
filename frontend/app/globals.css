@@ -1361,6 +1361,13 @@ a {
   line-height: 1;
 }
 
+.analysis-snapshot-value.is-score {
+  background: linear-gradient(90deg, #0a84ff, #63a6ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .analysis-snapshot-tags {
   margin-top: 0;
 }
