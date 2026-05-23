@@ -345,6 +345,26 @@ _WHITELIST_NORMALIZE = {
     "sla": "SLA",
 }
 
+def _build_whitelist_pattern(key: str) -> re.Pattern[str]:
+    """
+    Build a safe match pattern for a whitelist keyword.
+    Prevents false positives for short tokens (e.g. "go" in "ongoing").
+    """
+    escaped = re.escape(key.lower()).replace(r"\ ", r"\s+")
+    # For very short alpha tokens, require word boundaries.
+    if key.isalpha() and len(key) <= 3:
+        return re.compile(rf"\b{escaped}\b")
+    # For plain words / phrases, word boundaries are usually correct.
+    if re.fullmatch(r"[a-z0-9 ]+", key.lower()):
+        return re.compile(rf"\b{escaped}\b")
+    # For tokens with punctuation (ci/cd, node.js, c++, c#), require non-alnum boundaries.
+    return re.compile(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])")
+
+
+_WHITELIST_PATTERNS: dict[str, re.Pattern[str]] = {
+    key: _build_whitelist_pattern(key) for key in _WHITELIST
+}
+
 
 def _split_phrases(text: str) -> list[str]:
     text = text.replace("/", " / ")
@@ -414,6 +434,18 @@ def normalize_keywords(skills: list[str], limit: int = 30) -> list[str]:
     seen: set[str] = set()
     for item in skills:
         if not item:
+            continue
+        # Preserve exact whitelist terms (especially punctuated ones like "CI/CD").
+        raw = str(item).strip()
+        raw_key = raw.lower()
+        if raw_key in _WHITELIST:
+            normalized = _WHITELIST_NORMALIZE.get(raw_key, raw)
+            norm_key = normalized.lower()
+            if norm_key not in seen:
+                seen.add(norm_key)
+                unique.append(normalized)
+            if len(unique) >= limit:
+                break
             continue
         for phrase in _split_phrases(str(item)):
             cleaned = phrase.strip()
@@ -504,7 +536,7 @@ def extract_whitelist_keywords(text: str, limit: int = 30) -> list[str]:
         return []
     lower = text.lower()
     hits: list[str] = []
-    for key in _WHITELIST:
-        if key in lower:
+    for key, pattern in _WHITELIST_PATTERNS.items():
+        if pattern.search(lower):
             hits.append(_WHITELIST_NORMALIZE.get(key, key))
     return normalize_keywords(hits, limit=limit)
