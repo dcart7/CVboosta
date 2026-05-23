@@ -27,12 +27,16 @@ def history(
     items = []
     for row in rows:
         result = row.result_json or {}
+        match_before = result.get("match_before")
+        match_after = result.get("match_after")
         items.append(
             HistoryItem(
                 id=row.id,
                 role=result.get("role"),
                 company=result.get("company"),
                 score=row.score,
+                match_before=match_before if isinstance(match_before, int) else None,
+                match_after=match_after if isinstance(match_after, int) else None,
                 created_at=row.created_at,
             )
         )

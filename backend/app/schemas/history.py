@@ -8,6 +8,8 @@ class HistoryItem(BaseModel):
     role: str | None
     company: str | None
     score: int
+    match_before: int | None = None
+    match_after: int | None = None
     created_at: datetime
 
 

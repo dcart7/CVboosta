@@ -12,6 +12,8 @@ type HistoryItem = {
   role: string | null;
   company: string | null;
   score: number;
+  match_before?: number | null;
+  match_after?: number | null;
   created_at: string;
 };
 
@@ -70,6 +72,14 @@ export default function HistoryPage() {
     });
 
   const scoreToLabel = (score: number) => `${score}%`;
+  const scoreDeltaLabel = (item: HistoryItem) => {
+    const before = typeof item.match_before === "number" ? item.match_before : null;
+    const after = typeof item.match_after === "number" ? item.match_after : null;
+    if (before === null && after === null) return scoreToLabel(item.score);
+    const safeAfter = after ?? item.score;
+    if (before === null) return scoreToLabel(safeAfter);
+    return `${scoreToLabel(before)} → ${scoreToLabel(safeAfter)}`;
+  };
 
   return (
     <main className="page">
@@ -117,7 +127,7 @@ export default function HistoryPage() {
               >
                 <div data-label={t("history.role")}>{item.role || "—"}</div>
                 <div data-label={t("history.company")}>{item.company || "—"}</div>
-                <div data-label={t("history.score")}>{scoreToLabel(item.score)}</div>
+                <div data-label={t("history.score")}>{scoreDeltaLabel(item)}</div>
                 <div data-label={t("history.date")}>{formatDate(item.created_at)}</div>
                 <div style={{ textAlign: 'right' }}>
                   <span className="btn secondary" style={{ padding: '4px 12px', fontSize: '12px' }}>
