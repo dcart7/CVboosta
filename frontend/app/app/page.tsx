@@ -447,7 +447,8 @@ export default function WorkspacePage() {
             target_company: targetCompany,
           }),
         },
-        { attempts: 3, baseDelayMs: 300, timeoutMs: 25_000 },
+        // Optimization can take longer than analysis (LLM + matching + recommendations).
+        { attempts: 3, baseDelayMs: 300, timeoutMs: 90_000 },
       );
       const data = await response.json();
       if (response.status === 402) {
