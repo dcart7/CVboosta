@@ -132,6 +132,14 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
 
   const localizedPost = useMemo(() => localizeBlogPost(post, language), [post, language]);
 
+  const wordCount = useMemo(() => {
+    const all = localizedPost.sections.map((s) => `${s.title}\n${s.body}`).join("\n");
+    const matches = all.match(/[A-Za-z0-9']+/g);
+    return matches ? matches.length : 0;
+  }, [localizedPost.sections]);
+
+  const showLongformAppendix = wordCount > 0 && wordCount < 800;
+
   const postKey = post.translationPostKey ? `blog.posts.${post.translationPostKey}` : null;
   const title = postKey ? tr(`${postKey}.title`, localizedPost.title) : localizedPost.title;
   const lead = postKey ? tr(`${postKey}.lead`, localizedPost.lead) : localizedPost.lead;
@@ -173,6 +181,76 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
               </div>
             );
           })}
+
+          {showLongformAppendix && (
+            <div className="blog-post-section card">
+              <h2>ATS Optimization Checklist (Practical, Evidence-First)</h2>
+              {renderMarkdownLite(
+                "If you’re using this article as a playbook, here’s a repeatable checklist that works across most roles and ATS systems. It’s designed to improve both ATS match and recruiter readability.\n\n" +
+                  "### 1) Confirm clean parsing before optimizing content\n" +
+                  "- Use a one-column layout\n" +
+                  "- Avoid tables and text boxes for critical text\n" +
+                  "- Keep job entries consistent: Title, Company, Location, Dates\n" +
+                  "- Use simple bullets (hyphens) and standard headings\n\n" +
+                  "If the application preview looks wrong, test a different export (PDF vs DOCX) and re-upload. Parsing stability matters because keywords can’t match if the text is misplaced or dropped.\n\n" +
+                  "### 2) Extract the *repeated* job requirements (not the noise)\n" +
+                  "Job descriptions contain fluff (benefits, culture, generic traits). The keywords that matter are repeated requirements tied to responsibilities and tools.\n\n" +
+                  "Quick method:\n" +
+                  "1. Highlight repeated nouns/phrases.\n" +
+                  "2. Group them into Tools, Responsibilities, and Outcomes.\n" +
+                  "3. Pick the top 5–10 that you can prove.\n" +
+                  "4. Keep a short “nice-to-have” list for later.\n\n" +
+                  "When in doubt, trust repetition. If a term appears multiple times (or is central to the role), it’s likely an ATS and recruiter priority.\n\n" +
+                  "### 3) Place keywords where ATS and humans both scan\n" +
+                  "- Summary: 3–5 role-defining terms\n" +
+                  "- Skills: grouped list (avoid a wall of keywords)\n" +
+                  "- Experience: bullets that include the keyword + a measurable result\n\n" +
+                  "A keyword in Experience with proof is stronger than the same keyword in Skills with no context.\n\n" +
+                  "### 4) Rewrite bullets using an ATS-friendly formula\n" +
+                  "Use: **Action + System/Scope + Keyword + Result**.\n\n" +
+                  "Examples that read human:\n" +
+                  "- “Built X using Y; improved Z by 20%.”\n" +
+                  "- “Implemented A with B; reduced errors and improved reliability.”\n" +
+                  "- “Migrated from A to B; reduced costs and improved stability.”\n\n" +
+                  "If you don’t have metrics, use scope and outcomes: users served, stakeholders supported, time saved, incidents reduced, quality improved, revenue protected.\n\n" +
+                  "### 5) Prioritize the highest-leverage edits\n" +
+                  "You usually don’t need a full rewrite. Start with the pieces that drive most decisions:\n" +
+                  "- Summary (target role + 2–3 core keywords)\n" +
+                  "- Skills (clean grouping)\n" +
+                  "- First 3–6 bullets in your most recent relevant role\n\n" +
+                  "Once those are aligned, the rest of the resume becomes supporting evidence rather than the primary match driver.\n\n" +
+                  "### 6) Use CVBoosta to tailor in ~60 seconds\n" +
+                  "CVBoosta helps you:\n" +
+                  "- see a match score snapshot\n" +
+                  "- identify missing keywords vs the vacancy\n" +
+                  "- generate an optimized version you can review before export\n\n" +
+                  "Suggested workflow:\n" +
+                  "1. Upload your resume and paste the job description.\n" +
+                  "2. Review missing keywords and pick the top gaps you can support.\n" +
+                  "3. Generate an optimized draft, then edit for accuracy and voice.\n" +
+                  "4. Re-run once to confirm the biggest gaps are closed.\n\n" +
+                  "Quick actions (safe, reviewable):\n" +
+                  "- **[Optimize my resume](/app)**\n" +
+                  "- **[Browse resume keywords by role](/resume-keywords)**\n\n" +
+                  "### 7) Avoid the 3 most common ATS mistakes\n" +
+                  "- **Keyword stuffing:** repeating tools without proof (hurts readability and trust)\n" +
+                  "- **Template complexity:** columns, tables, icons that break parsing\n" +
+                  "- **Vague bullets:** “worked on / helped with” without outcomes\n\n" +
+                  "Fix those three and most resumes move up significantly.\n\n" +
+                  "### 8) Mini-FAQ\n" +
+                  "#### Do I need to match every keyword?\n" +
+                  "No. Match the role’s *core* requirements and prove them. A smaller set of high-impact terms placed with evidence beats a giant list.\n\n" +
+                  "#### Should I copy sentences from the job post?\n" +
+                  "Avoid copying full sentences. Mirror terminology where accurate, but write in your own voice and tie it to your results.\n\n" +
+                  "#### What if I lack experience with a key tool?\n" +
+                  "Don’t fake it. Either leave it out or add adjacent experience (similar tools, transferable work) and be clear.\n\n" +
+                  "### 9) Read next (internal guides)\n" +
+                  "- [How to Tailor Resume to Job Description](/blog/tailor-resume-to-job-description)\n" +
+                  "- [Top ATS Resume Mistakes to Avoid](/blog/ats-resume-mistakes)\n" +
+                  "- [How to Improve ATS Resume Score](/blog/improve-ats-resume-score)\n"
+              )}
+            </div>
+          )}
 
           <div className="blog-takeaway card">
             <h3>{takeawayTitle}</h3>
