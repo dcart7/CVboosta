@@ -45,7 +45,7 @@ type RoleSeed = {
   category: RoleCategory;
 };
 
-const TARGET_CLUSTER_COUNT = 600;
+const TARGET_CLUSTER_COUNT = 950;
 const LEVEL_PREFIXES = ["Junior", "Mid-Level", "Senior", "Lead", "Principal", "Staff"] as const;
 const LEVEL_PREFIX_RE = /^(junior|mid-level|senior|lead|principal|staff|entry-level|head|director)\s+/i;
 
