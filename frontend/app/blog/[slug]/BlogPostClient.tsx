@@ -55,6 +55,74 @@ function renderTextWithLinks(text: string): ReactNode[] {
   return nodes;
 }
 
+function renderMarkdownLite(markdown: string): ReactNode {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const blocks: ReactNode[] = [];
+
+  let i = 0;
+  while (i < lines.length) {
+    const raw = lines[i];
+    const line = raw.trimEnd();
+
+    if (!line.trim()) {
+      i += 1;
+      continue;
+    }
+
+    if (line.startsWith("### ")) {
+      blocks.push(<h3 key={`h3-${i}`}>{renderTextWithLinks(line.slice(4).trim())}</h3>);
+      i += 1;
+      continue;
+    }
+
+    if (line.startsWith("#### ")) {
+      blocks.push(<h4 key={`h4-${i}`}>{renderTextWithLinks(line.slice(5).trim())}</h4>);
+      i += 1;
+      continue;
+    }
+
+    // Unordered list
+    if (/^\s*-\s+/.test(raw)) {
+      const items: ReactNode[] = [];
+      while (i < lines.length && /^\s*-\s+/.test(lines[i])) {
+        const itemText = lines[i].replace(/^\s*-\s+/, "").trim();
+        items.push(<li key={`ul-${i}`}>{renderTextWithLinks(itemText)}</li>);
+        i += 1;
+      }
+      blocks.push(<ul key={`ul-block-${i}`}>{items}</ul>);
+      continue;
+    }
+
+    // Ordered list
+    if (/^\s*\d+\.\s+/.test(raw)) {
+      const items: ReactNode[] = [];
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
+        const itemText = lines[i].replace(/^\s*\d+\.\s+/, "").trim();
+        items.push(<li key={`ol-${i}`}>{renderTextWithLinks(itemText)}</li>);
+        i += 1;
+      }
+      blocks.push(<ol key={`ol-block-${i}`}>{items}</ol>);
+      continue;
+    }
+
+    // Paragraph (consume until blank line)
+    const paragraphLines: string[] = [];
+    while (i < lines.length && lines[i].trim()) {
+      // Stop if next line begins a new block type
+      const peek = lines[i];
+      if (peek.startsWith("### ") || peek.startsWith("#### ") || /^\s*-\s+/.test(peek) || /^\s*\d+\.\s+/.test(peek)) {
+        break;
+      }
+      paragraphLines.push(peek.trim());
+      i += 1;
+    }
+    const paragraph = paragraphLines.join(" ");
+    blocks.push(<p key={`p-${i}`}>{renderTextWithLinks(paragraph)}</p>);
+  }
+
+  return <>{blocks}</>;
+}
+
 export default function BlogPostClient({ post, relatedRoles }: BlogPostClientProps) {
   const { t, language } = useTranslation();
   const tr = (path: string, fallback: string) => {
@@ -101,7 +169,7 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
             return (
               <div className="blog-post-section card" key={`${post.slug}-${index}`}>
                 <h2>{sectionTitle}</h2>
-                <p>{renderTextWithLinks(sectionBody)}</p>
+                {renderMarkdownLite(sectionBody)}
               </div>
             );
           })}
@@ -125,6 +193,22 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
                   <span aria-hidden="true">→</span>
                 </Link>
               ))}
+            </div>
+          </div>
+
+          <div className="blog-takeaway card">
+            <h3>Try CVBoosta in 60 seconds</h3>
+            <p>
+              Run a safe ATS scan and generate an optimized version you can review before exporting.
+              Your text is protected and never auto-submitted anywhere.
+            </p>
+            <div className="nav-actions" style={{ marginTop: "12px" }}>
+              <Link className="btn primary" href="/app">
+                Optimize my resume
+              </Link>
+              <Link className="btn ghost" href="/resume-keywords">
+                Browse resume keywords
+              </Link>
             </div>
           </div>
         </article>

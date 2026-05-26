@@ -19,6 +19,131 @@ export type BlogPost = {
 
 const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "backend-developer-resume-keywords-for-ats",
+    publishAt: "2026-05-26",
+    title: "Backend Developer Resume Keywords for ATS (2026 List + Examples)",
+    excerpt:
+      "A practical keyword list, placement strategy, and before/after examples to help backend engineers improve ATS match without keyword stuffing.",
+    lead:
+      "Use these backend developer resume keywords to align with job descriptions, boost ATS match, and still sound human to recruiters.",
+    tags: ["ATS", "Backend", "Keywords"],
+    sections: [
+      {
+        title: "What “backend developer resume keywords” really means (and what ATS looks for)",
+        body:
+          "ATS systems don’t “judge your talent” — they look for signals that you match the role.\n\n" +
+          "In practice, **backend developer resume keywords** are the repeated terms that appear in job descriptions and correlate with:\n" +
+          "- core backend responsibilities (APIs, services, scalability)\n" +
+          "- the stack (language + framework + database)\n" +
+          "- reliability practices (observability, CI/CD, incident response)\n" +
+          "- product context (payments, identity, integrations)\n\n" +
+          "### The goal isn’t to paste a list\n" +
+          "Your goal is to **prove** keywords with credible context: where you used the tool, what you built, what improved, and at what scale.\n\n" +
+          "If you want the fastest workflow, start with the job post and extract the missing terms first. A good process is:\n" +
+          "1. Paste the job description into CVBoosta.\n" +
+          "2. Review missing keywords + match score.\n" +
+          "3. Add only what you can support with real experience.\n\n" +
+          "Related reading: [How to Tailor Resume to Job Description](/blog/tailor-resume-to-job-description) and [Top ATS Resume Mistakes to Avoid](/blog/ats-resume-mistakes).",
+      },
+      {
+        title: "Backend developer ATS keyword list (grouped by intent)",
+        body:
+          "Below is a curated list you can use as a checklist. You don’t need all of them — you need the ones that match *your* target role.\n\n" +
+          "### Core backend keywords\n" +
+          "- REST API, API development, microservices, monolith, service boundaries\n" +
+          "- authentication, authorization, OAuth2, JWT, session management\n" +
+          "- database design, SQL, migrations, indexing, query optimization\n" +
+          "- caching, Redis, CDN, rate limiting\n\n" +
+          "### Reliability & scale keywords\n" +
+          "- observability, monitoring, logging, alerting\n" +
+          "- SLO, SLA, incident response, postmortems\n" +
+          "- performance optimization, latency, throughput\n" +
+          "- load balancing, horizontal scaling\n\n" +
+          "### Common stacks (use only what’s true for you)\n" +
+          "- Python, Django, FastAPI, Flask, Celery\n" +
+          "- Node.js, TypeScript, Express, NestJS\n" +
+          "- Java, Spring Boot\n" +
+          "- Go, gRPC, Protobuf\n" +
+          "- PostgreSQL, MySQL, MongoDB, Elasticsearch\n\n" +
+          "### Domain keywords (high impact when relevant)\n" +
+          "- payments, subscriptions, billing, invoicing, chargebacks\n" +
+          "- webhooks, integrations, third‑party APIs\n" +
+          "- data pipelines, event-driven, Kafka, RabbitMQ\n\n" +
+          "Tip: If you’re not sure which terms are most important, open our role page and compare it to your job post: [Backend Developer Resume Keywords](/resume-keywords/backend-developer).",
+      },
+      {
+        title: "Where to place keywords so ATS and humans both understand you",
+        body:
+          "A common failure mode is “keywords only in Skills.” ATS can still match, but recruiters won’t see proof.\n\n" +
+          "### Best-practice placement (simple structure)\n" +
+          "- **Headline / Summary:** 2–4 role-defining terms (e.g., “Backend Engineer • APIs • PostgreSQL • AWS”).\n" +
+          "- **Skills:** grouped, not a wall of words (Languages, Frameworks, Databases, Cloud, Tooling).\n" +
+          "- **Experience bullets:** each bullet should contain *one* relevant keyword + measurable outcome.\n\n" +
+          "### Bullet formula that reads naturally\n" +
+          "Use: **Action + System + Keyword + Result**.\n\n" +
+          "Examples:\n" +
+          "- “Built a REST API in FastAPI with JWT auth; reduced onboarding time from 3 days to 1 hour.”\n" +
+          "- “Optimized PostgreSQL queries and indexing for high-traffic endpoints; improved p95 latency by 38%.”\n\n" +
+          "If you struggle to rewrite bullets without sounding robotic, this checklist helps: [How to Improve ATS Resume Score](/blog/improve-ats-resume-score).",
+      },
+      {
+        title: "Common backend resume keyword mistakes (and how to fix them fast)",
+        body:
+          "Most “ATS problems” are actually **structure + evidence** problems. Here are the patterns we see most often with backend developer resumes.\n\n" +
+          "### Mistake 1: listing tools you didn’t use recently\n" +
+          "Recruiters spot inflated stacks quickly. If you haven’t touched a tool in 3+ years, either remove it or move it to a clearly labeled “Previous” bucket.\n\n" +
+          "### Mistake 2: keywords without context\n" +
+          "Writing “Kafka, Redis, Kubernetes” in Skills is weaker than one bullet that proves you used them.\n\n" +
+          "Quick fix:\n" +
+          "- Pick 3–5 “must-have” keywords from the vacancy.\n" +
+          "- Add 1 bullet each in your most recent roles that shows *what you built* and *what improved*.\n\n" +
+          "### Mistake 3: vague verbs (“worked on”, “helped with”)\n" +
+          "ATS may match, but humans won’t be convinced.\n\n" +
+          "Quick fix:\n" +
+          "- Replace vague verbs with concrete actions (built, implemented, migrated, optimized, automated).\n" +
+          "- Add a result: latency, error rate, throughput, cost, reliability, release speed.\n\n" +
+          "### Mistake 4: inconsistent naming\n" +
+          "If the job post says “PostgreSQL” and you write “Postgres” everywhere, you may reduce exact-match signals.\n\n" +
+          "Quick fix:\n" +
+          "- Mirror the job’s exact term once (PostgreSQL) and optionally add the variant (Postgres) in parentheses.\n\n" +
+          "More pitfalls (layout, file formats, columns): [Top ATS Resume Mistakes to Avoid](/blog/ats-resume-mistakes).",
+      },
+      {
+        title: "Before/After examples (ATS-friendly, not keyword stuffing)",
+        body:
+          "These examples show how to add keywords *with evidence*.\n\n" +
+          "### Example 1: vague → specific\n" +
+          "- **Before:** “Worked on backend features and improvements.”\n" +
+          "- **After:** “Delivered microservice endpoints for order processing (REST API, PostgreSQL); improved error rate by 22% via structured logging and alerts.”\n\n" +
+          "### Example 2: tool mention → impact mention\n" +
+          "- **Before:** “Used AWS and Docker.”\n" +
+          "- **After:** “Containerized services with Docker and deployed on AWS; added CI/CD checks to prevent regressions and speed releases.”\n\n" +
+          "### Example 3: “security” without proof → security with scope\n" +
+          "- **Before:** “Implemented security improvements.”\n" +
+          "- **After:** “Implemented OAuth2 flows and JWT validation; tightened authorization checks and reduced unauthorized access incidents.”\n\n" +
+          "Want faster iteration? Run CVBoosta, check missing keywords, and update only the top 5–10 gaps first — that typically produces the biggest score lift without bloating the resume.",
+      },
+      {
+        title: "How to use CVBoosta to tailor your backend resume to a specific vacancy (60-second workflow)",
+        body:
+          "Here’s a repeatable process that works even when job descriptions are long and noisy.\n\n" +
+          "### Step-by-step\n" +
+          "1. Upload your resume and paste the job description.\n" +
+          "2. Check **missing keywords** and the match score snapshot.\n" +
+          "3. Pick the top missing items that you can honestly support.\n" +
+          "4. Generate an optimized version, then review edits before exporting.\n\n" +
+          "### What to do if the job post is messy\n" +
+          "- Remove company “benefits” sections before pasting (they often add irrelevant noise).\n" +
+          "- Prefer repeated requirements over one-off “nice-to-haves.”\n" +
+          "- Keep terminology consistent (e.g., “PostgreSQL” vs “Postgres”).\n\n" +
+          "For a broader strategy (not only backend), see: [How to Improve ATS Resume Score](/blog/improve-ats-resume-score).",
+      },
+    ],
+    takeawayTitle: "Key takeaway",
+    takeawayBody:
+      "Backend ATS wins come from the right keywords placed in the right sections with proof. Match the vacancy, show evidence, and avoid keyword stuffing.",
+  },
+  {
     slug: "tailor-resume-to-job-description",
     publishAt: "2026-04-21",
     title: "How to Tailor Resume to Job Description",
