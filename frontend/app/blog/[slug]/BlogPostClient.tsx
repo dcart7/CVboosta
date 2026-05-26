@@ -243,6 +243,7 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
   const ctaPrimary = tr("blog.cta.primary", "Optimize my resume");
   const ctaSecondary = tr("blog.cta.secondary", "Free ATS checker");
   const ctaTertiary = tr("blog.cta.tertiary", "Resume keywords by role");
+  const ctaRegister = tr("blog.cta.register", "Create free account");
 
   const midCtaTitle = tr("blog.cta.midTitle", "Try CVBoosta while you read");
   const midCtaBody = tr(
@@ -291,6 +292,9 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
               </Link>
               <Link className="btn secondary" href="/free-ats-resume-checker">
                 {ctaSecondary}
+              </Link>
+              <Link className="btn ghost" href="/register">
+                {ctaRegister}
               </Link>
               <Link className="btn ghost" href="/resume-keywords">
                 {ctaTertiary}
@@ -399,6 +403,9 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
               </Link>
               <Link className="btn secondary" href="/free-ats-resume-checker">
                 {ctaSecondary}
+              </Link>
+              <Link className="btn ghost" href="/register">
+                {ctaRegister}
               </Link>
               <Link className="btn ghost" href="/resume-keywords">
                 {ctaTertiary}

@@ -157,6 +157,7 @@ export const translations = {
           "Run a safe ATS scan and generate an optimized version in ~60 seconds. Review every edit before export.",
         primary: "Optimize my resume",
         secondary: "Free ATS checker",
+        register: "Create free account",
         tertiary: "Resume keywords by role",
         midTitle: "Try CVBoosta while you read",
         midBody:
@@ -861,6 +862,7 @@ export const translations = {
           "Запустіть безпечний ATS-скан і отримайте оптимізовану версію приблизно за 60 секунд. Перегляньте всі зміни перед експортом.",
         primary: "Оптимізувати резюме",
         secondary: "Безкоштовний ATS чекер",
+        register: "Створити акаунт безкоштовно",
         tertiary: "Ключові слова за ролями",
         midTitle: "Спробуйте CVBoosta під час читання",
         midBody:
@@ -1562,6 +1564,7 @@ export const translations = {
           "Uruchom bezpieczny skan ATS i wygeneruj zoptymalizowaną wersję w ~60 sekund. Przejrzyj każdą zmianę przed eksportem.",
         primary: "Optymalizuj CV",
         secondary: "Darmowy ATS checker",
+        register: "Załóż darmowe konto",
         tertiary: "Słowa kluczowe według roli",
         midTitle: "Wypróbuj CVBoosta w trakcie czytania",
         midBody:
@@ -2254,6 +2257,7 @@ export const translations = {
           "Spustite bezpečný ATS sken a vygenerujte optimalizovanú verziu približne za 60 sekúnd. Pred exportom si skontrolujte každú úpravu.",
         primary: "Optimalizovať CV",
         secondary: "Bezplatný ATS checker",
+        register: "Vytvoriť účet zdarma",
         tertiary: "Kľúčové slová podľa roly",
         midTitle: "Vyskúšajte CVBoosta počas čítania",
         midBody:
@@ -2950,6 +2954,7 @@ export const translations = {
           "Spusťte bezpečný ATS sken a vygenerujte optimalizovanou verzi za ~60 sekund. Před exportem zkontrolujte každou úpravu.",
         primary: "Optimalizovat CV",
         secondary: "ATS checker zdarma",
+        register: "Vytvořit účet zdarma",
         tertiary: "Klíčová slova podle role",
         midTitle: "Vyzkoušejte CVBoosta při čtení",
         midBody:
@@ -3651,6 +3656,7 @@ export const translations = {
           "Haz un escaneo ATS seguro y genera una versión optimizada en ~60 segundos. Revisa cada cambio antes de exportar.",
         primary: "Optimizar mi CV",
         secondary: "ATS checker gratis",
+        register: "Crear cuenta gratis",
         tertiary: "Palabras clave por rol",
         midTitle: "Prueba CVBoosta mientras lees",
         midBody:
