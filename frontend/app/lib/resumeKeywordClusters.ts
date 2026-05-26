@@ -354,6 +354,12 @@ function buildExpandedRoleSeeds(baseSeeds: RoleSeed[]): RoleSeed[] {
     seedMap.set(slug, { role: normalized, category });
   };
 
+  const roleHasTrack = (role: string, track: string) => {
+    const roleTokens = new Set(role.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+    const trackTokens = track.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    return trackTokens.some((token) => roleTokens.has(token));
+  };
+
   baseSeeds.forEach((seed) => addSeed(seed.role, seed.category));
 
   for (const seed of baseSeeds) {
@@ -366,8 +372,10 @@ function buildExpandedRoleSeeds(baseSeeds: RoleSeed[]): RoleSeed[] {
   for (const seed of baseSeeds) {
     const baseRole = stripLeadingLevel(seed.role);
     for (const track of CATEGORY_TRACKS[seed.category]) {
-      addSeed(`${baseRole} ${track}`, seed.category);
-      addSeed(`${track} ${baseRole}`, seed.category);
+      // Avoid awkward repeats like "Analytics Analytics Engineer" or "API API Engineer".
+      if (!roleHasTrack(baseRole, track)) {
+        addSeed(`${baseRole} ${track}`, seed.category);
+      }
     }
   }
 
