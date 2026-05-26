@@ -99,8 +99,11 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
               <Link className="btn primary" href="/free-ats-resume-checker">
                 {ui.freeChecker}
               </Link>
-              <Link className="btn ghost" href="/pricing">
+              <Link className="btn secondary" href="/app">
                 {ui.optimizeCv}
+              </Link>
+              <Link className="btn ghost" href="/register">
+                {ui.register}
               </Link>
             </div>
           </div>

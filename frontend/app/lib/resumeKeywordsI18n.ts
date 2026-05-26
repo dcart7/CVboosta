@@ -40,6 +40,7 @@ type UiTexts = {
   nextStepText: string;
   freeChecker: string;
   optimizeCv: string;
+  register: string;
   before: string;
   after: string;
 };
@@ -194,6 +195,7 @@ const UI: Record<Language, UiTexts> = {
       "Apply this guide on your resume with live ATS feedback and missing keyword detection.",
     freeChecker: "Free ATS Resume Checker",
     optimizeCv: "Optimize CV",
+    register: "Create free account",
     before: "Before",
     after: "After",
   },
@@ -247,6 +249,7 @@ const UI: Record<Language, UiTexts> = {
       "Застосуйте цей гайд до свого резюме з live ATS-фідбеком і пошуком відсутніх ключових слів.",
     freeChecker: "Безкоштовний ATS Resume Checker",
     optimizeCv: "Оптимізувати CV",
+    register: "Створити акаунт безкоштовно",
     before: "До",
     after: "Після",
   },
@@ -300,6 +303,7 @@ const UI: Record<Language, UiTexts> = {
       "Zastosuj ten poradnik do swojego CV z live ATS feedback i wykrywaniem brakujących słów kluczowych.",
     freeChecker: "Darmowy ATS Resume Checker",
     optimizeCv: "Optymalizuj CV",
+    register: "Załóż darmowe konto",
     before: "Przed",
     after: "Po",
   },
@@ -353,6 +357,7 @@ const UI: Record<Language, UiTexts> = {
       "Použite tento návod na svoj životopis s live ATS spätnou väzbou a detekciou chýbajúcich kľúčových slov.",
     freeChecker: "Bezplatný ATS Resume Checker",
     optimizeCv: "Optimalizovať CV",
+    register: "Vytvoriť účet zdarma",
     before: "Pred",
     after: "Po",
   },
@@ -406,6 +411,7 @@ const UI: Record<Language, UiTexts> = {
       "Použijte tento průvodce na svůj životopis s live ATS zpětnou vazbou a detekcí chybějících klíčových slov.",
     freeChecker: "Bezplatný ATS Resume Checker",
     optimizeCv: "Optimalizovat CV",
+    register: "Vytvořit účet zdarma",
     before: "Před",
     after: "Po",
   },
@@ -459,6 +465,7 @@ const UI: Record<Language, UiTexts> = {
       "Aplica esta guía a tu CV con feedback ATS en vivo y detección de palabras clave faltantes.",
     freeChecker: "Free ATS Resume Checker",
     optimizeCv: "Optimizar CV",
+    register: "Crear cuenta gratis",
     before: "Antes",
     after: "Después",
   },
