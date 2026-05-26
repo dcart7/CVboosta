@@ -13,46 +13,104 @@ type BlogPostClientProps = {
   relatedRoles: Array<{ slug: string; role: string }>;
 };
 
-function renderTextWithLinks(text: string): ReactNode[] {
-  const pattern = /\[([^\]]+)\]\((\/[^\s)]+|https?:\/\/[^\s)]+)\)/g;
-  const nodes: ReactNode[] = [];
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
+type InlineToken =
+  | { type: "text"; value: string }
+  | { type: "bold"; value: string }
+  | { type: "italic"; value: string }
+  | { type: "code"; value: string }
+  | { type: "link"; label: string; href: string };
 
-  while ((match = pattern.exec(text)) !== null) {
-    const [fullMatch, label, href] = match;
-    const start = match.index;
+function tokenizeInline(markdown: string): InlineToken[] {
+  const tokens: InlineToken[] = [];
+  let i = 0;
 
-    if (start > lastIndex) {
-      nodes.push(text.slice(lastIndex, start));
-    }
-
-    if (href.startsWith("/")) {
-      nodes.push(
-        <Link key={`${href}-${start}`} href={href}>
-          {label}
-        </Link>,
-      );
+  const pushText = (value: string) => {
+    if (!value) return;
+    const prev = tokens[tokens.length - 1];
+    if (prev?.type === "text") {
+      prev.value += value;
     } else {
-      nodes.push(
-        <a key={`${href}-${start}`} href={href} target="_blank" rel="noopener noreferrer">
-          {label}
-        </a>,
-      );
+      tokens.push({ type: "text", value });
+    }
+  };
+
+  while (i < markdown.length) {
+    // Links: [label](href)
+    if (markdown[i] === "[") {
+      const close = markdown.indexOf("]", i + 1);
+      const openParen = close >= 0 ? markdown.indexOf("(", close + 1) : -1;
+      const closeParen = openParen >= 0 ? markdown.indexOf(")", openParen + 1) : -1;
+      if (close > i && openParen === close + 1 && closeParen > openParen) {
+        const label = markdown.slice(i + 1, close);
+        const href = markdown.slice(openParen + 1, closeParen);
+        if (href.startsWith("/") || href.startsWith("http://") || href.startsWith("https://")) {
+          tokens.push({ type: "link", label, href });
+          i = closeParen + 1;
+          continue;
+        }
+      }
     }
 
-    lastIndex = start + fullMatch.length;
+    // Inline code: `code`
+    if (markdown[i] === "`") {
+      const end = markdown.indexOf("`", i + 1);
+      if (end > i + 1) {
+        tokens.push({ type: "code", value: markdown.slice(i + 1, end) });
+        i = end + 1;
+        continue;
+      }
+    }
+
+    // Bold: **text**
+    if (markdown.startsWith("**", i)) {
+      const end = markdown.indexOf("**", i + 2);
+      if (end > i + 2) {
+        tokens.push({ type: "bold", value: markdown.slice(i + 2, end) });
+        i = end + 2;
+        continue;
+      }
+    }
+
+    // Italic: *text*
+    if (markdown[i] === "*") {
+      const end = markdown.indexOf("*", i + 1);
+      if (end > i + 1) {
+        tokens.push({ type: "italic", value: markdown.slice(i + 1, end) });
+        i = end + 1;
+        continue;
+      }
+    }
+
+    pushText(markdown[i]);
+    i += 1;
   }
 
-  if (lastIndex < text.length) {
-    nodes.push(text.slice(lastIndex));
-  }
+  return tokens;
+}
 
-  if (nodes.length === 0) {
-    return [text];
-  }
-
-  return nodes;
+function renderInline(markdown: string): ReactNode[] {
+  const tokens = tokenizeInline(markdown);
+  return tokens.map((token, index) => {
+    if (token.type === "text") return token.value;
+    if (token.type === "bold") return <strong key={`b-${index}`}>{token.value}</strong>;
+    if (token.type === "italic") return <em key={`i-${index}`}>{token.value}</em>;
+    if (token.type === "code") return <code key={`c-${index}`}>{token.value}</code>;
+    if (token.type === "link") {
+      if (token.href.startsWith("/")) {
+        return (
+          <Link key={`l-${index}`} href={token.href}>
+            {token.label}
+          </Link>
+        );
+      }
+      return (
+        <a key={`l-${index}`} href={token.href} target="_blank" rel="noopener noreferrer">
+          {token.label}
+        </a>
+      );
+    }
+    return null;
+  });
 }
 
 function renderMarkdownLite(markdown: string): ReactNode {
@@ -70,15 +128,42 @@ function renderMarkdownLite(markdown: string): ReactNode {
     }
 
     if (line.startsWith("### ")) {
-      blocks.push(<h3 key={`h3-${i}`}>{renderTextWithLinks(line.slice(4).trim())}</h3>);
+      blocks.push(<h3 key={`h3-${i}`}>{renderInline(line.slice(4).trim())}</h3>);
       i += 1;
       continue;
     }
 
     if (line.startsWith("#### ")) {
-      blocks.push(<h4 key={`h4-${i}`}>{renderTextWithLinks(line.slice(5).trim())}</h4>);
+      blocks.push(<h4 key={`h4-${i}`}>{renderInline(line.slice(5).trim())}</h4>);
       i += 1;
       continue;
+    }
+
+    // Before/After pairs (common in our content): "- **Before:** ..." + "- **After:** ..."
+    const beforeMatch = raw.match(/^\s*-\s+(?:\*\*)?Before:(?:\*\*)?\s*(.+)$/i);
+    if (beforeMatch) {
+      const beforeText = beforeMatch[1].trim();
+      let afterText = "";
+      let j = i + 1;
+      while (j < lines.length && !lines[j].trim()) j += 1;
+      const afterMatch = j < lines.length ? lines[j].match(/^\s*-\s+(?:\*\*)?After:(?:\*\*)?\s*(.+)$/i) : null;
+      if (afterMatch) {
+        afterText = afterMatch[1].trim();
+        blocks.push(
+          <div className="before-after" key={`ba-${i}`}>
+            <div className="before-after-card is-before">
+              <div className="before-after-label">Before</div>
+              <div className="before-after-text">{renderInline(beforeText)}</div>
+            </div>
+            <div className="before-after-card is-after">
+              <div className="before-after-label">After</div>
+              <div className="before-after-text">{renderInline(afterText)}</div>
+            </div>
+          </div>,
+        );
+        i = j + 1;
+        continue;
+      }
     }
 
     // Unordered list
@@ -86,7 +171,7 @@ function renderMarkdownLite(markdown: string): ReactNode {
       const items: ReactNode[] = [];
       while (i < lines.length && /^\s*-\s+/.test(lines[i])) {
         const itemText = lines[i].replace(/^\s*-\s+/, "").trim();
-        items.push(<li key={`ul-${i}`}>{renderTextWithLinks(itemText)}</li>);
+        items.push(<li key={`ul-${i}`}>{renderInline(itemText)}</li>);
         i += 1;
       }
       blocks.push(<ul key={`ul-block-${i}`}>{items}</ul>);
@@ -98,7 +183,7 @@ function renderMarkdownLite(markdown: string): ReactNode {
       const items: ReactNode[] = [];
       while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
         const itemText = lines[i].replace(/^\s*\d+\.\s+/, "").trim();
-        items.push(<li key={`ol-${i}`}>{renderTextWithLinks(itemText)}</li>);
+        items.push(<li key={`ol-${i}`}>{renderInline(itemText)}</li>);
         i += 1;
       }
       blocks.push(<ol key={`ol-block-${i}`}>{items}</ol>);
@@ -117,7 +202,7 @@ function renderMarkdownLite(markdown: string): ReactNode {
       i += 1;
     }
     const paragraph = paragraphLines.join(" ");
-    blocks.push(<p key={`p-${i}`}>{renderTextWithLinks(paragraph)}</p>);
+    blocks.push(<p key={`p-${i}`}>{renderInline(paragraph)}</p>);
   }
 
   return <>{blocks}</>;
@@ -150,6 +235,21 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
     ? tr(`${postKey}.takeawayBody`, localizedPost.takeawayBody)
     : localizedPost.takeawayBody;
 
+  const ctaTitle = tr("blog.cta.title", "Tailor your resume with CVBoosta");
+  const ctaBody = tr(
+    "blog.cta.body",
+    "Run a safe ATS scan and generate an optimized version in ~60 seconds. Review every edit before export.",
+  );
+  const ctaPrimary = tr("blog.cta.primary", "Optimize my resume");
+  const ctaSecondary = tr("blog.cta.secondary", "Free ATS checker");
+  const ctaTertiary = tr("blog.cta.tertiary", "Resume keywords by role");
+
+  const midCtaTitle = tr("blog.cta.midTitle", "Try CVBoosta while you read");
+  const midCtaBody = tr(
+    "blog.cta.midBody",
+    "Paste the vacancy, see missing keywords, and update only the top gaps you can prove—no keyword stuffing.",
+  );
+
   return (
     <main className="page">
       <TopNav />
@@ -181,6 +281,22 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
               </div>
             );
           })}
+
+          <div className="blog-takeaway card">
+            <h3>{midCtaTitle}</h3>
+            <p>{midCtaBody}</p>
+            <div className="nav-actions" style={{ marginTop: "12px" }}>
+              <Link className="btn primary" href="/app">
+                {ctaPrimary}
+              </Link>
+              <Link className="btn secondary" href="/free-ats-resume-checker">
+                {ctaSecondary}
+              </Link>
+              <Link className="btn ghost" href="/resume-keywords">
+                {ctaTertiary}
+              </Link>
+            </div>
+          </div>
 
           {showLongformAppendix && (
             <div className="blog-post-section card">
@@ -275,17 +391,17 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
           </div>
 
           <div className="blog-takeaway card">
-            <h3>Try CVBoosta in 60 seconds</h3>
-            <p>
-              Run a safe ATS scan and generate an optimized version you can review before exporting.
-              Your text is protected and never auto-submitted anywhere.
-            </p>
+            <h3>{ctaTitle}</h3>
+            <p>{ctaBody}</p>
             <div className="nav-actions" style={{ marginTop: "12px" }}>
               <Link className="btn primary" href="/app">
-                Optimize my resume
+                {ctaPrimary}
+              </Link>
+              <Link className="btn secondary" href="/free-ats-resume-checker">
+                {ctaSecondary}
               </Link>
               <Link className="btn ghost" href="/resume-keywords">
-                Browse resume keywords
+                {ctaTertiary}
               </Link>
             </div>
           </div>

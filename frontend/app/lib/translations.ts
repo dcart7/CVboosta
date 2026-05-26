@@ -151,6 +151,17 @@ export const translations = {
       readArticle: "Read article",
       backToBlog: "Back to blog",
       publishedOn: "Published",
+      cta: {
+        title: "Tailor your resume with CVBoosta",
+        body:
+          "Run a safe ATS scan and generate an optimized version in ~60 seconds. Review every edit before export.",
+        primary: "Optimize my resume",
+        secondary: "Free ATS checker",
+        tertiary: "Resume keywords by role",
+        midTitle: "Try CVBoosta while you read",
+        midBody:
+          "Paste the vacancy, see missing keywords, and update only the top gaps you can prove—no keyword stuffing.",
+      },
       articles: {
         tailor: {
           title: "How to Tailor Resume to Job Description",
@@ -844,6 +855,17 @@ export const translations = {
       readArticle: "Читати статтю",
       backToBlog: "Назад до блогу",
       publishedOn: "Опубліковано",
+      cta: {
+        title: "Адаптуйте резюме з CVBoosta",
+        body:
+          "Запустіть безпечний ATS-скан і отримайте оптимізовану версію приблизно за 60 секунд. Перегляньте всі зміни перед експортом.",
+        primary: "Оптимізувати резюме",
+        secondary: "Безкоштовний ATS чекер",
+        tertiary: "Ключові слова за ролями",
+        midTitle: "Спробуйте CVBoosta під час читання",
+        midBody:
+          "Вставте вакансію, подивіться відсутні ключові слова та закрийте лише топ-прогалини, які можете підтвердити — без keyword stuffing.",
+      },
       articles: {
         tailor: {
           title: "Як адаптувати резюме під опис вакансії",
@@ -1534,6 +1556,17 @@ export const translations = {
       readArticle: "Czytaj artykuł",
       backToBlog: "Wróć do bloga",
       publishedOn: "Opublikowano",
+      cta: {
+        title: "Dopasuj CV z CVBoosta",
+        body:
+          "Uruchom bezpieczny skan ATS i wygeneruj zoptymalizowaną wersję w ~60 sekund. Przejrzyj każdą zmianę przed eksportem.",
+        primary: "Optymalizuj CV",
+        secondary: "Darmowy ATS checker",
+        tertiary: "Słowa kluczowe według roli",
+        midTitle: "Wypróbuj CVBoosta w trakcie czytania",
+        midBody:
+          "Wklej ofertę, zobacz brakujące słowa kluczowe i uzupełnij tylko najważniejsze luki, które możesz udowodnić — bez keyword stuffing.",
+      },
       articles: {
         tailor: {
           title: "Jak dopasować CV do opisu stanowiska",
@@ -2215,6 +2248,17 @@ export const translations = {
       readArticle: "Čítať článok",
       backToBlog: "Späť na blog",
       publishedOn: "Publikované",
+      cta: {
+        title: "Prispôsobte si CV s CVBoosta",
+        body:
+          "Spustite bezpečný ATS sken a vygenerujte optimalizovanú verziu približne za 60 sekúnd. Pred exportom si skontrolujte každú úpravu.",
+        primary: "Optimalizovať CV",
+        secondary: "Bezplatný ATS checker",
+        tertiary: "Kľúčové slová podľa roly",
+        midTitle: "Vyskúšajte CVBoosta počas čítania",
+        midBody:
+          "Vložte inzerát, pozrite si chýbajúce kľúčové slová a doplňte len top medzery, ktoré viete doložiť — bez keyword stuffing.",
+      },
       articles: {
         tailor: {
           title: "Ako prispôsobiť CV popisu pozície",
@@ -2900,6 +2944,17 @@ export const translations = {
       readArticle: "Číst článek",
       backToBlog: "Zpět na blog",
       publishedOn: "Publikováno",
+      cta: {
+        title: "Přizpůsobte CV s CVBoosta",
+        body:
+          "Spusťte bezpečný ATS sken a vygenerujte optimalizovanou verzi za ~60 sekund. Před exportem zkontrolujte každou úpravu.",
+        primary: "Optimalizovat CV",
+        secondary: "ATS checker zdarma",
+        tertiary: "Klíčová slova podle role",
+        midTitle: "Vyzkoušejte CVBoosta při čtení",
+        midBody:
+          "Vložte nabídku práce, uvidíte chybějící klíčová slova a doplňte jen top mezery, které můžete doložit — bez keyword stuffing.",
+      },
       articles: {
         tailor: {
           title: "Jak přizpůsobit CV popisu pozice",
@@ -3590,6 +3645,17 @@ export const translations = {
       readArticle: "Leer artículo",
       backToBlog: "Volver al blog",
       publishedOn: "Publicado",
+      cta: {
+        title: "Adapta tu CV con CVBoosta",
+        body:
+          "Haz un escaneo ATS seguro y genera una versión optimizada en ~60 segundos. Revisa cada cambio antes de exportar.",
+        primary: "Optimizar mi CV",
+        secondary: "ATS checker gratis",
+        tertiary: "Palabras clave por rol",
+        midTitle: "Prueba CVBoosta mientras lees",
+        midBody:
+          "Pega la vacante, mira las palabras clave faltantes y cierra solo las brechas principales que puedas respaldar — sin keyword stuffing.",
+      },
       articles: {
         tailor: {
           title: "Cómo adaptar tu CV a la descripción del puesto",
