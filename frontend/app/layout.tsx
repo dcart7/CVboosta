@@ -4,6 +4,7 @@ import CookieBanner from "./components/CookieBanner";
 import RouteTransition from "./components/RouteTransition";
 import BehaviorTracking from "./components/BehaviorTracking";
 import GoogleTagManager from "./components/GoogleTagManager";
+import GoogleAdsTag from "./components/GoogleAdsTag";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
@@ -106,6 +107,7 @@ export default function RootLayout({
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <GoogleTagManager />
+        <GoogleAdsTag />
         <BehaviorTracking />
         <LanguageProvider>
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>

@@ -24,6 +24,20 @@ export default function CookieBanner() {
 
   const saveConsent = (type: string) => {
     localStorage.setItem("cookie-consent", type);
+    if (type === "accepted-all") {
+      localStorage.setItem(
+        "cookie-preferences",
+        JSON.stringify({ necessary: true, analytics: true, marketing: true }),
+      );
+    } else if (type === "rejected-all") {
+      localStorage.setItem(
+        "cookie-preferences",
+        JSON.stringify({ necessary: true, analytics: false, marketing: false }),
+      );
+    } else if (type === "custom") {
+      localStorage.setItem("cookie-preferences", JSON.stringify(preferences));
+    }
+    window.dispatchEvent(new Event("cookie-consent-updated"));
     setShow(false);
     setShowPreferences(false);
   };
