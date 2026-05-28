@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import Script from "next/script";
 import { useTranslation } from "../lib/LanguageContext";
 
 export default function Footer() {
@@ -58,6 +59,43 @@ export default function Footer() {
                 {t("footer.linkedin")}
               </a>
             </div>
+
+            <div className="footer-review-row" aria-label="Review links">
+              <a
+                href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-cvboosta-ai-resume-optimizer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-review-badge"
+                aria-label="Leave a review on Product Hunt"
+              >
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1209906&theme=light"
+                  alt="Leave a review on Product Hunt"
+                  width={250}
+                  height={54}
+                  loading="lazy"
+                />
+              </a>
+
+              <Script
+                id="trustpilot-widget"
+                strategy="afterInteractive"
+                src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+              />
+              <div
+                className="trustpilot-widget footer-review-trustpilot"
+                data-locale="en-US"
+                data-template-id="56278e9abfbbba0bdcd568bc"
+                data-businessunit-id="69f3862ed92de14a6b52d88c"
+                data-style-height="52px"
+                data-style-width="100%"
+                data-token="16fdccf2-5744-4915-8d1d-5b1fcc003d22"
+              >
+                <a href="https://www.trustpilot.com/review/cvboosta.com" target="_blank" rel="noopener noreferrer">
+                  Trustpilot
+                </a>
+              </div>
+            </div>
           </div>
 
           <div className="footer-right">
@@ -105,6 +143,25 @@ export default function Footer() {
           align-items: center;
           width: fit-content;
           gap: 16px;
+        }
+        .footer-review-row {
+          margin-top: 10px;
+          display: grid;
+          gap: 12px;
+          align-items: start;
+          max-width: 560px;
+        }
+        .footer-review-badge {
+          display: inline-flex;
+          width: fit-content;
+          text-decoration: none;
+        }
+        .footer-review-badge img {
+          border-radius: 12px;
+          box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+        }
+        .footer-review-trustpilot {
+          max-width: 560px;
         }
         .footer-social-btn {
           display: inline-flex;
@@ -255,6 +312,9 @@ export default function Footer() {
             padding-top: 0;
           }
           .footer-social-row {
+            width: 100%;
+          }
+          .footer-review-row {
             width: 100%;
           }
         }
