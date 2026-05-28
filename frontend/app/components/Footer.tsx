@@ -12,35 +12,38 @@ export default function Footer() {
     <footer className="footer">
       <div className="shell">
         <div className="footer-content">
-          <div className="footer-left">
-            <Link href="/" className="logo">
-              <Image
-                src="/logo.png"
-                alt="CVboosta logo"
-                width={34}
-                height={34}
-                className="footer-logo"
-                sizes="34px"
-              />
-              <span className="logo-text">
-                CV<span>boosta</span>
-              </span>
-            </Link>
+          <div className="footer-row footer-row-1">
+            <div className="footer-brand">
+              <Link href="/" className="logo">
+                <Image
+                  src="/logo.png"
+                  alt="CVboosta logo"
+                  width={34}
+                  height={34}
+                  className="footer-logo"
+                  sizes="34px"
+                />
+                <span className="logo-text">
+                  CV<span>boosta</span>
+                </span>
+              </Link>
 
-            <div className="footer-meta">
-              <p className="footer-copy">{t("footer.rights")}</p>
-              <a
-                href="https://virelsolutions.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="attribution-link"
-              >
-                {t("footer.createdBy")}
-              </a>
-              <a href={`mailto:${t("footer.support")}`} className="footer-email">
-                {t("footer.support")}
-              </a>
+              <div className="footer-meta">
+                <p className="footer-copy">{t("footer.rights")}</p>
+                <a
+                  href="https://virelsolutions.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="attribution-link"
+                >
+                  {t("footer.createdBy")}
+                </a>
+                <a href={`mailto:${t("footer.support")}`} className="footer-email">
+                  {t("footer.support")}
+                </a>
+              </div>
             </div>
+
             <div className="footer-social-row">
               <a
                 href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer"
@@ -59,8 +62,11 @@ export default function Footer() {
                 {t("footer.linkedin")}
               </a>
             </div>
+          </div>
 
-            <div className="footer-review-row" aria-label="Review links">
+          <div className="footer-row footer-row-2" aria-label="Review links">
+            <div className="footer-review-head">LEAVE A REVIEW ON</div>
+            <div className="footer-review-grid">
               <a
                 href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-cvboosta-ai-resume-optimizer"
                 target="_blank"
@@ -98,7 +104,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="footer-right">
+          <div className="footer-row footer-row-3">
             <div className="footer-links">
               <Link href="/privacy" className="footer-link">
                 {t("footer.privacy")}
@@ -126,12 +132,20 @@ export default function Footer() {
           backdrop-filter: blur(10px);
         }
         .footer-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 24px;
+          display: grid;
+          gap: 18px;
         }
-        .footer-left {
+        .footer-row {
+          display: flex;
+          align-items: flex-start;
+          justify-content: flex-start;
+          gap: 16px 18px;
+          flex-wrap: wrap;
+        }
+        .footer-row-1 {
+          justify-content: space-between;
+        }
+        .footer-brand {
           display: flex;
           flex-direction: column;
           gap: 14px;
@@ -144,12 +158,21 @@ export default function Footer() {
           width: fit-content;
           gap: 16px;
         }
-        .footer-review-row {
-          margin-top: 10px;
+        .footer-review-head {
+          font-size: 12px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          font-weight: 800;
+          color: var(--muted);
+          opacity: 0.88;
+        }
+        .footer-review-grid {
           display: grid;
-          gap: 12px;
-          align-items: start;
-          max-width: 560px;
+          grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+          gap: 12px 16px;
+          align-items: center;
+          width: 100%;
+          max-width: 860px;
         }
         .footer-review-badge {
           display: inline-flex;
@@ -161,7 +184,7 @@ export default function Footer() {
           box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
         }
         .footer-review-trustpilot {
-          max-width: 560px;
+          width: 100%;
         }
         .footer-social-btn {
           display: inline-flex;
@@ -188,13 +211,6 @@ export default function Footer() {
           border-color: color-mix(in srgb, var(--accent) 56%, var(--glass-border));
           opacity: 0.92;
           transform: translateY(-1px);
-        }
-        .footer-right {
-          display: flex;
-          align-items: flex-start;
-          justify-content: flex-end;
-          min-width: 220px;
-          padding-top: 8px;
         }
         .logo {
           display: inline-flex;
@@ -262,7 +278,8 @@ export default function Footer() {
         }
         .footer-links {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
+          flex-wrap: wrap;
           align-items: flex-start;
           gap: 10px;
         }
@@ -301,21 +318,11 @@ export default function Footer() {
           transform: translateY(-1px);
         }
         @media (max-width: 640px) {
-          .footer-content {
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-          }
-          .footer-right {
-            justify-content: flex-start;
-            min-width: 0;
-            padding-top: 0;
-          }
           .footer-social-row {
             width: 100%;
           }
-          .footer-review-row {
-            width: 100%;
+          .footer-review-grid {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>
