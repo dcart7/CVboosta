@@ -13,7 +13,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
 
 export const metadata: Metadata = {
   title: "CVboosta | ATS-Friendly CV Optimization",
-  description: "Stop guessing why you don't get callbacks. Get an honest AI feedback and ATS-optimized rewrite for your CV in seconds.",
+  description: "Stop guessing why you don't get callbacks. Get honest feedback and an ATS-optimized rewrite for your CV in seconds.",
   keywords: ["CV optimization", "ATS resume", "AI resume builder", "career feedback", "CVboosta"],
   authors: [{ name: "CVboosta Team" }],
   metadataBase: new URL(siteUrl),
