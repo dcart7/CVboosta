@@ -47,6 +47,7 @@ async def optimize_cv(
     current_user=Depends(get_current_user_optional),
 ) -> OptimizeResponse:
     consumed_scan = False
+    llm_failed = False
     if current_user:
         enforce_fair_use_or_raise(db, current_user)
         consume_feature_or_raise(
@@ -57,10 +58,9 @@ async def optimize_cv(
         )
         consumed_scan = True
     else:
-        # For guests, we could either block or allow 1 based on IP, 
-        # but for now let's require login for optimization or treat as free with 0 scans allowed if not logged in.
-        # Actually, let's just enforce that optimization requires login for tracking.
-        raise HTTPException(status_code=401, detail="Authentication required to optimize CV.")
+        # Allow guest optimization (no usage tracking, no history persistence).
+        # Rate-limiting and abuse prevention should be handled by middleware.
+        consumed_scan = False
 
     try:
         cleaned_text = clean_job_text(payload.job_text)
@@ -114,19 +114,24 @@ async def optimize_cv(
                 skills=normalize_keywords(keyword_result.skills),
                 requirements=normalize_keywords(keyword_result.requirements),
             )
-        result = await run_in_threadpool(
-            generate_optimized_cv,
-            payload.cv_text,
-            payload.job_text,
-            payload.cv_analysis,
-            payload.job_analysis,
-            ats_keywords,
-            payload.target_role,
-            payload.target_company,
-            None  # initial forced_keywords
-        )
+        try:
+            result = await run_in_threadpool(
+                generate_optimized_cv,
+                payload.cv_text,
+                payload.job_text,
+                payload.cv_analysis,
+                payload.job_analysis,
+                ats_keywords,
+                payload.target_role,
+                payload.target_company,
+                None,  # initial forced_keywords
+            )
+        except LLMServiceError:
+            llm_failed = True
+            result = None
         match_before, _, original_missing = await run_in_threadpool(compute_match_score, payload.cv_text, ats_keywords)
-        match_after, _, missing_skills = await run_in_threadpool(compute_match_score, result.optimized_cv, ats_keywords)
+        optimized_text = result.optimized_cv if result else payload.cv_text
+        match_after, _, missing_skills = await run_in_threadpool(compute_match_score, optimized_text, ats_keywords)
         
         added_keywords = list(set(original_missing) - set(missing_skills))
 
@@ -141,7 +146,10 @@ async def optimize_cv(
             raise HTTPException(status_code=500, detail=str(exc)) from exc
         raise HTTPException(status_code=500, detail="Unexpected server error") from exc
 
-    if current_user:
+    if llm_failed and consumed_scan and current_user:
+        refund_feature_best_effort(db, user_id=current_user.id, feature="scan")
+
+    if current_user and not llm_failed:
         analysis = Analysis(
             user_id=current_user.id,
             # Do not persist plaintext CV/JD in columns.
@@ -163,15 +171,27 @@ async def optimize_cv(
         db.add(analysis)
         db.commit()
         record_activity(db, user_id=current_user.id, action="CV optimized", meta={})
+    analysis_id: int | None = None
+    if current_user and not llm_failed:
+        analysis_id = analysis.id
+
+    if llm_failed:
+        feedback = (
+            "AI generation is temporarily unavailable. Showing match results and recommendations using your original CV text."
+        )
+        optimized_cv = payload.cv_text
+    else:
+        feedback = result.feedback
+        optimized_cv = result.optimized_cv
     return OptimizeResponse(
-        optimized_cv=result.optimized_cv,
-        feedback=result.feedback,
+        optimized_cv=optimized_cv,
+        feedback=feedback,
         missing_skills=missing_skills,
         added_keywords=added_keywords,
         recommendations=recommendations,
         match_before=match_before,
         match_after=match_after,
-        analysis_id=analysis.id if current_user else None,
+        analysis_id=analysis_id,
     )
 
 

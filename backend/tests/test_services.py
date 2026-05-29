@@ -21,6 +21,21 @@ def test_parse_cv_text_sections():
     assert "Awarded Top Dev" in parsed.achievements
 
 
+def test_parse_cv_skills_ukrainian_heading_filters_hobbies():
+    text = (
+        "Навички\n"
+        "Python, SQL, Docker\n"
+        "Хоббі: Вважаю, що хоббі допомагає переключити свою увагу.\n"
+        "Досвід роботи\n"
+        "Backend Developer\n"
+    )
+    parsed = parse_cv(file_bytes=text.encode("utf-8"), filename="resume.txt")
+    assert "Python" in parsed.skills
+    assert "SQL" in parsed.skills
+    assert "Docker" in parsed.skills
+    assert all("хоб" not in s.casefold() for s in parsed.skills)
+
+
 def test_compute_match_score():
     score, matched, missing = compute_match_score("Python SQL", ["Python", "Go"])
     assert score == 50

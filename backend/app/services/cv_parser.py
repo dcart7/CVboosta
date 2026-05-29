@@ -87,6 +87,20 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
             "stack",
             "hard skills",
             "soft skills",
+            # Ukrainian / Russian common headings
+            "навички",
+            "ключові навички",
+            "технічні навички",
+            "компетенції",
+            "технології",
+            "інструменти",
+            "стек",
+            "мови",
+            "языки",
+            "навыки",
+            "ключевые навыки",
+            "технические навыки",
+            "инструменты",
         },
         "experience": {
             "experience",
@@ -97,6 +111,13 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
             "work history",
             "career history",
             "positions held",
+            "досвід",
+            "досвід роботи",
+            "професійний досвід",
+            "кар'єра",
+            "опыт",
+            "опыт работы",
+            "профессиональный опыт",
         },
         "education": {
             "education",
@@ -106,6 +127,10 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
             "qualifications",
             "academic qualifications",
             "degrees",
+            "освіта",
+            "навчання",
+            "образование",
+            "обучение",
         },
         "achievements": {
             "achievements",
@@ -116,6 +141,13 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
             "certificates",
             "projects",
             "notable projects",
+            "досягнення",
+            "сертифікати",
+            "сертифікації",
+            "проєкти",
+            "достижения",
+            "сертификаты",
+            "проекты",
         },
     }
     header_lookup = {alias: key for key, aliases in headings.items() for alias in aliases}
@@ -157,6 +189,50 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
 
 
 def _extract_skills(text: str) -> list[str]:
+    def _normalize_skill_token(item: str) -> str:
+        value = item.strip().strip("•- \t")
+        # Remove trailing sentence punctuation that often appears at end-of-line.
+        value = value.strip().strip(".,;:").strip()
+        return value
+
+    def _looks_like_skill(item: str) -> bool:
+        value = _normalize_skill_token(item)
+        if not value or len(value) < 2:
+            return False
+        if len(value) > 80:
+            return False
+        if value.count(" ") > 8:
+            return False
+
+        lowered = value.casefold()
+        noise_markers = (
+            "хоб",
+            "hobby",
+            "interests",
+            "інтерес",
+            "особист",
+            "about me",
+            "про мене",
+            "обо мне",
+            "сім'я",
+            "семья",
+            "діти",
+            "дети",
+            "доньк",
+            "дочь",
+            "сын",
+            "married",
+            "children",
+        )
+        if any(marker in lowered for marker in noise_markers):
+            return False
+
+        # Filter sentence-like fragments (common when "About me" content gets misclassified as skills).
+        if ". " in value or "!" in value or "?" in value:
+            return False
+
+        return True
+
     sections = _extract_sections(text)
     skills_lines = sections.get("skills", [])
     if skills_lines:
@@ -165,11 +241,9 @@ def _extract_skills(text: str) -> list[str]:
         # Drop paragraph-sized blobs mistaken for skills; keep short tokens only
         out: list[str] = []
         for p in parts:
-            if not p or len(p) < 2:
-                continue
-            if len(p) > 80 or p.count(" ") > 8:
-                continue
-            out.append(p)
+            normalized = _normalize_skill_token(p)
+            if _looks_like_skill(normalized):
+                out.append(normalized)
         return out[:40]
     return []
 
