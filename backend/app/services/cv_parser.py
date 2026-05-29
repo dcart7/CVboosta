@@ -79,8 +79,15 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
             "tech skills",
             "core skills",
             "core competencies",
-            "competencies",
+            "core competence",
+            "key competencies",
             "key skills",
+            "key expertise",
+            "areas of expertise",
+            "expertise",
+            "strengths",
+            "core strengths",
+            "competencies",
             "technologies",
             "tools",
             "languages",
@@ -91,6 +98,9 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
             "навички",
             "ключові навички",
             "технічні навички",
+            "експертиза",
+            "ключова експертиза",
+            "сильні сторони",
             "компетенції",
             "технології",
             "інструменти",
@@ -100,6 +110,9 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
             "навыки",
             "ключевые навыки",
             "технические навыки",
+            "экспертиза",
+            "ключевая экспертиза",
+            "сильные стороны",
             "инструменты",
         },
         "experience": {
@@ -282,7 +295,41 @@ def _extract_skills(text: str) -> list[str]:
             if _looks_like_skill(normalized):
                 out.append(normalized)
         return out[:40]
-    return []
+
+    # Fallback: some CVs don't have a dedicated Skills section, but include
+    # dense comma/bullet lists (often in "Summary"/"Profile"). Extract only
+    # clearly list-like lines to avoid pulling paragraphs.
+    candidate_lines: list[str] = []
+    for line in (ln.strip() for ln in text.splitlines()):
+        if not line:
+            continue
+        normalized = _normalize_heading(line)
+        core = normalized.rstrip(":").strip()
+        # Skip obvious non-skill headings.
+        if core in {"summary", "profile", "about me", "про мене", "обо мне"}:
+            continue
+        has_many_commas = line.count(",") >= 2
+        has_bullets = "•" in line or re.search(r"(^|\\s)[\\-–•]\\s+\\S+", line) is not None
+        if not (has_many_commas or has_bullets):
+            continue
+        # Avoid long sentences.
+        if len(line) > 160:
+            continue
+        candidate_lines.append(line)
+        if len(candidate_lines) >= 8:
+            break
+
+    if not candidate_lines:
+        return []
+
+    joined = " ".join(candidate_lines)
+    parts = [p.strip("•- \t").strip() for p in re.split(r"[,;|\n]", joined)]
+    out: list[str] = []
+    for p in parts:
+        normalized = _normalize_skill_token(p)
+        if _looks_like_skill(normalized):
+            out.append(normalized)
+    return out[:40]
 
 
 def _extract_experience(text: str) -> list[str]:

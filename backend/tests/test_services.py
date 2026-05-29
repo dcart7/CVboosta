@@ -37,6 +37,18 @@ def test_parse_cv_skills_ukrainian_heading_filters_hobbies():
     assert all("розвитку" not in s.casefold() for s in parsed.skills)
 
 
+def test_parse_cv_skills_fallback_from_dense_list_line():
+    text = (
+        "Summary\n"
+        "Product leadership, Go-to-market, P&L ownership, Stakeholder management\n"
+        "Experience\n"
+        "Director of Product\n"
+    )
+    parsed = parse_cv(file_bytes=text.encode("utf-8"), filename="resume.txt")
+    assert "Product leadership" in parsed.skills
+    assert "Go-to-market" in parsed.skills
+
+
 def test_compute_match_score():
     score, matched, missing = compute_match_score("Python SQL", ["Python", "Go"])
     assert score == 50
