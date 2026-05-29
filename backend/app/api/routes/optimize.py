@@ -58,9 +58,10 @@ async def optimize_cv(
         )
         consumed_scan = True
     else:
-        # Allow guest optimization (no usage tracking, no history persistence).
-        # Rate-limiting and abuse prevention should be handled by middleware.
-        consumed_scan = False
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required to optimize CV.",
+        )
 
     try:
         cleaned_text = clean_job_text(payload.job_text)
