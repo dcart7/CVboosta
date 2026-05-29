@@ -431,8 +431,16 @@ export default function WorkspacePage() {
   };
 
   const runOptimization = async () => {
-    if (!parsed?.raw_text || !jobText.trim()) {
-      setOptimizeStatus("Upload CV and paste job description first.");
+    if (!parsed?.raw_text) {
+      const msg = t("dashboard.step1") || "Upload a CV first.";
+      setOptimizeStatus(msg);
+      showNotice(msg, "error");
+      return;
+    }
+    if (!jobText.trim()) {
+      const message = t("dashboard.jobDescriptionMissing") || "Paste a job description first.";
+      setOptimizeStatus(message);
+      showNotice(message, "error");
       return;
     }
     if (workspaceId === null) {
