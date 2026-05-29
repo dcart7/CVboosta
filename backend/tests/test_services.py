@@ -25,7 +25,7 @@ def test_parse_cv_skills_ukrainian_heading_filters_hobbies():
     text = (
         "Навички\n"
         "Python, SQL, Docker\n"
-        "Хоббі: Вважаю, що хоббі допомагає переключити свою увагу.\n"
+        "Хоббі: Вважаю, що хоббі допомагає переключити свою увагу, але й корисно для розвитку мозку.\n"
         "Досвід роботи\n"
         "Backend Developer\n"
     )
@@ -34,6 +34,7 @@ def test_parse_cv_skills_ukrainian_heading_filters_hobbies():
     assert "SQL" in parsed.skills
     assert "Docker" in parsed.skills
     assert all("хоб" not in s.casefold() for s in parsed.skills)
+    assert all("розвитку" not in s.casefold() for s in parsed.skills)
 
 
 def test_compute_match_score():

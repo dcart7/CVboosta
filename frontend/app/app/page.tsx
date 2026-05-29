@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import PremiumModal from "../components/PremiumModal";
@@ -53,6 +53,11 @@ export default function WorkspacePage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [notice, setNotice] = useState<{
+    message: string;
+    kind: "info" | "error";
+  } | null>(null);
+  const noticeTimerRef = useRef<number | null>(null);
   
   useEffect(() => {
     if (!isOptimizing) {
@@ -71,6 +76,18 @@ export default function WorkspacePage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [mobileDashboardTab, setMobileDashboardTab] = useState<"editor" | "preview">("editor");
+
+  const showNotice = (message: string, kind: "info" | "error" = "info") => {
+    setNotice({ message, kind });
+    if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = window.setTimeout(() => setNotice(null), 4500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
+    };
+  }, []);
 
   const hashText = (value: string) => {
     let hash = 0;
@@ -349,19 +366,22 @@ export default function WorkspacePage() {
 
   const runAnalysis = async () => {
     if (!parsed?.raw_text) {
-      setAnalysisStatus("Upload a CV first.");
+      const msg = t("dashboard.step1") || "Upload a CV first.";
+      setAnalysisStatus(msg);
+      showNotice(msg, "error");
       return;
     }
-    if (!jobText.trim()) {
-      setAnalysisStatus("Paste a job description first.");
-      return;
-    }
-    if (keywordCache.length === 0) {
-      setAnalysisStatus("Extract keywords first.");
+    if (!jobText.trim() && keywordCache.length === 0) {
+      const msg =
+        t("analyze.setupDesc") ||
+        "Paste a job description (recommended) or add keywords first.";
+      setAnalysisStatus(msg);
+      showNotice(msg, "error");
       return;
     }
     if (workspaceId === null) {
-      setAnalysisStatus("Loading workspace…");
+      const msg = t("common.loading") || "Loading…";
+      setAnalysisStatus(msg);
       return;
     }
     localStorage.setItem(wsFieldKey(workspaceId, "target_role"), targetRole);
@@ -395,14 +415,16 @@ export default function WorkspacePage() {
         return;
       }
       if (!response.ok) {
-        throw new Error("Analysis failed.");
+        throw new Error(data?.detail || "Analysis failed.");
       }
       setMatchPercent(data.match_percent ?? null);
       setMissingKeywords(data.missing_keywords || []);
       setAnalysisStatus("Analysis complete.");
       trackEvent("ats_analysis_completed", { stage: "match" });
     } catch (err) {
-      setAnalysisStatus(err instanceof Error ? err.message : "Analysis failed.");
+      const msg = err instanceof Error ? err.message : "Analysis failed.";
+      setAnalysisStatus(msg);
+      showNotice(msg, "error");
     } finally {
       setIsAnalyzing(false);
     }
@@ -526,6 +548,16 @@ export default function WorkspacePage() {
   return (
     <main className="page">
       <TopNav />
+      {notice && (
+        <div
+          className={`toast ${notice.kind === "error" ? "is-error" : "is-info"}`}
+          role="alert"
+          aria-live="polite"
+          onClick={() => setNotice(null)}
+        >
+          {notice.message}
+        </div>
+      )}
       <div className="shell">
         <div className="mobile-dash-tabs" role="tablist" aria-label="Dashboard sections">
           <button

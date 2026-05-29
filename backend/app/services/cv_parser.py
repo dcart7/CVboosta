@@ -172,12 +172,49 @@ def _extract_sections(text: str) -> dict[str, list[str]]:
 
     sections: dict[str, list[str]] = {key: [] for key in headings.keys()}
     current: str | None = None
+    # Stop-capture headings that often appear inside CVs but are not professional sections.
+    # When encountered while we're inside "skills", we end the skills section to avoid
+    # ingesting hobby/personal paragraphs as skills.
+    stop_headings: set[str] = {
+        "hobbies",
+        "hobby",
+        "interests",
+        "about me",
+        "summary",
+        "profile",
+        "personal",
+        "personal information",
+        "additional information",
+        "misc",
+        "other",
+        "хоббі",
+        "інтереси",
+        "про мене",
+        "профіль",
+        "резюме",
+        "додаткова інформація",
+        "особисте",
+        "хобби",
+        "интересы",
+        "обо мне",
+        "дополнительная информация",
+        "личное",
+    }
 
     lines = [line.strip() for line in text.splitlines()]
     for line in lines:
         if not line:
             continue
         normalized = _normalize_heading(line)
+        # End the "skills" section if we hit an "About/Hobbies" style heading.
+        core = normalized.rstrip(":").strip()
+        if current == "skills":
+            for stop in stop_headings:
+                if core == stop or core.startswith(f"{stop}:") or core.startswith(stop):
+                    current = None
+                    break
+            if current is None:
+                continue
         if _is_section_heading(normalized):
             cat = _heading_category(normalized)
             if cat is not None:
