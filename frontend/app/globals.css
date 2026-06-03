@@ -1243,6 +1243,24 @@ a {
   letter-spacing: -0.01em;
 }
 
+.seo-anchor {
+  scroll-margin-top: 112px;
+}
+
+.resume-example-toc-list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.72;
+  column-gap: 28px;
+}
+
+@media (min-width: 920px) {
+  .resume-example-toc-list {
+    columns: 2;
+  }
+}
+
 .blog-post-section p {
   margin: 0;
   font-size: 16px;

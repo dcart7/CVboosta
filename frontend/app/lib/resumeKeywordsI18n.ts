@@ -7,6 +7,7 @@ type UiTexts = {
   hubSubtitle: string;
   rolesLabel: string;
   openGuide: string;
+  openExample: string;
   filterLabel: string;
   allSectors: string;
   searchPlaceholder: string;
@@ -149,9 +150,10 @@ const UI: Record<Language, UiTexts> = {
     hubKicker: "SEO Cluster Hub",
     hubTitle: "Resume Keywords by Role",
     hubSubtitle:
-      "Role-specific ATS keyword guides with mistakes, rewrite examples, and FAQ.",
+    "Role-specific ATS keyword guides with mistakes, rewrite examples, and FAQ.",
     rolesLabel: "Roles",
     openGuide: "Open guide",
+    openExample: "Resume example",
     filterLabel: "Sector",
     allSectors: "All sectors",
     searchPlaceholder: "Search role (e.g. Product Manager)",
@@ -203,9 +205,10 @@ const UI: Record<Language, UiTexts> = {
     hubKicker: "SEO кластер",
     hubTitle: "Ключові слова резюме за ролями",
     hubSubtitle:
-      "Рольові ATS-гайди з типовими помилками, прикладами переписування та FAQ.",
+    "Рольові ATS-гайди з типовими помилками, прикладами переписування та FAQ.",
     rolesLabel: "Ролі",
     openGuide: "Відкрити гайд",
+    openExample: "Приклад резюме",
     filterLabel: "Сфера",
     allSectors: "Усі сфери",
     searchPlaceholder: "Пошук ролі (наприклад, Product Manager)",
@@ -260,6 +263,7 @@ const UI: Record<Language, UiTexts> = {
       "Przewodniki ATS dla ról: błędy, przykłady przeredagowania i FAQ.",
     rolesLabel: "Role",
     openGuide: "Otwórz poradnik",
+    openExample: "Przykład CV",
     filterLabel: "Obszar",
     allSectors: "Wszystkie obszary",
     searchPlaceholder: "Szukaj roli (np. Product Manager)",
@@ -314,6 +318,7 @@ const UI: Record<Language, UiTexts> = {
       "ATS návody podľa rolí s chybami, príkladmi prepísania a FAQ.",
     rolesLabel: "Roly",
     openGuide: "Otvoriť návod",
+    openExample: "Príklad životopisu",
     filterLabel: "Oblasť",
     allSectors: "Všetky oblasti",
     searchPlaceholder: "Hľadať rolu (napr. Product Manager)",
@@ -368,6 +373,7 @@ const UI: Record<Language, UiTexts> = {
       "ATS průvodci podle rolí s chybami, příklady přepisu a FAQ.",
     rolesLabel: "Role",
     openGuide: "Otevřít průvodce",
+    openExample: "Příklad životopisu",
     filterLabel: "Obor",
     allSectors: "Všechny obory",
     searchPlaceholder: "Hledat roli (např. Product Manager)",
@@ -422,6 +428,7 @@ const UI: Record<Language, UiTexts> = {
       "Guías ATS por rol con errores comunes, ejemplos de reescritura y FAQ.",
     rolesLabel: "Roles",
     openGuide: "Abrir guía",
+    openExample: "Ejemplo de CV",
     filterLabel: "Sector",
     allSectors: "Todos los sectores",
     searchPlaceholder: "Buscar rol (p. ej. Product Manager)",

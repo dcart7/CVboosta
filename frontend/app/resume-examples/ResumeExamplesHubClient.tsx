@@ -5,7 +5,8 @@ import Link from "next/link";
 import TopNav from "../components/TopNav";
 import { useTranslation } from "../lib/LanguageContext";
 import type { RoleCategory } from "../lib/resumeKeywordClusters";
-import { getResumeKeywordsUi, getSectorLabel, localizeRoleName } from "../lib/resumeKeywordsI18n";
+import { getSectorLabel, localizeRoleName } from "../lib/resumeKeywordsI18n";
+import { getResumeExamplesUi } from "../lib/resumeExamplesI18n";
 
 type HubCluster = {
   slug: string;
@@ -33,15 +34,17 @@ const CATEGORY_ORDER: RoleCategory[] = [
   "education",
   "security",
 ];
+
 const PAGE_SIZE = 72;
 
-export default function ResumeKeywordsHubClient({ clusters }: Props) {
+export default function ResumeExamplesHubClient({ clusters }: Props) {
   const { language, t } = useTranslation();
-  const ui = getResumeKeywordsUi(language);
+  const ui = getResumeExamplesUi(language);
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"all" | RoleCategory>("all");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
   const localizedClusters = useMemo(
     () =>
       clusters.map((item) => ({
@@ -77,14 +80,6 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
   }, [visibleFiltered, language]);
 
   const hasMore = filtered.length > visibleCount;
-  const loadMoreLabel = {
-    en: "Load more roles",
-    uk: "Показати більше ролей",
-    pl: "Pokaż więcej ról",
-    sk: "Zobraziť viac rolí",
-    cs: "Zobrazit více rolí",
-    es: "Ver más roles",
-  }[language];
 
   return (
     <main className="page">
@@ -123,9 +118,9 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
 
           <div className="rk-filters">
             <div className="rk-filter-control">
-              <label htmlFor="rk-search">{ui.searchPlaceholder}</label>
+              <label htmlFor="re-search">{ui.searchPlaceholder}</label>
               <input
-                id="rk-search"
+                id="re-search"
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -133,9 +128,9 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
               />
             </div>
             <div className="rk-filter-control">
-              <label htmlFor="rk-category">{ui.filterLabel}</label>
+              <label htmlFor="re-category">{ui.filterLabel}</label>
               <select
-                id="rk-category"
+                id="re-category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value as "all" | RoleCategory)}
               >
@@ -162,13 +157,13 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
                   <div className="grid rk-role-grid">
                     {group.items.map((cluster) => (
                       <article key={cluster.slug} className="rk-role-card">
-                        <p className="rk-role-card-kicker">{ui.roleGuideKicker}</p>
+                        <p className="rk-role-card-kicker">{ui.roleCardKicker}</p>
                         <h3 className="rk-role-card-title">{cluster.role}</h3>
                         <p className="rk-role-card-copy">
-                          {ui.hubSubtitle}
+                          {ui.roleCardCopy}
                         </p>
-                        <Link className="btn ghost rk-role-card-btn" href={`/resume-keywords/${cluster.slug}`}>
-                          {ui.openGuide}
+                        <Link className="btn ghost rk-role-card-btn" href={`/resume-examples/${cluster.slug}`}>
+                          {ui.openExample}
                         </Link>
                       </article>
                     ))}
@@ -182,7 +177,7 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
                     className="btn primary"
                     onClick={() => setVisibleCount((value) => value + PAGE_SIZE)}
                   >
-                    {loadMoreLabel}
+                    {ui.loadMoreLabel}
                   </button>
                 </div>
               )}
@@ -192,10 +187,10 @@ export default function ResumeKeywordsHubClient({ clusters }: Props) {
 
         <section className="section fade-up rk-section">
           <div className="card rk-panel rk-cta-panel">
-            <h2 className="section-title">Take these keyword insights into the product</h2>
+            <h2 className="section-title">Use these pages, then move into the product</h2>
             <p className="rk-copy">
-              Once you know the right terms for your role, run a scan and open the optimizer so you
-              can match them to a real vacancy instead of guessing.
+              Read the example, run a scan, and then open the optimizer so you can turn the advice
+              into a vacancy-specific resume before you submit.
             </p>
             <div className="nav-actions rk-hero-actions">
               <Link className="btn primary" href="/free-ats-resume-checker">
