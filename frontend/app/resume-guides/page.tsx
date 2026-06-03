@@ -5,7 +5,7 @@ import { getSeoExpansionHubItems } from "../lib/seoExpansion";
 
 export const revalidate = 3600;
 
-const config = getSeoExpansionConfig("ats");
+const config = getSeoExpansionConfig("resume-guides");
 
 export const metadata: Metadata = {
   title: config.metadataTitle,
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AtsHubPage() {
+export default function ResumeGuidesHubPage() {
   return (
     <SeoGuideHubClient
       badge={config.badge}
@@ -25,7 +25,7 @@ export default function AtsHubPage() {
       openLabel={config.openLabel}
       ctaTitle={config.ctaTitle}
       ctaLead={config.ctaLead}
-      items={getSeoExpansionHubItems("ats", 100)}
+      items={getSeoExpansionHubItems("resume-guides", 180)}
     />
   );
 }

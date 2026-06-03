@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getPublishedBlogPosts } from "./lib/blogPosts";
 import { getResumeKeywordStaticSlugs } from "./lib/resumeKeywordClusters";
+import { getAllSeoExpansionRoutes } from "./lib/seoExpansion";
 
 export const revalidate = 3600;
 
@@ -13,16 +14,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const resumeExampleRoutes = getResumeKeywordStaticSlugs().map(
     (slug) => `/resume-examples/${slug}`,
   );
+  const seoExpansionRoutes = getAllSeoExpansionRoutes();
   const staticRoutes = [
     "",
     "/about",
     "/ats",
+    "/best",
     "/blog",
     "/cases",
     "/free-ats-resume-checker",
+    "/interview-resume",
+    "/job-description",
     "/resume-bullets",
     "/resume-examples",
     "/resume-for",
+    "/resume-guides",
+    "/resume-industry",
     "/resume-keywords",
     "/resume-summary",
     "/ai.txt",
@@ -37,6 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...publishedBlogRoutes,
     ...resumeKeywordRoutes,
     ...resumeExampleRoutes,
+    ...seoExpansionRoutes,
   ]));
 
   const routes = allRoutes.map((route) => {
@@ -47,10 +55,38 @@ export default function sitemap(): MetadataRoute.Sitemap {
           ? 0.85
           : route === "/resume-examples"
             ? 0.92
+        : route.startsWith("/resume-guides/")
+          ? 0.86
+          : route === "/resume-guides"
+            ? 0.9
         : route.startsWith("/resume-keywords/")
           ? 0.86
           : route === "/resume-keywords"
             ? 0.92
+            : route.startsWith("/resume-for/")
+              ? 0.84
+              : route === "/resume-for"
+                ? 0.89
+              : route.startsWith("/ats/")
+                ? 0.84
+                : route === "/ats"
+                  ? 0.9
+              : route.startsWith("/resume-industry/")
+                ? 0.83
+                : route === "/resume-industry"
+                  ? 0.88
+              : route.startsWith("/interview-resume/")
+                ? 0.83
+                : route === "/interview-resume"
+                  ? 0.88
+              : route.startsWith("/job-description/")
+                ? 0.83
+                : route === "/job-description"
+                  ? 0.88
+              : route.startsWith("/best/")
+                ? 0.82
+                : route === "/best"
+                  ? 0.87
             : route.startsWith("/blog/")
               ? 0.82
               : 0.8;
@@ -58,6 +94,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const changeFrequency =
       route.startsWith("/resume-keywords/") ||
       route.startsWith("/resume-examples/") ||
+      route.startsWith("/resume-guides/") ||
+      route.startsWith("/resume-for/") ||
+      route.startsWith("/ats/") ||
+      route.startsWith("/resume-industry/") ||
+      route.startsWith("/interview-resume/") ||
+      route.startsWith("/job-description/") ||
+      route.startsWith("/best/") ||
       route.startsWith("/blog/")
         ? ("weekly" as const)
         : ("monthly" as const);
