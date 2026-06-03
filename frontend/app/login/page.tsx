@@ -176,10 +176,10 @@ export default function LoginPage() {
           <div className="card auth-footer-card">
             <h3>{t("auth.whatsNew")}</h3>
             <ul style={{ margin: "10px 0 0", paddingLeft: "18px", color: "var(--muted)", lineHeight: 1.7 }}>
-              <li>Improved CV skill extraction</li>
-              <li>Job-description-first analysis</li>
-              <li>Before/after score history</li>
-              <li>Clearer recommendations for every optimization pass</li>
+              <li>{t("auth.whatsNewBullet1")}</li>
+              <li>{t("auth.whatsNewBullet2")}</li>
+              <li>{t("auth.whatsNewBullet3")}</li>
+              <li>{t("auth.whatsNewBullet4")}</li>
             </ul>
           </div>
         </section>
