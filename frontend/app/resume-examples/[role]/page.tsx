@@ -105,7 +105,7 @@ export default async function ResumeExampleRolePage({ params }: ResumeExampleRol
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ResumeExampleRoleClient page={page} roleSlug={cluster.slug} roleName={cluster.role} />
+      <ResumeExampleRoleClient cluster={cluster} relatedRoles={related} />
     </>
   );
 }

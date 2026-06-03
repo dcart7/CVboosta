@@ -1,22 +1,29 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import TopNav from "../../components/TopNav";
 import MarkdownLite from "../../components/MarkdownLite";
 import { useTranslation } from "../../lib/LanguageContext";
 import { getResumeExamplesUi } from "../../lib/resumeExamplesI18n";
-import type { ResumeExampleSeoPage } from "../../lib/resumeExamplePages";
+import { buildResumeExampleSeoPage } from "../../lib/resumeExamplePages";
 import { localizeRoleName } from "../../lib/resumeKeywordsI18n";
+import type { ResumeKeywordCluster } from "../../lib/resumeKeywordClusters";
 
 type Props = {
-  page: ResumeExampleSeoPage;
-  roleSlug: string;
-  roleName: string;
+  cluster: ResumeKeywordCluster;
+  relatedRoles: ResumeKeywordCluster[];
 };
 
-export default function ResumeExampleRoleClient({ page, roleSlug, roleName }: Props) {
+export default function ResumeExampleRoleClient({ cluster, relatedRoles }: Props) {
   const { language, t } = useTranslation();
   const ui = getResumeExamplesUi(language);
+  const page = useMemo(
+    () => buildResumeExampleSeoPage(cluster, relatedRoles, language),
+    [cluster, relatedRoles, language],
+  );
+  const roleSlug = cluster.slug;
+  const roleName = cluster.role;
   const localizedRoleName = localizeRoleName(roleName, language);
 
   const slugify = (value: string) =>

@@ -5,6 +5,7 @@ import {
   type ResumeKeywordCluster,
   type RoleCategory,
 } from "./resumeKeywordClusters";
+import type { Language } from "./translations";
 
 export type SeoExpansionFamily =
   | "ats"
@@ -36,6 +37,16 @@ export type SeoGuidePage = {
   estimatedWordCount: number;
   sections: SeoGuideSection[];
   relatedPages: SeoGuideRelatedLink[];
+  context?: {
+    roleSlug?: string;
+    roleName?: string;
+    company?: string;
+    country?: string;
+    industry?: string;
+    atsVendor?: string;
+    situation?: string;
+    pageType?: string;
+  };
 };
 
 type SeoSeed = {
@@ -1045,6 +1056,122 @@ function buildGuidePage(seed: SeoSeed): SeoGuidePage {
     estimatedWordCount,
     sections,
     relatedPages: buildRelatedPages(seed),
+    context: {
+      roleSlug: seed.roleSlug,
+      roleName: seed.roleName,
+      company: seed.company,
+      country: seed.country,
+      industry: seed.industry,
+      atsVendor: seed.atsVendor,
+      situation: seed.situation,
+      pageType: seed.pageType,
+    },
+  };
+}
+
+function countPageWords(page: SeoGuidePage): number {
+  return countWords(
+    [page.seoTitle, page.metaDescription, page.h1, page.lead, ...page.sections.map((section) => `${section.title}\n${section.body}`)].join("\n\n"),
+  );
+}
+
+export function localizeSeoExpansionPage(page: SeoGuidePage, language: Language): SeoGuidePage {
+  if (language === "en") return page;
+
+  const role = page.context?.roleName || "this role";
+  const roleSlug = page.context?.roleSlug;
+  const label = page.context?.company || page.context?.country || page.context?.industry || page.context?.atsVendor || page.context?.situation || role;
+
+  const localizedBodies: Record<Exclude<Language, "en">, { lead: string; sections: SeoGuideSection[]; seoTitle: string; meta: string; h1: string }> = {
+    uk: {
+      seoTitle: `${page.seoTitle} — гайд`,
+      meta: `${page.seoTitle}: практичний гайд з ATS, ключових слів, структури, помилок і наступних кроків.`,
+      h1: `${page.h1} — гайд`,
+      lead: `Ця сторінка пояснює тему **${page.h1.toLowerCase()}** коротко і практично: що бачить ATS, що сканує рекрутер і які зміни справді впливають на результат.`,
+      sections: [
+        { title: "Вступ", body: `Цей матеріал для випадку **${label}**. Його завдання — не дати абстрактну теорію, а показати, як прибрати дві головні проблеми: нечіткий сигнал і слабкий доказ.\n\nЯкщо тема пов’язана з роллю **${role}**, ключові слова мають працювати разом із реальними bullet-пунктами, а не жити окремим списком.` },
+        { title: "Що насправді відбувається під час скринінгу", body: `Типовий скринінг виглядає так:\n1. **ATS** перетворює файл у текст і шукає сигнали.\n2. **Рекрутер** швидко перевіряє role fit, scope і credibility.\n3. **Hiring manager** дивиться, чи доводять ваші формулювання реальний рівень роботи.\n\nСаме тому найсильніші сторінки в цьому кластері спираються на структуру, доказ і лише потім на формулювання.` },
+        { title: "Практичний playbook", body: `### Що зробити\n- залишити просту читабельну структуру\n- винести ключові сигнали у верхню частину сторінки або резюме\n- підтвердити keywords конкретним результатом\n- не перевантажувати текст повтореннями\n- перевірити фінальний варіант на реальній вакансії або у parsed preview` },
+        { title: "Приклади і міні-трансформації", body: `Слабка версія зазвичай описує активність. Сильніша версія показує зміну, масштаб і вплив.\n\nДля role-based тем рухайте користувача між [resume example](${roleSlug ? `/resume-examples/${roleSlug}` : "/resume-examples"}) і [resume keywords](${roleSlug ? `/resume-keywords/${roleSlug}` : "/resume-keywords"}), щоб signal layer і proof layer працювали разом.` },
+        { title: "Типові помилки", body: `- занадто загальні формулювання\n- ключові слова без доказу\n- layout, який ускладнює parsing\n- keyword stuffing без нової інформації\n- відсутність чіткого next step після діагностики проблеми` },
+        { title: "FAQ", body: `- **Наскільки сильно треба адаптувати контент?** Почніть із summary, skills order і перших bullet-пунктів.\n- **Що найважливіше для скринінгу?** Швидке підтвердження fit, scope і measurable outcomes.\n- **Що робити далі?** Перевірити резюме на конкретній вакансії й виправити найбільші розриви спочатку.` },
+        { title: "Що читати далі", body: `- [Free ATS resume checker](/free-ats-resume-checker)\n- [Optimize my resume](/app)\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)\n- [ATS guides](/ats)` },
+      ],
+    },
+    pl: {
+      seoTitle: `${page.seoTitle} — poradnik`,
+      meta: `${page.seoTitle}: praktyczny przewodnik po ATS, keywords, strukturze, błędach i kolejnych krokach.`,
+      h1: `${page.h1} — poradnik`,
+      lead: `Ta strona wyjaśnia temat **${page.h1.toLowerCase()}** w prosty i praktyczny sposób: co widzi ATS, co skanuje rekruter i jakie poprawki naprawdę pomagają.`,
+      sections: [
+        { title: "Wprowadzenie", body: `Ten materiał dotyczy tematu **${label}**. Celem jest usunięcie dwóch najczęstszych problemów: słabego sygnału i słabego dowodu.\n\nJeśli temat dotyczy roli **${role}**, keywords muszą działać razem z realnym doświadczeniem.` },
+        { title: "Co naprawdę dzieje się podczas screeningu", body: `Screening zwykle wygląda tak: ATS parsuje plik, rekruter robi szybki skan, a hiring manager ocenia poziom i wiarygodność.\n\nDlatego najlepsze strony w tym klastrze stawiają na strukturę, dowód i czytelność.` },
+        { title: "Praktyczny playbook", body: `- zachowaj prostą strukturę\n- pokaż ważne sygnały wysoko\n- potwierdzaj keywords konkretnym wynikiem\n- nie przesadzaj z powtórzeniami\n- sprawdź finalną wersję na realnej ofercie` },
+        { title: "Przykłady i mini-transformacje", body: `Słaba wersja opisuje czynność. Mocniejsza pokazuje zmianę, skalę i wpływ.\n\nW tematach role-based łącz [resume example](${roleSlug ? `/resume-examples/${roleSlug}` : "/resume-examples"}) z [resume keywords](${roleSlug ? `/resume-keywords/${roleSlug}` : "/resume-keywords"}).` },
+        { title: "Typowe błędy", body: `- zbyt ogólne sformułowania\n- keywords bez dowodu\n- layout utrudniający parsing\n- keyword stuffing\n- brak jasnego next step` },
+        { title: "FAQ", body: `- **Jak mocno dopasowywać treść?** Zacznij od summary, skills i pierwszych bulletów.\n- **Co ma największe znaczenie?** Szybkie potwierdzenie fit, zakresu i wyników.\n- **Co dalej?** Sprawdź CV na realnym job description i napraw najważniejsze luki.` },
+        { title: "Co czytać dalej", body: `- [Free ATS resume checker](/free-ats-resume-checker)\n- [Optimize my resume](/app)\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)` },
+      ],
+    },
+    sk: {
+      seoTitle: `${page.seoTitle} — sprievodca`,
+      meta: `${page.seoTitle}: praktický sprievodca k ATS, kľúčovým slovám, štruktúre, chybám a ďalším krokom.`,
+      h1: `${page.h1} — sprievodca`,
+      lead: `Táto stránka vysvetľuje tému **${page.h1.toLowerCase()}** stručne a prakticky: čo vidí ATS, čo skenuje recruiter a ktoré zmeny majú reálny efekt.`,
+      sections: [
+        { title: "Úvod", body: `Tento materiál rieši tému **${label}**. Cieľom je odstrániť slabý signal a slabý proof.\n\nAk sa téma týka roly **${role}**, kľúčové slová musia byť podložené reálnymi bullet bodmi.` },
+        { title: "Čo sa deje pri screeningu", body: `ATS najprv parsuje súbor, recruiter robí rýchly scan a hiring manager kontroluje úroveň práce.\n\nNajlepšie stránky v tomto klastri preto stavajú na štruktúre, dôkaze a čitateľnosti.` },
+        { title: "Praktický playbook", body: `- nechajte jednoduchú štruktúru\n- zvýraznite dôležité signály hore\n- podporte keywords konkrétnym výsledkom\n- nepreťažujte text opakovaniami\n- otestujte výsledok na reálnej pozícii` },
+        { title: "Príklady a mini transformácie", body: `Slabá verzia popisuje aktivitu. Silnejšia verzia ukazuje zmenu, rozsah a dopad.\n\nPri role-based témach prepájajte [resume example](${roleSlug ? `/resume-examples/${roleSlug}` : "/resume-examples"}) a [resume keywords](${roleSlug ? `/resume-keywords/${roleSlug}` : "/resume-keywords"}).` },
+        { title: "Typické chyby", body: `- príliš všeobecný text\n- keywords bez dôkazu\n- layout, ktorý komplikuje parsing\n- keyword stuffing\n- chýbajúci next step` },
+        { title: "FAQ", body: `- **Ako veľmi treba obsah prispôsobiť?** Začnite so summary, skills a prvými bulletmi.\n- **Čo je najdôležitejšie?** Rýchle potvrdenie fitu, scope a výsledkov.\n- **Čo ďalej?** Otestujte životopis na reálnej ponuke a opravte najväčšie gapy.` },
+        { title: "Čo čítať ďalej", body: `- [Free ATS resume checker](/free-ats-resume-checker)\n- [Optimize my resume](/app)\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)` },
+      ],
+    },
+    cs: {
+      seoTitle: `${page.seoTitle} — průvodce`,
+      meta: `${page.seoTitle}: praktický průvodce k ATS, klíčovým slovům, struktuře, chybám a dalším krokům.`,
+      h1: `${page.h1} — průvodce`,
+      lead: `Tato stránka vysvětluje téma **${page.h1.toLowerCase()}** stručně a prakticky: co vidí ATS, co skenuje recruiter a které změny mají největší dopad.`,
+      sections: [
+        { title: "Úvod", body: `Tento materiál řeší téma **${label}**. Cílem je odstranit slabý signal a slabý proof.\n\nPokud je téma navázané na roli **${role}**, keywords musí být podložené reálnými bullet body.` },
+        { title: "Co se děje při screeningu", body: `ATS nejdřív parsuje soubor, recruiter dělá rychlý scan a hiring manager kontroluje úroveň a věrohodnost.\n\nNejlepší stránky v tomto klastru proto stojí na struktuře, důkazu a čitelnosti.` },
+        { title: "Praktický playbook", body: `- ponechte jednoduchou strukturu\n- ukažte důležité signály nahoře\n- potvrzujte keywords konkrétním výsledkem\n- nepřetěžujte text opakováním\n- otestujte finální verzi na reálné pozici` },
+        { title: "Příklady a mini transformace", body: `Slabá verze popisuje aktivitu. Silnější verze ukazuje změnu, rozsah a dopad.\n\nU role-based témat propojujte [resume example](${roleSlug ? `/resume-examples/${roleSlug}` : "/resume-examples"}) a [resume keywords](${roleSlug ? `/resume-keywords/${roleSlug}` : "/resume-keywords"}).` },
+        { title: "Typické chyby", body: `- příliš obecný text\n- keywords bez důkazu\n- layout komplikující parsing\n- keyword stuffing\n- chybějící next step` },
+        { title: "FAQ", body: `- **Jak moc obsah upravit?** Začněte summary, skills a prvními bullety.\n- **Co je nejdůležitější?** Rychlé potvrzení fitu, rozsahu a výsledků.\n- **Co dál?** Otestujte životopis na reálném job description a opravte největší gapy.` },
+        { title: "Co číst dál", body: `- [Free ATS resume checker](/free-ats-resume-checker)\n- [Optimize my resume](/app)\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)` },
+      ],
+    },
+    es: {
+      seoTitle: `${page.seoTitle} — guía`,
+      meta: `${page.seoTitle}: guía práctica sobre ATS, palabras clave, estructura, errores y próximos pasos.`,
+      h1: `${page.h1} — guía`,
+      lead: `Esta página explica **${page.h1.toLowerCase()}** de forma directa y práctica: qué ve el ATS, qué escanea el recruiter y qué cambios realmente mueven el resultado.`,
+      sections: [
+        { title: "Introducción", body: `Este material trata el tema **${label}**. El objetivo es corregir dos problemas frecuentes: señal débil y prueba débil.\n\nSi el tema está ligado al rol **${role}**, las keywords tienen que estar respaldadas por bullets reales.` },
+        { title: "Qué ocurre durante el screening", body: `El ATS parsea el archivo, el recruiter hace un escaneo rápido y el hiring manager valida nivel y credibilidad.\n\nPor eso las mejores páginas de este cluster priorizan estructura, prueba y claridad.` },
+        { title: "Playbook práctico", body: `- mantén una estructura simple\n- muestra las señales importantes arriba\n- respalda las keywords con resultados concretos\n- evita repetir texto sin añadir valor\n- prueba la versión final con una vacante real` },
+        { title: "Ejemplos y mini transformaciones", body: `La versión débil describe actividad. La versión fuerte muestra cambio, alcance e impacto.\n\nEn temas role-based conviene unir [resume example](${roleSlug ? `/resume-examples/${roleSlug}` : "/resume-examples"}) y [resume keywords](${roleSlug ? `/resume-keywords/${roleSlug}` : "/resume-keywords"}).` },
+        { title: "Errores comunes", body: `- texto demasiado genérico\n- keywords sin prueba\n- layout que complica el parsing\n- keyword stuffing\n- falta de next step claro` },
+        { title: "FAQ", body: `- **¿Cuánto hay que adaptar el contenido?** Empieza por summary, skills y los primeros bullets.\n- **¿Qué importa más?** Confirmar rápido fit, alcance y resultados.\n- **¿Qué hago después?** Prueba el CV con una vacante real y corrige primero las mayores brechas.` },
+        { title: "Seguir leyendo", body: `- [Free ATS resume checker](/free-ats-resume-checker)\n- [Optimize my resume](/app)\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)` },
+      ],
+    },
+  };
+
+  const localized = localizedBodies[language as Exclude<Language, "en">];
+  const nextPage = {
+    ...page,
+    seoTitle: localized.seoTitle,
+    metaDescription: truncateText(localized.meta, 160),
+    h1: localized.h1,
+    lead: localized.lead,
+    sections: localized.sections,
+  };
+  return {
+    ...nextPage,
+    estimatedWordCount: countPageWords(nextPage),
   };
 }
 

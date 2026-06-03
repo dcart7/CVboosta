@@ -1,4 +1,5 @@
 import type { ResumeKeywordCluster, RoleCategory } from "./resumeKeywordClusters";
+import type { Language } from "./translations";
 
 export type SeoFaqItem = { question: string; answer: string };
 export type SeoInternalLink = { href: string; anchor: string };
@@ -25,6 +26,272 @@ export type ResumeExampleSeoPage = {
   imageIdeas: string[];
   estimatedWordCount: number;
 };
+
+const EXAMPLE_UI: Record<Language, {
+  intro: string;
+  hiring: string;
+  template: string;
+  summary: string;
+  skills: string;
+  realistic: string;
+  tailoring: string;
+  bullets: string;
+  ats: string;
+  mistakes: string;
+  beforeAfter: string;
+  faq: string;
+  links: string;
+  images: string;
+  cta: string;
+}> = {
+  en: {
+    intro: "Introduction",
+    hiring: "How hiring teams screen (ATS → recruiter → hiring manager)",
+    template: "ATS-safe resume template (structure + formatting)",
+    summary: "Resume summary examples (3 options you can adapt)",
+    skills: "Skills section example (grouped, ATS-safe)",
+    realistic: "Realistic resume example (copy the structure, then tailor)",
+    tailoring: "How to tailor this resume in 20 minutes (repeatable)",
+    bullets: "Realistic examples (bullets + rewrites)",
+    ats: "ATS optimization (parsing, keywords, recruiter scan)",
+    mistakes: "Common mistakes (and why they hurt)",
+    beforeAfter: "Before/after transformation (weak → optimized)",
+    faq: "FAQ",
+    links: "Internal links (next reads)",
+    images: "Suggested image ideas (optional)",
+    cta: "Soft CTA",
+  },
+  uk: {
+    intro: "Вступ",
+    hiring: "Як найм-команди сканують резюме (ATS → рекрутер → hiring manager)",
+    template: "ATS-безпечний шаблон резюме (структура + форматування)",
+    summary: "Приклади summary для резюме (3 варіанти)",
+    skills: "Приклад секції Skills (згруповано, ATS-safe)",
+    realistic: "Реалістичний приклад резюме (копіюйте структуру, потім адаптуйте)",
+    tailoring: "Як адаптувати це резюме за 20 хвилин",
+    bullets: "Реалістичні bullet-приклади та переписування",
+    ats: "ATS-оптимізація (парсинг, ключові слова, скан рекрутера)",
+    mistakes: "Типові помилки (і чому вони шкодять)",
+    beforeAfter: "Трансформація до/після (слабко → сильніше)",
+    faq: "FAQ",
+    links: "Внутрішні посилання (що читати далі)",
+    images: "Ідеї для зображень (опційно)",
+    cta: "Наступний крок",
+  },
+  pl: {
+    intro: "Wprowadzenie",
+    hiring: "Jak zespoły rekrutacyjne skanują CV (ATS → rekruter → hiring manager)",
+    template: "Szablon CV bezpieczny dla ATS (struktura + formatowanie)",
+    summary: "Przykłady podsumowania CV (3 warianty)",
+    skills: "Przykład sekcji Skills (grupowane, ATS-safe)",
+    realistic: "Realistyczny przykład CV (skopiuj strukturę, potem dopasuj)",
+    tailoring: "Jak dopasować to CV w 20 minut",
+    bullets: "Realistyczne bullet points i przeróbki",
+    ats: "Optymalizacja ATS (parsowanie, keywords, skan rekrutera)",
+    mistakes: "Typowe błędy (i dlaczego szkodzą)",
+    beforeAfter: "Transformacja before/after (słabo → lepiej)",
+    faq: "FAQ",
+    links: "Linki wewnętrzne (co czytać dalej)",
+    images: "Pomysły na grafiki (opcjonalnie)",
+    cta: "Następny krok",
+  },
+  sk: {
+    intro: "Úvod",
+    hiring: "Ako hiring tímy skenujú životopis (ATS → recruiter → hiring manager)",
+    template: "ATS-safe šablóna životopisu (štruktúra + formátovanie)",
+    summary: "Príklady summary do životopisu (3 verzie)",
+    skills: "Príklad sekcie Skills (zoskupené, ATS-safe)",
+    realistic: "Realistický príklad životopisu (skopírujte štruktúru a prispôsobte)",
+    tailoring: "Ako prispôsobiť tento životopis za 20 minút",
+    bullets: "Realistické bullet body a prepisy",
+    ats: "ATS optimalizácia (parsing, kľúčové slová, recruiter scan)",
+    mistakes: "Typické chyby (a prečo škodia)",
+    beforeAfter: "Transformácia pred/po (slabé → silnejšie)",
+    faq: "FAQ",
+    links: "Interné odkazy (čo čítať ďalej)",
+    images: "Návrhy obrázkov (voliteľné)",
+    cta: "Ďalší krok",
+  },
+  cs: {
+    intro: "Úvod",
+    hiring: "Jak hiring týmy skenují životopis (ATS → recruiter → hiring manager)",
+    template: "ATS-safe šablona životopisu (struktura + formátování)",
+    summary: "Příklady summary do životopisu (3 varianty)",
+    skills: "Příklad sekce Skills (seskupené, ATS-safe)",
+    realistic: "Realistický příklad životopisu (zkopírujte strukturu a pak upravte)",
+    tailoring: "Jak upravit tento životopis za 20 minut",
+    bullets: "Realistické bullet body a přepisy",
+    ats: "ATS optimalizace (parsování, klíčová slova, recruiter scan)",
+    mistakes: "Typické chyby (a proč škodí)",
+    beforeAfter: "Transformace před/po (slabé → silnější)",
+    faq: "FAQ",
+    links: "Interní odkazy (co číst dál)",
+    images: "Nápady na obrázky (volitelné)",
+    cta: "Další krok",
+  },
+  es: {
+    intro: "Introducción",
+    hiring: "Cómo los equipos de contratación escanean el CV (ATS → recruiter → hiring manager)",
+    template: "Plantilla de CV compatible con ATS (estructura + formato)",
+    summary: "Ejemplos de resumen para CV (3 opciones)",
+    skills: "Ejemplo de sección Skills (agrupada, ATS-safe)",
+    realistic: "Ejemplo realista de CV (copia la estructura y luego adáptala)",
+    tailoring: "Cómo adaptar este CV en 20 minutos",
+    bullets: "Bullets realistas y reescrituras",
+    ats: "Optimización ATS (parsing, palabras clave, escaneo del recruiter)",
+    mistakes: "Errores comunes (y por qué perjudican)",
+    beforeAfter: "Transformación antes/después (débil → mejor)",
+    faq: "FAQ",
+    links: "Enlaces internos (sigue leyendo)",
+    images: "Ideas de imágenes (opcional)",
+    cta: "Siguiente paso",
+  },
+};
+
+function replaceSectionTitle(title: string, language: Language): string {
+  if (language === "en") return title;
+  const ui = EXAMPLE_UI[language] || EXAMPLE_UI.en;
+  const mapping = new Map<string, string>([
+    ["Introduction", ui.intro],
+    ["How hiring teams screen (ATS → recruiter → hiring manager)", ui.hiring],
+    ["ATS-safe resume template (structure + formatting)", ui.template],
+    ["Resume summary examples (3 options you can adapt)", ui.summary],
+    ["Skills section example (grouped, ATS-safe)", ui.skills],
+    ["Realistic resume example (copy the structure, then tailor)", ui.realistic],
+    [/^How to tailor a .+ resume in 20 minutes \(repeatable\)$/ as unknown as string, ui.tailoring],
+    ["Realistic examples (bullets + rewrites)", ui.bullets],
+    ["ATS optimization (parsing, keywords, recruiter scan)", ui.ats],
+    ["Common mistakes (and why they hurt)", ui.mistakes],
+    ["Before/after transformation (weak → optimized)", ui.beforeAfter],
+    ["FAQ", ui.faq],
+    ["Internal links (next reads)", ui.links],
+    ["Suggested image ideas (optional)", ui.images],
+    ["Soft CTA", ui.cta],
+  ]);
+
+  if (mapping.has(title)) return mapping.get(title)!;
+  if (/^How to tailor a .+ resume in 20 minutes \(repeatable\)$/.test(title)) return ui.tailoring;
+  return title;
+}
+
+function getLocalizedExampleCopy(language: Language, role: string, roleSlug: string, lane: string, keywords: string[]) {
+  const keywordA = keywords[0] ?? "role fit";
+  const keywordB = keywords[1] ?? "clear outcomes";
+  const keywordC = keywords[2] ?? "ATS readability";
+
+  if (language === "uk") {
+    return {
+      seoTitle: `${role} — приклад резюме (ATS-friendly)`,
+      meta: `Приклад резюме для ${role}: ATS-безпечна структура, summary, skills, bullet-переписування, типові помилки та FAQ.`,
+      h1: `${role} — приклад резюме (ATS-friendly)`,
+      lead: `Практичний приклад резюме для ${role} з фокусом на ${lane}, ATS-парсинг і сильні bullet-пункти.`,
+      intro: `Ця сторінка показує, як зробити резюме для **${role}** зрозумілим і для ATS, і для рекрутера. Найсильніші резюме швидко підтверджують рольову відповідність, дають 2–4 релевантні сигнали і підкріплюють їх цифрами.\n\nПочинайте з простої структури, далі вирівнюйте ключові слова, а вже потім допрацьовуйте формулювання. Для цієї ролі важливо підсвітити **${keywordA}**, **${keywordB}** і **${keywordC}**.\n\nЯкщо хочете спочатку подивитися keyword-чекліст, відкрийте [ключові слова для ${role}](/resume-keywords/${roleSlug}).`,
+      hiring: `Сильне резюме проходить три короткі перевірки:\n1. **ATS** читає файл як текст і намагається знайти секції та ключові слова.\n2. **Рекрутер** за перші 10–30 секунд оцінює рольову відповідність, scope і credibility.\n3. **Hiring manager** дивиться, чи справді ваші bullet-пункти доводять потрібний рівень роботи.\n\nЩо швидше ви робите ${lane} очевидним, то менше невизначеності залишається у скринінгу.`,
+      template: `Найбезпечніший шаблон для ATS — це **одна колонка**, стандартні заголовки та читабельний текст.\n\n### Рекомендований порядок секцій\n- Contact\n- Headline + Summary\n- Skills\n- Experience\n- Education\n\n### Що працює краще за все\n- стандартні headings\n- прості bullets\n- однаковий формат дат\n- без таблиць, sidebar і критичного тексту в header/footer\n\nЯкщо потрібні глибші правила форматування, відкрийте [ATS guides](/ats).`,
+      summary: `Сильне summary для ${role} має бути коротким: **2–4 речення**. Воно повинно назвати цільову роль, кілька ключових слів і один сигнал довіри.\n\n### Що включити\n- назву ролі\n- 2–4 must-have keywords\n- один вимірюваний результат або scope line\n\nПісля цього адаптуйте summary під конкретну вакансію, замінюючи ключові слова на ті, що реально повторюються в job description.`,
+      skills: `Секція Skills не повинна виглядати як довгий хаотичний список. Краще групувати навички за змістом, щоб їх було легко сканувати і ATS, і рекрутеру.\n\n### Практичний принцип\n- **Core:** ${keywords.slice(0, 8).join(", ")}\n- **Tools / Systems:** ${keywords.slice(8, 16).join(", ")}\n- **Methods / Workflow:** ${keywords.slice(16, 24).join(", ")}\n\nЯкщо термін справді важливий, він має з’явитися хоча б в одному bullet-пункті з доказом.`,
+      realistic: `Нижче логіка прикладу: спершу структура, потім зміст.\n\n- поставте найсильніші докази у перші 3–6 bullet-пунктів\n- залиште standard headings\n- не ховайте важливий текст у декоративних елементах\n\nКопіюйте каркас, але не копіюйте слова без перевірки на правдивість.`,
+      tailoring: `Адаптація не означає переписати все з нуля.\n\n### Повторюваний workflow\n1. Витягніть 8–15 повторюваних вимог із вакансії.\n2. Оновіть summary під роль.\n3. Підніміть ключові skills вище.\n4. Перепишіть перші 3–6 bullet-пунктів у найбільш релевантному досвіді.\n5. Перевірте parsed preview перед відправкою.\n\nПісля цього варто запустити [безкоштовний ATS scan](/free-ats-resume-checker).`,
+      bullets: `Найкращі bullet-пункти для ${role} показують **дію + контекст + результат**. Уникайте фраз на кшталт “responsible for” без доказу.\n\nШукайте формулювання, які показують ownership, scope і вимірюваний вплив на ${lane}.`,
+      ats: `ATS не “розуміє” резюме як людина — він спочатку парсить структуру, а потім індексує терміни. Тому важливо:\n- використовувати стандартні секції\n- розміщувати keywords у Summary, Skills і Experience\n- не перенасичувати текст повтореннями\n- перевіряти parsed preview\n\nНайсильніший ATS-match виникає там, де ключове слово підтверджене реальним результатом.`,
+      mistakes: `Типові помилки для ${role}:\n- занадто загальне summary\n- список tools без доказів у досвіді\n- двоколонковий layout або таблиці\n- keyword stuffing без контексту\n- розмиті bullet-пункти без ownership і цифр`,
+      beforeAfter: `Слабка версія bullet-пункту зазвичай описує активність. Сильніша версія описує результат, контекст і вимірюваний вплив.\n\nПереписуйте так, щоб recruiter одразу бачив: що змінилося, на скільки і завдяки чому.`,
+      faqTitle: "FAQ",
+      links: `Що читати далі:\n- [Ключові слова для ${role}](/resume-keywords/${roleSlug})\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)\n- [ATS guides](/ats)\n- [Free ATS resume checker](/free-ats-resume-checker)`,
+      images: `Ідеї для візуалів:\n- clean one-column resume mockup\n- before/after bullet card\n- keyword placement diagram\n- ATS parsing flow`,
+      cta: `Хочете застосувати це до конкретної вакансії? Перейдіть у продукт:\n- [Запустити ATS scan](/free-ats-resume-checker)\n- [Оптимізувати резюме](/app)`,
+    };
+  }
+
+  const generic = {
+    pl: {
+      seoTitle: `${role} — przykład CV (ATS-friendly)`,
+      meta: `Przykład CV dla ${role}: bezpieczna struktura ATS, summary, skills, przeróbki bulletów, błędy i FAQ.`,
+      h1: `${role} — przykład CV (ATS-friendly)`,
+      lead: `Praktyczny przykład CV dla ${role} z naciskiem na ${lane}, parsing ATS i mocniejsze bullet points.`,
+      intro: `Ta strona pokazuje, jak zbudować CV dla **${role}**, które jest czytelne dla ATS i dla rekrutera. Najlepsze CV szybko potwierdza dopasowanie do roli, pokazuje 2–4 ważne sygnały i wspiera je dowodami.\n\nNa tej roli warto wyraźnie zaznaczyć **${keywordA}**, **${keywordB}** i **${keywordC}**.\n\nZobacz też [słowa kluczowe CV dla ${role}](/resume-keywords/${roleSlug}).`,
+      hiring: `Silne CV przechodzi trzy krótkie etapy: ATS, szybki skan rekrutera i przegląd hiring managera. Im szybciej pokażesz ${lane}, tym mniejsze ryzyko, że CV zostanie pominięte.`,
+      template: `Najbezpieczniejszy układ dla ATS to jedna kolumna, standardowe nagłówki i prosty tekst. Unikaj tabel, sidebarów i ważnych treści w header/footer.`,
+      summary: `Summary powinno być krótkie: 2–4 zdania, nazwa roli, kilka keywords i jeden sygnał wiarygodności.`,
+      skills: `Sekcję Skills grupuj logicznie, zamiast wrzucać długą listę. Kluczowe terms powinny pojawiać się też w Experience z dowodem.`,
+      realistic: `Traktuj ten przykład jako strukturę bazową. Najmocniejsze 3–6 bulletów powinny być na górze ostatniego istotnego doświadczenia.`,
+      tailoring: `Dopasowanie CV to krótka seria zmian: wyciągnij wymagania z ogłoszenia, popraw summary, podnieś ważne skills i przepisz lead bullets.`,
+      bullets: `Najlepsze bullet points pokazują działanie, kontekst i wynik. Unikaj ogólnych zdań bez liczb i ownership.`,
+      ats: `ATS najpierw parsuje strukturę, potem indeksuje terms. Dlatego standardowe sekcje, dobre rozmieszczenie keywords i czysty layout są ważniejsze niż ozdobniki.`,
+      mistakes: `Najczęstsze błędy to ogólne summary, tools bez dowodu, keyword stuffing, zbyt ozdobny layout i słabe bullets.`,
+      beforeAfter: `Słaba wersja opisuje czynność. Mocniejsza wersja pokazuje zmianę, wynik i wpływ biznesowy.`,
+      faqTitle: "FAQ",
+      links: `Czytaj dalej:\n- [Słowa kluczowe CV dla ${role}](/resume-keywords/${roleSlug})\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)\n- [ATS guides](/ats)`,
+      images: `Pomysły na grafiki:\n- one-column CV mockup\n- before/after bullet card\n- keyword placement diagram`,
+      cta: `Chcesz zastosować to do realnej oferty?\n- [Uruchom ATS scan](/free-ats-resume-checker)\n- [Optymalizuj CV](/app)`,
+    },
+    sk: {
+      seoTitle: `${role} — príklad životopisu (ATS-friendly)`,
+      meta: `Príklad životopisu pre ${role}: ATS-safe štruktúra, summary, skills, prepisy bulletov, chyby a FAQ.`,
+      h1: `${role} — príklad životopisu (ATS-friendly)`,
+      lead: `Praktický príklad životopisu pre ${role} so zameraním na ${lane}, ATS parsing a silnejšie bullet body.`,
+      intro: `Táto stránka ukazuje, ako pripraviť životopis pre **${role}**, ktorý je čitateľný pre ATS aj recruitera. Dôležité je rýchlo ukázať role fit a dôkaz.\n\nPre túto rolu zvýraznite **${keywordA}**, **${keywordB}** a **${keywordC}**.\n\nPozrite si aj [kľúčové slová životopisu pre ${role}](/resume-keywords/${roleSlug}).`,
+      hiring: `Silný životopis prechádza cez ATS, krátky recruiter scan a potom cez hiring managera. Čím skôr ukážete ${lane}, tým lepšie.`,
+      template: `Najbezpečnejší ATS layout je jedna kolóna, štandardné headings a čistý text. Vyhnite sa tabuľkám a sidebarom.`,
+      summary: `Summary má byť krátke: 2–4 vety, názov roly, pár kľúčových slov a jeden dôveryhodný výsledok.`,
+      skills: `Skills sekciu zoskupujte logicky. Dôležité terms by sa mali objaviť aj v Experience s dôkazom.`,
+      realistic: `Tento príklad berte ako kostru. Najsilnejšie bullet body presuňte hore do poslednej relevantnej pozície.`,
+      tailoring: `Prispôsobenie je krátky workflow: vytiahnite požiadavky z job postu, upravte summary, zoraďte skills a prepíšte lead bullets.`,
+      bullets: `Najlepšie bullet body ukazujú akciu, kontext a výsledok. Vyhýbajte sa všeobecným frázam bez metrík.`,
+      ats: `ATS najprv parsuje štruktúru a potom indexuje terms. Preto je dôležitá čistá štruktúra, dobré umiestnenie kľúčových slov a preview kontrola.`,
+      mistakes: `Typické chyby: príliš všeobecné summary, tools bez dôkazu, keyword stuffing, ozdobný layout a slabé bullets.`,
+      beforeAfter: `Slabá verzia opisuje aktivitu. Silnejšia verzia ukazuje zmenu, výsledok a dopad.`,
+      faqTitle: "FAQ",
+      links: `Čítajte ďalej:\n- [Kľúčové slová životopisu pre ${role}](/resume-keywords/${roleSlug})\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)\n- [ATS guides](/ats)`,
+      images: `Návrhy obrázkov:\n- one-column resume mockup\n- before/after bullet card\n- ATS flow diagram`,
+      cta: `Chcete to použiť na reálnu pozíciu?\n- [Spustiť ATS scan](/free-ats-resume-checker)\n- [Optimalizovať životopis](/app)`,
+    },
+    cs: {
+      seoTitle: `${role} — příklad životopisu (ATS-friendly)`,
+      meta: `Příklad životopisu pro ${role}: ATS-safe struktura, summary, skills, přepisy bulletů, chyby a FAQ.`,
+      h1: `${role} — příklad životopisu (ATS-friendly)`,
+      lead: `Praktický příklad životopisu pro ${role} se zaměřením na ${lane}, ATS parsování a silnější bullet body.`,
+      intro: `Tato stránka ukazuje, jak připravit životopis pro **${role}**, který je čitelný pro ATS i recruitera. Silný životopis rychle potvrdí role fit a důkaz výsledků.\n\nPro tuto roli zvýrazněte **${keywordA}**, **${keywordB}** a **${keywordC}**.\n\nPodívejte se i na [klíčová slova životopisu pro ${role}](/resume-keywords/${roleSlug}).`,
+      hiring: `Silný životopis prochází přes ATS, rychlý recruiter scan a pak hiring managera. Čím dřív ukážete ${lane}, tím lépe.`,
+      template: `Nejbezpečnější ATS layout je jeden sloupec, standardní headings a čistý text. Vyhněte se tabulkám a sidebarům.`,
+      summary: `Summary má být krátké: 2–4 věty, název role, pár klíčových slov a jeden důvěryhodný výsledek.`,
+      skills: `Sekci Skills seskupujte logicky. Důležité terms se mají objevit i v Experience s důkazem.`,
+      realistic: `Tento příklad berte jako kostru. Nejsilnější bullet body patří nahoru do poslední relevantní pozice.`,
+      tailoring: `Úprava CV je krátký workflow: vytáhněte požadavky z job postu, upravte summary, přesuňte důležité skills a přepište lead bullets.`,
+      bullets: `Nejlepší bullet body ukazují akci, kontext a výsledek. Vyhýbejte se obecným frázím bez metrik.`,
+      ats: `ATS nejdřív parsuje strukturu a pak indexuje terms. Proto je důležitá čistá struktura, dobré rozmístění keywords a kontrola preview.`,
+      mistakes: `Typické chyby: příliš obecné summary, tools bez důkazu, keyword stuffing, přeplácaný layout a slabé bullets.`,
+      beforeAfter: `Slabá verze popisuje aktivitu. Silnější verze ukazuje změnu, výsledek a dopad.`,
+      faqTitle: "FAQ",
+      links: `Čtěte dál:\n- [Klíčová slova životopisu pro ${role}](/resume-keywords/${roleSlug})\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)\n- [ATS guides](/ats)`,
+      images: `Nápady na obrázky:\n- one-column resume mockup\n- before/after bullet card\n- ATS flow diagram`,
+      cta: `Chcete to použít na reálnou pozici?\n- [Spustit ATS scan](/free-ats-resume-checker)\n- [Optimalizovat životopis](/app)`,
+    },
+    es: {
+      seoTitle: `${role} — ejemplo de CV (ATS-friendly)`,
+      meta: `Ejemplo de CV para ${role}: estructura segura para ATS, summary, skills, reescrituras de bullets, errores y FAQ.`,
+      h1: `${role} — ejemplo de CV (ATS-friendly)`,
+      lead: `Ejemplo práctico de CV para ${role} con foco en ${lane}, parsing ATS y bullets más fuertes.`,
+      intro: `Esta página muestra cómo construir un CV para **${role}** que sea claro tanto para ATS como para recruiters. Un buen CV confirma rápido el role fit y lo respalda con pruebas.\n\nPara este rol conviene destacar **${keywordA}**, **${keywordB}** y **${keywordC}**.\n\nTambién puedes abrir [palabras clave del CV para ${role}](/resume-keywords/${roleSlug}).`,
+      hiring: `Un CV fuerte pasa por ATS, por el primer escaneo del recruiter y luego por el hiring manager. Cuanto antes hagas visible ${lane}, mejor.`,
+      template: `El layout más seguro para ATS es una sola columna, headings estándar y texto limpio. Evita tablas y sidebars.`,
+      summary: `El summary debe ser corto: 2–4 frases, el título objetivo, algunas keywords y una señal de credibilidad.`,
+      skills: `Agrupa la sección Skills de forma lógica. Los terms importantes también deben aparecer en Experience con prueba.`,
+      realistic: `Usa este ejemplo como estructura base. Los 3–6 bullets más fuertes deben ir arriba en la experiencia más relevante.`,
+      tailoring: `Adaptar el CV es un workflow corto: extrae requisitos del job post, ajusta el summary, sube las skills relevantes y reescribe los lead bullets.`,
+      bullets: `Los mejores bullets muestran acción, contexto y resultado. Evita frases genéricas sin métricas.`,
+      ats: `ATS primero parsea la estructura y luego indexa los terms. Por eso importan más la estructura limpia, la colocación de keywords y la revisión del preview.`,
+      mistakes: `Errores comunes: summary demasiado genérico, tools sin prueba, keyword stuffing, layout decorativo y bullets débiles.`,
+      beforeAfter: `La versión débil describe actividad. La versión fuerte muestra cambio, resultado e impacto.`,
+      faqTitle: "FAQ",
+      links: `Sigue leyendo:\n- [Palabras clave del CV para ${role}](/resume-keywords/${roleSlug})\n- [Resume summary examples](/resume-summary)\n- [Resume bullet examples](/resume-bullets)\n- [ATS guides](/ats)`,
+      images: `Ideas de imágenes:\n- one-column resume mockup\n- before/after bullet card\n- ATS flow diagram`,
+      cta: `¿Quieres aplicarlo a una vacante real?\n- [Ejecutar ATS scan](/free-ats-resume-checker)\n- [Optimizar CV](/app)`,
+    },
+  } as const;
+
+  return generic[language as keyof typeof generic] ?? generic.pl;
+}
 
 const TODAY = "2026-06-01";
 
@@ -602,7 +869,70 @@ function buildInternalLinks(roleSlug: string, role: string): SeoInternalLink[] {
 export function buildResumeExampleSeoPage(
   cluster: ResumeKeywordCluster,
   relatedRoles: ResumeKeywordCluster[],
+  language: Language = "en",
 ): ResumeExampleSeoPage {
+  if (language !== "en") {
+    const h = hashString(`${cluster.slug}:${language}`);
+    const lane = pick(CATEGORY_LANES[cluster.category], h, 2);
+    const copy = getLocalizedExampleCopy(language, cluster.role, cluster.slug, lane, cluster.keywords);
+    const sections: SeoSection[] = [
+      { title: replaceSectionTitle("Introduction", language), body: copy.intro },
+      { title: replaceSectionTitle("How hiring teams screen (ATS → recruiter → hiring manager)", language), body: copy.hiring },
+      { title: replaceSectionTitle("ATS-safe resume template (structure + formatting)", language), body: copy.template },
+      { title: replaceSectionTitle("Resume summary examples (3 options you can adapt)", language), body: copy.summary },
+      { title: replaceSectionTitle("Skills section example (grouped, ATS-safe)", language), body: copy.skills },
+      { title: replaceSectionTitle("Realistic resume example (copy the structure, then tailor)", language), body: copy.realistic },
+      { title: replaceSectionTitle(`How to tailor a ${cluster.role} resume in 20 minutes (repeatable)`, language), body: copy.tailoring },
+      { title: replaceSectionTitle("Realistic examples (bullets + rewrites)", language), body: copy.bullets },
+      { title: replaceSectionTitle("ATS optimization (parsing, keywords, recruiter scan)", language), body: copy.ats },
+      { title: replaceSectionTitle("Common mistakes (and why they hurt)", language), body: copy.mistakes },
+      { title: replaceSectionTitle("Before/after transformation (weak → optimized)", language), body: copy.beforeAfter },
+      { title: replaceSectionTitle("FAQ", language), body: `- **${copy.faqTitle}?** ${copy.lead}` },
+      { title: replaceSectionTitle("Internal links (next reads)", language), body: copy.links },
+      { title: replaceSectionTitle("Suggested image ideas (optional)", language), body: copy.images },
+      { title: replaceSectionTitle("Soft CTA", language), body: copy.cta },
+    ];
+
+    const faq: SeoFaqItem[] = [
+      {
+        question: `${copy.faqTitle}?`,
+        answer: copy.lead,
+      },
+    ];
+
+    const relatedPages: SeoRelatedPage[] = relatedRoles.slice(0, 10).map((item) => ({
+      href: `/resume-examples/${item.slug}`,
+      title: `${item.role} Resume Example (ATS-Friendly)`,
+    }));
+
+    const similarRoles = relatedRoles.slice(0, 10).map((item) => ({
+      slug: item.slug,
+      role: item.role,
+    }));
+
+    const internalLinks = buildInternalLinks(cluster.slug, cluster.role);
+    const estimatedWordCount = countWords(
+      [copy.seoTitle, copy.meta, copy.h1, copy.lead, ...sections.map((section) => `${section.title}\n${section.body}`)].join("\n\n"),
+    );
+
+    return {
+      slug: cluster.slug,
+      role: cluster.role,
+      seoTitle: truncateTo(copy.seoTitle, 60),
+      metaDescription: truncateTo(copy.meta, 160),
+      h1: copy.h1,
+      lead: copy.lead,
+      updatedAt: TODAY,
+      sections,
+      faq,
+      internalLinks,
+      relatedPages,
+      similarRoles,
+      imageIdeas: [],
+      estimatedWordCount,
+    };
+  }
+
   const h = hashString(cluster.slug);
   const lane = pick(CATEGORY_LANES[cluster.category], h, 2);
 

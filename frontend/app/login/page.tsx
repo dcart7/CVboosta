@@ -175,7 +175,12 @@ export default function LoginPage() {
           
           <div className="card auth-footer-card">
             <h3>{t("auth.whatsNew")}</h3>
-            <p>{t("auth.whatsNewDesc")}</p>
+            <ul style={{ margin: "10px 0 0", paddingLeft: "18px", color: "var(--muted)", lineHeight: 1.7 }}>
+              <li>Improved CV skill extraction</li>
+              <li>Job-description-first analysis</li>
+              <li>Before/after score history</li>
+              <li>Clearer recommendations for every optimization pass</li>
+            </ul>
           </div>
         </section>
       </div>

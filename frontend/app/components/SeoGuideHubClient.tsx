@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TopNav from "./TopNav";
 import { useTranslation } from "../lib/LanguageContext";
+import type { Language } from "../lib/translations";
 
 type HubItem = {
   slug: string;
@@ -34,9 +35,89 @@ export default function SeoGuideHubClient({
   ctaLead,
   items,
 }: Props) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [query, setQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const copy: Record<Language, {
+    pages: string;
+    searchLabel: string;
+    searchPlaceholder: string;
+    noResults: string;
+    noResultsHint: string;
+    loadMore: string;
+    freeChecker: string;
+    optimize: string;
+    register: string;
+  }> = {
+    en: {
+      pages: "Pages",
+      searchLabel: "Search this hub",
+      searchPlaceholder: "Search titles, intents, or slugs",
+      noResults: "No pages found",
+      noResultsHint: "Try a shorter keyword or a role, company, ATS, or industry term.",
+      loadMore: "Load more pages",
+      freeChecker: "Free ATS resume checker",
+      optimize: "Optimize my resume",
+      register: "Create free account",
+    },
+    uk: {
+      pages: "Сторінки",
+      searchLabel: "Пошук у цьому хабі",
+      searchPlaceholder: "Шукайте назви, наміри або slug",
+      noResults: "Сторінки не знайдено",
+      noResultsHint: "Спробуйте коротший запит або назву ролі, компанії, ATS чи індустрії.",
+      loadMore: "Показати більше сторінок",
+      freeChecker: "Безкоштовний ATS Resume Checker",
+      optimize: "Оптимізувати резюме",
+      register: "Створити акаунт безкоштовно",
+    },
+    pl: {
+      pages: "Strony",
+      searchLabel: "Szukaj w tym hubie",
+      searchPlaceholder: "Szukaj tytułów, intencji lub slugów",
+      noResults: "Nie znaleziono stron",
+      noResultsHint: "Spróbuj krótszego zapytania albo nazwy roli, firmy, ATS lub branży.",
+      loadMore: "Pokaż więcej stron",
+      freeChecker: "Darmowy ATS Resume Checker",
+      optimize: "Zoptymalizuj CV",
+      register: "Załóż darmowe konto",
+    },
+    sk: {
+      pages: "Stránky",
+      searchLabel: "Hľadať v tomto hube",
+      searchPlaceholder: "Hľadajte názvy, intent alebo slugy",
+      noResults: "Nenašli sa žiadne stránky",
+      noResultsHint: "Skúste kratší dopyt alebo názov roly, firmy, ATS či odvetvia.",
+      loadMore: "Zobraziť viac stránok",
+      freeChecker: "Bezplatný ATS Resume Checker",
+      optimize: "Optimalizovať životopis",
+      register: "Vytvoriť účet zadarmo",
+    },
+    cs: {
+      pages: "Stránky",
+      searchLabel: "Hledat v tomto hubu",
+      searchPlaceholder: "Hledejte názvy, intent nebo slugy",
+      noResults: "Žádné stránky nebyly nalezeny",
+      noResultsHint: "Zkuste kratší dotaz nebo název role, firmy, ATS či odvětví.",
+      loadMore: "Zobrazit více stránek",
+      freeChecker: "Bezplatný ATS Resume Checker",
+      optimize: "Optimalizovat životopis",
+      register: "Vytvořit účet zdarma",
+    },
+    es: {
+      pages: "Páginas",
+      searchLabel: "Buscar en este hub",
+      searchPlaceholder: "Busca títulos, intenciones o slugs",
+      noResults: "No se encontraron páginas",
+      noResultsHint: "Prueba una consulta más corta o el nombre del rol, empresa, ATS o industria.",
+      loadMore: "Ver más páginas",
+      freeChecker: "ATS Resume Checker gratis",
+      optimize: "Optimizar mi CV",
+      register: "Crear cuenta gratis",
+    },
+  };
+  const ui = copy[language] || copy.en;
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -68,13 +149,13 @@ export default function SeoGuideHubClient({
             <p className="hero-subtitle rk-hero-subtitle">{subtitle}</p>
             <div className="nav-actions rk-hero-actions">
               <Link className="btn primary" href="/free-ats-resume-checker">
-                Free ATS resume checker
+                {ui.freeChecker}
               </Link>
               <Link className="btn secondary" href="/app">
-                Optimize my resume
+                {ui.optimize}
               </Link>
               <Link className="btn ghost" href="/register">
-                Create free account
+                {ui.register}
               </Link>
               <Link className="btn ghost" href="/login">
                 {t("nav.login")}
@@ -86,27 +167,27 @@ export default function SeoGuideHubClient({
         <section className="section fade-up rk-hub-section">
           <div className="rk-hub-head">
             <h2 className="section-title">
-              Pages ({filtered.length})
+              {ui.pages} ({filtered.length})
             </h2>
           </div>
 
           <div className="rk-filters">
             <div className="rk-filter-control">
-              <label htmlFor={`${basePath}-search`}>Search this hub</label>
+              <label htmlFor={`${basePath}-search`}>{ui.searchLabel}</label>
               <input
                 id={`${basePath}-search`}
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search titles, intents, or slugs"
+                placeholder={ui.searchPlaceholder}
               />
             </div>
           </div>
 
           {visibleItems.length === 0 ? (
             <div className="card rk-empty">
-              <h3>No pages found</h3>
-              <p>Try a shorter keyword or a role, company, ATS, or industry term.</p>
+              <h3>{ui.noResults}</h3>
+              <p>{ui.noResultsHint}</p>
             </div>
           ) : (
             <>
@@ -129,7 +210,7 @@ export default function SeoGuideHubClient({
                     className="btn primary"
                     onClick={() => setVisibleCount((value) => value + PAGE_SIZE)}
                   >
-                    Load more pages
+                    {ui.loadMore}
                   </button>
                 </div>
               )}
@@ -143,13 +224,13 @@ export default function SeoGuideHubClient({
             <p className="rk-copy">{ctaLead}</p>
             <div className="nav-actions rk-hero-actions">
               <Link className="btn primary" href="/free-ats-resume-checker">
-                Free ATS resume checker
+                {ui.freeChecker}
               </Link>
               <Link className="btn secondary" href="/app">
-                Optimize my resume
+                {ui.optimize}
               </Link>
               <Link className="btn ghost" href="/register">
-                Create free account
+                {ui.register}
               </Link>
               <Link className="btn ghost" href="/login">
                 {t("nav.login")}
