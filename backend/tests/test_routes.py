@@ -1,5 +1,6 @@
 from app.schemas.keywords import KeywordExtractionResult
 from app.services.llm import LLMResult
+from datetime import datetime, timedelta, timezone
 
 
 def test_health(client):
@@ -175,3 +176,209 @@ def test_csrf_blocks_cookie_auth_without_origin(client, monkeypatch):
         headers={"Origin": "http://localhost:3000"},
     )
     assert allowed.status_code == 200
+
+
+def _register_and_get_token(client, email: str) -> str:
+    response = client.post(
+        "/auth/register",
+        json={"email": email, "password": "password123", "full_name": "User"},
+    )
+    assert response.status_code == 200
+    return response.json()["access_token"]
+
+
+def _mock_app_store_payload(
+    *,
+    product_id: str,
+    transaction_id: str,
+    original_transaction_id: str,
+    quantity: int = 1,
+    expires_in_days: int | None = None,
+) -> dict[str, object]:
+    now = datetime.now(timezone.utc)
+    payload: dict[str, object] = {
+        "bundleId": "com.cvboosta.app",
+        "environment": "Sandbox",
+        "productId": product_id,
+        "transactionId": transaction_id,
+        "originalTransactionId": original_transaction_id,
+        "purchaseDate": int(now.timestamp() * 1000),
+        "signedDate": int(now.timestamp() * 1000),
+        "quantity": quantity,
+    }
+    if expires_in_days is not None:
+        payload["expiresDate"] = int((now + timedelta(days=expires_in_days)).timestamp() * 1000)
+    return payload
+
+
+def test_app_store_sync_activates_plan_and_extends_status(client, monkeypatch):
+    from app.api.routes import billing as billing_routes
+
+    token = _register_and_get_token(client, "ios-go@example.com")
+    monkeypatch.setattr(
+        billing_routes,
+        "verify_and_decode_app_store_transaction",
+        lambda _jws: _mock_app_store_payload(
+            product_id="com.cvboosta.app.go.monthly",
+            transaction_id="tx-go-001",
+            original_transaction_id="orig-go-001",
+            expires_in_days=30,
+        ),
+    )
+
+    sync_response = client.post(
+        "/billing/app-store/sync",
+        json={
+            "product_id": "com.cvboosta.app.go.monthly",
+            "transaction_id": "tx-go-001",
+            "original_transaction_id": "orig-go-001",
+            "transaction_jws": "signed-jws",
+            "environment": "sandbox",
+            "quantity": 1,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert sync_response.status_code == 200
+    payload = sync_response.json()
+    assert payload["tier"] == "go"
+    assert payload["plan"] == "go"
+    assert payload["entitlement"] == "go"
+    assert payload["source"] == "app_store"
+    assert payload["billing_cycle"] == "month"
+    assert payload["scan_credit_balance"] == 0
+    assert isinstance(payload["expires_at"], str)
+    assert "scans_remaining_today" in payload
+
+    status_response = client.get(
+        "/billing/status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert status_response.status_code == 200
+    status_payload = status_response.json()
+    assert status_payload["tier"] == "go"
+    assert status_payload["source"] == "app_store"
+
+
+def test_app_store_single_scan_sync_is_idempotent(client, monkeypatch):
+    from app.api.routes import billing as billing_routes
+
+    token = _register_and_get_token(client, "ios-credit@example.com")
+    monkeypatch.setattr(
+        billing_routes,
+        "verify_and_decode_app_store_transaction",
+        lambda _jws: _mock_app_store_payload(
+            product_id="com.cvboosta.app.single_scan",
+            transaction_id="tx-credit-001",
+            original_transaction_id="orig-credit-001",
+            quantity=2,
+        ),
+    )
+
+    first = client.post(
+        "/billing/app-store/sync",
+        json={
+            "product_id": "com.cvboosta.app.single_scan",
+            "transaction_id": "tx-credit-001",
+            "original_transaction_id": "orig-credit-001",
+            "transaction_jws": "signed-jws",
+            "environment": "sandbox",
+            "quantity": 2,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert first.status_code == 200
+    assert first.json()["scan_credit_balance"] == 2
+
+    second = client.post(
+        "/billing/app-store/sync",
+        json={
+            "product_id": "com.cvboosta.app.single_scan",
+            "transaction_id": "tx-credit-001",
+            "original_transaction_id": "orig-credit-001",
+            "transaction_jws": "signed-jws",
+            "environment": "sandbox",
+            "quantity": 2,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert second.status_code == 200
+    assert second.json()["scan_credit_balance"] == 2
+
+
+def test_optimize_uses_app_store_scan_credit_after_free_limit(client, monkeypatch):
+    from app.api.routes import billing as billing_routes
+    from app.api.routes import optimize as optimize_routes
+
+    monkeypatch.setattr(
+        optimize_routes,
+        "generate_optimized_cv",
+        lambda *_, **__: LLMResult(optimized_cv="OK", feedback="done"),
+    )
+    monkeypatch.setattr(
+        optimize_routes,
+        "extract_job_keywords",
+        lambda text: KeywordExtractionResult(skills=["Python", "SQL"], requirements=[]),
+    )
+    monkeypatch.setattr(
+        optimize_routes,
+        "build_recommendations",
+        lambda missing: [f"Learn {m}" for m in missing],
+    )
+    monkeypatch.setattr(
+        billing_routes,
+        "verify_and_decode_app_store_transaction",
+        lambda _jws: _mock_app_store_payload(
+            product_id="com.cvboosta.app.single_scan",
+            transaction_id="tx-credit-002",
+            original_transaction_id="orig-credit-002",
+            quantity=1,
+        ),
+    )
+
+    token = _register_and_get_token(client, "ios-credit-usage@example.com")
+    sync_response = client.post(
+        "/billing/app-store/sync",
+        json={
+            "product_id": "com.cvboosta.app.single_scan",
+            "transaction_id": "tx-credit-002",
+            "original_transaction_id": "orig-credit-002",
+            "transaction_jws": "signed-jws",
+            "environment": "sandbox",
+            "quantity": 1,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert sync_response.status_code == 200
+
+    optimize_payload = {
+        "cv_text": "Python",
+        "job_text": "Job",
+        "cv_analysis": "a",
+        "job_analysis": "b",
+    }
+    first = client.post(
+        "/optimize",
+        json=optimize_payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    second = client.post(
+        "/optimize",
+        json=optimize_payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    third = client.post(
+        "/optimize",
+        json=optimize_payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert third.status_code == 402
+
+    status_response = client.get(
+        "/billing/status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert status_response.status_code == 200
+    assert status_response.json()["scan_credit_balance"] == 0

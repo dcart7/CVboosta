@@ -22,6 +22,7 @@ type ActivityItem = {
 
 type BillingStatusResponse = {
   tier?: string;
+  source?: string;
   limits?: {
     scans: number;
     cl: number;
@@ -334,7 +335,8 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {(subscriptionTier === "go" || subscriptionTier === "pro") && (
+              {(subscriptionTier === "go" || subscriptionTier === "pro") &&
+                billingStatus?.source !== "app_store" && (
                 <div className="section">
                   <h2 className="section-title">Subscription</h2>
                   {!billingStatus?.cancel_at_period_end ? (

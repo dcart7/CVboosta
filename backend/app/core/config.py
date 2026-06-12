@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     auth_cookie_domain: str | None = None
     google_oauth_client_id: str | None = None
     apple_oauth_client_id: str | None = None
+    app_store_bundle_id: str = "com.cvboosta.app"
     trusted_proxy_ips: list[str] = Field(default_factory=lambda: ["127.0.0.1", "::1"])
     trusted_proxy_cidrs: list[str] = Field(
         default_factory=lambda: [

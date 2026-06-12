@@ -7,6 +7,7 @@ from sqlalchemy import case, update
 from sqlalchemy.orm import Session
 
 from app.models.user import User
+from app.services.app_store import consume_app_store_scan_credit, refresh_app_store_entitlement_from_transactions
 
 
 _FEATURE_TO_COUNTER: dict[str, str] = {
@@ -45,6 +46,19 @@ def consume_feature_or_raise(
     if not user:
         raise HTTPException(status_code=401, detail="Authentication required.")
 
+    entitlement = refresh_app_store_entitlement_from_transactions(db, user_id)
+    if (
+        feature == "scan"
+        and entitlement
+        and user.paddle_subscription_id is None
+        and tier_includes_app_store_plan(user.subscription_tier)
+        and not entitlement.is_active
+    ):
+        user.subscription_tier = "free"
+        user.subscription_active_until = None
+        db.add(user)
+        db.flush()
+
     tier = (user.subscription_tier or "free").strip().lower()
     now = datetime.now(timezone.utc)
     if tier != "single":
@@ -82,6 +96,9 @@ def consume_feature_or_raise(
             .values({counter_field: counter_col + 1})
         )
         if (result.rowcount or 0) <= 0:
+            if feature == "scan" and consume_app_store_scan_credit(db, user_id):
+                db.commit()
+                return db.query(User).filter(User.id == user_id).first()  # type: ignore[return-value]
             raise HTTPException(status_code=402, detail=exhausted_detail)
 
     db.commit()
@@ -118,3 +135,7 @@ def refund_feature_best_effort(
             .values({counter_field: case((counter_col > 0, counter_col - 1), else_=0)})
         )
     db.commit()
+
+
+def tier_includes_app_store_plan(tier: str | None) -> bool:
+    return (tier or "").strip().lower() in {"go", "pro"}

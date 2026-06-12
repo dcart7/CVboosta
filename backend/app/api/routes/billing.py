@@ -7,7 +7,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 try:
@@ -19,8 +19,18 @@ from app.api.routes.auth import get_current_user
 from app.core.config import get_cors_origins, settings
 from app.db.session import get_db
 from app.models.activity import ActivityLog
+from app.models.billing import AppStoreTransaction
 from app.models.user import LIFETIME_WHITELIST_EMAILS, User
 from app.services.activity_logger import record_activity
+from app.services.app_store import (
+    get_app_store_product_config,
+    get_app_store_scan_credit_balance,
+    get_or_create_billing_entitlement,
+    millis_to_datetime,
+    normalize_app_store_environment,
+    refresh_app_store_entitlement_from_transactions,
+    verify_and_decode_app_store_transaction,
+)
 
 router = APIRouter()
 
@@ -32,6 +42,18 @@ class StripeCheckoutRequest(BaseModel):
     billing_cycle: str | None = None
     success_url: str | None = None
     cancel_url: str | None = None
+
+
+class AppStoreSyncRequest(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    product_id: str
+    transaction_id: str
+    original_transaction_id: str | None = None
+    transaction_jws: str
+    expires_at: datetime | None = None
+    environment: str | None = None
+    quantity: int = 1
 
 
 def _safe_checkout_redirect_url(
@@ -821,73 +843,123 @@ async def paddle_webhook(
         print(f"Webhook error: {e}")
         return {"status": "error", "message": str(e)}
 
-@router.get("/status")
-def get_subscription_status(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def _maybe_auto_downgrade_single_tier(current_user: User, db: Session) -> str:
     tier = current_user.subscription_tier
+    if tier != "single":
+        return tier
+    if (
+        current_user.daily_scans_count <= 0
+        and current_user.daily_cl_count <= 0
+        and current_user.daily_prep_count <= 0
+    ):
+        current_user.subscription_tier = "free"
+        current_user.paddle_subscription_id = None
+        current_user.subscription_active_until = None
+        db.add(current_user)
+        db.commit()
+        record_activity(
+            db,
+            user_id=current_user.id,
+            action="Single Scan quota exhausted",
+            meta={"event": "single_scan_auto_downgrade"},
+        )
+        return "free"
+    return tier
+
+
+def _build_subscription_status(current_user: User, db: Session) -> dict[str, Any]:
+    app_store_entitlement = refresh_app_store_entitlement_from_transactions(db, current_user.id)
+    scan_credit_balance = get_app_store_scan_credit_balance(db, current_user.id)
+    tier = current_user.subscription_tier
+    active_until = current_user.subscription_active_until
+    billing_cycle = None
+    cancel_at_period_end = False
+    source = "free"
+
     if (current_user.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
         tier = "lifetime"
-
-    # Single Scan is credit-based and repurchasable.
-    # When all credits are spent, downgrade to free so pricing marks it as purchasable again.
-    if tier == "single":
-        if (
-            current_user.daily_scans_count <= 0
-            and current_user.daily_cl_count <= 0
-            and current_user.daily_prep_count <= 0
-        ):
-            current_user.subscription_tier = "free"
-            current_user.paddle_subscription_id = None
+        active_until = None
+        source = "manual"
+        if current_user.subscription_tier != "lifetime":
+            current_user.subscription_tier = "lifetime"
             current_user.subscription_active_until = None
             db.add(current_user)
             db.commit()
-            record_activity(
-                db,
-                user_id=current_user.id,
-                action="Single Scan quota exhausted",
-                meta={"event": "single_scan_auto_downgrade"},
-            )
-            tier = "free"
-
-    cancel_at_period_end = False
-    active_until = current_user.subscription_active_until
-    billing_cycle = None
-    if (
-        settings.stripe_secret_key
-        and current_user.paddle_subscription_id
-        and tier in {"go", "pro"}
+    elif (
+        app_store_entitlement
+        and app_store_entitlement.is_active
+        and app_store_entitlement.plan in {"go", "pro", "lifetime"}
     ):
-        stripe.api_key = settings.stripe_secret_key
-        try:
-            sub = stripe.Subscription.retrieve(current_user.paddle_subscription_id)
-            sub_data = _stripe_to_dict(sub)
-            status = str(sub_data.get("status") or "").lower()
-            if status in {"canceled", "incomplete_expired", "unpaid"}:
-                current_user.subscription_tier = "free"
-                current_user.paddle_subscription_id = None
-                current_user.subscription_active_until = None
-                db.add(current_user)
-                db.commit()
-                tier = "free"
-                active_until = None
-            else:
-                mapped_tier = _extract_stripe_subscription_tier(sub_data)
-                items = sub_data.get("items", {}).get("data", [])
-                if isinstance(items, list) and items:
-                    price_obj = items[0].get("price", {})
-                    if isinstance(price_obj, dict):
-                        billing_cycle = _resolve_stripe_cycle_by_price_id(price_obj.get("id"))
-                if mapped_tier and mapped_tier != current_user.subscription_tier:
-                    current_user.subscription_tier = mapped_tier
+        tier = app_store_entitlement.plan
+        active_until = app_store_entitlement.expires_at
+        billing_cycle = "month" if tier in {"go", "pro"} else None
+        source = "app_store"
+        if current_user.subscription_tier == "single" and tier != "single":
+            current_user.daily_scans_count = 0
+            current_user.daily_cl_count = 0
+            current_user.daily_prep_count = 0
+        if tier != current_user.subscription_tier or active_until != current_user.subscription_active_until:
+            current_user.subscription_tier = tier
+            current_user.subscription_active_until = active_until
+            db.add(current_user)
+            db.commit()
+    else:
+        if tier in {"go", "pro"} and not current_user.paddle_subscription_id:
+            current_user.subscription_tier = "free"
+            current_user.subscription_active_until = None
+            db.add(current_user)
+            db.commit()
+            tier = "free"
+            active_until = None
+
+        tier = _maybe_auto_downgrade_single_tier(current_user, db)
+        active_until = current_user.subscription_active_until
+
+        if settings.stripe_secret_key and current_user.paddle_subscription_id and stripe is not None:
+            stripe.api_key = settings.stripe_secret_key
+            try:
+                sub = stripe.Subscription.retrieve(current_user.paddle_subscription_id)
+                sub_data = _stripe_to_dict(sub)
+                status = str(sub_data.get("status") or "").lower()
+                if status in {"canceled", "incomplete_expired", "unpaid"}:
+                    current_user.subscription_tier = "free"
+                    current_user.paddle_subscription_id = None
+                    current_user.subscription_active_until = None
                     db.add(current_user)
                     db.commit()
-                    tier = mapped_tier
-                cancel_at_period_end = bool(sub_data.get("cancel_at_period_end"))
-                active_until = _from_unix_ts(sub_data.get("current_period_end"))
-                current_user.subscription_active_until = active_until
-                db.add(current_user)
-                db.commit()
-        except Exception:
-            pass
+                    tier = "free"
+                    active_until = None
+                else:
+                    mapped_tier = _extract_stripe_subscription_tier(sub_data)
+                    items = sub_data.get("items", {}).get("data", [])
+                    if isinstance(items, list) and items:
+                        price_obj = items[0].get("price", {})
+                        if isinstance(price_obj, dict):
+                            billing_cycle = _resolve_stripe_cycle_by_price_id(price_obj.get("id"))
+                    if mapped_tier and mapped_tier != current_user.subscription_tier:
+                        current_user.subscription_tier = mapped_tier
+                        db.add(current_user)
+                        db.commit()
+                        tier = mapped_tier
+                    else:
+                        tier = current_user.subscription_tier
+                    cancel_at_period_end = bool(sub_data.get("cancel_at_period_end"))
+                    active_until = _from_unix_ts(sub_data.get("current_period_end"))
+                    current_user.subscription_active_until = active_until
+                    db.add(current_user)
+                    db.commit()
+                    source = "stripe"
+            except Exception:
+                source = "web" if tier in {"single", "go", "pro", "lifetime"} else "free"
+        else:
+            source = "web" if tier in {"single", "go", "pro", "lifetime"} else "free"
+
+    if source == "free" and scan_credit_balance > 0:
+        source = "app_store"
+
+    if current_user.reset_usage_if_needed():
+        db.add(current_user)
+        db.commit()
 
     limits = current_user.get_limits()
     usage = {
@@ -895,14 +967,149 @@ def get_subscription_status(current_user: User = Depends(get_current_user), db: 
         "cl": current_user.daily_cl_count,
         "prep": current_user.daily_prep_count,
     }
+    scans_remaining_today = (
+        max(0, usage["scans"])
+        if tier == "single"
+        else max(0, int(limits.get("scans", 0)) - int(usage["scans"]))
+    )
+    expires_at = active_until.isoformat() if active_until else None
 
-    # Simple endpoint to return tier and limits
     return {
         "tier": tier,
+        "plan": tier,
+        "entitlement": tier,
+        "source": source,
+        "expires_at": expires_at,
+        "scans_remaining_today": scans_remaining_today,
+        "scan_credit_balance": scan_credit_balance,
         "limits": limits,
         "usage": usage,
         "single_scan_remaining": max(0, usage["scans"]) if tier == "single" else None,
         "billing_cycle": billing_cycle,
         "cancel_at_period_end": cancel_at_period_end,
-        "subscription_active_until": active_until.isoformat() if active_until else None,
+        "subscription_active_until": expires_at,
     }
+
+
+@router.post("/app-store/sync")
+def sync_app_store_purchase(
+    payload: AppStoreSyncRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    try:
+        verified_payload = verify_and_decode_app_store_transaction(payload.transaction_jws)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    product_id = str(verified_payload.get("productId") or "").strip()
+    if not product_id or product_id != payload.product_id.strip():
+        raise HTTPException(status_code=400, detail="App Store product_id mismatch.")
+
+    product_config = get_app_store_product_config(product_id)
+    if not product_config:
+        raise HTTPException(status_code=400, detail="Unsupported App Store product.")
+
+    transaction_id = str(verified_payload.get("transactionId") or "").strip()
+    if not transaction_id or transaction_id != payload.transaction_id.strip():
+        raise HTTPException(status_code=400, detail="App Store transaction_id mismatch.")
+
+    original_transaction_id = str(verified_payload.get("originalTransactionId") or "").strip() or None
+    if (
+        payload.original_transaction_id
+        and original_transaction_id
+        and payload.original_transaction_id.strip() != original_transaction_id
+    ):
+        raise HTTPException(status_code=400, detail="App Store original_transaction_id mismatch.")
+
+    environment = normalize_app_store_environment(str(verified_payload.get("environment") or ""))
+    requested_environment = normalize_app_store_environment(payload.environment)
+    if requested_environment and environment and requested_environment != environment:
+        raise HTTPException(status_code=400, detail="App Store environment mismatch.")
+
+    existing_transaction = (
+        db.query(AppStoreTransaction)
+        .filter(AppStoreTransaction.transaction_id == transaction_id)
+        .first()
+    )
+    if existing_transaction:
+        if existing_transaction.user_id != current_user.id:
+            raise HTTPException(status_code=409, detail="This App Store transaction is already linked.")
+        refresh_app_store_entitlement_from_transactions(db, current_user.id)
+        db.commit()
+        return _build_subscription_status(current_user, db)
+
+    verified_quantity_raw = verified_payload.get("quantity")
+    try:
+        verified_quantity = (
+            max(1, int(verified_quantity_raw))
+            if verified_quantity_raw is not None
+            else max(1, int(payload.quantity or 1))
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail="Invalid App Store quantity.") from exc
+    if (
+        verified_quantity_raw is not None
+        and payload.quantity > 0
+        and int(payload.quantity) != int(verified_quantity_raw)
+    ):
+        raise HTTPException(status_code=400, detail="App Store quantity mismatch.")
+
+    transaction = AppStoreTransaction(
+        user_id=current_user.id,
+        product_id=product_id,
+        transaction_id=transaction_id,
+        original_transaction_id=original_transaction_id,
+        web_order_line_item_id=str(verified_payload.get("webOrderLineItemId") or "").strip() or None,
+        environment=environment,
+        quantity=verified_quantity,
+        transaction_type=str(verified_payload.get("type") or "").strip() or None,
+        ownership_type=str(verified_payload.get("inAppOwnershipType") or "").strip() or None,
+        bundle_id=str(verified_payload.get("bundleId") or "").strip() or None,
+        purchase_at=millis_to_datetime(verified_payload.get("purchaseDate")),
+        expires_at=millis_to_datetime(verified_payload.get("expiresDate")) or payload.expires_at,
+        revocation_at=millis_to_datetime(verified_payload.get("revocationDate")),
+        signed_at=millis_to_datetime(verified_payload.get("signedDate")),
+        is_upgraded=bool(verified_payload.get("isUpgraded") or False),
+        transaction_jws=payload.transaction_jws,
+        raw_payload=verified_payload,
+    )
+    db.add(transaction)
+
+    entitlement = get_or_create_billing_entitlement(db, current_user.id)
+    if product_config.get("kind") == "credit":
+        entitlement.scan_credit_balance = int(entitlement.scan_credit_balance or 0) + verified_quantity
+        entitlement.source = "app_store"
+        entitlement.last_synced_at = datetime.now(timezone.utc)
+        db.add(entitlement)
+
+    refreshed_entitlement = refresh_app_store_entitlement_from_transactions(db, current_user.id)
+    if (
+        refreshed_entitlement
+        and refreshed_entitlement.is_active
+        and refreshed_entitlement.plan in {"go", "pro", "lifetime"}
+    ):
+        if current_user.subscription_tier == "single":
+            current_user.daily_scans_count = 0
+            current_user.daily_cl_count = 0
+            current_user.daily_prep_count = 0
+        current_user.subscription_tier = refreshed_entitlement.plan
+        current_user.subscription_active_until = refreshed_entitlement.expires_at
+        db.add(current_user)
+
+    db.commit()
+    record_activity(
+        db,
+        user_id=current_user.id,
+        action="App Store purchase synced",
+        meta={"product_id": product_id, "transaction_id": transaction_id},
+    )
+    return _build_subscription_status(current_user, db)
+
+
+@router.get("/status")
+def get_subscription_status(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    return _build_subscription_status(current_user, db)
