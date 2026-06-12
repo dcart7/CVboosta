@@ -178,6 +178,123 @@ def test_csrf_blocks_cookie_auth_without_origin(client, monkeypatch):
     assert allowed.status_code == 200
 
 
+def test_apns_device_registration_and_deactivation(client):
+    token = _register_and_get_token(client, "push-device@example.com")
+    legacy_payload = {
+        "token": "a" * 64,
+        "bundle_id": "com.cvboosta.app",
+    }
+
+    register_response = client.post(
+        "/devices/apns",
+        json=legacy_payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert register_response.status_code == 200
+    assert register_response.json()["message"] == "APNs token registered."
+
+    deactivate_response = client.post(
+        "/devices/apns/deactivate",
+        json={**legacy_payload, "apns_environment": "sandbox"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert deactivate_response.status_code == 200
+    assert deactivate_response.json()["message"] == "APNs token deactivated."
+
+
+def test_internal_push_route_requires_api_key_and_returns_summary(client, monkeypatch):
+    from app.api.routes import push_internal as push_internal_routes
+    from app.core import internal_auth
+    from app.schemas.push import PushDeliveryResponse
+
+    monkeypatch.setattr(internal_auth.settings, "internal_api_key", "push-secret")
+    monkeypatch.setattr(
+        push_internal_routes,
+        "send_push_to_user",
+        lambda db, user_id, payload: PushDeliveryResponse(
+            requested=1,
+            sent=1,
+            failed=0,
+            deactivated=0,
+            results=[],
+        ),
+    )
+
+    unauthorized = client.post(
+        "/internal/notifications/users/123/push",
+        json={"alert": {"title": "CVBoosta", "body": "Your analysis is ready"}},
+    )
+    assert unauthorized.status_code == 401
+
+    authorized = client.post(
+        "/internal/notifications/users/123/push",
+        json={"alert": {"title": "CVBoosta", "body": "Your analysis is ready"}},
+        headers={"X-Internal-API-Key": "push-secret"},
+    )
+    assert authorized.status_code == 200
+    assert authorized.json()["sent"] == 1
+
+
+def test_apple_oauth_registers_then_reuses_identity_without_email(client, monkeypatch):
+    from app.api.routes import auth as auth_routes
+
+    first_claims = {
+        "sub": "apple-user-123",
+        "email": "apple-user@example.com",
+        "email_verified": True,
+    }
+    monkeypatch.setattr(auth_routes, "verify_oauth_id_token", lambda provider, token: first_claims)
+
+    first = client.post(
+        "/auth/oauth/apple",
+        json={
+            "id_token": "x" * 64,
+            "full_name": "Apple Person",
+            "email": "apple-user@example.com",
+        },
+    )
+    assert first.status_code == 200
+    first_token = first.json()["access_token"]
+
+    me = client.get("/auth/me", headers={"Authorization": f"Bearer {first_token}"})
+    assert me.status_code == 200
+    assert me.json()["email"] == "apple-user@example.com"
+
+    second_claims = {
+        "sub": "apple-user-123",
+    }
+    monkeypatch.setattr(auth_routes, "verify_oauth_id_token", lambda provider, token: second_claims)
+
+    second = client.post(
+        "/auth/oauth/apple",
+        json={
+            "id_token": "y" * 64,
+        },
+        headers={"Origin": "http://localhost:3000"},
+    )
+    assert second.status_code == 200
+    assert second.json()["email"] == "apple-user@example.com"
+
+
+def test_apple_oauth_rejects_first_login_without_email(client, monkeypatch):
+    from app.api.routes import auth as auth_routes
+
+    monkeypatch.setattr(
+        auth_routes,
+        "verify_oauth_id_token",
+        lambda provider, token: {"sub": "apple-user-without-email"},
+    )
+
+    response = client.post(
+        "/auth/oauth/apple",
+        json={
+            "id_token": "z" * 64,
+        },
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "OAuth email is missing"
+
+
 def _register_and_get_token(client, email: str) -> str:
     response = client.post(
         "/auth/register",

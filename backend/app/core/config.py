@@ -51,7 +51,13 @@ class Settings(BaseSettings):
     auth_cookie_domain: str | None = None
     google_oauth_client_id: str | None = None
     apple_oauth_client_id: str | None = None
+    apple_oauth_client_ids: list[str] = Field(default_factory=list)
     app_store_bundle_id: str = "com.cvboosta.app"
+    apns_key_id: str | None = None
+    apns_team_id: str | None = None
+    apns_key_path: str | None = None
+    apns_key_content: str | None = None
+    apns_request_timeout_seconds: int = 10
     trusted_proxy_ips: list[str] = Field(default_factory=lambda: ["127.0.0.1", "::1"])
     trusted_proxy_cidrs: list[str] = Field(
         default_factory=lambda: [
@@ -99,6 +105,7 @@ class Settings(BaseSettings):
         "trusted_proxy_cidrs",
         "analysis_encryption_legacy_keys",
         "internal_allowed_cidrs",
+        "apple_oauth_client_ids",
         mode="before",
     )
     @classmethod

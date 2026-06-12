@@ -25,15 +25,21 @@ _PROVIDER_CONFIG = {
 }
 
 
-def _get_provider_audience(provider: str) -> str:
+def _get_provider_audiences(provider: str) -> list[str]:
     if provider == "google":
         if not settings.google_oauth_client_id:
             raise ValueError("Google OAuth is not configured")
-        return settings.google_oauth_client_id
+        return [settings.google_oauth_client_id]
     if provider == "apple":
-        if not settings.apple_oauth_client_id:
+        values = []
+        primary = (settings.apple_oauth_client_id or "").strip()
+        if primary:
+            values.append(primary)
+        values.extend(value.strip() for value in settings.apple_oauth_client_ids if value.strip())
+        unique_values = list(dict.fromkeys(values))
+        if not unique_values:
             raise ValueError("Apple OAuth is not configured")
-        return settings.apple_oauth_client_id
+        return unique_values
     raise ValueError("Unsupported OAuth provider")
 
 
@@ -60,7 +66,7 @@ def verify_oauth_id_token(provider: str, token: str) -> dict[str, Any]:
     if not config:
         raise ValueError("Unsupported OAuth provider")
 
-    audience = _get_provider_audience(provider)
+    allowed_audiences = _get_provider_audiences(provider)
     unverified_header = jwt.get_unverified_header(token)
     kid = str(unverified_header.get("kid", ""))
     if not kid:
@@ -70,7 +76,6 @@ def verify_oauth_id_token(provider: str, token: str) -> dict[str, Any]:
     keys = jwks.get("keys") or []
     key = next((item for item in keys if item.get("kid") == kid), None)
     if not key:
-        # Force refresh once in case provider rotated keys recently.
         _JWKS_CACHE.pop(provider, None)
         jwks = _fetch_jwks(provider)
         keys = jwks.get("keys") or []
@@ -82,26 +87,27 @@ def verify_oauth_id_token(provider: str, token: str) -> dict[str, Any]:
         token,
         key,
         algorithms=[key.get("alg", "RS256")],
-        audience=audience,
         issuer=list(config["issuer"]),
-        options={"verify_at_hash": False},
+        options={"verify_at_hash": False, "verify_aud": False},
     )
 
-    email = str(claims.get("email", "")).strip().lower()
-    if not email:
-        raise ValueError("Email is missing in provider token")
+    if not _audience_matches(claims.get("aud"), allowed_audiences):
+        raise ValueError("OAuth audience mismatch")
 
-    email_verified = claims.get("email_verified")
-    if isinstance(email_verified, str):
-        email_verified = email_verified.lower() == "true"
-    if email_verified is False:
-        raise ValueError("Provider email is not verified")
+    email = str(claims.get("email", "")).strip().lower()
+    if email:
+        claims["email"] = email
+        email_verified = claims.get("email_verified")
+        if isinstance(email_verified, str):
+            email_verified = email_verified.lower() == "true"
+        if email_verified is False:
+            raise ValueError("Provider email is not verified")
 
     return claims
 
 
 def verify_google_access_token(token: str) -> dict[str, Any]:
-    audience = _get_provider_audience("google")
+    audience = _get_provider_audiences("google")[0]
     url = "https://www.googleapis.com/oauth2/v3/tokeninfo?" + urllib.parse.urlencode({"access_token": token})
     with urllib.request.urlopen(url, timeout=8) as response:
         claims = json.loads(response.read().decode("utf-8"))
@@ -120,4 +126,19 @@ def verify_google_access_token(token: str) -> dict[str, Any]:
     if email_verified is False:
         raise ValueError("Provider email is not verified")
 
+    claims["email"] = email
     return claims
+
+
+def _audience_matches(raw_audience: Any, allowed_audiences: list[str]) -> bool:
+    normalized_allowed = {value.strip() for value in allowed_audiences if value.strip()}
+    if not normalized_allowed:
+        return False
+
+    if isinstance(raw_audience, str):
+        return raw_audience.strip() in normalized_allowed
+
+    if isinstance(raw_audience, list):
+        return any(str(value).strip() in normalized_allowed for value in raw_audience)
+
+    return False

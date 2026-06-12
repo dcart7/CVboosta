@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.session import get_db
+from app.models.oauth_identity import OAuthIdentity
 from app.models.user import User
 from app.schemas.auth import (
     ActivityResponse,
@@ -168,41 +169,93 @@ def oauth_login(
     except Exception as exc:
         raise HTTPException(status_code=401, detail="Invalid OAuth token") from exc
 
-    email = str(claims.get("email", "")).strip().lower()
-    if not email:
-        raise HTTPException(status_code=400, detail="OAuth email is missing")
+    provider_user_id = str(claims.get("sub", "")).strip()
+    if not provider_user_id:
+        raise HTTPException(status_code=400, detail="OAuth subject is missing")
 
-    user = db.query(User).filter(User.email == email).first()
+    email = str(claims.get("email", payload.email or "")).strip().lower()
+    identity = (
+        db.query(OAuthIdentity)
+        .filter(
+            OAuthIdentity.provider == provider_name,
+            OAuthIdentity.provider_user_id == provider_user_id,
+        )
+        .first()
+    )
+
+    user = db.query(User).filter(User.id == identity.user_id).first() if identity else None
+    display_name = (payload.full_name or "").strip() or str(claims.get("name", "")).strip() or None
+
     if not user:
-        display_name = (payload.full_name or "").strip() or str(claims.get("name", "")).strip() or None
-        random_password = secrets.token_urlsafe(48)
-        user = User(
-            email=email,
-            password_hash=hash_password(random_password),
-            full_name=display_name,
-        )
-        try:
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-        except IntegrityError:
-            db.rollback()
-            user = db.query(User).filter(User.email == email).first()
-            if not user:
-                raise HTTPException(status_code=500, detail="Failed to create OAuth user")
-        record_activity(
-            db,
-            user_id=user.id,
-            action="Account created",
-            meta={"method": provider_name},
-        )
-    else:
-        if not user.full_name:
-            display_name = (payload.full_name or "").strip() or str(claims.get("name", "")).strip()
-            if display_name:
-                user.full_name = display_name
+        if not email:
+            raise HTTPException(status_code=400, detail="OAuth email is missing")
+
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            random_password = secrets.token_urlsafe(48)
+            user = User(
+                email=email,
+                password_hash=hash_password(random_password),
+                full_name=display_name,
+            )
+            try:
                 db.add(user)
                 db.commit()
+                db.refresh(user)
+            except IntegrityError:
+                db.rollback()
+                user = db.query(User).filter(User.email == email).first()
+                if not user:
+                    raise HTTPException(status_code=500, detail="Failed to create OAuth user")
+            record_activity(
+                db,
+                user_id=user.id,
+                action="Account created",
+                meta={"method": provider_name},
+            )
+        elif display_name and not user.full_name:
+            user.full_name = display_name
+            db.add(user)
+            db.commit()
+
+        identity = OAuthIdentity(
+            user_id=user.id,
+            provider=provider_name,
+            provider_user_id=provider_user_id,
+            email=email or None,
+        )
+        try:
+            db.add(identity)
+            db.commit()
+            db.refresh(identity)
+        except IntegrityError:
+            db.rollback()
+            identity = (
+                db.query(OAuthIdentity)
+                .filter(
+                    OAuthIdentity.provider == provider_name,
+                    OAuthIdentity.provider_user_id == provider_user_id,
+                )
+                .first()
+            )
+            if identity is None:
+                raise HTTPException(status_code=500, detail="Failed to link OAuth identity")
+            user = db.query(User).filter(User.id == identity.user_id).first()
+            if user is None:
+                raise HTTPException(status_code=500, detail="OAuth identity is linked to a missing user")
+    else:
+        needs_commit = False
+        if display_name and not user.full_name:
+            user.full_name = display_name
+            needs_commit = True
+        if email and identity and identity.email != email:
+            identity.email = email
+            needs_commit = True
+        if needs_commit:
+            db.add(user)
+            if identity:
+                db.add(identity)
+            db.commit()
 
     record_activity(db, user_id=user.id, action="Signed in", meta={"method": provider_name})
     token = create_access_token(user)

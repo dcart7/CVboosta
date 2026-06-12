@@ -11,6 +11,8 @@ from app.api.routes.history import router as history_router
 from app.api.routes.logs import router as logs_router
 from app.api.routes.optimize import router as optimize_router
 from app.api.routes.billing import router as billing_router
+from app.api.routes.push import router as push_router
+from app.api.routes.push_internal import router as push_internal_router
 from app.api.routes.demo import router as demo_router
 from app.core.api_key import api_key_middleware
 from app.core.csrf import csrf_protect_middleware
@@ -113,7 +115,9 @@ app.include_router(demo_router, prefix="/demo", tags=["demo"])
 app.include_router(logs_router, tags=["logs"])
 app.include_router(auth_router, tags=["auth"])
 app.include_router(history_router, tags=["history"])
+app.include_router(push_router, tags=["push"])
 app.include_router(billing_router, prefix="/billing", tags=["billing"])
+app.include_router(push_internal_router, prefix="/internal", tags=["internal"])
 
 
 @app.on_event("startup")
