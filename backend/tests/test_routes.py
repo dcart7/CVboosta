@@ -76,6 +76,9 @@ def test_optimize_route(client, monkeypatch):
     from app.api.routes import optimize as optimize_routes
     from app.schemas.keywords import KeywordExtractionResult
     from app.services.llm import LLMResult
+    push_calls: list[tuple[int, int | None]] = []
+    live_activity_calls: list[tuple[int, int]] = []
+    progress_calls: list[tuple[int, float, str, str]] = []
     monkeypatch.setattr(
         optimize_routes,
         "generate_optimized_cv",
@@ -90,6 +93,21 @@ def test_optimize_route(client, monkeypatch):
         optimize_routes,
         "build_recommendations",
         lambda missing: [f"Learn {m}" for m in missing],
+    )
+    monkeypatch.setattr(
+        optimize_routes,
+        "send_analysis_ready_push_best_effort",
+        lambda user_id, analysis_id=None: push_calls.append((user_id, analysis_id)),
+    )
+    monkeypatch.setattr(
+        optimize_routes,
+        "end_ats_live_activity_best_effort",
+        lambda user_id, final_score: live_activity_calls.append((user_id, final_score)),
+    )
+    monkeypatch.setattr(
+        optimize_routes,
+        "update_ats_live_activity_best_effort",
+        lambda user_id, progress, detail, eta_text: progress_calls.append((user_id, progress, detail, eta_text)),
     )
 
     reg = client.post(
@@ -111,6 +129,10 @@ def test_optimize_route(client, monkeypatch):
     assert response.status_code == 200
     payload = response.json()
     assert payload["optimized_cv"] == "OK"
+    assert payload["analysis_id"] is not None
+    assert push_calls == [(1, payload["analysis_id"])]
+    assert live_activity_calls == [(1, payload["match_after"])]
+    assert [round(call[1], 2) for call in progress_calls] == [0.08, 0.24, 0.48, 0.76, 0.92]
 
     # Free tier is limited to 1 scan/day.
     response2 = client.post(
@@ -202,6 +224,59 @@ def test_apns_device_registration_and_deactivation(client):
     assert deactivate_response.json()["message"] == "APNs token deactivated."
 
 
+def test_live_activity_token_registration_and_deactivation(client):
+    token = _register_and_get_token(client, "live-activity-device@example.com")
+    payload = {
+        "activity_id": "ats-activity-001",
+        "token": "c" * 64,
+        "bundle_id": "com.cvboosta.app",
+        "apns_environment": "sandbox",
+        "mode": "atsOptimization",
+    }
+
+    register_response = client.post(
+        "/live-activities/apns",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert register_response.status_code == 200
+    assert register_response.json()["message"] == "Live Activity push token registered."
+
+    deactivate_response = client.post(
+        "/live-activities/apns/deactivate",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert deactivate_response.status_code == 200
+    assert deactivate_response.json()["message"] == "Live Activity push token deactivated."
+
+
+def test_live_activity_push_to_start_registration_and_deactivation(client):
+    token = _register_and_get_token(client, "live-activity-start@example.com")
+    payload = {
+        "token": "e" * 64,
+        "bundle_id": "com.cvboosta.app",
+        "apns_environment": "sandbox",
+        "mode": "atsOptimization",
+    }
+
+    register_response = client.post(
+        "/live-activities/apns/push-to-start",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert register_response.status_code == 200
+    assert register_response.json()["message"] == "Live Activity push-to-start token registered."
+
+    deactivate_response = client.post(
+        "/live-activities/apns/push-to-start/deactivate",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert deactivate_response.status_code == 200
+    assert deactivate_response.json()["message"] == "Live Activity push-to-start token deactivated."
+
+
 def test_internal_push_route_requires_api_key_and_returns_summary(client, monkeypatch):
     from app.api.routes import push_internal as push_internal_routes
     from app.core import api_key as api_key_middleware
@@ -236,6 +311,162 @@ def test_internal_push_route_requires_api_key_and_returns_summary(client, monkey
     )
     assert authorized.status_code == 200
     assert authorized.json()["sent"] == 1
+
+
+def test_internal_live_activity_route_requires_api_key_and_returns_summary(client, monkeypatch):
+    from app.api.routes import push_internal as push_internal_routes
+    from app.core import api_key as api_key_middleware
+    from app.core import internal_auth
+    from app.schemas.push import LiveActivityDeliveryResponse
+
+    monkeypatch.setattr(api_key_middleware.settings, "api_key_enabled", True)
+    monkeypatch.setattr(api_key_middleware.settings, "api_key", "site-secret")
+    monkeypatch.setattr(internal_auth.settings, "internal_api_key", "push-secret")
+    monkeypatch.setattr(
+        push_internal_routes,
+        "send_live_activity_event_to_user",
+        lambda db, user_id, payload: LiveActivityDeliveryResponse(
+            requested=1,
+            sent=1,
+            failed=0,
+            deactivated=1,
+            results=[],
+        ),
+    )
+
+    unauthorized = client.post(
+        "/internal/live-activities/users/123",
+        json={
+            "event": "end",
+            "state": {
+                "mode": "atsOptimization",
+                "title": "ATS Scan Complete",
+                "detail": "Final score: 92",
+                "progress": 1,
+                "etaText": "",
+            },
+        },
+    )
+    assert unauthorized.status_code == 401
+
+    authorized = client.post(
+        "/internal/live-activities/users/123",
+        json={
+            "event": "end",
+            "state": {
+                "mode": "atsOptimization",
+                "title": "ATS Scan Complete",
+                "detail": "Final score: 92",
+                "progress": 1,
+                "etaText": "",
+            },
+        },
+        headers={"X-Internal-API-Key": "push-secret"},
+    )
+    assert authorized.status_code == 200
+    assert authorized.json()["deactivated"] == 1
+
+
+def test_internal_live_activity_start_route_requires_api_key_and_returns_summary(client, monkeypatch):
+    from app.api.routes import push_internal as push_internal_routes
+    from app.core import api_key as api_key_middleware
+    from app.core import internal_auth
+    from app.schemas.push import PushDeliveryResponse
+
+    monkeypatch.setattr(api_key_middleware.settings, "api_key_enabled", True)
+    monkeypatch.setattr(api_key_middleware.settings, "api_key", "site-secret")
+    monkeypatch.setattr(internal_auth.settings, "internal_api_key", "push-secret")
+    monkeypatch.setattr(
+        push_internal_routes,
+        "send_live_activity_start_to_user",
+        lambda db, user_id, payload: PushDeliveryResponse(
+            requested=1,
+            sent=1,
+            failed=0,
+            deactivated=0,
+            results=[],
+        ),
+    )
+
+    unauthorized = client.post(
+        "/internal/live-activities/users/123/start",
+        json={
+            "activityName": "ATS Optimization",
+            "state": {
+                "mode": "atsOptimization",
+                "title": "ATS Scan running",
+                "detail": "Preparing ATS scan",
+                "progress": 0.1,
+                "etaText": "~15s",
+            },
+        },
+    )
+    assert unauthorized.status_code == 401
+
+    authorized = client.post(
+        "/internal/live-activities/users/123/start",
+        json={
+            "activityName": "ATS Optimization",
+            "state": {
+                "mode": "atsOptimization",
+                "title": "ATS Scan running",
+                "detail": "Preparing ATS scan",
+                "progress": 0.1,
+                "etaText": "~15s",
+            },
+        },
+        headers={"X-Internal-API-Key": "push-secret"},
+    )
+    assert authorized.status_code == 200
+    assert authorized.json()["sent"] == 1
+
+
+def test_analysis_ready_push_is_best_effort(client, monkeypatch):
+    from app.services import push_notifications
+
+    token = _register_and_get_token(client, "push-best-effort@example.com")
+    client.post(
+        "/devices/apns",
+        json={
+            "token": "b" * 64,
+            "bundle_id": "com.cvboosta.app",
+            "apns_environment": "sandbox",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    monkeypatch.setattr(
+        push_notifications,
+        "send_push_to_user",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("apns down")),
+    )
+
+    push_notifications.send_analysis_ready_push_best_effort(user_id=1, analysis_id=99)
+
+
+def test_ats_live_activity_end_is_best_effort(client, monkeypatch):
+    from app.services import push_notifications
+
+    token = _register_and_get_token(client, "live-activity-best-effort@example.com")
+    client.post(
+        "/live-activities/apns",
+        json={
+            "activity_id": "ats-activity-002",
+            "token": "d" * 64,
+            "bundle_id": "com.cvboosta.app",
+            "apns_environment": "sandbox",
+            "mode": "atsOptimization",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    monkeypatch.setattr(
+        push_notifications,
+        "send_live_activity_event_to_user",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("apns down")),
+    )
+
+    push_notifications.end_ats_live_activity_best_effort(user_id=1, final_score=88)
 
 
 def test_apple_oauth_registers_then_reuses_identity_without_email(client, monkeypatch):

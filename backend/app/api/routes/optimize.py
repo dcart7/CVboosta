@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from starlette.concurrency import run_in_threadpool
 
 from app.schemas.optimize import (
@@ -36,6 +36,11 @@ from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.models.analysis import Analysis
 from app.models.user import User
+from app.services.push_notifications import (
+    end_ats_live_activity_best_effort,
+    send_analysis_ready_push_best_effort,
+    update_ats_live_activity_best_effort,
+)
 
 router = APIRouter()
 
@@ -43,6 +48,7 @@ router = APIRouter()
 @router.post("", response_model=OptimizeResponse)
 async def optimize_cv(
     payload: OptimizeRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user_optional),
 ) -> OptimizeResponse:
@@ -63,8 +69,20 @@ async def optimize_cv(
             detail="Authentication required to optimize CV.",
         )
 
+    async def push_ats_progress(progress: float, detail: str, eta_text: str) -> None:
+        await run_in_threadpool(
+            update_ats_live_activity_best_effort,
+            current_user.id,
+            progress,
+            detail,
+            eta_text,
+        )
+
+    await push_ats_progress(0.08, "Preparing ATS scan", "~15s")
+
     try:
         cleaned_text = clean_job_text(payload.job_text)
+        await push_ats_progress(0.24, "Extracting ATS keywords", "~12s")
         cached = get_keyword_list_by_source_text(db, payload.job_text)
         if cached:
             keyword_result = cached
@@ -115,6 +133,7 @@ async def optimize_cv(
                 skills=normalize_keywords(keyword_result.skills),
                 requirements=normalize_keywords(keyword_result.requirements),
             )
+        await push_ats_progress(0.48, "Optimizing your resume", "~8s")
         try:
             result = await run_in_threadpool(
                 generate_optimized_cv,
@@ -130,6 +149,7 @@ async def optimize_cv(
         except LLMServiceError:
             llm_failed = True
             result = None
+        await push_ats_progress(0.76, "Scoring ATS match", "~4s")
         match_before, _, original_missing = await run_in_threadpool(compute_match_score, payload.cv_text, ats_keywords)
         optimized_text = result.optimized_cv if result else payload.cv_text
         match_after, _, missing_skills = await run_in_threadpool(compute_match_score, optimized_text, ats_keywords)
@@ -151,6 +171,7 @@ async def optimize_cv(
         refund_feature_best_effort(db, user_id=current_user.id, feature="scan")
 
     if current_user and not llm_failed:
+        await push_ats_progress(0.92, "Saving your analysis", "~2s")
         analysis = Analysis(
             user_id=current_user.id,
             # Do not persist plaintext CV/JD in columns.
@@ -173,8 +194,18 @@ async def optimize_cv(
         db.commit()
         record_activity(db, user_id=current_user.id, action="CV optimized", meta={})
     analysis_id: int | None = None
+    background_tasks.add_task(
+        end_ats_live_activity_best_effort,
+        current_user.id,
+        match_after,
+    )
     if current_user and not llm_failed:
         analysis_id = analysis.id
+        background_tasks.add_task(
+            send_analysis_ready_push_best_effort,
+            current_user.id,
+            analysis_id,
+        )
 
     if llm_failed:
         feedback = (
