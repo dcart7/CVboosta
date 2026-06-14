@@ -15,6 +15,9 @@ async def api_key_middleware(request: Request, call_next):  # type: ignore[no-un
         return await call_next(request)
     if path.startswith("/auth"):
         return await call_next(request)
+    if path.startswith("/internal"):
+        # Internal routes have their own X-Internal-API-Key guard.
+        return await call_next(request)
 
     if not settings.api_key:
         return JSONResponse(

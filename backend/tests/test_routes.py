@@ -204,9 +204,12 @@ def test_apns_device_registration_and_deactivation(client):
 
 def test_internal_push_route_requires_api_key_and_returns_summary(client, monkeypatch):
     from app.api.routes import push_internal as push_internal_routes
+    from app.core import api_key as api_key_middleware
     from app.core import internal_auth
     from app.schemas.push import PushDeliveryResponse
 
+    monkeypatch.setattr(api_key_middleware.settings, "api_key_enabled", True)
+    monkeypatch.setattr(api_key_middleware.settings, "api_key", "site-secret")
     monkeypatch.setattr(internal_auth.settings, "internal_api_key", "push-secret")
     monkeypatch.setattr(
         push_internal_routes,
