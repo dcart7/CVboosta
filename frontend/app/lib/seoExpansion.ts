@@ -700,21 +700,25 @@ function familyLabel(family: SeoExpansionFamily): string {
   }
 }
 
-function buildMeta(seed: SeoSeed): string {
+function buildMeta(
+  seed: SeoSeed,
+  roleContext: ReturnType<typeof getRoleContext>,
+): string {
+  const role = roleContext?.role;
   const raw =
     seed.family === "ats"
-      ? `${seed.title} with ATS parsing rules, keyword placement tips, template advice, common mistakes, and FAQ.`
+      ? `${seed.title}: ATS rules, keyword placement, resume examples, and an ATS-safe checklist for cleaner parsing and stronger screening.`
       : seed.family === "resume-for"
-        ? `${seed.title} with ATS-safe tailoring advice, role fit signals, examples, common mistakes, and a practical checklist.`
+        ? `${seed.title}: ATS-safe tailoring advice, recruiter signals, examples, and a practical checklist for this company, market, or situation.`
         : seed.family === "resume-industry"
-          ? `${seed.title} with keyword strategy, recruiter signals, resume structure advice, examples, and FAQ.`
+          ? `${seed.title}: industry resume keywords, recruiter signals, examples, and an ATS-safe checklist for faster tailoring.`
           : seed.family === "interview-resume"
-            ? `${seed.title} with resume-first advice, recruiter logic, examples, and practical next steps for better interview outcomes.`
+            ? `${seed.title}: resume fixes, recruiter logic, examples, and next steps to improve interview response rates.`
             : seed.family === "job-description"
-              ? `${seed.title} with a repeatable workflow for extracting keywords, identifying priorities, and tailoring resumes faster.`
+              ? `${seed.title}: extract the right resume keywords, spot must-haves, and tailor faster with a practical ATS-safe checklist.`
               : seed.family === "best"
-                ? `${seed.title} compared through ATS accuracy, workflow speed, review quality, and candidate use cases.`
-                : `${seed.title} with examples, keyword links, ATS strategy, bullet ideas, summaries, and internal links.`;
+                ? `${seed.title}: compare resume tools by ATS accuracy, speed, output quality, and real job-search use cases.`
+                : `${seed.title}: ${role ? `${role} example, keywords, ` : ""}ATS strategy, bullet ideas, and a faster tailoring checklist in one guide.`;
   return truncateText(raw, 160);
 }
 
@@ -1034,7 +1038,7 @@ function buildGuidePage(seed: SeoSeed): SeoGuidePage {
   const sections = buildSections(seed);
   const roleContext = getRoleContext(seed.roleSlug);
   const seoTitle = seed.title;
-  const metaDescription = buildMeta(seed);
+  const metaDescription = buildMeta(seed, roleContext);
   const h1 = seed.title;
   const lead =
     seed.lead +

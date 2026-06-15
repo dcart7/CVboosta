@@ -14,6 +14,38 @@ type ResumeKeywordRolePageProps = {
   params: Promise<{ role: string }>;
 };
 
+function truncateText(value: string, max: number): string {
+  if (value.length <= max) return value;
+  const cut = value.slice(0, max - 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${cut.slice(0, lastSpace > 32 ? lastSpace : cut.length).trim()}…`;
+}
+
+function buildResumeKeywordsTitle(role: string): string {
+  const options = [
+    `${role} Resume Keywords (2026): ATS Skills`,
+    `${role} Resume Keywords (2026)`,
+    `Resume Keywords for ${role} (2026)`,
+    `${role} ATS Resume Keywords`,
+  ];
+  return options.find((item) => item.length <= 60) ?? truncateText(options[1], 60);
+}
+
+function buildResumeKeywordsDescription(
+  role: string,
+  keywords: string[],
+): string {
+  const featured = keywords
+    .slice(0, 3)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(", ");
+  const raw = featured
+    ? `Top ${role} resume keywords for ATS in 2026, plus bullet examples, mistakes, and a copy-ready checklist. Includes ${featured}.`
+    : `Top ${role} resume keywords for ATS in 2026, plus bullet examples, common mistakes, and a copy-ready checklist.`;
+  return truncateText(raw, 160);
+}
+
 export async function generateStaticParams() {
   return getResumeKeywordStaticSlugs().map((role) => ({ role }));
 }
@@ -31,9 +63,11 @@ export async function generateMetadata({
     };
   }
 
+  const description = buildResumeKeywordsDescription(cluster.role, cluster.keywords);
+
   return {
-    title: `Resume Keywords for ${cluster.role} | CVboosta`,
-    description: `Top ATS keywords for ${cluster.role}, common resume mistakes, bullet rewrite examples, and practical FAQ.`,
+    title: `${buildResumeKeywordsTitle(cluster.role)} | CVboosta`,
+    description,
     alternates: {
       canonical: `/resume-keywords/${cluster.slug}`,
     },
@@ -88,7 +122,7 @@ export default async function ResumeKeywordRolePage({
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
-  const pageDescription = `This guide shows how to build a stronger ${cluster.role} resume using ATS keyword alignment, measurable bullet rewrites, and role-specific quality checks.`;
+  const pageDescription = buildResumeKeywordsDescription(cluster.role, cluster.keywords);
   const articleSchema = buildArticleSchema(siteUrl, cluster.slug, cluster.role, pageDescription);
   const faqSchema = buildFaqSchema(cluster.role, cluster.faq);
 

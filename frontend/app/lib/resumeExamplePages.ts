@@ -345,19 +345,19 @@ function countWords(text: string): number {
 
 function titleForRole(role: string, h: number): string {
   const variants = [
-    `${role} Resume Example (ATS-Friendly, 2026)`,
-    `${role} Resume Example: ATS-Safe Template + Tips`,
-    `${role} Resume Example: Bullets, Summary, Skills`,
-    `${role} Resume Example (Pass ATS + Get Interviews)`,
+    `${role} Resume Example (2026 ATS-Friendly)`,
+    `${role} Resume Example: Template + Bullet Tips`,
+    `${role} Resume Example: Summary + Skills`,
+    `${role} Resume Example for ATS (2026)`,
   ];
   return pick(variants, h, 19);
 }
 
 function metaForRole(role: string, lane: string, h: number): string {
   const variants = [
-    `ATS-friendly ${role} resume example with summary, skills, and bullets. Includes a before/after rewrite, common mistakes, and a checklist for ${lane}.`,
-    `Copy-ready ${role} resume example built for ATS parsing. Learn keyword placement, bullet formulas, mistakes to avoid, and how to tailor fast for ${lane}.`,
-    `A realistic ${role} resume example that passes ATS: clean layout, keyword strategy, measurable bullet rewrites, FAQ, and a practical submit checklist.`,
+    `ATS-friendly ${role} resume example with template, summary, skills, and bullet rewrites. Includes mistakes to avoid and a checklist for ${lane}.`,
+    `Copy-ready ${role} resume example for ATS with a clean template, summary ideas, bullet formulas, and a fast tailoring checklist for ${lane}.`,
+    `A realistic ${role} resume example with ATS-safe layout, keyword strategy, measurable bullets, FAQ, and a practical submit checklist.`,
   ];
   return truncateTo(pick(variants, h, 23), 160);
 }
