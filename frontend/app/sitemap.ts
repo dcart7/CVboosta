@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { getPublishedBlogPosts } from "./lib/blogPosts";
+import { getCvOptimizerGuideRoutes } from "./lib/cvOptimizerCluster";
 import { getResumeKeywordStaticSlugs } from "./lib/resumeKeywordClusters";
 import { getAllSeoExpansionRoutes } from "./lib/seoExpansion";
 
@@ -14,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const resumeExampleRoutes = getResumeKeywordStaticSlugs().map(
     (slug) => `/resume-examples/${slug}`,
   );
+  const cvOptimizerGuideRoutes = getCvOptimizerGuideRoutes();
   const seoExpansionRoutes = getAllSeoExpansionRoutes();
   const staticRoutes = [
     "",
@@ -22,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/best",
     "/blog",
     "/cases",
+    "/cv-optimizer",
     "/free-ats-resume-checker",
     "/interview-resume",
     "/job-description",
@@ -42,6 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const allRoutes = Array.from(new Set([
     ...staticRoutes,
     ...publishedBlogRoutes,
+    ...cvOptimizerGuideRoutes,
     ...resumeKeywordRoutes,
     ...resumeExampleRoutes,
     ...seoExpansionRoutes,
@@ -51,7 +55,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const priority =
       route === ""
         ? 1
-        : route.startsWith("/resume-examples/")
+        : route.startsWith("/cv-optimizer/")
+          ? 0.88
+          : route.startsWith("/resume-examples/")
           ? 0.85
           : route === "/resume-examples"
             ? 0.92
@@ -93,6 +99,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     const changeFrequency =
       route.startsWith("/resume-keywords/") ||
+      route.startsWith("/cv-optimizer/") ||
       route.startsWith("/resume-examples/") ||
       route.startsWith("/resume-guides/") ||
       route.startsWith("/resume-for/") ||
