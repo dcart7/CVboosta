@@ -4,12 +4,19 @@ import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.session import get_db
+from app.models.analysis import Analysis
+from app.models.billing import AppStoreTransaction, UserBillingEntitlement
+from app.models.device_push_token import DevicePushToken
+from app.models.live_activity_push_token import LiveActivityPushToken
+from app.models.live_activity_start_token import LiveActivityStartToken
 from app.models.oauth_identity import OAuthIdentity
+from app.models.request_log import RequestLog
 from app.models.user import User
 from app.schemas.auth import (
     ActivityResponse,
@@ -39,6 +46,18 @@ from app.services.oauth import verify_google_access_token, verify_oauth_id_token
 
 router = APIRouter()
 optional_bearer = HTTPBearer(auto_error=False)
+
+
+def _delete_user_related_rows(db: Session, user_id: int) -> None:
+    db.execute(delete(RequestLog).where(RequestLog.user_id == user_id))
+    db.execute(delete(ActivityLog).where(ActivityLog.user_id == user_id))
+    db.execute(delete(Analysis).where(Analysis.user_id == user_id))
+    db.execute(delete(AppStoreTransaction).where(AppStoreTransaction.user_id == user_id))
+    db.execute(delete(UserBillingEntitlement).where(UserBillingEntitlement.user_id == user_id))
+    db.execute(delete(DevicePushToken).where(DevicePushToken.user_id == user_id))
+    db.execute(delete(LiveActivityPushToken).where(LiveActivityPushToken.user_id == user_id))
+    db.execute(delete(LiveActivityStartToken).where(LiveActivityStartToken.user_id == user_id))
+    db.execute(delete(OAuthIdentity).where(OAuthIdentity.user_id == user_id))
 
 
 def _request_is_https(request: Request) -> bool:
@@ -303,6 +322,29 @@ def get_current_user_optional(
     except Exception:
         return None
     return db.query(User).filter(User.id == user_id).first()
+
+
+@router.delete("/auth/account", status_code=status.HTTP_204_NO_CONTENT)
+def delete_account(
+    response: Response,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    _delete_user_related_rows(db, current_user.id)
+    db.delete(current_user)
+
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Account deletion is blocked by linked records. Please try again after removing attached data.",
+        ) from exc
+
+    _clear_auth_cookie(response)
+    response.status_code = status.HTTP_204_NO_CONTENT
+    return response
 
 
 @router.get("/auth/me", response_model=UserResponse)

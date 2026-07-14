@@ -1,6 +1,18 @@
 from app.schemas.keywords import KeywordExtractionResult
 from app.services.llm import LLMResult
 from datetime import datetime, timedelta, timezone
+from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.db.session import get_engine
+from app.models.activity import ActivityLog
+from app.models.analysis import Analysis
+from app.models.billing import AppStoreTransaction, UserBillingEntitlement
+from app.models.device_push_token import DevicePushToken
+from app.models.live_activity_push_token import LiveActivityPushToken
+from app.models.live_activity_start_token import LiveActivityStartToken
+from app.models.oauth_identity import OAuthIdentity
+from app.models.request_log import RequestLog
 
 
 def test_health(client):
@@ -527,6 +539,102 @@ def test_apple_oauth_rejects_first_login_without_email(client, monkeypatch):
     )
     assert response.status_code == 400
     assert response.json()["detail"] == "OAuth email is missing"
+
+
+def test_delete_account_removes_related_rows_and_allows_re_registration(client):
+    email = "delete-account@example.com"
+    token = _register_and_get_token(client, email)
+    me_response = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me_response.status_code == 200
+    user_id = me_response.json()["id"]
+
+    with Session(get_engine()) as db:
+        db.add(Analysis(
+            user_id=user_id,
+            original_cv="Original CV",
+            job_description="Job Description",
+            score=83,
+            result_json={"status": "ok"},
+        ))
+        db.add(ActivityLog(user_id=user_id, action="Manual test event", meta={"source": "test"}))
+        db.add(RequestLog(
+            user_id=user_id,
+            method="GET",
+            path="/auth/me",
+            status_code=200,
+            duration_ms=12,
+        ))
+        db.add(AppStoreTransaction(
+            user_id=user_id,
+            product_id="com.cvboosta.app.go.monthly",
+            transaction_id="delete-account-tx-001",
+            original_transaction_id="delete-account-orig-001",
+            transaction_jws="signed-jws",
+            quantity=1,
+        ))
+        db.add(UserBillingEntitlement(
+            user_id=user_id,
+            plan="go",
+            entitlement="go",
+            source="app_store",
+            is_active=True,
+        ))
+        db.add(OAuthIdentity(
+            user_id=user_id,
+            provider="apple",
+            provider_user_id="delete-account-apple-001",
+            email=email,
+        ))
+        db.add(DevicePushToken(
+            user_id=user_id,
+            token="a" * 64,
+            bundle_id="com.cvboosta.app",
+            apns_environment="sandbox",
+        ))
+        db.add(LiveActivityStartToken(
+            user_id=user_id,
+            token="b" * 128,
+            bundle_id="com.cvboosta.app",
+            mode="atsOptimization",
+            apns_environment="sandbox",
+        ))
+        db.add(LiveActivityPushToken(
+            user_id=user_id,
+            activity_id="delete-account-activity-001",
+            token="c" * 128,
+            bundle_id="com.cvboosta.app",
+            mode="atsOptimization",
+            apns_environment="sandbox",
+        ))
+        db.commit()
+
+    delete_response = client.request(
+        "DELETE",
+        "/auth/account",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert delete_response.status_code == 204
+    assert client.cookies.get(settings.auth_cookie_name) is None
+
+    me_after_delete = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me_after_delete.status_code == 401
+
+    with Session(get_engine()) as db:
+        assert db.query(Analysis).filter(Analysis.user_id == user_id).count() == 0
+        assert db.query(ActivityLog).filter(ActivityLog.user_id == user_id).count() == 0
+        assert db.query(RequestLog).filter(RequestLog.user_id == user_id).count() == 0
+        assert db.query(AppStoreTransaction).filter(AppStoreTransaction.user_id == user_id).count() == 0
+        assert db.query(UserBillingEntitlement).filter(UserBillingEntitlement.user_id == user_id).count() == 0
+        assert db.query(OAuthIdentity).filter(OAuthIdentity.user_id == user_id).count() == 0
+        assert db.query(DevicePushToken).filter(DevicePushToken.user_id == user_id).count() == 0
+        assert db.query(LiveActivityStartToken).filter(LiveActivityStartToken.user_id == user_id).count() == 0
+        assert db.query(LiveActivityPushToken).filter(LiveActivityPushToken.user_id == user_id).count() == 0
+
+    register_again_response = client.post(
+        "/auth/register",
+        json={"email": email, "password": "password123", "full_name": "User"},
+    )
+    assert register_again_response.status_code == 200
 
 
 def _register_and_get_token(client, email: str) -> str:
