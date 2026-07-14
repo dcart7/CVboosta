@@ -3511,6 +3511,34 @@ a {
   opacity: 0.92;
 }
 
+.legal-block p + p {
+  margin-top: 12px;
+}
+
+.legal-subheading {
+  margin: 18px 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.legal-list {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  opacity: 0.92;
+}
+
+.legal-list li {
+  line-height: 1.7;
+}
+
+.legal-list code {
+  font-size: 0.95em;
+}
+
 .legal-faq-list {
   margin-top: 6px;
   display: grid;
@@ -3628,6 +3656,10 @@ a {
   }
 
   .legal-block p {
+    font-size: 15px;
+  }
+
+  .legal-subheading {
     font-size: 15px;
   }
 }

@@ -188,7 +188,7 @@ export default function PrivacyPage() {
           <div className="legal-doc">
             <div className="legal-meta">
               <span className="legal-chip">{t("results.legalDocumentLabel")}</span>
-              <span className="legal-chip">{t("results.lastUpdatedPrefix")}: April 16, 2026</span>
+              <span className="legal-chip">{t("results.lastUpdatedPrefix")}: July 14, 2026</span>
             </div>
 
             <div className="legal-content">
@@ -222,6 +222,194 @@ export default function PrivacyPage() {
                     </details>
                   ))}
                 </div>
+              </div>
+
+              <div className="legal-block">
+                <h3>Scope</h3>
+                <p>
+                  This policy applies to CVBoosta services made available through:
+                </p>
+                <ul className="legal-list">
+                  <li>
+                    <code>https://cvboosta.com</code>
+                  </li>
+                  <li>the CVBoosta iOS application</li>
+                </ul>
+              </div>
+
+              <div className="legal-block">
+                <h3>Data We Collect</h3>
+                <p>
+                  We may collect the following categories of data when you use CVBoosta:
+                </p>
+
+                <h4 className="legal-subheading">Account and contact data</h4>
+                <ul className="legal-list">
+                  <li>name</li>
+                  <li>email address</li>
+                  <li>account or user identifiers</li>
+                  <li>authentication and session records</li>
+                </ul>
+
+                <h4 className="legal-subheading">Resume and application content</h4>
+                <ul className="legal-list">
+                  <li>resume files you upload</li>
+                  <li>resume text extracted for analysis</li>
+                  <li>job descriptions, tailoring inputs, and generated resume suggestions</li>
+                  <li>
+                    application tracker entries such as company, role, status, notes, links,
+                    and interview reflections
+                  </li>
+                  <li>
+                    other user-generated content submitted through the app or website to power
+                    CVBoosta features
+                  </li>
+                </ul>
+
+                <h4 className="legal-subheading">Subscription and transaction data</h4>
+                <ul className="legal-list">
+                  <li>App Store product identifiers</li>
+                  <li>entitlement and subscription status</li>
+                  <li>purchase history metadata</li>
+                  <li>transaction identifiers and related validation records</li>
+                </ul>
+
+                <h4 className="legal-subheading">Device and service data</h4>
+                <ul className="legal-list">
+                  <li>
+                    push notification tokens and live activity push tokens used to deliver
+                    notifications
+                  </li>
+                  <li>
+                    basic service and security logs needed to operate, secure, and debug the
+                    product
+                  </li>
+                </ul>
+
+                <h4 className="legal-subheading">
+                  Data we generally do not collect from the current iOS app version
+                </h4>
+                <ul className="legal-list">
+                  <li>payment card numbers or bank details</li>
+                  <li>precise or coarse location</li>
+                  <li>contacts</li>
+                  <li>advertising identifiers for cross-app tracking</li>
+                </ul>
+
+                <p>
+                  If you choose a profile photo in the current iOS app, that photo is stored
+                  locally on your device unless and until CVBoosta explicitly adds a server sync
+                  feature for it.
+                </p>
+              </div>
+
+              <div className="legal-block">
+                <h3>How We Use Data</h3>
+                <p>We use collected data to:</p>
+                <ul className="legal-list">
+                  <li>create and authenticate accounts</li>
+                  <li>
+                    deliver resume scanning, tailoring, export, and application tracking
+                    features
+                  </li>
+                  <li>sync account state, subscription access, and saved workspace data</li>
+                  <li>validate purchases and restore App Store entitlements</li>
+                  <li>send optional notifications and live activity updates</li>
+                  <li>prevent fraud, abuse, and unauthorized access</li>
+                  <li>operate, secure, maintain, and improve the service</li>
+                  <li>provide customer support</li>
+                </ul>
+              </div>
+
+              <div className="legal-block">
+                <h3>CVBoosta for iOS</h3>
+                <p>For the current iOS app version:</p>
+                <ul className="legal-list">
+                  <li>CVBoosta collects data primarily to provide app functionality.</li>
+                  <li>
+                    CVBoosta does not use iOS app data for cross-app tracking or targeted
+                    advertising.
+                  </li>
+                  <li>
+                    CVBoosta does not receive your payment card number from Apple when you
+                    purchase through the App Store.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="legal-block">
+                <h3>Data Retention</h3>
+                <p>
+                  We retain data for as long as it is reasonably needed for the purposes
+                  described above, including to provide the service, maintain account access,
+                  validate purchases, protect the service, and comply with legal obligations.
+                </p>
+                <p>In practice, this means:</p>
+                <ul className="legal-list">
+                  <li>
+                    account profile, login, subscription, and workspace data are generally
+                    retained while your account is active
+                  </li>
+                  <li>
+                    resume analysis inputs, generated outputs, tracker records, and related
+                    user content are generally retained while your account is active unless
+                    deleted earlier
+                  </li>
+                  <li>
+                    notification tokens are retained until they are replaced, invalidated, no
+                    longer needed for notifications, or your account is deleted
+                  </li>
+                  <li>
+                    operational and security logs may be retained for limited periods needed
+                    for security, fraud prevention, debugging, backup restoration, or legal
+                    compliance
+                  </li>
+                  <li>
+                    backup copies may persist for a limited time before they age out under
+                    routine backup cycles
+                  </li>
+                </ul>
+              </div>
+
+              <div className="legal-block">
+                <h3>Account and Data Deletion</h3>
+                <p>
+                  You can request deletion of your CVBoosta account directly inside the iOS
+                  app:
+                </p>
+                <ul className="legal-list">
+                  <li>
+                    <code>Settings</code> -&gt; <code>Delete Account</code>
+                  </li>
+                </ul>
+                <p>
+                  When you delete your account, CVBoosta will remove or de-identify the
+                  associated account data from active systems, subject to limited retention
+                  needed for legal compliance, fraud prevention, security, financial reporting,
+                  and backup expiration cycles.
+                </p>
+                <p>
+                  Deleting your CVBoosta account does not automatically cancel an App Store
+                  subscription. App Store subscriptions are managed by Apple and must be
+                  canceled separately through your Apple account subscription settings.
+                </p>
+                <p>
+                  If you cannot access the app and need help with account deletion or privacy
+                  questions, contact:
+                </p>
+                <ul className="legal-list">
+                  <li>
+                    <code>support@virelsolutions.com</code>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="legal-block">
+                <h3>Policy Updates</h3>
+                <p>
+                  We may update this Privacy Policy from time to time. When we do, we will
+                  update the &quot;Last updated&quot; date on this page.
+                </p>
               </div>
             </div>
           </div>
