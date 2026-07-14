@@ -97,6 +97,9 @@ export default function ResumeExamplesHubClient({ clusters }: Props) {
               <Link className="btn secondary" href="/app">
                 {ui.optimizeCv}
               </Link>
+              <Link className="btn ghost" href="/cv-optimizer">
+                CV optimizer
+              </Link>
               <Link className="btn ghost" href="/register">
                 {ui.register}
               </Link>
@@ -198,6 +201,9 @@ export default function ResumeExamplesHubClient({ clusters }: Props) {
               </Link>
               <Link className="btn secondary" href="/app">
                 {ui.optimizeCv}
+              </Link>
+              <Link className="btn ghost" href="/cv-optimizer">
+                CV optimizer
               </Link>
               <Link className="btn ghost" href="/register">
                 {ui.register}

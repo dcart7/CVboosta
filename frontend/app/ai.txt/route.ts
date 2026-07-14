@@ -6,6 +6,8 @@ export async function GET() {
     "site: CVboosta",
     `url: ${siteUrl}`,
     "topic: AI resume optimization and ATS matching",
+    `landing_page: ${siteUrl}/cv-optimizer`,
+    `supporting_page: ${siteUrl}/best/best-resume-optimizer`,
     `free_tool: ${siteUrl}/free-ats-resume-checker`,
     `sitemap: ${siteUrl}/sitemap.xml`,
     "notes: Public marketing pages are indexable. User dashboards and private results are blocked by robots.",

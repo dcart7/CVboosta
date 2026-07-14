@@ -1,4 +1,7 @@
 keyword,intent,cluster,target_url,content_type,priority,title_hint,h1_hint
+cv optimizer,commercial,cv-optimizer,/cv-optimizer,landing,P1,CV Optimizer,CV Optimizer: Improve Your CV for ATS and Real Recruiters
+resume optimizer,commercial,cv-optimizer,/cv-optimizer,landing,P1,Resume Optimizer,CV Optimizer for ATS and Real Recruiters
+ats cv optimizer,commercial,cv-optimizer,/cv-optimizer,landing,P1,ATS CV Optimizer,CV Optimizer for ATS Job Applications
 ai cv optimizer,commercial,home,/,landing,P1,CVboosta AI CV Optimizer,AI CV Optimizer for ATS
 ats cv optimization tool,commercial,home,/,landing,P1,ATS CV Optimization Tool,CV Optimization Tool for ATS
 optimize cv for ats online,commercial,home,/,landing,P1,Optimize CV for ATS Online,Optimize Your CV for ATS Online

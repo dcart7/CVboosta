@@ -53,6 +53,11 @@ export default function SeoGuidePageClient({ page, hubHref, hubLabel }: Props) {
             </Link>
             <h1 className="hero-title blog-post-title">{localizedPage.h1}</h1>
             <p className="hero-subtitle blog-post-lead">{localizedPage.lead}</p>
+            <p style={{ marginTop: "10px" }}>
+              If you want to use this guidance on a live application,{" "}
+              <Link href="/cv-optimizer">improve ATS compatibility</Link> and review the role match
+              before you submit.
+            </p>
             <p className="label blog-label">
               {ui.updated}: {localizedPage.updatedAt} • ~{localizedPage.estimatedWordCount} {ui.words}
             </p>
@@ -62,6 +67,9 @@ export default function SeoGuidePageClient({ page, hubHref, hubLabel }: Props) {
               </Link>
               <Link className="btn secondary" href="/app">
                 {ui.optimize}
+              </Link>
+              <Link className="btn ghost" href="/cv-optimizer">
+                CV optimizer
               </Link>
               <Link className="btn ghost" href="/register">
                 {ui.register}
@@ -112,12 +120,19 @@ export default function SeoGuidePageClient({ page, hubHref, hubLabel }: Props) {
           <div className="blog-takeaway card">
             <h3>{ui.ctaTitle}</h3>
             <p>{ui.ctaLead}</p>
+            <p style={{ marginTop: "10px" }}>
+              The fastest next step is to <Link href="/cv-optimizer">optimize your CV</Link> for
+              the exact role instead of trying to generalize the advice across every application.
+            </p>
             <div className="nav-actions" style={{ marginTop: "12px" }}>
               <Link className="btn primary" href="/free-ats-resume-checker">
                 {ui.freeChecker}
               </Link>
               <Link className="btn secondary" href="/app">
                 {ui.optimize}
+              </Link>
+              <Link className="btn ghost" href="/cv-optimizer">
+                CV optimizer
               </Link>
               <Link className="btn ghost" href="/register">
                 {ui.register}

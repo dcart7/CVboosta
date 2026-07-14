@@ -26,6 +26,14 @@ export default function FreeAtsResumeCheckerPage() {
               Upload your CV, paste the job description, and see missing keywords in minutes.
             </p>
             <FreeAtsCtasClient />
+            <div className="hero-mini-block" style={{ marginTop: "16px" }}>
+              <p className="hero-mini-title">Need more than a score?</p>
+              <p className="hero-mini-text">
+                Use the full <Link href="/cv-optimizer">CV Optimizer</Link> page to understand how
+                ATS parsing, keyword gaps, bullet strength, and recruiter review work together
+                before you open the product.
+              </p>
+            </div>
           </div>
         </section>
       </div>

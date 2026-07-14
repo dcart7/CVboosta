@@ -154,6 +154,9 @@ export default function SeoGuideHubClient({
               <Link className="btn secondary" href="/app">
                 {ui.optimize}
               </Link>
+              <Link className="btn ghost" href="/cv-optimizer">
+                CV optimizer
+              </Link>
               <Link className="btn ghost" href="/register">
                 {ui.register}
               </Link>
@@ -222,12 +225,20 @@ export default function SeoGuideHubClient({
           <div className="card rk-panel rk-cta-panel">
             <h2 className="section-title">{ctaTitle}</h2>
             <p className="rk-copy">{ctaLead}</p>
+            <p style={{ marginTop: "10px" }}>
+              If you already know the target position,{" "}
+              <Link href="/cv-optimizer">tailor your CV for this role</Link> before you export the
+              final version.
+            </p>
             <div className="nav-actions rk-hero-actions">
               <Link className="btn primary" href="/free-ats-resume-checker">
                 {ui.freeChecker}
               </Link>
               <Link className="btn secondary" href="/app">
                 {ui.optimize}
+              </Link>
+              <Link className="btn ghost" href="/cv-optimizer">
+                CV optimizer
               </Link>
               <Link className="btn ghost" href="/register">
                 {ui.register}

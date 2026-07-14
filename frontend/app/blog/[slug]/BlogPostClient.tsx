@@ -286,6 +286,11 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
           <div className="blog-takeaway card">
             <h3>{midCtaTitle}</h3>
             <p>{midCtaBody}</p>
+            <p style={{ marginTop: "10px" }}>
+              When you are ready to apply,{" "}
+              <Link href="/cv-optimizer">check your CV against a job description</Link> so this
+              article turns into a real file update, not just another tab.
+            </p>
             <div className="nav-actions" style={{ marginTop: "12px" }}>
               <Link className="btn primary" href="/app">
                 {ctaPrimary}

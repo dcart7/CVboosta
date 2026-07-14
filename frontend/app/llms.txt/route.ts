@@ -9,6 +9,8 @@ export async function GET() {
     "",
     "## Public, indexable URLs",
     `- Home: ${siteUrl}/`,
+    `- CV Optimizer: ${siteUrl}/cv-optimizer`,
+    `- Best Resume Optimizer: ${siteUrl}/best/best-resume-optimizer`,
     `- Free ATS Resume Checker: ${siteUrl}/free-ats-resume-checker`,
     `- Blog: ${siteUrl}/blog`,
     `- Pricing: ${siteUrl}/pricing`,
