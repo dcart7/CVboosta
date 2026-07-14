@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { getPublishedBlogPosts } from "./lib/blogPosts";
 import { getCvOptimizerGuideRoutes } from "./lib/cvOptimizerCluster";
 import { getResumeKeywordStaticSlugs } from "./lib/resumeKeywordClusters";
+import { getSeoMarkdownRoutes } from "./lib/seoMarkdownPages";
 import { getAllSeoExpansionRoutes } from "./lib/seoExpansion";
 
 export const revalidate = 3600;
@@ -17,14 +18,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
   const cvOptimizerGuideRoutes = getCvOptimizerGuideRoutes();
   const seoExpansionRoutes = getAllSeoExpansionRoutes();
+  const seoMarkdownRoutes = getSeoMarkdownRoutes();
   const staticRoutes = [
     "",
     "/about",
     "/ats",
+    "/ats-comparisons",
     "/best",
     "/blog",
     "/cases",
     "/cv-optimizer",
+    "/datasets",
     "/free-ats-resume-checker",
     "/interview-resume",
     "/job-description",
@@ -35,6 +39,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/resume-industry",
     "/resume-keywords",
     "/resume-summary",
+    "/skills",
+    "/tools",
     "/ai.txt",
     "/llms.txt",
     "/pricing",
@@ -49,6 +55,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...resumeKeywordRoutes,
     ...resumeExampleRoutes,
     ...seoExpansionRoutes,
+    ...seoMarkdownRoutes,
   ]));
 
   const routes = allRoutes.map((route) => {
@@ -77,6 +84,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
                 ? 0.84
                 : route === "/ats"
                   ? 0.9
+              : route.startsWith("/ats-comparisons/")
+                ? 0.83
+                : route === "/ats-comparisons"
+                  ? 0.88
               : route.startsWith("/resume-industry/")
                 ? 0.83
                 : route === "/resume-industry"
@@ -89,6 +100,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
                 ? 0.83
                 : route === "/job-description"
                   ? 0.88
+              : route.startsWith("/skills/")
+                ? 0.82
+                : route === "/skills"
+                  ? 0.87
+              : route.startsWith("/tools/")
+                ? 0.82
+                : route === "/tools"
+                  ? 0.87
+              : route.startsWith("/datasets/")
+                ? 0.81
+                : route === "/datasets"
+                  ? 0.86
               : route.startsWith("/best/")
                 ? 0.82
                 : route === "/best"
@@ -104,9 +127,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       route.startsWith("/resume-guides/") ||
       route.startsWith("/resume-for/") ||
       route.startsWith("/ats/") ||
+      route.startsWith("/ats-comparisons/") ||
       route.startsWith("/resume-industry/") ||
       route.startsWith("/interview-resume/") ||
       route.startsWith("/job-description/") ||
+      route.startsWith("/skills/") ||
+      route.startsWith("/tools/") ||
+      route.startsWith("/datasets/") ||
       route.startsWith("/best/") ||
       route.startsWith("/blog/")
         ? ("weekly" as const)

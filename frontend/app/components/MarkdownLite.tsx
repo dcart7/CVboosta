@@ -84,7 +84,16 @@ function renderInline(markdown: string): ReactNode[] {
     if (token.type === "text") return token.value;
     if (token.type === "bold") return <strong key={`b-${index}`}>{token.value}</strong>;
     if (token.type === "italic") return <em key={`i-${index}`}>{token.value}</em>;
-    if (token.type === "code") return <code key={`c-${index}`}>{token.value}</code>;
+    if (token.type === "code") {
+      if (token.value.startsWith("/")) {
+        return (
+          <Link key={`c-${index}`} href={token.value}>
+            <code>{token.value}</code>
+          </Link>
+        );
+      }
+      return <code key={`c-${index}`}>{token.value}</code>;
+    }
     if (token.type === "link") {
       if (token.href.startsWith("/")) {
         return (

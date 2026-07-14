@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import SeoGuideHubClient from "../components/SeoGuideHubClient";
 import { getSeoExpansionConfig } from "../lib/seoExpansionConfigs";
 import { getSeoExpansionHubItems } from "../lib/seoExpansion";
+import { getSeoMarkdownHubItems } from "../lib/seoMarkdownPages";
 
 export const revalidate = 3600;
 
@@ -16,6 +17,8 @@ export const metadata: Metadata = {
 };
 
 export default function AtsHubPage() {
+  const items = [...getSeoExpansionHubItems("ats", 100), ...getSeoMarkdownHubItems("ats")];
+
   return (
     <SeoGuideHubClient
       badge={config.badge}
@@ -25,7 +28,7 @@ export default function AtsHubPage() {
       openLabel={config.openLabel}
       ctaTitle={config.ctaTitle}
       ctaLead={config.ctaLead}
-      items={getSeoExpansionHubItems("ats", 100)}
+      items={items}
     />
   );
 }

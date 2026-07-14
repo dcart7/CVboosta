@@ -1,11 +1,14 @@
 import Script from "next/script";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import SeoMarkdownPageClient from "../../components/SeoMarkdownPageClient";
+import SeoMarkdownStructuredData from "../../components/SeoMarkdownStructuredData";
 import {
   getResumeKeywordClusterBySlug,
   getRelatedResumeKeywordClusters,
   getResumeKeywordStaticSlugs,
 } from "../../lib/resumeKeywordClusters";
+import { getSeoMarkdownConfig, getSeoMarkdownPage, getSeoMarkdownSlugs } from "../../lib/seoMarkdownPages";
 import ResumeKeywordRoleClient from "./ResumeKeywordRoleClient";
 
 export const revalidate = 3600;
@@ -13,6 +16,8 @@ export const revalidate = 3600;
 type ResumeKeywordRolePageProps = {
   params: Promise<{ role: string }>;
 };
+
+const fallbackConfig = getSeoMarkdownConfig("resume-keywords");
 
 function truncateText(value: string, max: number): string {
   if (value.length <= max) return value;
@@ -47,7 +52,10 @@ function buildResumeKeywordsDescription(
 }
 
 export async function generateStaticParams() {
-  return getResumeKeywordStaticSlugs().map((role) => ({ role }));
+  const roles = Array.from(
+    new Set([...getResumeKeywordStaticSlugs(), ...getSeoMarkdownSlugs("resume-keywords")]),
+  );
+  return roles.map((role) => ({ role }));
 }
 
 export async function generateMetadata({
@@ -57,9 +65,20 @@ export async function generateMetadata({
   const cluster = getResumeKeywordClusterBySlug(role);
 
   if (!cluster) {
+    const fallbackPage = getSeoMarkdownPage("resume-keywords", role);
+    if (!fallbackPage) {
+      return {
+        title: "Resume Keywords | CVboosta",
+        description: "Role-specific resume keywords and ATS optimization tips.",
+      };
+    }
+
     return {
-      title: "Resume Keywords | CVboosta",
-      description: "Role-specific resume keywords and ATS optimization tips.",
+      title: `${fallbackPage.seoTitle} | CVboosta`,
+      description: fallbackPage.metaDescription,
+      alternates: {
+        canonical: `/resume-keywords/${fallbackPage.slug}`,
+      },
     };
   }
 
@@ -118,7 +137,24 @@ export default async function ResumeKeywordRolePage({
   const cluster = getResumeKeywordClusterBySlug(role);
 
   if (!cluster) {
-    notFound();
+    const fallbackPage = getSeoMarkdownPage("resume-keywords", role);
+    if (!fallbackPage) {
+      notFound();
+    }
+
+    return (
+      <>
+        <SeoMarkdownStructuredData
+          page={fallbackPage}
+          canonicalPath={`/resume-keywords/${fallbackPage.slug}`}
+        />
+        <SeoMarkdownPageClient
+          page={fallbackPage}
+          hubHref={fallbackConfig.basePath}
+          hubLabel={fallbackConfig.pageHubLabel}
+        />
+      </>
+    );
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
