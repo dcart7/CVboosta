@@ -5,11 +5,12 @@ import { getResumeKeywordStaticSlugs } from "./lib/resumeKeywordClusters";
 import { getSeoMarkdownRoutes } from "./lib/seoMarkdownPages";
 import { getAllSeoExpansionRoutes } from "./lib/seoExpansion";
 import { RESUME_OPTIMIZER_PAGES } from "./resume-optimizer/data";
+import { getEnabledSeoPages, getSeoSitemapRoutes, SEO_CLUSTERS } from "./seo-data";
 
 export const revalidate = 3600;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com").replace(/\/$/, "");
   const publishedBlogRoutes = getPublishedBlogPosts().map((post) => `/blog/${post.slug}`);
   const resumeKeywordRoutes = getResumeKeywordStaticSlugs().map(
     (slug) => `/resume-keywords/${slug}`,
@@ -23,6 +24,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const resumeOptimizerRoutes = RESUME_OPTIMIZER_PAGES.map(
     (page) => `/resume-optimizer/${page.slug}`,
   );
+  const programmaticSeoRoutes = getSeoSitemapRoutes();
+  const programmaticSeoPriorities = new Map<string, number>();
+  for (const cluster of SEO_CLUSTERS) {
+    programmaticSeoPriorities.set(`/${cluster}`, 0.9);
+    for (const page of getEnabledSeoPages(cluster)) {
+      programmaticSeoPriorities.set(`/${cluster}/${page.slug}`, page.priorityTier === 1 ? 0.8 : page.priorityTier === 2 ? 0.7 : 0.6);
+    }
+  }
   const staticRoutes = [
     "",
     "/about",
@@ -62,10 +71,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...seoExpansionRoutes,
     ...seoMarkdownRoutes,
     ...resumeOptimizerRoutes,
+    ...programmaticSeoRoutes,
   ]));
 
   const routes = allRoutes.map((route) => {
-    const priority =
+    const priority = programmaticSeoPriorities.get(route) ?? (
       route === ""
         ? 1
         : route === "/resume-optimizer"
@@ -128,7 +138,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
                   ? 0.87
             : route.startsWith("/blog/")
               ? 0.82
-              : 0.8;
+              : 0.8);
 
     const changeFrequency =
       route.startsWith("/resume-keywords/") ||
@@ -151,7 +161,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     return {
       url: `${baseUrl}${route}`,
-      lastModified: new Date(),
       changeFrequency,
       priority,
     };
