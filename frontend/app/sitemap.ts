@@ -4,6 +4,7 @@ import { getCvOptimizerGuideRoutes } from "./lib/cvOptimizerCluster";
 import { getResumeKeywordStaticSlugs } from "./lib/resumeKeywordClusters";
 import { getSeoMarkdownRoutes } from "./lib/seoMarkdownPages";
 import { getAllSeoExpansionRoutes } from "./lib/seoExpansion";
+import { RESUME_OPTIMIZER_PAGES } from "./resume-optimizer/data";
 
 export const revalidate = 3600;
 
@@ -19,6 +20,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const cvOptimizerGuideRoutes = getCvOptimizerGuideRoutes();
   const seoExpansionRoutes = getAllSeoExpansionRoutes();
   const seoMarkdownRoutes = getSeoMarkdownRoutes();
+  const resumeOptimizerRoutes = RESUME_OPTIMIZER_PAGES.map(
+    (page) => `/resume-optimizer/${page.slug}`,
+  );
   const staticRoutes = [
     "",
     "/about",
@@ -38,6 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/resume-guides",
     "/resume-industry",
     "/resume-keywords",
+    "/resume-optimizer",
     "/resume-summary",
     "/skills",
     "/tools",
@@ -56,12 +61,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...resumeExampleRoutes,
     ...seoExpansionRoutes,
     ...seoMarkdownRoutes,
+    ...resumeOptimizerRoutes,
   ]));
 
   const routes = allRoutes.map((route) => {
     const priority =
       route === ""
         ? 1
+        : route === "/resume-optimizer"
+          ? 0.9
+          : route.startsWith("/resume-optimizer/")
+            ? 0.72
         : route.startsWith("/cv-optimizer/")
           ? 0.88
           : route.startsWith("/resume-examples/")
