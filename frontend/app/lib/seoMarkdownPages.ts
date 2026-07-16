@@ -205,6 +205,12 @@ function slugifyHeading(title: string, index: number): string {
   return `${base || "section"}-${index + 1}`;
 }
 
+function normalizeSectionTitle(title: string) {
+  return title.trim().toLowerCase() === "internal link ideas"
+    ? "Recommended next reads"
+    : title;
+}
+
 function collapseParagraph(block: string): string {
   return block
     .split("\n")
@@ -227,7 +233,7 @@ function parseSections(markdown: string): { lead: string; introMarkdown: string;
         rawSections.push(currentSection);
       }
       currentSection = {
-        title: line.slice(3).trim(),
+        title: normalizeSectionTitle(line.slice(3)),
         lines: [],
       };
       continue;

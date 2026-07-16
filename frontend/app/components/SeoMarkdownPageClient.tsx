@@ -13,6 +13,73 @@ type Props = {
   hubLabel: string;
 };
 
+type InternalLink = {
+  href: string;
+  label: string;
+};
+
+function isInternalLinkIdeasSection(title: string) {
+  return ["internal link ideas", "recommended next reads"].includes(title.trim().toLowerCase());
+}
+
+function titleCaseSlug(value: string) {
+  return value
+    .split("-")
+    .filter(Boolean)
+    .map((part) => {
+      const upper = part.toUpperCase();
+      if (["ats", "api", "sql", "pdf", "docx", "hr", "qa", "ux", "ui"].includes(part)) return upper;
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(" ");
+}
+
+function internalLinkLabel(href: string) {
+  const parts = href.split("/").filter(Boolean);
+  const family = parts[0] || "guide";
+  const topic = titleCaseSlug(parts.at(-1) || "guide");
+
+  switch (family) {
+    case "tools":
+      return `Open ${topic}`;
+    case "ats":
+      return `Read the ${topic} ATS guide`;
+    case "resume-keywords":
+      return `See ${topic} resume keywords`;
+    case "skills":
+      return `Review ${topic} skill guidance`;
+    case "datasets":
+      return `Explore ${topic} resume skills`;
+    default:
+      return `Explore ${topic}`;
+  }
+}
+
+function extractInternalLinks(markdown: string): InternalLink[] {
+  const links = markdown.split(/\r?\n/).flatMap((line) => {
+    const rawPath = line.match(/^\s*-\s+`(\/[^`]+)`\s*$/)?.[1];
+    const markdownPath = line.match(/^\s*-\s+\[[^\]]+\]\((\/[^)]+)\)\s*$/)?.[1];
+    const href = rawPath || markdownPath;
+    return href ? [{ href, label: internalLinkLabel(href) }] : [];
+  });
+
+  return Array.from(new Map(links.map((link) => [link.href, link])).values());
+}
+
+function InternalLinkButtons({ markdown }: { markdown: string }) {
+  const links = extractInternalLinks(markdown);
+
+  return (
+    <div className="nav-actions seo-internal-link-actions">
+      {links.map((link, index) => (
+        <Link className={`btn ${index === 0 ? "primary" : "secondary"}`} href={link.href} key={link.href}>
+          {link.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export default function SeoMarkdownPageClient({ page, hubHref, hubLabel }: Props) {
   const { t, language } = useTranslation();
   const uiMap: Record<
@@ -138,7 +205,9 @@ export default function SeoMarkdownPageClient({ page, hubHref, hubLabel }: Props
               <ul className="resume-example-toc-list">
                 {page.sections.map((section) => (
                   <li key={section.id}>
-                    <a href={`#${section.id}`}>{section.title}</a>
+                    <a href={`#${section.id}`}>
+                      {isInternalLinkIdeasSection(section.title) ? "Recommended next reads" : section.title}
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -154,9 +223,18 @@ export default function SeoMarkdownPageClient({ page, hubHref, hubLabel }: Props
           {page.sections.map((section) => (
             <div className="blog-post-section card" key={`${page.slug}-${section.id}`}>
               <h2 className="seo-anchor" id={section.id}>
-                {section.title}
+                {isInternalLinkIdeasSection(section.title) ? "Recommended next reads" : section.title}
               </h2>
-              <MarkdownLite markdown={section.markdown} />
+              {isInternalLinkIdeasSection(section.title) ? (
+                <>
+                  <p className="seo-internal-link-lead">
+                    Continue with the most relevant CVBoosta guides for this topic.
+                  </p>
+                  <InternalLinkButtons markdown={section.markdown} />
+                </>
+              ) : (
+                <MarkdownLite markdown={section.markdown} />
+              )}
             </div>
           ))}
 

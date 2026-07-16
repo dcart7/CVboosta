@@ -4575,6 +4575,31 @@ a {
   border-bottom: 0;
 }
 
+.seo-internal-link-lead {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.seo-internal-link-actions {
+  margin-top: 16px;
+}
+
+.seo-internal-link-actions .btn {
+  white-space: normal;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .seo-internal-link-actions {
+    align-items: stretch;
+  }
+
+  .seo-internal-link-actions .btn {
+    width: 100%;
+  }
+}
+
 .rk-cta-panel {
   background:
     linear-gradient(150deg, rgba(56, 189, 248, 0.14), rgba(37, 99, 235, 0.08)),
