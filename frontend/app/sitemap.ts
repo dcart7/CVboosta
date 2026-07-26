@@ -55,8 +55,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/resume-summary",
     "/skills",
     "/tools",
-    "/ai.txt",
-    "/llms.txt",
     "/pricing",
     "/privacy",
     "/terms",

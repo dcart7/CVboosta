@@ -4,6 +4,7 @@ import SeoGuidePageClient from "../../components/SeoGuidePageClient";
 import SeoGuideStructuredData from "../../components/SeoGuideStructuredData";
 import { getSeoExpansionConfig } from "../../lib/seoExpansionConfigs";
 import { getSeoExpansionPage, getSeoExpansionSlugs } from "../../lib/seoExpansion";
+import { buildSeoMetadata } from "../../lib/seoMetadata";
 
 export const revalidate = 3600;
 
@@ -28,13 +29,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  return {
-    title: `${page.seoTitle} | CVboosta`,
+  return buildSeoMetadata({
+    title: page.seoTitle,
     description: page.metaDescription,
-    alternates: {
-      canonical: `${config.basePath}/${page.slug}`,
-    },
-  };
+    canonical: `${config.basePath}/${page.slug}`,
+    keywords: [page.h1, page.context?.roleName || "resume", "ATS"],
+  });
 }
 
 export default async function ResumeForSeoPage({ params }: Props) {

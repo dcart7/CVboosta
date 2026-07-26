@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   description: "Stop guessing why you don't get callbacks. Get honest feedback and an ATS-optimized rewrite for your CV in seconds.",
   keywords: ["CV optimization", "ATS resume", "AI resume builder", "career feedback", "CVboosta"],
   authors: [{ name: "CVboosta Team" }],
+  creator: "CVboosta",
+  publisher: "CVboosta",
+  category: "career development",
   metadataBase: new URL(siteUrl),
   robots: {
     index: true,

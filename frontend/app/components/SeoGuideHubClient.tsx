@@ -217,6 +217,18 @@ export default function SeoGuideHubClient({
                   </button>
                 </div>
               )}
+              <noscript>
+                <section className="card" style={{ marginTop: "20px" }}>
+                  <h2 className="section-title">All {title} pages</h2>
+                  <ul>
+                    {items.map((item) => (
+                      <li key={`noscript-${item.slug}`}>
+                        <a href={`${basePath}/${item.slug}`}>{item.title}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </noscript>
             </>
           )}
         </section>

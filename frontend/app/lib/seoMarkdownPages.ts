@@ -221,6 +221,21 @@ function collapseParagraph(block: string): string {
     .trim();
 }
 
+function buildDistinctMetaDescription(item: SeoMarkdownManifestItem): string {
+  const keyword = item.primary_keyword.trim();
+  const title = item.seo_title.trim();
+  const templates: Record<SeoMarkdownFamily, string> = {
+    ats: `Practical ${keyword} guidance: parsing, keyword matching, section structure, file format, examples, and a checklist before applying.`,
+    "ats-comparisons": `${title}: compare ATS behavior, parsing risks, keyword signals, and resume choices before you apply.`,
+    "resume-keywords": `Find ${keyword} for ATS-friendly resumes, including placement advice, proof patterns, examples, and common mistakes.`,
+    skills: `Learn how to show ${keyword} on a resume with credible evidence, ATS-friendly wording, and role-specific examples.`,
+    tools: `${title}: understand the resume workflow, what the tool checks, what the result means, and what to improve next.`,
+    datasets: `Explore ${keyword} with practical resume skills, keyword patterns, evidence ideas, and ATS-safe formatting guidance.`,
+  };
+
+  return templates[item.url_path.split("/")[1] as SeoMarkdownFamily] || item.meta_description;
+}
+
 function parseSections(markdown: string): { lead: string; introMarkdown: string; sections: SeoMarkdownSection[] } {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const introLines: string[] = [];
@@ -292,7 +307,7 @@ function parsePage(item: SeoMarkdownManifestItem): SeoMarkdownPage {
     pageType: item.page_type,
     primaryKeyword: item.primary_keyword,
     seoTitle: item.seo_title,
-    metaDescription: item.meta_description,
+    metaDescription: buildDistinctMetaDescription(item),
     estimatedWordCount: item.word_count,
     updatedAt,
     h1,

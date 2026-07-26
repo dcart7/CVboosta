@@ -48,6 +48,13 @@ export default function SeoGuidePageClient({ page, hubHref, hubLabel }: Props) {
       <div className="shell">
         <article className="section fade-up blog-post-wrap">
           <div className="blog-post-head card">
+            <nav className="rk-breadcrumbs" aria-label="Breadcrumb">
+              <Link href="/">Home</Link>
+              <span aria-hidden="true">/</span>
+              <Link href={hubHref}>{hubLabel}</Link>
+              <span aria-hidden="true">/</span>
+              <span>{localizedPage.h1}</span>
+            </nav>
             <Link className="btn ghost" href={hubHref}>
               {hubLabel}
             </Link>
@@ -59,7 +66,7 @@ export default function SeoGuidePageClient({ page, hubHref, hubLabel }: Props) {
               before you submit.
             </p>
             <p className="label blog-label">
-              {ui.updated}: {localizedPage.updatedAt} • ~{localizedPage.estimatedWordCount} {ui.words}
+              {ui.updated}: <time dateTime={localizedPage.updatedAt}>{localizedPage.updatedAt}</time> • ~{localizedPage.estimatedWordCount} {ui.words}
             </p>
             <div className="nav-actions" style={{ marginTop: "14px" }}>
               <Link className="btn primary" href="/free-ats-resume-checker">
@@ -79,6 +86,11 @@ export default function SeoGuidePageClient({ page, hubHref, hubLabel }: Props) {
               </Link>
             </div>
           </div>
+
+          <section className="blog-post-section card" data-ai-summary="true" aria-labelledby="quick-answer">
+            <h2 className="section-title" id="quick-answer">Quick answer</h2>
+            <p>{localizedPage.lead}</p>
+          </section>
 
           <div className="blog-post-section card resume-example-toc">
             <h2 className="seo-anchor" id="on-this-page">

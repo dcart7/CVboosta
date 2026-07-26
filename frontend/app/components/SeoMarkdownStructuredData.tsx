@@ -7,11 +7,19 @@ type Props = {
 };
 
 function buildArticleSchema(siteUrl: string, page: SeoMarkdownPage, canonicalPath: string) {
+  const url = `${siteUrl}${canonicalPath}`;
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: page.seoTitle,
     description: page.metaDescription,
+    url,
+    inLanguage: "en",
+    keywords: [page.primaryKeyword, page.family, "resume", "ATS"],
+    about: [
+      { "@type": "Thing", name: page.primaryKeyword },
+      { "@type": "Thing", name: "ATS-friendly resume optimization" },
+    ],
     author: {
       "@type": "Organization",
       name: "CVboosta",
@@ -24,8 +32,21 @@ function buildArticleSchema(siteUrl: string, page: SeoMarkdownPage, canonicalPat
         url: `${siteUrl}/logo.png`,
       },
     },
-    mainEntityOfPage: `${siteUrl}${canonicalPath}`,
+    mainEntityOfPage: url,
     dateModified: page.updatedAt,
+  };
+}
+
+function buildBreadcrumbSchema(siteUrl: string, page: SeoMarkdownPage, canonicalPath: string) {
+  const hubUrl = `${siteUrl}/${page.family}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+      { "@type": "ListItem", position: 2, name: page.family.replace(/-/g, " "), item: hubUrl },
+      { "@type": "ListItem", position: 3, name: page.h1, item: `${siteUrl}${canonicalPath}` },
+    ],
   };
 }
 
@@ -87,6 +108,10 @@ function buildFaqSchema(items: Array<{ question: string; answer: string }>) {
   };
 }
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
 export default function SeoMarkdownStructuredData({ page, canonicalPath }: Props) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
   const faqItems = extractFaq(page);
@@ -97,14 +122,21 @@ export default function SeoMarkdownStructuredData({ page, canonicalPath }: Props
         id={`seo-markdown-article-${page.family}-${page.slug}`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(buildArticleSchema(siteUrl, page, canonicalPath)),
+          __html: jsonLd(buildArticleSchema(siteUrl, page, canonicalPath)),
+        }}
+      />
+      <Script
+        id={`seo-markdown-breadcrumb-${page.family}-${page.slug}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(buildBreadcrumbSchema(siteUrl, page, canonicalPath)),
         }}
       />
       {faqItems.length > 0 && (
         <Script
           id={`seo-markdown-faq-${page.family}-${page.slug}`}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFaqSchema(faqItems)) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(buildFaqSchema(faqItems)) }}
         />
       )}
     </>

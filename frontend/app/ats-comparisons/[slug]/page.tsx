@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import SeoMarkdownPageClient from "../../components/SeoMarkdownPageClient";
 import SeoMarkdownStructuredData from "../../components/SeoMarkdownStructuredData";
 import { getSeoMarkdownConfig, getSeoMarkdownPage, getSeoMarkdownSlugs } from "../../lib/seoMarkdownPages";
+import { buildSeoMetadata } from "../../lib/seoMetadata";
 
 export const revalidate = 3600;
 
@@ -27,13 +28,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  return {
-    title: `${page.seoTitle} | CVboosta`,
+  return buildSeoMetadata({
+    title: page.seoTitle,
     description: page.metaDescription,
-    alternates: {
-      canonical: `${config.basePath}/${page.slug}`,
-    },
-  };
+    canonical: `${config.basePath}/${page.slug}`,
+    keywords: [page.primaryKeyword, "ATS comparison", "resume format"],
+  });
 }
 
 export default async function AtsComparisonPage({ params }: Props) {

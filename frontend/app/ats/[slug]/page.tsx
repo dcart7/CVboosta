@@ -7,6 +7,7 @@ import SeoGuideStructuredData from "../../components/SeoGuideStructuredData";
 import { getSeoExpansionConfig } from "../../lib/seoExpansionConfigs";
 import { getSeoExpansionPage, getSeoExpansionSlugs } from "../../lib/seoExpansion";
 import { getSeoMarkdownPage, getSeoMarkdownSlugs } from "../../lib/seoMarkdownPages";
+import { buildSeoMetadata } from "../../lib/seoMetadata";
 
 export const revalidate = 3600;
 
@@ -34,22 +35,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       };
     }
 
-    return {
-      title: `${fallbackPage.seoTitle} | CVboosta`,
+    return buildSeoMetadata({
+      title: fallbackPage.seoTitle,
       description: fallbackPage.metaDescription,
-      alternates: {
-        canonical: `/ats/${fallbackPage.slug}`,
-      },
-    };
+      canonical: `/ats/${fallbackPage.slug}`,
+      keywords: [fallbackPage.primaryKeyword, "ATS", "resume"],
+    });
   }
 
-  return {
-    title: `${page.seoTitle} | CVboosta`,
+  return buildSeoMetadata({
+    title: page.seoTitle,
     description: page.metaDescription,
-    alternates: {
-      canonical: `${config.basePath}/${page.slug}`,
-    },
-  };
+    canonical: `${config.basePath}/${page.slug}`,
+    keywords: [page.h1, page.context?.atsVendor || "ATS", "resume optimization"],
+  });
 }
 
 export default async function AtsSeoPage({ params }: Props) {

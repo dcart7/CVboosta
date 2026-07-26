@@ -170,13 +170,20 @@ export default function SeoMarkdownPageClient({ page, hubHref, hubLabel }: Props
       <div className="shell">
         <article className="section fade-up blog-post-wrap">
           <div className="blog-post-head card">
+            <nav className="rk-breadcrumbs" aria-label="Breadcrumb">
+              <Link href="/">Home</Link>
+              <span aria-hidden="true">/</span>
+              <Link href={hubHref}>{hubLabel}</Link>
+              <span aria-hidden="true">/</span>
+              <span>{page.h1}</span>
+            </nav>
             <Link className="btn ghost" href={hubHref}>
               {hubLabel}
             </Link>
             <h1 className="hero-title blog-post-title">{page.h1}</h1>
             {page.lead && <p className="hero-subtitle blog-post-lead">{page.lead}</p>}
             <p className="label blog-label">
-              {ui.updated}: {page.updatedAt} • ~{page.estimatedWordCount} {ui.words}
+              {ui.updated}: <time dateTime={page.updatedAt}>{page.updatedAt}</time> • ~{page.estimatedWordCount} {ui.words}
             </p>
             <div className="nav-actions" style={{ marginTop: "14px" }}>
               <Link className="btn primary" href="/free-ats-resume-checker">
@@ -196,6 +203,11 @@ export default function SeoMarkdownPageClient({ page, hubHref, hubLabel }: Props
               </Link>
             </div>
           </div>
+
+          <section className="blog-post-section card" data-ai-summary="true" aria-labelledby="quick-answer">
+            <h2 className="section-title" id="quick-answer">Quick answer</h2>
+            <p>{page.lead || page.metaDescription}</p>
+          </section>
 
           {page.sections.length > 0 && (
             <div className="blog-post-section card resume-example-toc">
