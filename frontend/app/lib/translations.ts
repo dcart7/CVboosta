@@ -639,6 +639,8 @@ export const translations = {
       resumeKeywords: "Resume Keywords by Role",
       linkedin: "LinkedIn",
       productHunt: "Product Hunt",
+      appKicker: "Available on the App Store",
+      appButton: "Get the iOS app",
       cookieNotice: "Our website uses cookies to improve your experience and analyze usage limits.",
     },
     legal: {
@@ -1348,6 +1350,8 @@ export const translations = {
       resumeKeywords: "Ключові слова резюме за ролями",
       linkedin: "LinkedIn",
       productHunt: "Product Hunt",
+      appKicker: "Доступно в App Store",
+      appButton: "Завантажити iOS-застосунок",
       cookieNotice: "Наш сайт використовує файли cookie для покращення вашого досвіду та аналізу лімітів використання.",
     },
     legal: {
@@ -2048,6 +2052,8 @@ export const translations = {
       resumeKeywords: "Słowa kluczowe CV wg roli",
       linkedin: "LinkedIn",
       productHunt: "Product Hunt",
+      appKicker: "Dostępne w App Store",
+      appButton: "Pobierz aplikację iOS",
       cookieNotice: "Nasza strona korzysta z plików cookie, aby poprawić wrażenia użytkownika i analizować limity użycia.",
     },
     legal: {
@@ -2743,6 +2749,8 @@ export const translations = {
       resumeKeywords: "Kľúčové slová životopisu podľa role",
       linkedin: "LinkedIn",
       productHunt: "Product Hunt",
+      appKicker: "Dostupné v App Store",
+      appButton: "Stiahnuť iOS aplikáciu",
       cookieNotice: "Naša webová stránka používa súbory cookie na zlepšenie vášho zážitku a analýzu limitov používania.",
     },
     legal: {
@@ -3452,6 +3460,8 @@ export const translations = {
       resumeKeywords: "Klíčová slova životopisu podle role",
       linkedin: "LinkedIn",
       productHunt: "Product Hunt",
+      appKicker: "Dostupné v App Store",
+      appButton: "Stáhnout iOS aplikaci",
       cookieNotice: "Naše weby využívají soubory cookie pro lepší uživatelský zážitek.",
     },
     legal: {
@@ -4153,6 +4163,8 @@ export const translations = {
       resumeKeywords: "Palabras clave de CV por rol",
       linkedin: "LinkedIn",
       productHunt: "Product Hunt",
+      appKicker: "Disponible en App Store",
+      appButton: "Descargar app para iOS",
       cookieNotice: "Nuestro sitio web utiliza cookies para mejorar su experiencia y analizar los límites de uso.",
     },
     legal: {

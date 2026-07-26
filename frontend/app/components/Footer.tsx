@@ -46,6 +46,16 @@ export default function Footer() {
 
             <div className="footer-social-row">
               <a
+                href="https://apps.apple.com/ua/app/cvboosta/id6778948945?l=ru"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-app-btn"
+                aria-label={t("footer.appButton")}
+              >
+                <span className="footer-app-kicker">{t("footer.appKicker")}</span>
+                <span>{t("footer.appButton")}</span>
+              </a>
+              <a
                 href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -211,6 +221,34 @@ export default function Footer() {
           border-color: color-mix(in srgb, var(--accent) 56%, var(--glass-border));
           opacity: 0.92;
           transform: translateY(-1px);
+        }
+        .footer-app-btn {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: center;
+          min-height: 40px;
+          padding: 7px 14px;
+          border-radius: 12px;
+          border: 1px solid color-mix(in srgb, var(--accent) 64%, var(--glass-border));
+          background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #6d5dfc));
+          box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 22%, transparent);
+          color: #fff;
+          text-decoration: none;
+          line-height: 1.15;
+          transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+        }
+        .footer-app-btn:hover {
+          opacity: 0.94;
+          transform: translateY(-1px);
+          box-shadow: 0 12px 26px color-mix(in srgb, var(--accent) 30%, transparent);
+        }
+        .footer-app-kicker {
+          font-size: 10px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          opacity: 0.82;
+          font-weight: 700;
         }
         .logo {
           display: inline-flex;
