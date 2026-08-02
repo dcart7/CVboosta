@@ -9,6 +9,11 @@ import { fetchWithRetry } from "../lib/fetchRetry";
 import ThemeToggle from "./ThemeToggle";
 import { useTranslation } from "../lib/LanguageContext";
 import { Language } from "../lib/translations";
+import {
+  clearSensitiveFunnelData,
+  createIdempotencyKey,
+} from "../lib/funnelIntent";
+import { clearAllWorkspaceBrowserData } from "../lib/workspaceStorage";
 
 export default function TopNav() {
   const pathname = usePathname();
@@ -17,6 +22,8 @@ export default function TopNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
   const isHiddenRef = useRef(false);
   const isScrolledRef = useRef(false);
   const apiBase = getApiBase();
@@ -187,26 +194,29 @@ export default function TopNav() {
   }, [isMenuOpen]);
 
   const logout = async () => {
+    if (logoutLoading) return;
+    setLogoutLoading(true);
+    setLogoutError("");
     try {
-      await fetchWithRetry(
+      const response = await fetchWithRetry(
         `${apiBase}/auth/logout`,
         {
           method: "POST",
+          headers: { "Idempotency-Key": createIdempotencyKey("logout") },
         },
-        { attempts: 2, baseDelayMs: 250, timeoutMs: 10_000 },
+        { attempts: 3, baseDelayMs: 250, timeoutMs: 10_000 },
       );
+      if (!response.ok) throw new Error("logout_failed");
     } catch {
-      // Continue with local cleanup even if network failed.
+      setLogoutError(
+        "We could not end your server session. Check your connection and try logout again.",
+      );
+      setLogoutLoading(false);
+      return;
     }
-    // Clear only CV-related data, keep theme and language
-    const keysToKeep = ["theme", "app_lang"];
-    const allKeys = Object.keys(localStorage);
-    
-    allKeys.forEach((key) => {
-      if (!keysToKeep.includes(key)) {
-        localStorage.removeItem(key);
-      }
-    });
+
+    clearSensitiveFunnelData();
+    clearAllWorkspaceBrowserData();
 
     setEmail(null);
     setUserName(null);
@@ -284,8 +294,8 @@ export default function TopNav() {
                 <span className="cv-desktop-only">{userName || email}</span>
                 <span className="cv-mobile-only">{userName ? userName.charAt(0).toUpperCase() : (email ? email.charAt(0).toUpperCase() : "U")}</span>
               </Link>
-              <button className="btn primary cv-desktop-only" style={{ display: "inline-flex" }} onClick={logout} type="button">
-                {t("nav.logout")}
+              <button className="btn primary cv-desktop-only" style={{ display: "inline-flex" }} onClick={logout} type="button" disabled={logoutLoading}>
+                {logoutLoading ? "…" : t("nav.logout")}
               </button>
             </>
           ) : (
@@ -312,6 +322,11 @@ export default function TopNav() {
       </div>
       </header>
       <div className="nav-spacer" aria-hidden="true" />
+      {logoutError ? (
+        <div className="toast is-error" role="alert" aria-live="assertive">
+          {logoutError}
+        </div>
+      ) : null}
 
       {/* Mobile Menu Overlay — Glass Shutter */}
       {isMenuOpen && (
@@ -327,9 +342,10 @@ export default function TopNav() {
                       setIsMenuOpen(false);
                       await logout();
                     }}
+                    disabled={logoutLoading}
                     style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: "16px", borderRadius: "14px" }}
                   >
-                    {t("nav.logout")}
+                    {logoutLoading ? "…" : t("nav.logout")}
                   </button>
                 ) : (
                   <>

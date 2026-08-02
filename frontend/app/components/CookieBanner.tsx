@@ -2,49 +2,52 @@
 
 import { useEffect, useState } from "react";
 import { useTranslation } from "../lib/LanguageContext";
+import {
+  defaultConsent,
+  enforceOptionalCookieConsent,
+  readConsent,
+  writeConsent,
+} from "../lib/consent";
 
 export default function CookieBanner() {
   const [show, setShow] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const { t } = useTranslation();
 
-  const [preferences, setPreferences] = useState({
-    necessary: true,
-    analytics: true,
-    marketing: false,
-  });
+  const [preferences, setPreferences] = useState(defaultConsent);
 
   useEffect(() => {
-    const consent = localStorage.getItem("cookie-consent");
-    if (!consent) {
-      const timer = setTimeout(() => setShow(true), 2000);
-      return () => clearTimeout(timer);
+    const consent = readConsent();
+    enforceOptionalCookieConsent(consent);
+    let timer: number | undefined;
+    if (consent) {
+      setPreferences(consent);
+    } else {
+      timer = window.setTimeout(() => setShow(true), 2000);
     }
+
+    const openPreferences = () => {
+      setPreferences(readConsent() || defaultConsent());
+      setShow(true);
+      setShowPreferences(true);
+    };
+    window.addEventListener("cvboosta:open-cookie-settings", openPreferences);
+    return () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+      window.removeEventListener("cvboosta:open-cookie-settings", openPreferences);
+    };
   }, []);
 
-  const saveConsent = (type: string) => {
-    localStorage.setItem("cookie-consent", type);
-    if (type === "accepted-all") {
-      localStorage.setItem(
-        "cookie-preferences",
-        JSON.stringify({ necessary: true, analytics: true, marketing: true }),
-      );
-    } else if (type === "rejected-all") {
-      localStorage.setItem(
-        "cookie-preferences",
-        JSON.stringify({ necessary: true, analytics: false, marketing: false }),
-      );
-    } else if (type === "custom") {
-      localStorage.setItem("cookie-preferences", JSON.stringify(preferences));
-    }
-    window.dispatchEvent(new Event("cookie-consent-updated"));
+  const saveConsent = (analytics: boolean, marketing: boolean) => {
+    const saved = writeConsent({ analytics, marketing });
+    setPreferences(saved);
     setShow(false);
     setShowPreferences(false);
   };
 
-  const acceptAll = () => saveConsent("accepted-all");
-  const rejectAll = () => saveConsent("rejected-all");
-  const savePreferences = () => saveConsent("custom");
+  const acceptAll = () => saveConsent(true, true);
+  const rejectAll = () => saveConsent(false, false);
+  const savePreferences = () => saveConsent(preferences.analytics, preferences.marketing);
 
   if (!show) return null;
 
@@ -55,17 +58,17 @@ export default function CookieBanner() {
           <div className="cookie-text">
             <span style={{ fontSize: "20px" }}>🍪</span>
             <p>
-              {t("footer.cookieNotice") || "Our website uses cookies to improve your experience and analyze usage limits."}
+              {t("footer.cookieNotice") || "Optional cookies help us understand how the site is used. You can reject them and still use CVboosta."}
             </p>
           </div>
           <div className="cookie-actions">
-            <button className="btn ghost small" onClick={rejectAll}>
+            <button className="btn ghost small" type="button" onClick={rejectAll}>
               {t("common.rejectAll") || "Reject All"}
             </button>
-            <button className="btn ghost small" onClick={() => setShowPreferences(true)}>
+            <button className="btn ghost small" type="button" onClick={() => setShowPreferences(true)}>
               {t("common.customize") || "Customize"}
             </button>
-            <button className="btn primary small" onClick={acceptAll}>
+            <button className="btn primary small" type="button" onClick={acceptAll}>
               {t("common.acceptAll") || "Accept All"}
             </button>
           </div>
@@ -147,6 +150,8 @@ export default function CookieBanner() {
           >
             <button
               className="modal-close"
+              type="button"
+              aria-label={t("common.dismiss") || "Close cookie preferences"}
               onClick={() => setShowPreferences(false)}
             >
               &times;
@@ -196,6 +201,7 @@ export default function CookieBanner() {
             <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
               <button 
                 className="btn ghost" 
+                type="button"
                 style={{ flex: 1 }}
                 onClick={() => setShowPreferences(false)}
               >
@@ -203,6 +209,7 @@ export default function CookieBanner() {
               </button>
               <button 
                 className="btn primary" 
+                type="button"
                 style={{ flex: 1 }}
                 onClick={savePreferences}
               >

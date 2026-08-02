@@ -13,18 +13,27 @@ if settings.database_url and settings.database_url.startswith("sqlite"):
 # Other modules should use get_engine() and get_sessionlocal()
 _engine = None
 _SessionLocal = None
-_db_initialized = False
 
 def get_engine():
     global _engine
     if _engine is None:
         if not settings.database_url:
             return None
-        _engine = create_engine(
-            settings.database_url,
-            pool_pre_ping=True,
-            connect_args=connect_args,
-        )
+        engine_options: dict[str, object] = {
+            "pool_pre_ping": True,
+            "connect_args": connect_args,
+        }
+        if not settings.database_url.startswith("sqlite"):
+            engine_options.update(
+                {
+                    "pool_size": max(1, settings.db_pool_size),
+                    "max_overflow": max(0, settings.db_max_overflow),
+                    "pool_timeout": max(1, settings.db_pool_timeout_seconds),
+                    "pool_recycle": max(30, settings.db_pool_recycle_seconds),
+                    "pool_use_lifo": True,
+                }
+            )
+        _engine = create_engine(settings.database_url, **engine_options)
     return _engine
 
 def get_sessionlocal():
@@ -35,24 +44,10 @@ def get_sessionlocal():
             _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     return _SessionLocal
 
-def _ensure_db_init():
-    global _db_initialized
-    if not _db_initialized:
-        engine = get_engine()
-        if not engine:
-            return
-        from app.db.init_db import init_db
-        try:
-            init_db()
-            _db_initialized = True
-        except Exception as e:
-            print(f"Lazy DB init failed: {e}")
-
 def get_db() -> Generator[Session, None, None]:
     session_local = get_sessionlocal()
     if not session_local:
         raise RuntimeError("DATABASE_URL is not set or invalid.")
-    _ensure_db_init()
     db = session_local()
     try:
         yield db

@@ -18,11 +18,22 @@ os.environ["RATE_LIMIT_ENABLED"] = "false"
 os.environ["REQUEST_LOGGING_ENABLED"] = "false"
 os.environ.setdefault("JWT_SECRET", "unit_test_jwt_secret_0123456789abcdef")
 os.environ.setdefault("APP_ENV", "test")
+os.environ.setdefault("AUTH_COOKIE_SECURE", "false")
+os.environ.setdefault("NATIVE_AUTH_CLIENT_KEY", "unit-test-native-client-key-0123456789")
 
 from app.main import app  # noqa: E402
+from app.db.base import Base  # noqa: E402
+from app.db.session import get_engine  # noqa: E402
 
 
 @pytest.fixture()
 def client() -> TestClient:
+    # Every route test gets a clean database.  The previous process-wide DB
+    # made tests order-dependent (fixed user ids and globally unique push
+    # tokens leaked between otherwise unrelated tests).
+    engine = get_engine()
+    assert engine is not None
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     with TestClient(app) as client:
         yield client

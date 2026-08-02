@@ -1,13 +1,34 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from fastapi import HTTPException
 from sqlalchemy import case, update
 from sqlalchemy.orm import Session
 
+from app.models.billing import UserBillingEntitlement
 from app.models.user import User
-from app.services.app_store import consume_app_store_scan_credit, refresh_app_store_entitlement_from_transactions
+from app.services.app_store import (
+    consume_app_store_scan_credit,
+    get_app_store_scan_credit_balance,
+    refresh_app_store_entitlement_from_transactions,
+)
+
+
+@dataclass
+class ConsumptionReceipt:
+    """Identifies the exact balance changed by a quota consumption.
+
+    Keeping the bucket on the receipt makes failure refunds symmetric.  In
+    particular, a failed App Store single-scan can no longer decrement a
+    paid credit and then accidentally refund a daily allowance instead.
+    """
+
+    user_id: int
+    feature: str
+    bucket: str
+    refunded: bool = False
 
 
 _FEATURE_TO_COUNTER: dict[str, str] = {
@@ -29,7 +50,7 @@ def consume_feature_or_raise(
     user_id: int,
     feature: str,
     exhausted_detail: str,
-) -> User:
+) -> ConsumptionReceipt:
     """
     Atomically consume 1 unit of a feature quota for the user.
 
@@ -60,6 +81,29 @@ def consume_feature_or_raise(
         db.flush()
 
     tier = (user.subscription_tier or "free").strip().lower()
+    has_active_app_store_plan = bool(
+        entitlement
+        and entitlement.is_active
+        and entitlement.plan in {"go", "pro", "lifetime"}
+    )
+
+    # A standalone App Store single-scan is the paid entitlement for this
+    # request, so reserve it before touching any free/daily allowance.  Active
+    # subscribers keep their purchased single-scan balance for later.
+    if (
+        feature == "scan"
+        and get_app_store_scan_credit_balance(db, user_id) > 0
+        and not has_active_app_store_plan
+        and tier not in {"single", "go", "pro", "lifetime"}
+    ):
+        if consume_app_store_scan_credit(db, user_id):
+            db.commit()
+            return ConsumptionReceipt(
+                user_id=user_id,
+                feature=feature,
+                bucket="app_store_credit",
+            )
+
     now = datetime.now(timezone.utc)
     if tier != "single":
         if user.last_usage_reset is None or user.last_usage_reset.date() < now.date():
@@ -84,6 +128,7 @@ def consume_feature_or_raise(
         )
         if (result.rowcount or 0) <= 0:
             raise HTTPException(status_code=402, detail=exhausted_detail)
+        bucket = "single_credit"
     else:
         limits = user.get_limits()
         limit_key = _FEATURE_TO_LIMIT_KEY.get(feature, feature)
@@ -98,43 +143,68 @@ def consume_feature_or_raise(
         if (result.rowcount or 0) <= 0:
             if feature == "scan" and consume_app_store_scan_credit(db, user_id):
                 db.commit()
-                return db.query(User).filter(User.id == user_id).first()  # type: ignore[return-value]
+                return ConsumptionReceipt(
+                    user_id=user_id,
+                    feature=feature,
+                    bucket="app_store_credit",
+                )
             raise HTTPException(status_code=402, detail=exhausted_detail)
+        bucket = "daily_quota"
 
     db.commit()
-    return db.query(User).filter(User.id == user_id).first()  # type: ignore[return-value]
+    return ConsumptionReceipt(user_id=user_id, feature=feature, bucket=bucket)
 
 
 def refund_feature_best_effort(
     db: Session,
     *,
-    user_id: int,
-    feature: str,
+    receipt: ConsumptionReceipt | None,
 ) -> None:
     """Best-effort refund of a previously consumed quota unit."""
+    if receipt is None or receipt.refunded:
+        return
+    user_id = receipt.user_id
+    feature = receipt.feature
     counter_field = _FEATURE_TO_COUNTER.get(feature)
     if not counter_field:
         return
 
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return
 
-    tier = (user.subscription_tier or "free").strip().lower()
-    counter_col = getattr(User, counter_field)
-    if tier == "single":
-        db.execute(
-            update(User)
-            .where(User.id == user_id)
-            .values({counter_field: counter_col + 1})
-        )
-    else:
-        db.execute(
-            update(User)
-            .where(User.id == user_id)
-            .values({counter_field: case((counter_col > 0, counter_col - 1), else_=0)})
-        )
-    db.commit()
+        counter_col = getattr(User, counter_field)
+        if receipt.bucket == "app_store_credit":
+            result = db.execute(
+                update(UserBillingEntitlement)
+                .where(UserBillingEntitlement.user_id == user_id)
+                .values(
+                    scan_credit_balance=UserBillingEntitlement.scan_credit_balance + 1,
+                    updated_at=datetime.now(timezone.utc),
+                )
+            )
+            if (result.rowcount or 0) != 1:
+                db.rollback()
+                return
+        elif receipt.bucket == "single_credit":
+            db.execute(
+                update(User)
+                .where(User.id == user_id)
+                .values({counter_field: counter_col + 1})
+            )
+        elif receipt.bucket == "daily_quota":
+            db.execute(
+                update(User)
+                .where(User.id == user_id)
+                .values({counter_field: case((counter_col > 0, counter_col - 1), else_=0)})
+            )
+        else:
+            return
+        db.commit()
+        receipt.refunded = True
+    except Exception:
+        db.rollback()
 
 
 def tier_includes_app_store_plan(tier: str | None) -> bool:

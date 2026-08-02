@@ -41,7 +41,7 @@ declare global {
 
 type Props = {
   mode: "login" | "register";
-  onSuccess: (data: { access_token: string; email?: string }) => void;
+  onSuccess: (data: { access_token?: string; email?: string }) => void;
   onError: (message: string) => void;
   disabled?: boolean;
 };
@@ -108,7 +108,7 @@ export default function SocialAuthButtons({
       if (!response.ok) {
         throw new Error(parseOAuthError(payload));
       }
-      onSuccess(payload as { access_token: string; email?: string });
+      onSuccess(payload as { access_token?: string; email?: string });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Social login failed";
       onError(msg);

@@ -536,50 +536,40 @@ function roleMistakes(role: string, category: RoleCategory): string[] {
 
 function roleExamples(role: string, category: RoleCategory): ResumeKeywordExample[] {
   const h = hashString(role);
-  const initiativeCount = 2 + (h % 5);
-  const speedGain = 12 + (h % 23);
-  const qualityFrom = 70 + (h % 16);
-  const qualityTo = qualityFrom + 8 + (h % 9);
-  const lagCut = 18 + (h % 21);
   const impactArea = CATEGORY_IMPACT_AREAS[category][Math.floor(h / 7) % CATEGORY_IMPACT_AREAS[category].length];
-  const processGain = 10 + (h % 19);
-  const costReduction = 6 + (h % 16);
   return [
     {
       before: "Responsible for multiple cross-team initiatives.",
-      after: `Led ${initiativeCount} cross-functional ${role.toLowerCase()} initiatives, improving ${impactArea} by ${speedGain}% within two quarters.`,
+      after: `Illustrative template — led [number] cross-functional ${role.toLowerCase()} initiatives, improving ${impactArea} by [X%] within [time period].`,
     },
     {
       before: "Worked on process improvements.",
-      after: `Redesigned core ${role.toLowerCase()} workflow and improved quality KPI from ${qualityFrom}% to ${qualityTo}% in 6 months.`,
+      after: `Illustrative template — redesigned a core ${role.toLowerCase()} workflow and improved a verified quality KPI from [baseline] to [measured result] within [time period].`,
     },
     {
       before: "Helped with reporting and communication.",
-      after: `Built weekly ${role.toLowerCase()} reporting cadence for leadership, cutting decision lag by ${lagCut}%.`,
+      after: `Illustrative template — built a ${role.toLowerCase()} reporting cadence for leadership, cutting verified decision lag by [X%].`,
     },
     {
       before: "Collaborated on process improvements and documentation.",
-      after: `Standardized ${role.toLowerCase()} workflows and documentation, improving process consistency by ${processGain}% across teams.`,
+      after: `Illustrative template — standardized ${role.toLowerCase()} workflows and documentation, improving verified process consistency by [X%] across [number] teams.`,
     },
     {
       before: "Supported optimization initiatives across departments.",
-      after: `Partnered across teams to optimize ${role.toLowerCase()} operations, reducing avoidable cost and rework by ${costReduction}%.`,
+      after: `Illustrative template — partnered across teams to optimize ${role.toLowerCase()} operations, reducing verified avoidable cost and rework by [X%].`,
     },
   ];
 }
 
 function roleFaq(role: string, category: RoleCategory): ResumeKeywordFaq[] {
   const h = hashString(role);
-  const keywordMin = 18 + (h % 8);
-  const keywordMax = keywordMin + 10 + (h % 7);
   const track = CATEGORY_TRACKS[category][h % CATEGORY_TRACKS[category].length];
   const impactArea = CATEGORY_IMPACT_AREAS[category][Math.floor(h / 11) % CATEGORY_IMPACT_AREAS[category].length];
-  const docLength = 720 + (h % 360);
   return [
     {
       question: `How many keywords should a ${role} resume include?`,
       answer:
-        `Aim for relevance first: usually ${keywordMin}-${keywordMax} role-specific terms distributed across summary, skills, and recent experience. Prioritize repeated vacancy terms tied to ${impactArea}.`,
+        `Aim for relevance first rather than a fabricated keyword quota. Use truthful role-specific terms where they naturally fit in the summary, skills, and recent experience, prioritizing repeated vacancy terms tied to ${impactArea}.`,
     },
     {
       question: `Where should I place ${role} keywords in my resume?`,
@@ -604,7 +594,7 @@ function roleFaq(role: string, category: RoleCategory): ResumeKeywordFaq[] {
     {
       question: `How long should a ${role} resume be for ATS and hiring teams?`,
       answer:
-        `For most applicants, one to two pages is enough. Aim for around ${docLength}-${docLength + 180} words of high-signal content with clear metrics, not filler text.`,
+        "For most applicants, one to two pages is enough. Prioritize high-signal content and verified metrics rather than padding the document to an arbitrary word count.",
     },
     {
       question: `How often should I update my ${role} resume while job searching?`,

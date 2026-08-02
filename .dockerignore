@@ -1,4 +1,7 @@
 .git
+.env
+.env.*
+!.env.example
 .venv
 venv
 __pycache__
@@ -9,3 +12,6 @@ node_modules
 .DS_Store
 scratch/
 ml/models/tmp/
+*.pem
+*.key
+*.p8

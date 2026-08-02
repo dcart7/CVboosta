@@ -238,7 +238,7 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
   const ctaTitle = tr("blog.cta.title", "Tailor your resume with CVBoosta");
   const ctaBody = tr(
     "blog.cta.body",
-    "Run a safe ATS scan and generate an optimized version in ~60 seconds. Review every edit before export.",
+    "Compare your resume with a vacancy, generate an optimized draft, and review every edit for accuracy before export.",
   );
   const ctaPrimary = tr("blog.cta.primary", "Optimize my resume");
   const ctaSecondary = tr("blog.cta.secondary", "Free ATS checker");
@@ -311,7 +311,7 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
             <div className="blog-post-section card">
               <h2>ATS Optimization Checklist (Practical, Evidence-First)</h2>
               {renderMarkdownLite(
-                "If you’re using this article as a playbook, here’s a repeatable checklist that works across most roles and ATS systems. It’s designed to improve both ATS match and recruiter readability.\n\n" +
+                "If you’re using this article as a playbook, here’s a repeatable starting checklist for reviewing parsing, vacancy alignment, and readability. Always verify the imported fields in the application system.\n\n" +
                   "### 1) Confirm clean parsing before optimizing content\n" +
                   "- Use a one-column layout\n" +
                   "- Avoid tables and text boxes for critical text\n" +
@@ -333,18 +333,18 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
                   "A keyword in Experience with proof is stronger than the same keyword in Skills with no context.\n\n" +
                   "### 4) Rewrite bullets using an ATS-friendly formula\n" +
                   "Use: **Action + System/Scope + Keyword + Result**.\n\n" +
-                  "Examples that read human:\n" +
-                  "- “Built X using Y; improved Z by 20%.”\n" +
-                  "- “Implemented A with B; reduced errors and improved reliability.”\n" +
-                  "- “Migrated from A to B; reduced costs and improved stability.”\n\n" +
+                  "Illustrative templates (replace every bracketed field with your verified data):\n" +
+                  "- “Built [system] using [tool]; changed [metric] by [X%].”\n" +
+                  "- “Implemented [change] with [tool]; recorded [measured quality result].”\n" +
+                  "- “Migrated from [before] to [after]; changed [metric] by [X%].”\n\n" +
                   "If you don’t have metrics, use scope and outcomes: users served, stakeholders supported, time saved, incidents reduced, quality improved, revenue protected.\n\n" +
-                  "### 5) Prioritize the highest-leverage edits\n" +
-                  "You usually don’t need a full rewrite. Start with the pieces that drive most decisions:\n" +
+                  "### 5) Prioritize relevant edits\n" +
+                  "You may not need a full rewrite. Start with the sections most closely tied to the target role:\n" +
                   "- Summary (target role + 2–3 core keywords)\n" +
                   "- Skills (clean grouping)\n" +
                   "- First 3–6 bullets in your most recent relevant role\n\n" +
                   "Once those are aligned, the rest of the resume becomes supporting evidence rather than the primary match driver.\n\n" +
-                  "### 6) Use CVBoosta to tailor in ~60 seconds\n" +
+                  "### 6) Use CVBoosta to support tailoring\n" +
                   "CVBoosta helps you:\n" +
                   "- see a match score snapshot\n" +
                   "- identify missing keywords vs the vacancy\n" +
@@ -353,18 +353,18 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
                   "1. Upload your resume and paste the job description.\n" +
                   "2. Review missing keywords and pick the top gaps you can support.\n" +
                   "3. Generate an optimized draft, then edit for accuracy and voice.\n" +
-                  "4. Re-run once to confirm the biggest gaps are closed.\n\n" +
+                  "4. Re-run once to review whether the supported gaps changed.\n\n" +
                   "Quick actions (safe, reviewable):\n" +
                   "- **[Optimize my resume](/app)**\n" +
                   "- **[Browse resume keywords by role](/resume-keywords)**\n\n" +
-                  "### 7) Avoid the 3 most common ATS mistakes\n" +
+                  "### 7) Review three common resume issues\n" +
                   "- **Keyword stuffing:** repeating tools without proof (hurts readability and trust)\n" +
                   "- **Template complexity:** columns, tables, icons that break parsing\n" +
                   "- **Vague bullets:** “worked on / helped with” without outcomes\n\n" +
-                  "Fix those three and most resumes move up significantly.\n\n" +
+                  "These checks can improve clarity, but they do not guarantee a higher score, ATS progression, or an interview.\n\n" +
                   "### 8) Mini-FAQ\n" +
                   "#### Do I need to match every keyword?\n" +
-                  "No. Match the role’s *core* requirements and prove them. A smaller set of high-impact terms placed with evidence beats a giant list.\n\n" +
+                  "No. Focus on the role’s *core* requirements that you can prove. A concise evidence-backed set is easier to read than a giant list.\n\n" +
                   "#### Should I copy sentences from the job post?\n" +
                   "Avoid copying full sentences. Mirror terminology where accurate, but write in your own voice and tie it to your results.\n\n" +
                   "#### What if I lack experience with a key tool?\n" +
@@ -372,7 +372,7 @@ export default function BlogPostClient({ post, relatedRoles }: BlogPostClientPro
                   "### 9) Read next (internal guides)\n" +
                   "- [How to Tailor Resume to Job Description](/blog/tailor-resume-to-job-description)\n" +
                   "- [Top ATS Resume Mistakes to Avoid](/blog/ats-resume-mistakes)\n" +
-                  "- [How to Improve ATS Resume Score](/blog/improve-ats-resume-score)\n"
+                  "- [How to Review ATS Resume Alignment](/blog/improve-ats-resume-score)\n"
               )}
             </div>
           )}

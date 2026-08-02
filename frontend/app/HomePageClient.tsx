@@ -3,26 +3,10 @@
 import Link from "next/link";
 import TopNav from "./components/TopNav";
 import HeroActions from "./components/HeroActions";
-import BrandMarquee from "./components/BrandMarquee";
 import { useTranslation } from "./lib/LanguageContext";
 
 export default function HomePage() {
   const { t, language } = useTranslation();
-
-  const optimizedForCompanies = [
-    "apple",
-    "google",
-    "amazon",
-    "meta",
-    "spotify",
-    "ibm",
-    "openai",
-    "microsoft",
-    "netflix",
-    "nvidia",
-    "salesforce",
-    "uber",
-  ] as const;
 
   const localizedProjectInfo = {
     en: {
@@ -224,58 +208,210 @@ export default function HomePage() {
 
   const conversionUi = {
     en: {
-      ctaAction: "Upload your CV — get results in 60 seconds",
-      freeScore: "Free ATS score instantly",
-      firstTryFree: "First resume optimization is free",
       control: "You stay in control — edit before export. Nothing is auto-submitted.",
-      verified: "Verified beta user",
-      caseProof: "Case study details available on request.",
-      priceValue: "Same output quality. Faster workflow for rapid iteration.",
     },
     uk: {
-      ctaAction: "Завантажте CV — отримайте результат за 60 секунд",
-      freeScore: "Безкоштовний ATS score одразу",
-      firstTryFree: "Перша спроба безкоштовна",
       control: "Ви контролюєте результат — редагуєте перед експортом. Нічого не надсилається автоматично.",
-      verified: "Перевірений beta-користувач",
-      caseProof: "Деталі кейсів доступні за запитом.",
-      priceValue: "Той самий рівень результату. Швидший workflow для швидких ітерацій.",
     },
     pl: {
-      ctaAction: "Prześlij CV — otrzymaj wynik w 60 sekund",
-      freeScore: "Darmowy ATS score od razu",
-      firstTryFree: "Pierwszy skan za darmo",
       control: "Masz pełną kontrolę — edytujesz przed eksportem. Nic nie wysyła się automatycznie.",
-      verified: "Zweryfikowany użytkownik beta",
-      caseProof: "Szczegóły case study dostępne na życzenie.",
-      priceValue: "Ta sama jakość wyniku. Szybszy workflow do szybkich iteracji.",
     },
     sk: {
-      ctaAction: "Nahrajte CV — výsledok získate za 60 sekúnd",
-      freeScore: "Bezplatný ATS score okamžite",
-      firstTryFree: "Prvý sken je zadarmo",
       control: "Máte kontrolu — upravíte pred exportom. Nič sa neodosiela automaticky.",
-      verified: "Overený beta používateľ",
-      caseProof: "Detaily case study sú dostupné na požiadanie.",
-      priceValue: "Rovnaká kvalita výsledku. Rýchlejší workflow pre rýchle iterácie.",
     },
     cs: {
-      ctaAction: "Nahrajte CV — výsledek získáte za 60 sekund",
-      freeScore: "Free ATS score okamžitě",
-      firstTryFree: "První sken zdarma",
       control: "Máte kontrolu — upravíte před exportem. Nic se neodesílá automaticky.",
-      verified: "Ověřený beta uživatel",
-      caseProof: "Detaily case study jsou dostupné na vyžádání.",
-      priceValue: "Stejná kvalita výstupu. Rychlejší workflow pro rychlé iterace.",
     },
     es: {
-      ctaAction: "Sube tu CV — obtén resultados en 60 segundos",
-      freeScore: "ATS score gratis al instante",
-      firstTryFree: "Primer escaneo gratis",
       control: "Tú mantienes el control: editas antes de exportar. Nada se envía automáticamente.",
-      verified: "Usuario beta verificado",
-      caseProof: "Detalles de casos disponibles bajo solicitud.",
-      priceValue: "Misma calidad de resultado. Workflow más rápido para iterar.",
+    },
+  }[language];
+
+  const honestContent = {
+    en: {
+      hookLabel: "See how your CV matches a real vacancy",
+      hookTitle: "Find the gaps before you apply.",
+      hookSubtitle:
+        "Upload your CV and paste a job description to compare the language, identify missing signals, and review a clearer draft based only on your real experience.",
+      ctaAction: "Start with a free job-match preview",
+      freeScore: "Free match preview",
+      paidFeature: "Full rewrite and export are paid features",
+      metric1: "CV ↔ Job",
+      metric1Label: "side-by-side role match",
+      metric2: "Top gaps",
+      metric2Label: "prioritized before rewriting",
+      metric3: "You decide",
+      metric3Label: "review every suggested change",
+      scoreNote:
+        "The match score describes overlap with the vacancy. It cannot guarantee ATS passage, an interview, or a hiring outcome.",
+      demoTitle: "Illustrative wording example",
+      beforeLabel: "Original wording",
+      afterLabel: "Clearer wording",
+      beforeText: "Responsible for the product roadmap and communication across teams.",
+      afterText: "Owned the product roadmap and coordinated priorities across teams.",
+      exampleNote: "The example improves clarity without adding teams, metrics, tools, or results that were not supplied by the candidate.",
+      trustTitle: "What you can expect from CVboosta",
+      trustLead: "Clear product principles instead of anonymous success claims.",
+      cards: [
+        ["No invented experience", "Suggestions should preserve the facts, scope, and results you provide."],
+        ["A transparent score", "The score reflects job-description overlap, not a promise from an employer or ATS vendor."],
+        ["Private by default", "Nothing is submitted to an employer. You review and export the draft yourself."],
+      ],
+      priceTitle: "See value before choosing a plan",
+      priceText: "Start with the free match preview. If the gaps are useful, you can choose a paid option for the full rewrite and export.",
+    },
+    uk: {
+      hookLabel: "Перевірте, як ваше CV відповідає реальній вакансії",
+      hookTitle: "Знайдіть прогалини до відгуку на вакансію.",
+      hookSubtitle:
+        "Завантажте CV і вставте опис вакансії, щоб порівняти формулювання, знайти відсутні сигнали та переглянути чіткіший драфт лише на основі вашого реального досвіду.",
+      ctaAction: "Почніть із безкоштовного прев’ю відповідності",
+      freeScore: "Безкоштовне прев’ю match score",
+      paidFeature: "Повний rewrite та експорт — платні функції",
+      metric1: "CV ↔ Вакансія",
+      metric1Label: "порівняння з вимогами ролі",
+      metric2: "Головні прогалини",
+      metric2Label: "пріоритети до переписування",
+      metric3: "Вирішуєте ви",
+      metric3Label: "перевіряйте кожну запропоновану зміну",
+      scoreNote:
+        "Match score показує збіг з текстом вакансії. Він не гарантує проходження ATS, співбесіду чи найм.",
+      demoTitle: "Ілюстративний приклад формулювання",
+      beforeLabel: "Початкове формулювання",
+      afterLabel: "Чіткіше формулювання",
+      beforeText: "Відповідав за roadmap продукту та комунікацію між командами.",
+      afterText: "Керував roadmap продукту та координував пріоритети між командами.",
+      exampleNote: "Приклад покращує ясність, не додаючи команд, метрик, інструментів або результатів, яких кандидат не надав.",
+      trustTitle: "Чого очікувати від CVboosta",
+      trustLead: "Прозорі принципи продукту замість анонімних обіцянок успіху.",
+      cards: [
+        ["Без вигаданого досвіду", "Пропозиції мають зберігати факти, масштаб і результати, які ви надали."],
+        ["Прозорий score", "Score відображає збіг із вакансією, а не обіцянку роботодавця чи ATS-вендора."],
+        ["Приватність за замовчуванням", "Нічого не надсилається роботодавцю. Ви самі перевіряєте й експортуєте драфт."],
+      ],
+      priceTitle: "Оцініть користь до вибору плану",
+      priceText: "Почніть із безкоштовного прев’ю. Якщо аналіз корисний, оберіть платну опцію для повного rewrite та експорту.",
+    },
+    pl: {
+      hookLabel: "Sprawdź dopasowanie CV do prawdziwej oferty",
+      hookTitle: "Znajdź luki, zanim wyślesz aplikację.",
+      hookSubtitle:
+        "Prześlij CV i wklej opis stanowiska, aby porównać język, znaleźć brakujące sygnały i przejrzeć czytelniejszy draft oparty wyłącznie na Twoim doświadczeniu.",
+      ctaAction: "Zacznij od bezpłatnego podglądu dopasowania",
+      freeScore: "Bezpłatny podgląd match score",
+      paidFeature: "Pełny rewrite i eksport są płatne",
+      metric1: "CV ↔ Oferta",
+      metric1Label: "porównanie z wymaganiami roli",
+      metric2: "Najważniejsze luki",
+      metric2Label: "priorytety przed poprawą tekstu",
+      metric3: "Ty decydujesz",
+      metric3Label: "sprawdź każdą sugerowaną zmianę",
+      scoreNote: "Match score opisuje zgodność z ofertą. Nie gwarantuje przejścia ATS, rozmowy ani zatrudnienia.",
+      demoTitle: "Ilustracyjny przykład redakcji",
+      beforeLabel: "Pierwotne sformułowanie",
+      afterLabel: "Jaśniejsze sformułowanie",
+      beforeText: "Odpowiedzialny za roadmap produktu i komunikację między zespołami.",
+      afterText: "Prowadziłem roadmap produktu i koordynowałem priorytety między zespołami.",
+      exampleNote: "Przykład poprawia jasność bez dodawania zespołów, liczb, narzędzi ani wyników, których kandydat nie podał.",
+      trustTitle: "Czego możesz oczekiwać od CVboosta",
+      trustLead: "Jasne zasady produktu zamiast anonimowych obietnic sukcesu.",
+      cards: [
+        ["Bez zmyślonego doświadczenia", "Sugestie powinny zachować podane przez Ciebie fakty, zakres i wyniki."],
+        ["Przejrzysty score", "Score mierzy zgodność z ofertą, a nie obietnicę pracodawcy lub dostawcy ATS."],
+        ["Prywatność domyślnie", "Nic nie trafia do pracodawcy. Samodzielnie sprawdzasz i eksportujesz draft."],
+      ],
+      priceTitle: "Sprawdź wartość przed wyborem planu",
+      priceText: "Zacznij od bezpłatnego podglądu. Jeśli analiza jest przydatna, wybierz płatną opcję pełnego rewrite i eksportu.",
+    },
+    sk: {
+      hookLabel: "Pozrite sa, ako sa CV zhoduje s reálnou pozíciou",
+      hookTitle: "Nájdite medzery ešte pred odoslaním žiadosti.",
+      hookSubtitle: "Nahrajte CV a vložte popis práce. Porovnáme jazyk, ukážeme chýbajúce signály a návrh založený iba na vašich skúsenostiach.",
+      ctaAction: "Začnite bezplatným náhľadom zhody",
+      freeScore: "Bezplatný náhľad match score",
+      paidFeature: "Úplný rewrite a export sú platené",
+      metric1: "CV ↔ Pozícia",
+      metric1Label: "porovnanie s požiadavkami role",
+      metric2: "Hlavné medzery",
+      metric2Label: "priority pred prepisom",
+      metric3: "Rozhodujete vy",
+      metric3Label: "skontrolujte každú navrhnutú zmenu",
+      scoreNote: "Match score opisuje zhodu s pozíciou. Nezaručuje prejdenie ATS, pohovor ani prijatie.",
+      demoTitle: "Ilustračný príklad formulácie",
+      beforeLabel: "Pôvodná formulácia",
+      afterLabel: "Jasnejšia formulácia",
+      beforeText: "Zodpovedný za produktový roadmap a komunikáciu medzi tímami.",
+      afterText: "Riadil produktový roadmap a koordinoval priority medzi tímami.",
+      exampleNote: "Príklad zlepšuje jasnosť bez pridania tímov, metrík, nástrojov alebo výsledkov, ktoré kandidát neuviedol.",
+      trustTitle: "Čo môžete od CVboosta očakávať",
+      trustLead: "Jasné princípy produktu namiesto anonymných sľubov úspechu.",
+      cards: [
+        ["Bez vymyslených skúseností", "Návrhy majú zachovať fakty, rozsah a výsledky, ktoré uvediete."],
+        ["Transparentné skóre", "Skóre meria zhodu s pozíciou, nie prísľub zamestnávateľa alebo ATS."],
+        ["Súkromie od začiatku", "Nič sa neposiela zamestnávateľovi. Návrh kontrolujete a exportujete vy."],
+      ],
+      priceTitle: "Overte si hodnotu pred výberom plánu",
+      priceText: "Začnite bezplatným náhľadom. Ak je analýza užitočná, vyberte si platenú možnosť úplného prepisu a exportu.",
+    },
+    cs: {
+      hookLabel: "Zjistěte, jak CV odpovídá skutečné pozici",
+      hookTitle: "Najděte mezery ještě před odesláním žádosti.",
+      hookSubtitle: "Nahrajte CV a vložte popis práce. Porovnáme jazyk, ukážeme chybějící signály a návrh založený pouze na vašich zkušenostech.",
+      ctaAction: "Začněte bezplatným náhledem shody",
+      freeScore: "Bezplatný náhled match score",
+      paidFeature: "Úplný rewrite a export jsou placené",
+      metric1: "CV ↔ Pozice",
+      metric1Label: "porovnání s požadavky role",
+      metric2: "Hlavní mezery",
+      metric2Label: "priority před přepisem",
+      metric3: "Rozhodujete vy",
+      metric3Label: "zkontrolujte každou navrženou změnu",
+      scoreNote: "Match score popisuje shodu s pozicí. Nezaručuje průchod ATS, pohovor ani přijetí.",
+      demoTitle: "Ilustrační příklad formulace",
+      beforeLabel: "Původní formulace",
+      afterLabel: "Jasnější formulace",
+      beforeText: "Odpovědný za produktový roadmap a komunikaci mezi týmy.",
+      afterText: "Řídil produktový roadmap a koordinoval priority mezi týmy.",
+      exampleNote: "Příklad zlepšuje srozumitelnost bez přidání týmů, metrik, nástrojů nebo výsledků, které kandidát neuvedl.",
+      trustTitle: "Co můžete od CVboosta očekávat",
+      trustLead: "Jasné principy produktu místo anonymních slibů úspěchu.",
+      cards: [
+        ["Bez vymyšlených zkušeností", "Návrhy mají zachovat fakta, rozsah a výsledky, které uvedete."],
+        ["Transparentní skóre", "Skóre měří shodu s pozicí, ne příslib zaměstnavatele nebo ATS."],
+        ["Soukromí od začátku", "Nic se neposílá zaměstnavateli. Návrh kontrolujete a exportujete vy."],
+      ],
+      priceTitle: "Ověřte si hodnotu před výběrem plánu",
+      priceText: "Začněte bezplatným náhledem. Pokud je analýza užitečná, zvolte placenou možnost úplného přepisu a exportu.",
+    },
+    es: {
+      hookLabel: "Comprueba cómo encaja tu CV con una vacante real",
+      hookTitle: "Detecta las brechas antes de postularte.",
+      hookSubtitle: "Sube tu CV y pega una oferta para comparar el lenguaje, detectar señales ausentes y revisar un borrador basado únicamente en tu experiencia real.",
+      ctaAction: "Empieza con una vista previa gratuita",
+      freeScore: "Vista previa gratuita del match score",
+      paidFeature: "La reescritura completa y la exportación son de pago",
+      metric1: "CV ↔ Vacante",
+      metric1Label: "comparación con los requisitos",
+      metric2: "Brechas clave",
+      metric2Label: "priorizadas antes de reescribir",
+      metric3: "Tú decides",
+      metric3Label: "revisa cada cambio sugerido",
+      scoreNote: "El match score describe la coincidencia con la vacante. No garantiza pasar un ATS, una entrevista ni una contratación.",
+      demoTitle: "Ejemplo ilustrativo de redacción",
+      beforeLabel: "Redacción original",
+      afterLabel: "Redacción más clara",
+      beforeText: "Responsable del roadmap del producto y la comunicación entre equipos.",
+      afterText: "Gestioné el roadmap del producto y coordiné las prioridades entre equipos.",
+      exampleNote: "El ejemplo mejora la claridad sin añadir equipos, métricas, herramientas o resultados no aportados por la persona.",
+      trustTitle: "Qué puedes esperar de CVboosta",
+      trustLead: "Principios claros del producto en lugar de promesas anónimas de éxito.",
+      cards: [
+        ["Sin experiencia inventada", "Las sugerencias deben conservar los hechos, el alcance y los resultados que aportas."],
+        ["Un score transparente", "El score mide coincidencia con la vacante, no una promesa del empleador o proveedor ATS."],
+        ["Privacidad por defecto", "Nada se envía al empleador. Tú revisas y exportas el borrador."],
+      ],
+      priceTitle: "Comprueba el valor antes de elegir un plan",
+      priceText: "Empieza con la vista previa gratuita. Si el análisis te sirve, elige una opción de pago para la reescritura y exportación completas.",
     },
   }[language];
 
@@ -336,288 +472,43 @@ export default function HomePage() {
     },
   }[language];
 
+  // Keep homepage claims factual and independent of unverified outcomes.
   const conversionContent = {
     en: {
-      hookLabel: "Stop getting ignored by recruiters",
-      hookTitle: "Get more interviews — without changing your experience.",
-      hookSubtitle:
-        "Most candidates fail ATS pre-screening. Upload your CV and role now to turn weak bullets into interview-ready proof.",
-      kpiA: "average ATS score lift",
-      kpiB: "from upload to first draft",
-      kpiC: "faster tailoring per vacancy",
-      kpiNote:
-        "Internal benchmark (100+ test CVs): score improved from 48 to 91 using the same candidate data.",
-      demoTitle: "Before / after preview",
-      demoLeftTitle: "Before (weak signal)",
-      demoRightTitle: "After (hire-ready signal)",
-      beforeText: "\"Responsible for product roadmap and cross-team communication.\"",
-      afterText:
-        "\"Led quarterly roadmap across 3 squads, shipped 6 priority features, and increased activation by 21% within two release cycles.\"",
       demoImpactTitle: "What changed",
-      demoImpact1: "Keyword alignment added without keyword stuffing.",
-      demoImpact2: "Impact phrasing upgraded from task-based to result-based.",
-      demoImpact3: "ATS readability improved with cleaner structure and priorities.",
-      trustTitle: "Trust from real beta users",
-      trustLead:
-        "Names are partially hidden by request, but each case includes a measurable outcome and timeline.",
-      priceTitle: "Why pricing starts low",
-      priceDesc:
-        "Built for value: comparable output to $49 tools, faster and cheaper to validate before you commit.",
-      proofCases: [
-        {
-          name: "A. M.",
-          role: "Product Manager, B2B SaaS (Berlin, Germany)",
-          outcome: "ATS match score: 52 -> 89. Interview invite in 4 days.",
-          note: "Profile redacted by request. Role, timeline, and score delta confirmed during onboarding.",
-        },
-        {
-          name: "S. K.",
-          role: "Backend Engineer, Fintech (Warsaw, Poland)",
-          outcome: "Missing critical keywords: 7 -> 1 after rewrite and keyword map pass.",
-          note: "Anonymous beta case. Role, country, and before/after snapshot verified.",
-        },
-        {
-          name: "E. R.",
-          role: "UX Researcher, HealthTech (Valencia, Spain)",
-          outcome: "Application-to-interview ratio improved from 1/18 to 1/7 in 3 weeks.",
-          note: "Identity redacted; progress benchmark tracked on same role family.",
-        },
-      ],
+      demoImpact1: "Role-relevant wording is surfaced without keyword stuffing.",
+      demoImpact2: "Ownership is made clearer without adding unsupported results.",
+      demoImpact3: "The structure is easier to scan and review.",
     },
     uk: {
-      hookLabel: "Припиніть залишатися без відповіді від рекрутерів",
-      hookTitle: "Отримуйте більше співбесід\u00A0— без зміни вашого досвіду.",
-      hookSubtitle:
-        "Більшість кандидатів не проходять ATS-первинний відбір. Завантажте CV і роль зараз, щоб перетворити слабкі bullets на доказ результату.",
-      kpiA: "середнє зростання ATS score",
-      kpiB: "від завантаження до першого драфту",
-      kpiC: "швидше адаптування під вакансію",
-      kpiNote:
-        "Приклад бенчмарку: score зріс з 48 до 91 на тестовій вакансії з тими самими даними кандидата.",
-      demoTitle: "Приклад до / після",
-      demoLeftTitle: "До (слабкий сигнал)",
-      demoRightTitle: "Після (сигнал, готовий до найму)",
-      beforeText: "\"Відповідав за roadmap продукту та комунікацію між командами.\"",
-      afterText:
-        "\"Очолив квартальний roadmap для 3 скводів, запустив 6 пріоритетних фіч і підвищив активацію на 21% за два релізні цикли.\"",
       demoImpactTitle: "Що змінилося",
-      demoImpact1: "Додано релевантні ключові слова без keyword stuffing.",
-      demoImpact2: "Формулювання змінено з опису задач на опис результату.",
-      demoImpact3: "Покращено ATS-читабельність завдяки чистішій структурі й пріоритетам.",
-      trustTitle: "Довіра від реальних beta-користувачів",
-      trustLead:
-        "Імена частково приховані за запитом, але кожен кейс має вимірюваний результат і таймлайн.",
-      priceTitle: "Чому стартова ціна низька",
-      priceDesc:
-        "Сильне співвідношення ціни та результату: порівнюваний output із інструментами за $49, але швидше й дешевше для перевірки.",
-      proofCases: [
-        {
-          name: "A. M.",
-          role: "Product Manager, B2B SaaS (Берлін, Німеччина)",
-          outcome: "ATS score: 52 -> 89. Запрошення на співбесіду за 4 дні.",
-          note: "Профіль редаговано на запит. Роль, таймлайн і дельта score підтверджені на онбордингу.",
-        },
-        {
-          name: "S. K.",
-          role: "Backend Engineer, Fintech (Варшава, Польща)",
-          outcome: "Критично відсутні ключові слова: 7 -> 1 після rewrite і keyword map.",
-          note: "Анонімний beta-кейс. Роль, країну та before/after snapshot верифіковано.",
-        },
-        {
-          name: "E. R.",
-          role: "UX Researcher, HealthTech (Валенсія, Іспанія)",
-          outcome: "Співвідношення заявка/співбесіда покращилося з 1/18 до 1/7 за 3 тижні.",
-          note: "Ідентичність прихована; бенчмарк відстежено в межах однієї групи ролей.",
-        },
-      ],
+      demoImpact1: "Релевантні формулювання виділено без keyword stuffing.",
+      demoImpact2: "Відповідальність описано чіткіше без непідтверджених результатів.",
+      demoImpact3: "Структуру легше переглядати й перевіряти.",
     },
     pl: {
-      hookLabel: "Przestań być ignorowany przez rekruterów",
-      hookTitle: "Zdobywaj więcej rozmów — bez zmiany swojego doświadczenia.",
-      hookSubtitle:
-        "Większość kandydatów odpada na wstępnym ATS. Prześlij CV i rolę teraz, aby zamienić słabe bullet points w dowód efektu.",
-      kpiA: "średni wzrost ATS score",
-      kpiB: "od uploadu do pierwszego draftu",
-      kpiC: "szybsze dopasowanie pod ofertę",
-      kpiNote:
-        "Przykładowy benchmark: score wzrósł z 48 do 91 na testowej ofercie przy tych samych danych kandydata.",
-      demoTitle: "Podgląd przed / po",
-      demoLeftTitle: "Przed (słaby sygnał)",
-      demoRightTitle: "Po (sygnał gotowy na rekrutację)",
-      beforeText: "\"Odpowiedzialny za roadmap produktu i komunikację między zespołami.\"",
-      afterText:
-        "\"Prowadziłem kwartalny roadmap dla 3 squadów, wdrożyłem 6 priorytetowych funkcji i zwiększyłem aktywację o 21% w dwóch cyklach release.\"",
       demoImpactTitle: "Co się zmieniło",
-      demoImpact1: "Dodano dopasowane słowa kluczowe bez keyword stuffing.",
-      demoImpact2: "Język zmieniono z opisu zadań na opis efektów.",
-      demoImpact3: "Poprawiono czytelność ATS dzięki lepszej strukturze i priorytetom.",
-      trustTitle: "Zaufanie od realnych użytkowników beta",
-      trustLead:
-        "Nazwy są częściowo ukryte na prośbę użytkowników, ale każdy case ma mierzalny wynik i timeline.",
-      priceTitle: "Dlaczego cena startowa jest niska",
-      priceDesc:
-        "Mocny value-for-money: porównywalny output do narzędzi za $49, ale szybciej i taniej na start.",
-      proofCases: [
-        {
-          name: "A. M.",
-          role: "Product Manager, B2B SaaS (Berlin, Niemcy)",
-          outcome: "ATS score: 52 -> 89. Zaproszenie na rozmowę po 4 dniach.",
-          note: "Profil zanonimizowany na prośbę. Rola, timeline i delta score potwierdzone na onboardingu.",
-        },
-        {
-          name: "S. K.",
-          role: "Backend Engineer, Fintech (Warszawa, Polska)",
-          outcome: "Brakujące kluczowe słowa: 7 -> 1 po rewrite i keyword map.",
-          note: "Anonimowy case beta. Rola, kraj i before/after snapshot zostały zweryfikowane.",
-        },
-        {
-          name: "E. R.",
-          role: "UX Researcher, HealthTech (Walencja, Hiszpania)",
-          outcome: "Relacja aplikacja/rozmowa poprawiła się z 1/18 do 1/7 w 3 tygodnie.",
-          note: "Tożsamość ukryta; benchmark śledzony w ramach tej samej grupy ról.",
-        },
-      ],
+      demoImpact1: "Trafne sformułowania są widoczne bez keyword stuffingu.",
+      demoImpact2: "Odpowiedzialność jest jaśniejsza bez dodawania niepotwierdzonych wyników.",
+      demoImpact3: "Strukturę łatwiej przeskanować i sprawdzić.",
     },
     sk: {
-      hookLabel: "Prestaňte byť ignorovaní recruitermi",
-      hookTitle: "Získajte viac pohovorov — bez zmeny vašich skúseností.",
-      hookSubtitle:
-        "Väčšina kandidátov neprejde ATS predvýberom. Nahrajte CV a rolu teraz, aby sa slabé bullets zmenili na dôkaz výsledkov.",
-      kpiA: "priemerné zvýšenie ATS score",
-      kpiB: "od nahratia po prvý draft",
-      kpiC: "rýchlejšie prispôsobenie na pozíciu",
-      kpiNote:
-        "Ukážkový benchmark: score sa zvýšil z 48 na 91 na testovanej pozícii pri rovnakých dátach kandidáta.",
-      demoTitle: "Ukážka pred / po",
-      demoLeftTitle: "Pred (slabý signál)",
-      demoRightTitle: "Po (signál pripravený na hiring)",
-      beforeText: "\"Zodpovedný za produktový roadmap a komunikáciu medzi tímami.\"",
-      afterText:
-        "\"Viedol som kvartálny roadmap pre 3 squady, dodal 6 prioritných funkcií a zvýšil aktiváciu o 21% počas dvoch release cyklov.\"",
       demoImpactTitle: "Čo sa zmenilo",
-      demoImpact1: "Doplnené relevantné kľúčové slová bez keyword stuffingu.",
-      demoImpact2: "Formulácie sa posunuli z úloh na výsledky.",
-      demoImpact3: "Zlepšila sa ATS čitateľnosť vďaka čistejšej štruktúre a prioritám.",
-      trustTitle: "Dôvera od reálnych beta používateľov",
-      trustLead:
-        "Mená sú na požiadanie čiastočne skryté, ale každý case obsahuje merateľný výsledok a timeline.",
-      priceTitle: "Prečo začíname nízkou cenou",
-      priceDesc:
-        "Silný pomer cena/výkon: porovnateľný output s nástrojmi za $49, ale rýchlejšie a lacnejšie na overenie.",
-      proofCases: [
-        {
-          name: "A. M.",
-          role: "Product Manager, B2B SaaS (Berlín, Nemecko)",
-          outcome: "ATS score: 52 -> 89. Pozvánka na pohovor za 4 dni.",
-          note: "Profil je redigovaný na požiadanie. Rola, timeline a delta score boli potvrdené pri onboardingu.",
-        },
-        {
-          name: "S. K.",
-          role: "Backend Engineer, Fintech (Varšava, Poľsko)",
-          outcome: "Chýbajúce kritické kľúčové slová: 7 -> 1 po rewrite a keyword map.",
-          note: "Anonymný beta case. Rola, krajina a before/after snapshot sú overené.",
-        },
-        {
-          name: "E. R.",
-          role: "UX Researcher, HealthTech (Valencia, Španielsko)",
-          outcome: "Pomer prihláška/pohovor sa zlepšil z 1/18 na 1/7 za 3 týždne.",
-          note: "Identita je redigovaná; benchmark sledovaný v rámci rovnakej role family.",
-        },
-      ],
+      demoImpact1: "Relevantné formulácie sú zvýraznené bez keyword stuffingu.",
+      demoImpact2: "Zodpovednosť je jasnejšia bez nepodložených výsledkov.",
+      demoImpact3: "Štruktúra sa ľahšie kontroluje.",
     },
     cs: {
-      hookLabel: "Přestaňte být ignorováni recruitery",
-      hookTitle: "Získejte více pohovorů — bez změny vašich zkušeností.",
-      hookSubtitle:
-        "Většina kandidátů neprojde ATS předvýběrem. Nahrajte CV a roli teď, aby se slabé bullets změnily na důkaz výsledku.",
-      kpiA: "průměrné navýšení ATS score",
-      kpiB: "od nahrání k prvnímu draftu",
-      kpiC: "rychlejší přizpůsobení na pozici",
-      kpiNote:
-        "Ukázkový benchmark: score se zvýšil z 48 na 91 na testované pozici při stejných datech kandidáta.",
-      demoTitle: "Ukázka před / po",
-      demoLeftTitle: "Před (slabý signál)",
-      demoRightTitle: "Po (signál připravený pro hiring)",
-      beforeText: "\"Odpovědný za produktový roadmap a komunikaci mezi týmy.\"",
-      afterText:
-        "\"Vedl jsem kvartální roadmap pro 3 squady, doručil 6 prioritních funkcí a zvýšil aktivaci o 21% během dvou release cyklů.\"",
       demoImpactTitle: "Co se změnilo",
-      demoImpact1: "Doplněná klíčová slova bez keyword stuffingu.",
-      demoImpact2: "Formulace se posunuly z popisu úkolů na výsledky.",
-      demoImpact3: "ATS čitelnost se zlepšila díky čistší struktuře a prioritám.",
-      trustTitle: "Důvěra od reálných beta uživatelů",
-      trustLead:
-        "Jména jsou na žádost částečně skrytá, ale každý case obsahuje měřitelný výsledek a timeline.",
-      priceTitle: "Proč je startovní cena nízká",
-      priceDesc:
-        "Silná hodnota za cenu: srovnatelný output s nástroji za $49, ale rychleji a levněji pro první ověření.",
-      proofCases: [
-        {
-          name: "A. M.",
-          role: "Product Manager, B2B SaaS (Berlín, Německo)",
-          outcome: "ATS score: 52 -> 89. Pozvánka na pohovor za 4 dny.",
-          note: "Profil redigován na žádost. Role, timeline a delta score ověřeny při onboardingu.",
-        },
-        {
-          name: "S. K.",
-          role: "Backend Engineer, Fintech (Varšava, Polsko)",
-          outcome: "Chybějící kritická klíčová slova: 7 -> 1 po rewrite a keyword map.",
-          note: "Anonymní beta case. Role, země a before/after snapshot byly ověřeny.",
-        },
-        {
-          name: "E. R.",
-          role: "UX Researcher, HealthTech (Valencie, Španělsko)",
-          outcome: "Poměr žádost/pohovor se zlepšil z 1/18 na 1/7 během 3 týdnů.",
-          note: "Identita je redigovaná; benchmark sledovaný v rámci stejné role family.",
-        },
-      ],
+      demoImpact1: "Relevantní formulace jsou zvýrazněny bez keyword stuffingu.",
+      demoImpact2: "Odpovědnost je jasnější bez nepodložených výsledků.",
+      demoImpact3: "Struktura se snáze kontroluje.",
     },
     es: {
-      hookLabel: "Deja de ser ignorado por reclutadores",
-      hookTitle: "Consigue más entrevistas — sin cambiar tu experiencia.",
-      hookSubtitle:
-        "La mayoría de candidatos falla el pre-screening ATS. Sube tu CV y el rol ahora para convertir bullets débiles en prueba de impacto.",
-      kpiA: "aumento promedio de ATS score",
-      kpiB: "desde la carga hasta el primer borrador",
-      kpiC: "adaptación más rápida por vacante",
-      kpiNote:
-        "Benchmark de muestra: el score subió de 48 a 91 en una vacante de prueba con los mismos datos del candidato.",
-      demoTitle: "Vista previa antes / después",
-      demoLeftTitle: "Antes (señal débil)",
-      demoRightTitle: "Después (señal lista para hiring)",
-      beforeText: "\"Responsable del roadmap del producto y de la comunicación entre equipos.\"",
-      afterText:
-        "\"Lideré el roadmap trimestral de 3 squads, entregué 6 features prioritarias y aumenté la activación un 21% en dos ciclos de release.\"",
       demoImpactTitle: "Qué cambió",
-      demoImpact1: "Se añadieron keywords relevantes sin keyword stuffing.",
-      demoImpact2: "La redacción pasó de tareas a resultados.",
-      demoImpact3: "Mejoró la legibilidad ATS con una estructura y prioridades más claras.",
-      trustTitle: "Confianza de usuarios beta reales",
-      trustLead:
-        "Los nombres están parcialmente ocultos por solicitud, pero cada caso incluye resultado medible y timeline.",
-      priceTitle: "Por qué el precio inicial es bajo",
-      priceDesc:
-        "Gran relación valor/precio: output comparable a herramientas de $49, pero más rápido y más barato para validar.",
-      proofCases: [
-        {
-          name: "A. M.",
-          role: "Product Manager, B2B SaaS (Berlín, Alemania)",
-          outcome: "ATS score: 52 -> 89. Invitación a entrevista en 4 días.",
-          note: "Perfil redactado por solicitud. Rol, timeline y delta de score verificados en onboarding.",
-        },
-        {
-          name: "S. K.",
-          role: "Backend Engineer, Fintech (Varsovia, Polonia)",
-          outcome: "Keywords críticas faltantes: 7 -> 1 tras rewrite y keyword map.",
-          note: "Caso beta anónimo. Rol, país y before/after snapshot verificados.",
-        },
-        {
-          name: "E. R.",
-          role: "UX Researcher, HealthTech (Valencia, España)",
-          outcome: "Ratio solicitud/entrevista mejoró de 1/18 a 1/7 en 3 semanas.",
-          note: "Identidad redactada; benchmark seguido en la misma familia de roles.",
-        },
-      ],
+      demoImpact1: "Se destaca el lenguaje relevante sin keyword stuffing.",
+      demoImpact2: "La responsabilidad queda más clara sin añadir resultados no acreditados.",
+      demoImpact3: "La estructura es más fácil de revisar.",
     },
   }[language];
 
@@ -627,19 +518,19 @@ export default function HomePage() {
       <div className="shell">
         <section className="hero fade-up">
           <div style={{ maxWidth: "1200px", width: "100%" }}>
-            <p className="pill">{conversionContent.hookLabel}</p>
-            <h1 className="hero-title hero-title-conversion">{conversionContent.hookTitle}</h1>
-            <p className="hero-subtitle">{conversionContent.hookSubtitle}</p>
+            <p className="pill">{honestContent.hookLabel}</p>
+            <h1 className="hero-title hero-title-conversion">{honestContent.hookTitle}</h1>
+            <p className="hero-subtitle">{honestContent.hookSubtitle}</p>
             <p className="hero-subtitle hero-secondary-line" style={{ marginTop: "10px" }}>
               {localizedFreeCheckerLine}
             </p>
             <HeroActions />
             <div className="hero-mini-block">
-              <p className="hero-mini-title">{conversionUi.ctaAction}</p>
+              <p className="hero-mini-title">{honestContent.ctaAction}</p>
               <p className="hero-mini-text">{conversionUi.control}</p>
               <div className="hero-proof-chips">
-                <span className="tag">{conversionUi.freeScore}</span>
-                <span className="tag">{conversionUi.firstTryFree}</span>
+                <span className="tag">{honestContent.freeScore}</span>
+                <span className="tag">{honestContent.paidFeature}</span>
               </div>
             </div>
           </div>
@@ -648,56 +539,42 @@ export default function HomePage() {
         <section className="fade-up" style={{ marginBottom: "4rem" }}>
           <div className="hero-grid">
             <div className="kpi">
-              <h3>92%</h3>
-              <p>{conversionContent.kpiA}</p>
+              <h3>{honestContent.metric1}</h3>
+              <p>{honestContent.metric1Label}</p>
             </div>
             <div className="kpi">
-              <h3>3 min</h3>
-              <p>{conversionContent.kpiB}</p>
+              <h3>{honestContent.metric2}</h3>
+              <p>{honestContent.metric2Label}</p>
             </div>
             <div className="kpi">
-              <h3>5x</h3>
-              <p>{conversionContent.kpiC}</p>
+              <h3>{honestContent.metric3}</h3>
+              <p>{honestContent.metric3Label}</p>
             </div>
           </div>
-          <p className="kpi-proof-note">{conversionContent.kpiNote}</p>
-        </section>
-
-        <section
-          className="section fade-up optimized-for-section"
-          aria-label={t("home.optimizedForLine")}
-        >
-          <p className="optimized-for-line">{t("home.optimizedForLine")}</p>
-          <BrandMarquee brands={[...optimizedForCompanies]} />
-          <p className="optimized-for-disclaimer">
-            {t("home.optimizedForDisclaimer")}
-          </p>
+          <p className="kpi-proof-note">{honestContent.scoreNote}</p>
         </section>
 
         <section className="section fade-up">
-          <h2 className="section-title">{conversionContent.demoTitle}</h2>
+          <h2 className="section-title">{honestContent.demoTitle}</h2>
           <div className="score-proof">
             <div className="score-proof-card before">
-              <span className="score-proof-label">ATS</span>
-              <strong>43</strong>
+              <span className="score-proof-label">{honestContent.beforeLabel}</span>
+              <strong>CV</strong>
             </div>
             <span className="score-proof-arrow">→</span>
             <div className="score-proof-card score-proof-card-up after">
-              <span className="score-proof-label">ATS</span>
-              <strong>93</strong>
-              <span className="score-proof-microcopy">
-                {t("home.atsMicrocopy")}
-              </span>
+              <span className="score-proof-label">{honestContent.afterLabel}</span>
+              <strong>Draft</strong>
             </div>
           </div>
           <div className="before-after-grid">
             <article className="card before-after-card before-card">
-              <h3>{conversionContent.demoLeftTitle}</h3>
-              <p>{conversionContent.beforeText}</p>
+              <h3>{honestContent.beforeLabel}</h3>
+              <p>{honestContent.beforeText}</p>
             </article>
             <article className="card before-after-card after-card">
-              <h3>{conversionContent.demoRightTitle}</h3>
-              <p>{conversionContent.afterText}</p>
+              <h3>{honestContent.afterLabel}</h3>
+              <p>{honestContent.afterText}</p>
             </article>
           </div>
           <div className="card before-after-impact">
@@ -707,6 +584,7 @@ export default function HomePage() {
               <li>{conversionContent.demoImpact2}</li>
               <li>{conversionContent.demoImpact3}</li>
             </ul>
+            <p className="kpi-proof-note">{honestContent.exampleNote}</p>
           </div>
           <div className="optimized-for-cta">
             <Link className="btn primary" href="/app">
@@ -768,17 +646,13 @@ export default function HomePage() {
         </section>
 
         <section className="section fade-up" style={{ marginTop: "4rem" }}>
-          <h2 className="section-title">{conversionContent.trustTitle}</h2>
-          <p className="trust-lead">{conversionContent.trustLead}</p>
-          <p className="trust-case-proof">{conversionUi.caseProof}</p>
+          <h2 className="section-title">{honestContent.trustTitle}</h2>
+          <p className="trust-lead">{honestContent.trustLead}</p>
           <div className="grid">
-            {conversionContent.proofCases.map((item) => (
-              <article key={item.name} className="card trust-card">
-                <span className="trust-badge">{conversionUi.verified}</span>
-                <h3>{item.name}</h3>
-                <p className="trust-role">{item.role}</p>
-                <p className="trust-outcome">{item.outcome}</p>
-                <p className="trust-note">{item.note}</p>
+            {honestContent.cards.map(([title, description]) => (
+              <article key={title} className="card trust-card">
+                <h3>{title}</h3>
+                <p className="trust-note">{description}</p>
               </article>
             ))}
           </div>
@@ -786,8 +660,8 @@ export default function HomePage() {
 
         <section className="section fade-up">
           <div className="card pricing-perception-card">
-            <h2 className="section-title">{conversionContent.priceTitle}</h2>
-            <p>{conversionUi.priceValue}</p>
+            <h2 className="section-title">{honestContent.priceTitle}</h2>
+            <p>{honestContent.priceText}</p>
           </div>
         </section>
       </div>

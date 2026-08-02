@@ -8,17 +8,17 @@ export default function PrivacyPage() {
 
   const localizedBlocks = {
     en: {
-      noStorageTitle: "No Storage of Personal Files or Document Content",
+      noStorageTitle: "Document processing and saved history",
       noStorageDesc:
-        "CVboosta does not store uploaded CV files, CV document content, or job-description files in a persistent file storage system. Documents are processed in transient runtime memory for analysis and output generation, then discarded.",
+        "Uploaded file objects are processed in transient memory and are not kept as permanent files. If you sign in and run a paid optimization, the extracted inputs and generated result may be stored encrypted in your account history until you delete the account or result, subject to required billing and security retention.",
       billingTitle: "Billing and Payment Data",
       billingDesc:
         "Payments are processed by Stripe. CVboosta does not collect or store full card numbers, CVV/CVC, or other raw payment instrument details.",
       faqTitle: "Service FAQ",
       faq: [
         {
-          q: "Do you store my uploaded CV files permanently?",
-          a: "No. CVboosta processes files in transient memory for analysis and does not keep uploaded CV files in persistent storage.",
+          q: "What happens to my uploaded CV and its text?",
+          a: "The uploaded file object is processed transiently. For signed-in optimizations, extracted text and generated results may be stored encrypted in account history so you can reopen them.",
         },
         {
           q: "Who handles my payments?",
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
         },
         {
           q: "Is my data used to train public models?",
-          a: "CVboosta uses AI providers to generate outputs securely. Your data is not used for training public general-purpose models.",
+          a: "AI providers process submitted text under their API terms and privacy commitments. CVboosta does not use your documents to train its own public model.",
         },
         {
           q: "How long do you keep account-related data?",
@@ -35,17 +35,17 @@ export default function PrivacyPage() {
       ],
     },
     uk: {
-      noStorageTitle: "Відсутність зберігання особистих файлів і вмісту документів",
+      noStorageTitle: "Обробка документів і збережена історія",
       noStorageDesc:
-        "CVboosta не зберігає завантажені CV-файли, вміст CV або файли опису вакансій у постійному файловому сховищі. Документи обробляються у тимчасовій пам'яті для аналізу та генерації результату, після чого видаляються.",
+        "Завантажені файли обробляються у тимчасовій пам’яті й не зберігаються як постійні файли. Для авторизованої платної оптимізації витягнутий текст і результат можуть зберігатися зашифрованими в історії акаунта до видалення з урахуванням обов’язкового зберігання білінгу та безпеки.",
       billingTitle: "Оплата та платіжні дані",
       billingDesc:
         "Оплата обробляється через Stripe. CVboosta не збирає і не зберігає повні номери карток, CVV/CVC або інші сирі платіжні реквізити.",
       faqTitle: "FAQ по сервісу",
       faq: [
         {
-          q: "Ви зберігаєте мої завантажені CV-файли назавжди?",
-          a: "Ні. CVboosta обробляє файли у тимчасовій пам'яті для аналізу та не зберігає завантажені CV-файли у постійному сховищі.",
+          q: "Що відбувається із завантаженим CV та його текстом?",
+          a: "Сам файл обробляється тимчасово. Для авторизованих оптимізацій витягнутий текст і результати можуть зашифровано зберігатися в історії акаунта.",
         },
         {
           q: "Хто обробляє платежі?",
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
         },
         {
           q: "Мої дані використовуються для навчання публічних моделей?",
-          a: "CVboosta безпечно використовує AI-провайдерів для генерації результатів. Ваші дані не використовуються для навчання публічних універсальних моделей.",
+          a: "AI-провайдери обробляють надісланий текст відповідно до своїх API-умов і політик. CVboosta не навчає власну публічну модель на ваших документах.",
         },
         {
           q: "Як довго зберігаються дані акаунта?",
@@ -62,17 +62,17 @@ export default function PrivacyPage() {
       ],
     },
     pl: {
-      noStorageTitle: "Brak trwałego przechowywania plików i treści dokumentów",
+      noStorageTitle: "Przetwarzanie dokumentów i zapisana historia",
       noStorageDesc:
-        "CVboosta nie przechowuje przesłanych plików CV, treści CV ani plików opisów ofert w trwałym magazynie plików. Dokumenty są przetwarzane tymczasowo w pamięci operacyjnej, a następnie usuwane.",
+        "Przesłane pliki są przetwarzane tymczasowo i nie są zachowywane jako trwałe pliki. Przy zalogowanej płatnej optymalizacji wyodrębniony tekst i wynik mogą być szyfrowane i zapisane w historii konta do usunięcia, z uwzględnieniem wymaganej retencji rozliczeniowej i bezpieczeństwa.",
       billingTitle: "Płatności i dane rozliczeniowe",
       billingDesc:
         "Płatności są przetwarzane przez Stripe. CVboosta nie zbiera ani nie przechowuje pełnych numerów kart, CVV/CVC ani surowych danych instrumentów płatniczych.",
       faqTitle: "FAQ usługi",
       faq: [
         {
-          q: "Czy przechowujecie przesłane pliki CV na stałe?",
-          a: "Nie. CVboosta przetwarza pliki tymczasowo w pamięci i nie przechowuje ich trwale.",
+          q: "Co dzieje się z przesłanym CV i jego tekstem?",
+          a: "Sam plik jest przetwarzany tymczasowo. Dla zalogowanych optymalizacji wyodrębniony tekst i wyniki mogą być szyfrowane i zapisane w historii konta.",
         },
         {
           q: "Kto obsługuje płatności?",
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
         },
         {
           q: "Czy moje dane służą do trenowania publicznych modeli?",
-          a: "CVboosta bezpiecznie korzysta z dostawców AI do generowania wyników. Twoje dane nie są używane do trenowania publicznych modeli ogólnego przeznaczenia.",
+          a: "Dostawcy AI przetwarzają tekst zgodnie z warunkami i politykami swoich API. CVboosta nie trenuje własnego publicznego modelu na Twoich dokumentach.",
         },
         {
           q: "Jak długo przechowujecie dane konta?",
@@ -89,17 +89,17 @@ export default function PrivacyPage() {
       ],
     },
     sk: {
-      noStorageTitle: "Bez trvalého ukladania osobných súborov a obsahu dokumentov",
+      noStorageTitle: "Spracovanie dokumentov a uložená história",
       noStorageDesc:
-        "CVboosta neukladá nahrané CV súbory, obsah CV ani súbory popisu pracovnej pozície do trvalého úložiska. Dokumenty sa spracúvajú dočasne v pamäti a po spracovaní sa odstránia.",
+        "Nahrané súbory sa spracujú dočasne a neuchovávajú sa ako trvalé súbory. Pri prihlásenej platenej optimalizácii sa extrahovaný text a výsledok môžu šifrovane uložiť v histórii účtu do vymazania, s výnimkou povinnej fakturačnej a bezpečnostnej retencie.",
       billingTitle: "Platby a fakturačné údaje",
       billingDesc:
         "Platby sú spracované cez Stripe. CVboosta nezhromažďuje ani neukladá celé čísla kariet, CVV/CVC ani surové údaje platobných nástrojov.",
       faqTitle: "FAQ služby",
       faq: [
         {
-          q: "Ukladáte moje nahrané CV súbory natrvalo?",
-          a: "Nie. CVboosta spracúva súbory dočasne v pamäti a nahrané CV súbory neukladá do trvalého úložiska.",
+          q: "Čo sa stane s nahraným CV a jeho textom?",
+          a: "Súbor sa spracuje dočasne. Pri prihlásených optimalizáciách sa extrahovaný text a výsledky môžu šifrovane uložiť v histórii účtu.",
         },
         {
           q: "Kto spracúva platby?",
@@ -107,7 +107,7 @@ export default function PrivacyPage() {
         },
         {
           q: "Používajú sa moje dáta na tréning verejných modelov?",
-          a: "CVboosta bezpečne používa AI poskytovateľov na generovanie výstupov. Vaše dáta sa nepoužívajú na tréning verejných všeobecných modelov.",
+          a: "Poskytovatelia AI spracúvajú text podľa podmienok a zásad svojich API. CVboosta netrénuje vlastný verejný model na vašich dokumentoch.",
         },
         {
           q: "Ako dlho uchovávate údaje účtu?",
@@ -116,17 +116,17 @@ export default function PrivacyPage() {
       ],
     },
     cs: {
-      noStorageTitle: "Bez trvalého ukládání osobních souborů a obsahu dokumentů",
+      noStorageTitle: "Zpracování dokumentů a uložená historie",
       noStorageDesc:
-        "CVboosta neukládá nahrané soubory CV, obsah CV ani soubory popisu pozice do trvalého úložiště. Dokumenty jsou zpracovány dočasně v paměti a po zpracování odstraněny.",
+        "Nahrané soubory se zpracují dočasně a neuchovávají se jako trvalé soubory. U přihlášené placené optimalizace se extrahovaný text a výsledek mohou šifrovaně uložit v historii účtu do smazání, s výjimkou povinné fakturační a bezpečnostní retence.",
       billingTitle: "Platby a platební údaje",
       billingDesc:
         "Platby jsou zpracovány přes Stripe. CVboosta neshromažďuje ani neukládá úplná čísla karet, CVV/CVC ani surové údaje platebních prostředků.",
       faqTitle: "FAQ služby",
       faq: [
         {
-          q: "Ukládáte trvale nahrané soubory CV?",
-          a: "Ne. CVboosta zpracovává soubory dočasně v paměti a nahrané CV soubory neukládá do trvalého úložiště.",
+          q: "Co se stane s nahraným CV a jeho textem?",
+          a: "Soubor se zpracuje dočasně. U přihlášených optimalizací se extrahovaný text a výsledky mohou šifrovaně uložit v historii účtu.",
         },
         {
           q: "Kdo zpracovává platby?",
@@ -134,7 +134,7 @@ export default function PrivacyPage() {
         },
         {
           q: "Používají se moje data k trénování veřejných modelů?",
-          a: "CVboosta bezpečně využívá AI poskytovatele pro generování výstupů. Vaše data se nepoužívají k trénování veřejných obecných modelů.",
+          a: "Poskytovatelé AI zpracovávají text podle podmínek a zásad svých API. CVboosta netrénuje vlastní veřejný model na vašich dokumentech.",
         },
         {
           q: "Jak dlouho uchováváte data účtu?",
@@ -143,17 +143,17 @@ export default function PrivacyPage() {
       ],
     },
     es: {
-      noStorageTitle: "Sin almacenamiento persistente de archivos personales ni contenido",
+      noStorageTitle: "Procesamiento de documentos e historial guardado",
       noStorageDesc:
-        "CVboosta no almacena archivos CV subidos, contenido del CV ni archivos de descripción de vacante en almacenamiento persistente. Los documentos se procesan de forma temporal en memoria y luego se eliminan.",
+        "Los archivos subidos se procesan temporalmente y no se conservan como archivos permanentes. En una optimización de pago con sesión iniciada, el texto extraído y el resultado pueden guardarse cifrados en el historial de la cuenta hasta su eliminación, salvo la retención necesaria de facturación y seguridad.",
       billingTitle: "Facturación y datos de pago",
       billingDesc:
         "Los pagos se procesan mediante Stripe. CVboosta no recopila ni almacena números completos de tarjeta, CVV/CVC ni datos crudos del instrumento de pago.",
       faqTitle: "FAQ del servicio",
       faq: [
         {
-          q: "¿Guardan permanentemente mis archivos CV subidos?",
-          a: "No. CVboosta procesa los archivos temporalmente en memoria y no guarda los archivos CV en almacenamiento persistente.",
+          q: "¿Qué ocurre con el CV subido y su texto?",
+          a: "El archivo se procesa temporalmente. En optimizaciones con sesión iniciada, el texto extraído y los resultados pueden guardarse cifrados en el historial de la cuenta.",
         },
         {
           q: "¿Quién procesa los pagos?",
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
         },
         {
           q: "¿Mis datos se usan para entrenar modelos públicos?",
-          a: "CVboosta usa proveedores de IA de forma segura para generar resultados. Tus datos no se usan para entrenar modelos públicos de uso general.",
+          a: "Los proveedores de IA procesan el texto según las condiciones y políticas de sus API. CVboosta no entrena su propio modelo público con tus documentos.",
         },
         {
           q: "¿Cuánto tiempo conservan los datos de la cuenta?",
@@ -188,7 +188,7 @@ export default function PrivacyPage() {
           <div className="legal-doc">
             <div className="legal-meta">
               <span className="legal-chip">{t("results.legalDocumentLabel")}</span>
-              <span className="legal-chip">{t("results.lastUpdatedPrefix")}: July 14, 2026</span>
+              <span className="legal-chip">{t("results.lastUpdatedPrefix")}: August 3, 2026</span>
             </div>
 
             <div className="legal-content">

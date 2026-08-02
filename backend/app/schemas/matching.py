@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 class MatchRequest(BaseModel):
     cv_text: str = Field(min_length=1, max_length=12000)
     job_text: str = Field(default="", max_length=12000)
-    keywords: list[str] | None = None
+    keywords: list[str] | None = Field(default=None, max_length=45)
 
     @field_validator("cv_text", mode="before")
     @classmethod
@@ -24,6 +24,22 @@ class MatchRequest(BaseModel):
         if not isinstance(value, str):
             raise ValueError("must be a string")
         return value.strip()
+
+    @field_validator("keywords")
+    @classmethod
+    def validate_keywords(cls, values: list[str] | None) -> list[str] | None:
+        if values is None:
+            return None
+        normalized: list[str] = []
+        for value in values:
+            if not isinstance(value, str):
+                raise ValueError("keywords must be strings")
+            cleaned = value.strip()
+            if not cleaned or len(cleaned) > 200:
+                raise ValueError("each keyword must contain 1-200 characters")
+            if cleaned not in normalized:
+                normalized.append(cleaned)
+        return normalized
 
     @model_validator(mode="after")
     def require_job_or_keywords(self) -> "MatchRequest":

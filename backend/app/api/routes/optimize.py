@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException
 from starlette.concurrency import run_in_threadpool
 
 from app.schemas.optimize import (
@@ -41,6 +41,14 @@ from app.services.push_notifications import (
     send_analysis_ready_push_best_effort,
     update_ats_live_activity_best_effort,
 )
+from app.services.idempotency import (
+    begin_idempotent_request,
+    canonical_request_hash,
+    complete_idempotent_request,
+    fail_idempotent_request,
+    normalize_idempotency_key,
+)
+from app.services.entitlements import require_paid_entitlement
 
 router = APIRouter()
 
@@ -51,23 +59,47 @@ async def optimize_cv(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user_optional),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> OptimizeResponse:
-    consumed_scan = False
-    llm_failed = False
-    if current_user:
+    scan_receipt = None
+    idempotency_attempt = None
+    if not current_user:
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required to optimize CV.",
+        )
+
+    normalized_key = normalize_idempotency_key(idempotency_key)
+    if normalized_key:
+        attempt = begin_idempotent_request(
+            db,
+            operation="optimize.cv",
+            scope=f"user:{current_user.id}",
+            key=normalized_key,
+            request_hash=canonical_request_hash(payload.model_dump(mode="json")),
+            user_id=current_user.id,
+        )
+        idempotency_attempt = attempt
+        if attempt.is_replay:
+            return OptimizeResponse.model_validate(attempt.replay_response)
+
+    try:
+        require_paid_entitlement(
+            db,
+            current_user,
+            feature="scan",
+            detail="Upgrade or purchase a scan to generate the full optimized CV.",
+        )
         enforce_fair_use_or_raise(db, current_user)
-        consume_feature_or_raise(
+        scan_receipt = consume_feature_or_raise(
             db,
             user_id=current_user.id,
             feature="scan",
             exhausted_detail="Daily scan limit reached. Please upgrade your plan.",
         )
-        consumed_scan = True
-    else:
-        raise HTTPException(
-            status_code=401,
-            detail="Authentication required to optimize CV.",
-        )
+    except Exception:
+        fail_idempotent_request(db, attempt=idempotency_attempt)
+        raise
 
     async def push_ats_progress(progress: float, detail: str, eta_text: str) -> None:
         await run_in_threadpool(
@@ -134,24 +166,20 @@ async def optimize_cv(
                 requirements=normalize_keywords(keyword_result.requirements),
             )
         await push_ats_progress(0.48, "Optimizing your resume", "~8s")
-        try:
-            result = await run_in_threadpool(
-                generate_optimized_cv,
-                payload.cv_text,
-                payload.job_text,
-                payload.cv_analysis,
-                payload.job_analysis,
-                ats_keywords,
-                payload.target_role,
-                payload.target_company,
-                None,  # initial forced_keywords
-            )
-        except LLMServiceError:
-            llm_failed = True
-            result = None
+        result = await run_in_threadpool(
+            generate_optimized_cv,
+            payload.cv_text,
+            payload.job_text,
+            payload.cv_analysis,
+            payload.job_analysis,
+            ats_keywords,
+            payload.target_role,
+            payload.target_company,
+            None,  # initial forced_keywords
+        )
         await push_ats_progress(0.76, "Scoring ATS match", "~4s")
         match_before, _, original_missing = await run_in_threadpool(compute_match_score, payload.cv_text, ats_keywords)
-        optimized_text = result.optimized_cv if result else payload.cv_text
+        optimized_text = result.optimized_cv
         match_after, _, missing_skills = await run_in_threadpool(compute_match_score, optimized_text, ats_keywords)
         
         added_keywords = list(set(original_missing) - set(missing_skills))
@@ -159,18 +187,27 @@ async def optimize_cv(
 
         recommendations = await run_in_threadpool(build_recommendations, missing_skills)
     except Exception as exc:
-        if consumed_scan:
-            refund_feature_best_effort(db, user_id=current_user.id, feature="scan")
+        if scan_receipt:
+            refund_feature_best_effort(db, receipt=scan_receipt)
+        fail_idempotent_request(db, attempt=idempotency_attempt)
         if isinstance(exc, LLMServiceError):
-            raise
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "code": "optimization_unavailable",
+                    "message": "AI optimization is temporarily unavailable. Your credit was not used.",
+                },
+                headers={"Retry-After": "3"},
+            ) from exc
         if isinstance(exc, RuntimeError):
-            raise HTTPException(status_code=500, detail=str(exc)) from exc
+            raise HTTPException(status_code=500, detail="Optimization service failed safely.") from exc
         raise HTTPException(status_code=500, detail="Unexpected server error") from exc
 
-    if llm_failed and consumed_scan and current_user:
-        refund_feature_best_effort(db, user_id=current_user.id, feature="scan")
+    analysis_id: int | None = None
+    feedback = result.feedback
+    optimized_cv = result.optimized_cv
 
-    if current_user and not llm_failed:
+    try:
         await push_ats_progress(0.92, "Saving your analysis", "~2s")
         analysis = Analysis(
             user_id=current_user.id,
@@ -188,43 +225,69 @@ async def optimize_cv(
                 "company": payload.target_company or None,
                 "match_before": match_before,
                 "match_after": match_after,
+                # Single-use purchases permanently unlock the analysis
+                # they paid for even after the balance reaches zero.
+                "access_entitlement": (
+                    "single_purchase"
+                    if scan_receipt
+                    and scan_receipt.bucket in {"single_credit", "app_store_credit"}
+                    else "subscription"
+                ),
             },
         )
         db.add(analysis)
+        db.flush()
+        analysis_id = analysis.id
+
+        response_payload = OptimizeResponse(
+            optimized_cv=optimized_cv,
+            feedback=feedback,
+            missing_skills=missing_skills,
+            added_keywords=added_keywords,
+            recommendations=recommendations,
+            match_before=match_before,
+            match_after=match_after,
+            analysis_id=analysis_id,
+            can_export=analysis_id is not None,
+            access_entitlement=(
+                "single_purchase"
+                if scan_receipt
+                and scan_receipt.bucket in {"single_credit", "app_store_credit"}
+                else "subscription"
+            ),
+        )
+        if idempotency_attempt:
+            complete_idempotent_request(
+                db,
+                attempt=idempotency_attempt,
+                user_id=current_user.id,
+                response=response_payload.model_dump(mode="json"),
+                resource_id=analysis_id,
+                commit=False,
+            )
         db.commit()
-        record_activity(db, user_id=current_user.id, action="CV optimized", meta={})
-    analysis_id: int | None = None
+    except Exception as exc:
+        db.rollback()
+        if scan_receipt:
+            refund_feature_best_effort(db, receipt=scan_receipt)
+        fail_idempotent_request(db, attempt=idempotency_attempt)
+        raise HTTPException(status_code=500, detail="Failed to save the optimized CV safely.") from exc
+
+    record_activity(db, user_id=current_user.id, action="CV optimized", meta={})
+
     background_tasks.add_task(
         end_ats_live_activity_best_effort,
         current_user.id,
         match_after,
     )
-    if current_user and not llm_failed:
-        analysis_id = analysis.id
+    if analysis_id is not None:
         background_tasks.add_task(
             send_analysis_ready_push_best_effort,
             current_user.id,
             analysis_id,
         )
 
-    if llm_failed:
-        feedback = (
-            "AI generation is temporarily unavailable. Showing match results and recommendations using your original CV text."
-        )
-        optimized_cv = payload.cv_text
-    else:
-        feedback = result.feedback
-        optimized_cv = result.optimized_cv
-    return OptimizeResponse(
-        optimized_cv=optimized_cv,
-        feedback=feedback,
-        missing_skills=missing_skills,
-        added_keywords=added_keywords,
-        recommendations=recommendations,
-        match_before=match_before,
-        match_after=match_after,
-        analysis_id=analysis_id,
-    )
+    return response_payload
 
 
 @router.post("/cover-letter", response_model=CoverLetterResponse)
@@ -236,8 +299,14 @@ def optimize_cover_letter(
     if not current_user:
         raise HTTPException(status_code=401, detail="Authentication required.")
 
+    require_paid_entitlement(
+        db,
+        current_user,
+        feature="cl",
+        detail="A paid plan is required to generate a cover letter.",
+    )
     enforce_fair_use_or_raise(db, current_user)
-    consume_feature_or_raise(
+    receipt = consume_feature_or_raise(
         db,
         user_id=current_user.id,
         feature="cl",
@@ -251,10 +320,10 @@ def optimize_cover_letter(
             ui_language=payload.ui_language,
         )
     except LLMServiceError:
-        refund_feature_best_effort(db, user_id=current_user.id, feature="cl")
+        refund_feature_best_effort(db, receipt=receipt)
         raise
     except Exception as exc:
-        refund_feature_best_effort(db, user_id=current_user.id, feature="cl")
+        refund_feature_best_effort(db, receipt=receipt)
         raise HTTPException(status_code=500, detail="Failed to generate cover letter") from exc
 
     if current_user:

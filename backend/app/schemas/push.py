@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import json
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -81,6 +82,31 @@ class UserPushRequest(BaseModel):
     def validate_data(cls, value: dict[str, Any]) -> dict[str, Any]:
         if "aps" in value:
             raise ValueError("Custom payload data cannot include the reserved 'aps' key.")
+        if len(value) > 32:
+            raise ValueError("Custom payload data has too many keys.")
+
+        def depth(item: Any, level: int = 0) -> int:
+            if level > 4:
+                raise ValueError("Custom payload data is nested too deeply.")
+            if isinstance(item, dict):
+                if len(item) > 32:
+                    raise ValueError("Custom payload data has too many keys.")
+                return max((depth(v, level + 1) for v in item.values()), default=level)
+            if isinstance(item, list):
+                if len(item) > 64:
+                    raise ValueError("Custom payload arrays are too large.")
+                return max((depth(v, level + 1) for v in item), default=level)
+            if isinstance(item, str) and len(item) > 1024:
+                raise ValueError("Custom payload strings are too large.")
+            return level
+
+        depth(value)
+        try:
+            encoded = json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Custom payload data must be JSON serializable.") from exc
+        if len(encoded) > 3072:
+            raise ValueError("Custom payload data exceeds the APNs size budget.")
         return value
 
 

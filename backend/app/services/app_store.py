@@ -52,6 +52,26 @@ def get_app_store_product_config(product_id: str | None) -> dict[str, str] | Non
     return APP_STORE_PRODUCT_MAP.get(product_id.strip())
 
 
+def has_app_store_plan_history(db: Session, user_id: int, *, plan: str) -> bool:
+    """Return whether Apple ever supplied a transaction for the requested plan.
+
+    This is intentionally based on the signed transaction ledger rather than
+    the mutable aggregate entitlement.  It lets callers distinguish a revoked
+    Apple lifetime purchase from an unrelated, genuine web lifetime purchase.
+    """
+    product_ids = (
+        db.query(AppStoreTransaction.product_id)
+        .filter(AppStoreTransaction.user_id == user_id)
+        .all()
+    )
+    expected_plan = plan.strip().lower()
+    return any(
+        str((get_app_store_product_config(product_id) or {}).get("plan") or "").lower()
+        == expected_plan
+        for (product_id,) in product_ids
+    )
+
+
 def normalize_app_store_environment(value: str | None) -> str | None:
     normalized = (value or "").strip().lower()
     if not normalized:
@@ -273,6 +293,12 @@ def refresh_app_store_entitlement_from_transactions(
     chosen_key: tuple[int, int, int] | None = None
 
     for transaction in transactions:
+        if (
+            settings.app_env.lower() not in {"local", "dev", "development", "test"}
+            and normalize_app_store_environment(transaction.environment) != "Production"
+        ):
+            # Sandbox/Xcode purchases must never grant production entitlement.
+            continue
         config = get_app_store_product_config(transaction.product_id)
         if not config or config.get("kind") == "credit":
             continue

@@ -16,6 +16,7 @@ _CSRF_EXEMPT_PREFIXES = (
 _CSRF_EXEMPT_PATHS = {
     "/health",
     "/openapi.json",
+    "/auth/native/token",
 }
 
 
@@ -80,4 +81,3 @@ async def csrf_protect_middleware(request: Request, call_next):  # type: ignore[
         )
 
     return await call_next(request)
-

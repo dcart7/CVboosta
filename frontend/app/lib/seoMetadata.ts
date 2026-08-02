@@ -36,14 +36,13 @@ export function buildSeoMetadata({
       url: canonical,
       siteName: SITE_NAME,
       type,
-      images: [{ url: "/logo.png", width: 800, height: 600, alt: `${SITE_NAME} logo` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${SITE_NAME} CV-to-job matching` }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/logo.png"],
+      images: ["/opengraph-image"],
     },
   };
 }
-

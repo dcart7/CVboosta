@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import json
-import ipaddress
+import hashlib
+import hmac
 import time
 
 from fastapi import Request
 from starlette.responses import Response, StreamingResponse
 
 from app.core.config import settings
+from app.core.client_ip import client_ip
 from app.db.session import get_sessionlocal
 from app.models.request_log import RequestLog
 
@@ -48,7 +50,7 @@ _SENSITIVE_PATH_HINTS = (
 
 
 def _should_skip(path: str) -> bool:
-    if path in _SKIP_PATHS:
+    if path in _SKIP_PATHS or path.startswith("/health"):
         return True
     if path.startswith("/docs"):
         return True
@@ -96,7 +98,7 @@ def _summarize_bytes(body: bytes, content_type: str | None) -> str | None:
         except Exception:
             return _truncate(body.decode("utf-8", errors="replace"))
     if content_type and "application/x-www-form-urlencoded" in content_type:
-        return _truncate(body.decode("utf-8", errors="replace"))
+        return "[form payload omitted]"
     if content_type and "text/" in content_type:
         return _truncate(body.decode("utf-8", errors="replace"))
     return _truncate(f"[{len(body)} bytes; content-type={content_type or 'unknown'}]")
@@ -104,54 +106,55 @@ def _summarize_bytes(body: bytes, content_type: str | None) -> str | None:
 
 async def capture_response_body(response: Response) -> tuple[Response, bytes]:
     if isinstance(response, StreamingResponse):
-        chunks: list[bytes] = []
-        async for chunk in response.body_iterator:  # type: ignore[attr-defined]
-            if isinstance(chunk, bytes):
-                chunks.append(chunk)
-            else:
-                chunks.append(str(chunk).encode("utf-8"))
-        body = b"".join(chunks)
-        new_response = Response(
-            content=body,
-            status_code=response.status_code,
-            headers=dict(response.headers),
-            media_type=response.media_type,
-        )
-        return new_response, body
+        # Never consume a stream for diagnostics: buffering large exports or a
+        # long-lived stream can exhaust memory and changes response semantics.
+        return response, b""
 
     body = getattr(response, "body", b"") or b""
     return response, body
 
 
-def _client_ip(request: Request) -> str | None:
-    remote_host = request.client.host if request.client and request.client.host else None
-    if not remote_host:
+def _pseudonymize_ip(value: str | None) -> str | None:
+    if not value:
         return None
+    digest = hmac.new(
+        settings.jwt_secret.encode("utf-8"),
+        value.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return f"hmac:{digest[:32]}"
 
-    trusted_proxies = {ip.strip() for ip in settings.trusted_proxy_ips if ip.strip()}
-    trust_all = "*" in trusted_proxies
-    is_trusted_proxy = trust_all or remote_host in trusted_proxies
-    if not is_trusted_proxy:
-        try:
-            remote_ip = ipaddress.ip_address(remote_host)
-            for cidr in settings.trusted_proxy_cidrs:
-                try:
-                    if remote_ip in ipaddress.ip_network(cidr, strict=False):
-                        is_trusted_proxy = True
-                        break
-                except ValueError:
-                    continue
-        except ValueError:
-            pass
 
-    if is_trusted_proxy:
-        forwarded_for = request.headers.get("x-forwarded-for")
-        if forwarded_for:
-            client_ip = forwarded_for.split(",")[0].strip()
-            if client_ip:
-                return client_ip
-
-    return remote_host
+def _coarse_user_agent(value: str | None) -> str | None:
+    """Keep broad diagnostics without a fingerprintable raw UA string."""
+    normalized = (value or "").lower()
+    if not normalized:
+        return None
+    platform = "other"
+    for marker, label in (
+        ("iphone", "ios"),
+        ("ipad", "ios"),
+        ("android", "android"),
+        ("windows", "windows"),
+        ("macintosh", "macos"),
+        ("linux", "linux"),
+    ):
+        if marker in normalized:
+            platform = label
+            break
+    client = "other"
+    for marker, label in (
+        ("edg/", "edge"),
+        ("chrome/", "chrome"),
+        ("firefox/", "firefox"),
+        ("safari/", "safari"),
+        ("curl/", "curl"),
+        ("bot", "bot"),
+    ):
+        if marker in normalized:
+            client = label
+            break
+    return f"{platform}:{client}"
 
 
 def _safe_commit(log: RequestLog) -> None:
@@ -202,8 +205,8 @@ async def log_request_response(
         path=path,
         status_code=response.status_code,
         duration_ms=duration_ms,
-        client_ip=_client_ip(request),
-        user_agent=request.headers.get("user-agent"),
+        client_ip=_pseudonymize_ip(client_ip(request)),
+        user_agent=_coarse_user_agent(request.headers.get("user-agent")),
         content_type=content_type,
         request_body=request_body_summary,
         response_body=response_body_summary,

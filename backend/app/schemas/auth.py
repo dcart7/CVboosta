@@ -5,8 +5,8 @@ from pydantic import BaseModel, EmailStr, Field
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
-    full_name: str | None = None
+    password: str = Field(min_length=1, max_length=128)
+    full_name: str | None = Field(default=None, max_length=120)
 
 
 class LoginRequest(BaseModel):
@@ -17,14 +17,20 @@ class LoginRequest(BaseModel):
 class OAuthLoginRequest(BaseModel):
     id_token: str | None = Field(default=None, min_length=20, max_length=8000)
     access_token: str | None = Field(default=None, min_length=20, max_length=8000)
-    full_name: str | None = None
+    full_name: str | None = Field(default=None, max_length=120)
     email: EmailStr | None = None
 
 
 class AuthResponse(BaseModel):
+    access_token: str | None = None
+    token_type: str | None = None
+    email: EmailStr | None = None
+
+
+class NativeTokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    email: EmailStr | None = None
+    email: EmailStr
 
 
 class UserResponse(BaseModel):
@@ -36,7 +42,7 @@ class UserResponse(BaseModel):
 
 class ChangePasswordRequest(BaseModel):
     current_password: str = Field(min_length=8, max_length=128)
-    new_password: str = Field(min_length=8, max_length=128)
+    new_password: str = Field(min_length=1, max_length=128)
 
 
 class ForgotPasswordRequest(BaseModel):
@@ -45,7 +51,7 @@ class ForgotPasswordRequest(BaseModel):
 
 class ResetPasswordRequest(BaseModel):
     token: str = Field(min_length=20, max_length=4000)
-    new_password: str = Field(min_length=8, max_length=128)
+    new_password: str = Field(min_length=1, max_length=128)
 
 
 class ActivityItem(BaseModel):

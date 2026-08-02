@@ -5,20 +5,30 @@ import RouteTransition from "./components/RouteTransition";
 import BehaviorTracking from "./components/BehaviorTracking";
 import GoogleTagManager from "./components/GoogleTagManager";
 import GoogleAdsTag from "./components/GoogleAdsTag";
+import ConsentControlledAnalytics from "./components/ConsentControlledAnalytics";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
 
 export const metadata: Metadata = {
-  title: "CVboosta | ATS-Friendly CV Optimization",
+  title: "CVboosta | Match Your CV to a Real Job",
   description: "Stop guessing why you don't get callbacks. Get honest feedback and an ATS-optimized rewrite for your CV in seconds.",
   keywords: ["CV optimization", "ATS resume", "AI resume builder", "career feedback", "CVboosta"],
   authors: [{ name: "CVboosta Team" }],
   creator: "CVboosta",
   publisher: "CVboosta",
   category: "career development",
+  applicationName: "CVboosta",
+  other: {
+    "apple-itunes-app": "app-id=6778948945",
+  },
+  referrer: "origin-when-cross-origin",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   metadataBase: new URL(siteUrl),
   robots: {
     index: true,
@@ -38,9 +48,10 @@ export const metadata: Metadata = {
     siteName: "CVboosta",
     images: [
       {
-        url: "/logo.png",
-        width: 800,
-        height: 600,
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "CVboosta — match your CV to a real job description",
       },
     ],
     locale: "en_US",
@@ -50,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CVboosta | ATS-Friendly CV Optimization",
     description: "Get an honest AI feedback and ATS-optimized rewrite for your CV in seconds.",
-    images: ["/logo.png"],
+    images: ["/opengraph-image"],
   },
   icons: {
     icon: [{ url: "/favicon-v2.png", type: "image/png", sizes: "64x64" }],
@@ -62,6 +73,7 @@ export const metadata: Metadata = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": `${siteUrl}/#organization`,
   name: "CVboosta",
   url: siteUrl,
   logo: `${siteUrl}/logo.png`,
@@ -70,14 +82,36 @@ const organizationSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${siteUrl}/#website`,
   name: "CVboosta",
   url: siteUrl,
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${siteUrl}/?q={search_term_string}`,
-    "query-input": "required name=search_term_string",
-  },
+  publisher: { "@id": `${siteUrl}/#organization` },
+  inLanguage: ["en", "uk", "pl", "sk", "cs", "es"],
 };
+
+const webApplicationSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": `${siteUrl}/#app`,
+  name: "CVboosta",
+  url: `${siteUrl}/app`,
+  applicationCategory: "BusinessApplication",
+  applicationSubCategory: "Career development",
+  operatingSystem: "Web browser",
+  browserRequirements: "Requires JavaScript",
+  isAccessibleForFree: true,
+  publisher: { "@id": `${siteUrl}/#organization` },
+  featureList: [
+    "CV and job-description comparison",
+    "Job match score",
+    "Missing keyword analysis",
+    "CV draft optimization",
+  ],
+};
+
+function safeJsonLd(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
 
 export default function RootLayout({
   children,
@@ -89,11 +123,15 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationSchema) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(webApplicationSchema) }}
         />
         <script
           dangerouslySetInnerHTML={{
@@ -116,7 +154,7 @@ export default function RootLayout({
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <RouteTransition>{children}</RouteTransition>
           </div>
-          <Analytics />
+          <ConsentControlledAnalytics />
           <Footer />
           <CookieBanner />
         </LanguageProvider>

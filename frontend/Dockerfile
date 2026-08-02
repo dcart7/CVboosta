@@ -5,7 +5,15 @@ WORKDIR /app
 
 # Arguments passed during build time
 ARG NEXT_PUBLIC_API_BASE=/api
+ARG NEXT_PUBLIC_SITE_URL=http://localhost
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+ARG NEXT_PUBLIC_GTM_ID=
+ARG NEXT_PUBLIC_GOOGLE_ADS_ID=
 ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GTM_ID=$NEXT_PUBLIC_GTM_ID
+ENV NEXT_PUBLIC_GOOGLE_ADS_ID=$NEXT_PUBLIC_GOOGLE_ADS_ID
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -35,8 +43,14 @@ COPY --from=builder /app/package-lock.json ./package-lock.json
 # Install ONLY production dependencies
 RUN npm ci --omit=dev
 
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+COPY --chown=node:node --from=builder /app/.next ./.next
+COPY --chown=node:node --from=builder /app/public ./public
+
+# The official image already provides an unprivileged `node` user. Keeping the
+# runtime non-root limits damage from a dependency or rendering vulnerability.
+RUN chown -R node:node /app
+
+USER node
 
 EXPOSE 3000
 

@@ -48,11 +48,11 @@ const EXAMPLE_UI: Record<Language, {
     intro: "Introduction",
     hiring: "How hiring teams screen (ATS → recruiter → hiring manager)",
     template: "ATS-safe resume template (structure + formatting)",
-    summary: "Resume summary examples (3 options you can adapt)",
+    summary: "Illustrative resume summary templates (3 options you can adapt)",
     skills: "Skills section example (grouped, ATS-safe)",
-    realistic: "Realistic resume example (copy the structure, then tailor)",
-    tailoring: "How to tailor this resume in 20 minutes (repeatable)",
-    bullets: "Realistic examples (bullets + rewrites)",
+    realistic: "Illustrative resume template (copy the structure, then tailor)",
+    tailoring: "How to tailor this resume with a repeatable workflow",
+    bullets: "Illustrative bullet templates and rewrites",
     ats: "ATS optimization (parsing, keywords, recruiter scan)",
     mistakes: "Common mistakes (and why they hurt)",
     beforeAfter: "Before/after transformation (weak → optimized)",
@@ -65,11 +65,11 @@ const EXAMPLE_UI: Record<Language, {
     intro: "Вступ",
     hiring: "Як найм-команди сканують резюме (ATS → рекрутер → hiring manager)",
     template: "ATS-безпечний шаблон резюме (структура + форматування)",
-    summary: "Приклади summary для резюме (3 варіанти)",
+    summary: "Ілюстративні шаблони summary для резюме (3 варіанти)",
     skills: "Приклад секції Skills (згруповано, ATS-safe)",
-    realistic: "Реалістичний приклад резюме (копіюйте структуру, потім адаптуйте)",
-    tailoring: "Як адаптувати це резюме за 20 хвилин",
-    bullets: "Реалістичні bullet-приклади та переписування",
+    realistic: "Ілюстративний шаблон резюме (копіюйте структуру, потім адаптуйте)",
+    tailoring: "Як адаптувати це резюме за повторюваним процесом",
+    bullets: "Ілюстративні bullet-шаблони та переписування",
     ats: "ATS-оптимізація (парсинг, ключові слова, скан рекрутера)",
     mistakes: "Типові помилки (і чому вони шкодять)",
     beforeAfter: "Трансформація до/після (слабко → сильніше)",
@@ -82,11 +82,11 @@ const EXAMPLE_UI: Record<Language, {
     intro: "Wprowadzenie",
     hiring: "Jak zespoły rekrutacyjne skanują CV (ATS → rekruter → hiring manager)",
     template: "Szablon CV bezpieczny dla ATS (struktura + formatowanie)",
-    summary: "Przykłady podsumowania CV (3 warianty)",
+    summary: "Ilustracyjne szablony podsumowania CV (3 warianty)",
     skills: "Przykład sekcji Skills (grupowane, ATS-safe)",
-    realistic: "Realistyczny przykład CV (skopiuj strukturę, potem dopasuj)",
-    tailoring: "Jak dopasować to CV w 20 minut",
-    bullets: "Realistyczne bullet points i przeróbki",
+    realistic: "Ilustracyjny szablon CV (skopiuj strukturę, potem dopasuj)",
+    tailoring: "Jak dopasować to CV w powtarzalnym procesie",
+    bullets: "Ilustracyjne szablony bullet points i przeróbki",
     ats: "Optymalizacja ATS (parsowanie, keywords, skan rekrutera)",
     mistakes: "Typowe błędy (i dlaczego szkodzą)",
     beforeAfter: "Transformacja before/after (słabo → lepiej)",
@@ -99,11 +99,11 @@ const EXAMPLE_UI: Record<Language, {
     intro: "Úvod",
     hiring: "Ako hiring tímy skenujú životopis (ATS → recruiter → hiring manager)",
     template: "ATS-safe šablóna životopisu (štruktúra + formátovanie)",
-    summary: "Príklady summary do životopisu (3 verzie)",
+    summary: "Ilustračné šablóny summary do životopisu (3 verzie)",
     skills: "Príklad sekcie Skills (zoskupené, ATS-safe)",
-    realistic: "Realistický príklad životopisu (skopírujte štruktúru a prispôsobte)",
-    tailoring: "Ako prispôsobiť tento životopis za 20 minút",
-    bullets: "Realistické bullet body a prepisy",
+    realistic: "Ilustračná šablóna životopisu (skopírujte štruktúru a prispôsobte)",
+    tailoring: "Ako prispôsobiť tento životopis opakovateľným postupom",
+    bullets: "Ilustračné šablóny bulletov a prepisy",
     ats: "ATS optimalizácia (parsing, kľúčové slová, recruiter scan)",
     mistakes: "Typické chyby (a prečo škodia)",
     beforeAfter: "Transformácia pred/po (slabé → silnejšie)",
@@ -116,11 +116,11 @@ const EXAMPLE_UI: Record<Language, {
     intro: "Úvod",
     hiring: "Jak hiring týmy skenují životopis (ATS → recruiter → hiring manager)",
     template: "ATS-safe šablona životopisu (struktura + formátování)",
-    summary: "Příklady summary do životopisu (3 varianty)",
+    summary: "Ilustrační šablony summary do životopisu (3 varianty)",
     skills: "Příklad sekce Skills (seskupené, ATS-safe)",
-    realistic: "Realistický příklad životopisu (zkopírujte strukturu a pak upravte)",
-    tailoring: "Jak upravit tento životopis za 20 minut",
-    bullets: "Realistické bullet body a přepisy",
+    realistic: "Ilustrační šablona životopisu (zkopírujte strukturu a pak upravte)",
+    tailoring: "Jak upravit tento životopis opakovatelným postupem",
+    bullets: "Ilustrační šablony bulletů a přepisy",
     ats: "ATS optimalizace (parsování, klíčová slova, recruiter scan)",
     mistakes: "Typické chyby (a proč škodí)",
     beforeAfter: "Transformace před/po (slabé → silnější)",
@@ -133,11 +133,11 @@ const EXAMPLE_UI: Record<Language, {
     intro: "Introducción",
     hiring: "Cómo los equipos de contratación escanean el CV (ATS → recruiter → hiring manager)",
     template: "Plantilla de CV compatible con ATS (estructura + formato)",
-    summary: "Ejemplos de resumen para CV (3 opciones)",
+    summary: "Plantillas ilustrativas de resumen para CV (3 opciones)",
     skills: "Ejemplo de sección Skills (agrupada, ATS-safe)",
-    realistic: "Ejemplo realista de CV (copia la estructura y luego adáptala)",
-    tailoring: "Cómo adaptar este CV en 20 minutos",
-    bullets: "Bullets realistas y reescrituras",
+    realistic: "Plantilla ilustrativa de CV (copia la estructura y luego adáptala)",
+    tailoring: "Cómo adaptar este CV con un proceso repetible",
+    bullets: "Plantillas ilustrativas de bullets y reescrituras",
     ats: "Optimización ATS (parsing, palabras clave, escaneo del recruiter)",
     mistakes: "Errores comunes (y por qué perjudican)",
     beforeAfter: "Transformación antes/después (débil → mejor)",
@@ -158,7 +158,7 @@ function replaceSectionTitle(title: string, language: Language): string {
     ["Resume summary examples (3 options you can adapt)", ui.summary],
     ["Skills section example (grouped, ATS-safe)", ui.skills],
     ["Realistic resume example (copy the structure, then tailor)", ui.realistic],
-    [/^How to tailor a .+ resume in 20 minutes \(repeatable\)$/ as unknown as string, ui.tailoring],
+    [/^How to tailor a .+ resume with a repeatable workflow$/ as unknown as string, ui.tailoring],
     ["Realistic examples (bullets + rewrites)", ui.bullets],
     ["ATS optimization (parsing, keywords, recruiter scan)", ui.ats],
     ["Common mistakes (and why they hurt)", ui.mistakes],
@@ -170,7 +170,7 @@ function replaceSectionTitle(title: string, language: Language): string {
   ]);
 
   if (mapping.has(title)) return mapping.get(title)!;
-  if (/^How to tailor a .+ resume in 20 minutes \(repeatable\)$/.test(title)) return ui.tailoring;
+  if (/^How to tailor a .+ resume with a repeatable workflow$/.test(title)) return ui.tailoring;
   return title;
 }
 
@@ -293,7 +293,7 @@ function getLocalizedExampleCopy(language: Language, role: string, roleSlug: str
   return generic[language as keyof typeof generic] ?? generic.pl;
 }
 
-const TODAY = "2026-06-01";
+const CONTENT_REVIEWED_AT = "2026-08-03";
 
 const CATEGORY_LANES: Record<RoleCategory, string[]> = {
   engineering: ["systems", "delivery", "reliability", "performance", "ownership"],
@@ -325,10 +325,6 @@ function pick<T>(items: T[], h: number, salt = 0): T {
   return items[(h + salt) % items.length];
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
-
 function truncateTo(raw: string, maxChars: number): string {
   const s = (raw || "").replace(/\s+/g, " ").trim();
   if (s.length <= maxChars) return s;
@@ -345,10 +341,10 @@ function countWords(text: string): number {
 
 function titleForRole(role: string, h: number): string {
   const variants = [
-    `${role} Resume Example (2026 ATS-Friendly)`,
+    `${role} Resume Example (ATS-Friendly)`,
     `${role} Resume Example: Template + Bullet Tips`,
     `${role} Resume Example: Summary + Skills`,
-    `${role} Resume Example for ATS (2026)`,
+    `${role} Resume Example for ATS`,
   ];
   return pick(variants, h, 19);
 }
@@ -463,7 +459,7 @@ function buildTemplateSection(role: string, lane: string, h: number): SeoSection
   return {
     title: "ATS-safe resume template (structure + formatting)",
     body:
-      `Recruiters don’t read your resume like a blog post. They scan for **role fit** and **proof** fast—usually in 10–30 seconds.\n\n` +
+      "Recruiters don’t read your resume like a blog post. Their initial scan focuses on **role fit** and **proof**.\n\n" +
       `To avoid ATS parsing issues, use a simple structure with predictable headings and readable text. This is the safest default for ${lane} roles.\n\n` +
       "### Recommended section order\n" +
       "- Contact (in the body, not in header/footer)\n" +
@@ -484,8 +480,6 @@ function buildTemplateSection(role: string, lane: string, h: number): SeoSection
 }
 
 function buildHiringContextSection(role: string, category: RoleCategory, lane: string, h: number): SeoSection {
-  const scanTimes = [8, 10, 15, 20, 30];
-  const scan = pick(scanTimes, h, 101);
   const funnel = pick(
     [
       "High-volume hiring funnels reward speed. Your resume must make the *right* story obvious fast.",
@@ -561,7 +555,7 @@ function buildHiringContextSection(role: string, category: RoleCategory, lane: s
       `${funnel}\n\n` +
       `A typical flow looks like this:\n` +
       "1. **ATS parsing + indexing** (file → text → sections → searchable terms)\n" +
-      `2. **Recruiter scan** (first ${scan}–30 seconds: role alignment + keywords + credibility)\n` +
+      "2. **Recruiter scan** (initial review: role alignment + keywords + credibility)\n" +
       "3. **Hiring manager skim** (do your bullets prove the work at the right scope?)\n\n" +
       `${pick(categoryNotes[category], h, 107)}\n\n` +
       `When your resume makes ${lane} obvious early, you remove uncertainty — and that increases shortlist probability.`,
@@ -574,17 +568,16 @@ function buildSummaryExamplesSection(cluster: ResumeKeywordCluster, h: number): 
   const kwB = cluster.keywords[(h + 5) % cluster.keywords.length];
   const kwC = cluster.keywords[(h + 11) % cluster.keywords.length];
   const lane = pick(CATEGORY_LANES[cluster.category], h, 61);
-  const years = 3 + (h % 10);
-  const metric = 18 + (h % 37);
 
   return {
-    title: "Resume summary examples (3 options you can adapt)",
+    title: "Illustrative resume summary templates (3 options you can adapt)",
     body:
+      "These are illustrative templates, not claims to copy. Replace every bracketed placeholder with information you can verify.\n\n" +
       "A strong summary is short: **2–4 sentences**. It should include your target title, 2–4 role keywords, and one credibility signal.\n\n" +
       "### Option A: concise + keyword-aware\n" +
-      `- ${role} with ${years}+ years delivering ${lane} outcomes. Experience with ${kwA}, ${kwB}, and cross-functional execution. Known for clear ownership, measurable results, and ATS-friendly communication.\n\n` +
+      `- ${role} with [years]+ years delivering ${lane} outcomes. Experience with ${kwA}, ${kwB}, and cross-functional execution. Known for clear ownership, verified results, and ATS-friendly communication.\n\n` +
       "### Option B: metric-first (credible proof)\n" +
-      `- ${role} specializing in ${kwA} and ${kwC}. Improved ${lane} results by ${metric}% by tightening process, aligning to KPIs, and upgrading evidence in delivery. Comfortable partnering with stakeholders and shipping iteratively.\n\n` +
+      `- ${role} specializing in ${kwA} and ${kwC}. Improved ${lane} results by [X%] by tightening process, aligning to KPIs, and upgrading evidence in delivery. Comfortable partnering with stakeholders and shipping iteratively.\n\n` +
       "### Option C: fast tailoring version (for a specific vacancy)\n" +
       `- ${role} aligned to this role’s core requirements: ${kwA}, ${kwB}, ${kwC}. Proven track record delivering measurable outcomes in ${lane}. Seeking to bring the same execution and clarity to this team.\n\n` +
       "Tip: tailor Option C by swapping the three keywords to match the job post’s repeated must-haves.\n\n" +
@@ -629,7 +622,7 @@ function buildTailoringWorkflowSection(cluster: ResumeKeywordCluster, h: number)
   ].join("\n");
 
   return {
-    title: `How to tailor a ${role} resume in 20 minutes (repeatable)`,
+    title: `How to tailor a ${role} resume with a repeatable workflow`,
     body:
       "Tailoring is not a full rewrite. It’s a short, high-leverage edit pass that increases match and readability.\n\n" +
       "### The repeatable workflow\n" +
@@ -650,8 +643,6 @@ function buildResumeSnippet(role: string, cluster: ResumeKeywordCluster, h: numb
   const lane = pick(CATEGORY_LANES[cluster.category], h, 9);
   const kwA = cluster.keywords[h % cluster.keywords.length];
   const kwB = cluster.keywords[(h + 7) % cluster.keywords.length];
-  const metricA = 12 + (h % 38);
-  const metricB = 6 + ((h >> 2) % 22);
   const titleLine = pick(
     [
       `${role} • ${kwA} • ${kwB}`,
@@ -664,6 +655,7 @@ function buildResumeSnippet(role: string, cluster: ResumeKeywordCluster, h: numb
 
   return (
     "```text\n" +
+    "ILLUSTRATIVE TEMPLATE — REPLACE ALL BRACKETED PLACEHOLDERS WITH VERIFIED FACTS\n" +
     "FIRST LAST\n" +
     "City, Country | email@domain.com | +1 (555) 555-5555 | linkedin.com/in/handle\n" +
     "\n" +
@@ -677,12 +669,12 @@ function buildResumeSnippet(role: string, cluster: ResumeKeywordCluster, h: numb
     `- Core: ${cluster.keywords.slice(0, 10).join(", ")}\n` +
     "\n" +
     "EXPERIENCE\n" +
-    "Role Title | Company | 2023–Present\n" +
-    `- Improved ${lane} outcomes by ${metricA}% by aligning work to priority metrics and tightening execution.\n` +
-    `- Built repeatable process for ${kwA}; reduced rework by ${metricB}% with clearer ownership and QA checkpoints.\n` +
+    "Role Title | Company | [Start date]–[End date or Present]\n" +
+    `- Improved ${lane} outcomes by [X%] by aligning work to priority metrics and tightening execution.\n` +
+    `- Built repeatable process for ${kwA}; reduced verified rework by [X%] with clearer ownership and QA checkpoints.\n` +
     "\n" +
     "EDUCATION\n" +
-    "Degree | University | 2019\n" +
+    "Degree | University | [Graduation date]\n" +
     "```\n"
   );
 }
@@ -692,10 +684,10 @@ function buildExampleBullets(cluster: ResumeKeywordCluster, h: number): string {
   const lane = pick(lanes, h, 5);
 
   const exampleLines = [
-    `- Drove ${lane} improvements; reduced cycle time by ${10 + (h % 25)}% by clarifying ownership and removing duplicate steps.`,
-    `- Partnered cross-functionally to deliver ${cluster.keywords[(h + 3) % cluster.keywords.length]}; improved KPI from ${72 + (h % 16)}% to ${80 + (h % 12)}%.`,
-    `- Built a repeatable workflow around ${cluster.keywords[(h + 9) % cluster.keywords.length]}; cut avoidable rework by ${12 + (h % 26)}%.`,
-    `- Created weekly reporting for stakeholders; reduced decision lag by ${8 + (h % 18)}% by standardizing metrics and cadence.`,
+    `- Drove ${lane} improvements; reduced verified cycle time by [X%] by clarifying ownership and removing duplicate steps.`,
+    `- Partnered cross-functionally to deliver ${cluster.keywords[(h + 3) % cluster.keywords.length]}; improved a verified KPI from [baseline] to [measured result].`,
+    `- Built a repeatable workflow around ${cluster.keywords[(h + 9) % cluster.keywords.length]}; cut verified avoidable rework by [X%].`,
+    "- Created a reporting cadence for stakeholders; reduced verified decision lag by [X%] by standardizing metrics and cadence.",
   ];
 
   const fromCluster = cluster.examples
@@ -704,10 +696,10 @@ function buildExampleBullets(cluster: ResumeKeywordCluster, h: number): string {
     .join("\n\n");
 
   return (
-    "### Resume bullet examples (measurable, believable)\n" +
+    "### Illustrative resume bullet templates (replace placeholders with verified results)\n" +
     exampleLines.join("\n") +
     "\n\n" +
-    "### Before/after rewrites (same truth, stronger signal)\n" +
+    "### Illustrative before/after rewrites (keep only facts you can verify)\n" +
     fromCluster
   );
 }
@@ -755,14 +747,11 @@ function buildCommonMistakesSection(cluster: ResumeKeywordCluster, role: string,
     "Vague bullets (“helped”, “worked on”, “responsible for”) that hide ownership and impact.",
     ...cluster.mistakes.slice(0, 4).map((m) => `${m}`),
   ];
-  const count = clamp(8 + (h % 4), 8, Math.min(12, mistakes.length));
-
   return {
     title: "Common mistakes (and why they hurt)",
     body:
       "### Mistakes recruiters and ATS systems penalize\n" +
       mistakes
-        .slice(0, count)
         .map((m) => `- ${m}`)
         .join("\n") +
       "\n\n" +
@@ -773,22 +762,21 @@ function buildCommonMistakesSection(cluster: ResumeKeywordCluster, role: string,
 function buildBeforeAfterSection(role: string, cluster: ResumeKeywordCluster, h: number): SeoSection {
   const lane = pick(CATEGORY_LANES[cluster.category], h, 27);
   const kw = cluster.keywords[(h + 5) % cluster.keywords.length];
-  const metricA = 14 + (h % 33);
-  const metricB = 9 + ((h >> 3) % 26);
   const weak = [
     `- Worked on ${kw} and helped the team deliver projects.`,
     `- Responsible for improving ${lane} and supporting stakeholders.`,
     "- Created reports and communicated status updates.",
   ];
   const strong = [
-    `- Delivered ${kw} improvements; increased reliability and reduced rework by ${metricB}% by adding clear validation + ownership.`,
-    `- Improved ${lane} outcomes by ${metricA}% by prioritizing high-signal work and tightening execution against KPIs.`,
-    `- Built a weekly reporting cadence; reduced decision lag by ${7 + (h % 16)}% with standardized metrics and consistent updates.`,
+    `- Delivered ${kw} improvements; increased reliability and reduced verified rework by [X%] by adding clear validation + ownership.`,
+    `- Improved verified ${lane} outcomes by [X%] by prioritizing high-signal work and tightening execution against KPIs.`,
+    "- Built a reporting cadence; reduced verified decision lag by [X%] with standardized metrics and consistent updates.",
   ];
 
   return {
     title: "Before/after transformation (weak → optimized)",
     body:
+      "These are illustrative templates. Replace bracketed placeholders with verified facts and preserve the truth of your original experience.\n\n" +
       "### Weak version (common but low-signal)\n" +
       weak.map((l) => `- ${l}`).join("\n") +
       "\n\n" +
@@ -850,8 +838,7 @@ function buildFaq(role: string, cluster: ResumeKeywordCluster, h: number): SeoFa
     },
   ];
 
-  const count = 6 + (h % 3);
-  return faq.slice(0, count);
+  return faq;
 }
 
 function buildInternalLinks(roleSlug: string, role: string): SeoInternalLink[] {
@@ -882,7 +869,7 @@ export function buildResumeExampleSeoPage(
       { title: replaceSectionTitle("Resume summary examples (3 options you can adapt)", language), body: copy.summary },
       { title: replaceSectionTitle("Skills section example (grouped, ATS-safe)", language), body: copy.skills },
       { title: replaceSectionTitle("Realistic resume example (copy the structure, then tailor)", language), body: copy.realistic },
-      { title: replaceSectionTitle(`How to tailor a ${cluster.role} resume in 20 minutes (repeatable)`, language), body: copy.tailoring },
+      { title: replaceSectionTitle(`How to tailor a ${cluster.role} resume with a repeatable workflow`, language), body: copy.tailoring },
       { title: replaceSectionTitle("Realistic examples (bullets + rewrites)", language), body: copy.bullets },
       { title: replaceSectionTitle("ATS optimization (parsing, keywords, recruiter scan)", language), body: copy.ats },
       { title: replaceSectionTitle("Common mistakes (and why they hurt)", language), body: copy.mistakes },
@@ -922,7 +909,7 @@ export function buildResumeExampleSeoPage(
       metaDescription: truncateTo(copy.meta, 160),
       h1: copy.h1,
       lead: copy.lead,
-      updatedAt: TODAY,
+      updatedAt: CONTENT_REVIEWED_AT,
       sections,
       faq,
       internalLinks,
@@ -956,7 +943,7 @@ export function buildResumeExampleSeoPage(
   const tailoringSection = buildTailoringWorkflowSection(cluster, h);
 
   const exampleSection: SeoSection = {
-    title: "Realistic resume example (copy the structure, then tailor)",
+    title: "Illustrative resume template (copy the structure, then tailor)",
     body:
       "Below is a **structure-first** example. Replace placeholders with your truth, then tailor keywords to the vacancy.\n\n" +
       buildResumeSnippet(cluster.role, cluster, h) +
@@ -967,7 +954,7 @@ export function buildResumeExampleSeoPage(
   };
 
   const bulletsSection: SeoSection = {
-    title: "Realistic examples (bullets + rewrites)",
+    title: "Illustrative bullet templates and rewrites",
     body: buildExampleBullets(cluster, h),
   };
 
@@ -1059,7 +1046,7 @@ export function buildResumeExampleSeoPage(
         kwSlice.map((k) => `- ${k}`).join("\n") +
         "\n\n" +
         "### Proof patterns recruiters trust\n" +
-        "- Baseline → change → result (e.g., 72% → 86%)\n" +
+        "- Baseline → change → verified result (e.g., [baseline] → [measured result])\n" +
         "- Time saved / cycle time reduced\n" +
         "- Quality improved / incidents reduced\n" +
         "- Revenue protected / pipeline improved\n" +
@@ -1085,7 +1072,7 @@ export function buildResumeExampleSeoPage(
     metaDescription,
     h1,
     lead,
-    updatedAt: TODAY,
+    updatedAt: CONTENT_REVIEWED_AT,
     sections,
     faq,
     internalLinks,

@@ -1,20 +1,23 @@
 from __future__ import annotations
 
 import secrets
+import logging
+import hmac
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db.session import get_db
+from app.db.session import get_db, get_sessionlocal
 from app.models.analysis import Analysis
-from app.models.billing import AppStoreTransaction, UserBillingEntitlement
+from app.models.billing import AppStoreTransaction, PendingStripeCheckout, UserBillingEntitlement
 from app.models.device_push_token import DevicePushToken
 from app.models.live_activity_push_token import LiveActivityPushToken
 from app.models.live_activity_start_token import LiveActivityStartToken
+from app.models.idempotency import IdempotencyRecord
 from app.models.oauth_identity import OAuthIdentity
 from app.models.request_log import RequestLog
 from app.models.user import User
@@ -24,6 +27,7 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
     LoginRequest,
+    NativeTokenResponse,
     OAuthLoginRequest,
     RegisterRequest,
     ResetPasswordRequest,
@@ -36,16 +40,44 @@ from app.services.auth import (
     decode_password_reset_token,
     hash_password,
     normalize_password_input,
+    password_hash_needs_update,
+    validate_new_password,
     validate_password_reset_token_for_user,
+    validate_access_token_for_user,
     verify_password,
 )
 from app.services.activity_logger import record_activity
 from app.models.activity import ActivityLog
 from app.services.emailer import build_password_reset_link, send_password_reset_email
 from app.services.oauth import verify_google_access_token, verify_oauth_id_token
+from app.services.app_store import refresh_app_store_entitlement_from_transactions
+from app.services.idempotency import (
+    begin_idempotent_request,
+    canonical_request_hash,
+    complete_idempotent_request,
+    fail_idempotent_request,
+    normalize_idempotency_key,
+)
 
 router = APIRouter()
 optional_bearer = HTTPBearer(auto_error=False)
+logger = logging.getLogger(__name__)
+_DUMMY_PASSWORD_HASH = hash_password("timing-only-password-2026!")
+
+
+def _deliver_password_reset(user_id: int, email: str, reset_link: str) -> None:
+    if not send_password_reset_email(to_email=email, reset_link=reset_link):
+        return
+    session_local = get_sessionlocal()
+    if session_local is None:
+        return
+    db = session_local()
+    try:
+        record_activity(db, user_id=user_id, action="Password reset requested", meta={})
+    except Exception:
+        db.rollback()
+    finally:
+        db.close()
 
 
 def _delete_user_related_rows(db: Session, user_id: int) -> None:
@@ -58,17 +90,15 @@ def _delete_user_related_rows(db: Session, user_id: int) -> None:
     db.execute(delete(LiveActivityPushToken).where(LiveActivityPushToken.user_id == user_id))
     db.execute(delete(LiveActivityStartToken).where(LiveActivityStartToken.user_id == user_id))
     db.execute(delete(OAuthIdentity).where(OAuthIdentity.user_id == user_id))
-
-
-def _request_is_https(request: Request) -> bool:
-    forwarded_proto = (request.headers.get("x-forwarded-proto") or "").split(",")[0].strip().lower()
-    if forwarded_proto == "https":
-        return True
-    return request.url.scheme.lower() == "https"
+    db.execute(delete(IdempotencyRecord).where(IdempotencyRecord.user_id == user_id))
+    db.execute(delete(PendingStripeCheckout).where(PendingStripeCheckout.user_id == user_id))
 
 
 def _set_auth_cookie(request: Request, response: Response, token: str) -> None:
-    secure = settings.auth_cookie_secure and _request_is_https(request)
+    # Never silently downgrade a production Secure cookie because an internal
+    # proxy hop reaches the app over HTTP. Local development opts out through
+    # AUTH_COOKIE_SECURE=false explicitly.
+    secure = settings.auth_cookie_secure
     samesite = settings.auth_cookie_samesite.lower().strip() if settings.auth_cookie_samesite else "lax"
     if samesite not in {"lax", "strict", "none"}:
         samesite = "lax"
@@ -95,6 +125,29 @@ def _clear_auth_cookie(response: Response) -> None:
     )
 
 
+def _is_browser_request(request: Request) -> bool:
+    if (request.headers.get("origin") or "").strip():
+        return True
+    return any(
+        (request.headers.get(header) or "").strip()
+        for header in (
+            "sec-fetch-site",
+            "sec-fetch-mode",
+            "sec-fetch-dest",
+            "sec-fetch-user",
+        )
+    )
+
+
+def _auth_response(request: Request, user: User, token: str) -> AuthResponse:
+    # Browsers authenticate solely through the HttpOnly cookie. Existing iOS
+    # releases do not send browser Fetch Metadata headers and retain the legacy
+    # bearer response during the native-token-exchange rollout.
+    if _is_browser_request(request):
+        return AuthResponse(email=user.email)
+    return AuthResponse(access_token=token, token_type="bearer", email=user.email)
+
+
 def _extract_token(
     request: Request,
     credentials: HTTPAuthorizationCredentials | None,
@@ -107,18 +160,54 @@ def _extract_token(
     return cookie_token
 
 
-@router.post("/auth/register", response_model=AuthResponse)
+@router.post("/auth/register", response_model=AuthResponse, response_model_exclude_none=True)
 def register(
     payload: RegisterRequest,
     request: Request,
     response: Response,
     db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> AuthResponse:
-    normalized_password = normalize_password_input(payload.password)
-    if len(normalized_password) < 8:
-        raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
+    try:
+        normalized_password = validate_new_password(payload.password)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    normalized_email = payload.email.lower().strip()
+    normalized_key = normalize_idempotency_key(idempotency_key)
+    idempotency_attempt = None
+    if normalized_key:
+        attempt = begin_idempotent_request(
+            db,
+            operation="auth.register",
+            scope=f"registration:{normalized_email}",
+            key=normalized_key,
+            request_hash=canonical_request_hash(
+                {
+                    "email": normalized_email,
+                    "password": normalized_password,
+                    "full_name": (payload.full_name or "").strip(),
+                }
+            ),
+            user_id=None,
+        )
+        idempotency_attempt = attempt
+        if attempt.is_replay:
+            replay_user = (
+                db.query(User).filter(User.id == attempt.record.user_id).first()
+                if attempt.record.user_id
+                else None
+            )
+            if replay_user is None or replay_user.email.lower() != normalized_email:
+                raise HTTPException(
+                    status_code=409,
+                    detail="The completed registration cannot be replayed safely.",
+                )
+            token = create_access_token(replay_user)
+            _set_auth_cookie(request, response, token)
+            return _auth_response(request, replay_user, token)
+
     user = User(
-        email=payload.email.lower().strip(), 
+        email=normalized_email,
         password_hash=hash_password(normalized_password),
         full_name=payload.full_name
     )
@@ -128,15 +217,34 @@ def register(
         db.refresh(user)
     except IntegrityError:
         db.rollback()
+        fail_idempotent_request(db, attempt=idempotency_attempt)
         raise HTTPException(status_code=409, detail="Email already registered")
+
+    if idempotency_attempt:
+        try:
+            complete_idempotent_request(
+                db,
+                attempt=idempotency_attempt,
+                user_id=user.id,
+                response={"registered": True},
+                resource_id=user.id,
+            )
+        except Exception:
+            # Registration already committed.  Do not turn a successful account
+            # creation into a retry that appears safe to execute again.
+            fail_idempotent_request(db, attempt=idempotency_attempt)
+            raise HTTPException(
+                status_code=500,
+                detail="Account created, but the response could not be finalized. Please sign in.",
+            )
 
     record_activity(db, user_id=user.id, action="Account created", meta={})
     token = create_access_token(user)
     _set_auth_cookie(request, response, token)
-    return AuthResponse(access_token=token, email=user.email)
+    return _auth_response(request, user, token)
 
 
-@router.post("/auth/login", response_model=AuthResponse)
+@router.post("/auth/login", response_model=AuthResponse, response_model_exclude_none=True)
 def login(
     payload: LoginRequest,
     request: Request,
@@ -146,25 +254,37 @@ def login(
     user = db.query(User).filter(User.email == payload.email.lower().strip()).first()
     provided_password = payload.password
     normalized_password = normalize_password_input(provided_password)
-    candidates = [provided_password]
-    if normalized_password != provided_password:
-        candidates.append(normalized_password)
-    valid_password = bool(user) and any(
-        verify_password(candidate, user.password_hash) for candidate in candidates
-    )
+    candidates = [provided_password, normalized_password]
+    # Always perform the expensive password derivation, including for an
+    # unknown address, to reduce account enumeration through response timing.
+    comparison_hash = user.password_hash if user else _DUMMY_PASSWORD_HASH
+    password_results = [
+        verify_password(candidate, comparison_hash) for candidate in candidates
+    ]
+    valid_password = bool(user) and any(password_results)
     if not user or not valid_password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
 
+    if password_hash_needs_update(user.password_hash):
+        matched_password = next(
+            candidate
+            for candidate, matched in zip(candidates, password_results)
+            if matched
+        )
+        user.password_hash = hash_password(matched_password)
+        db.add(user)
+        db.commit()
+
     record_activity(db, user_id=user.id, action="Signed in", meta={})
     token = create_access_token(user)
     _set_auth_cookie(request, response, token)
-    return AuthResponse(access_token=token, email=user.email)
+    return _auth_response(request, user, token)
 
 
-@router.post("/auth/oauth/{provider}", response_model=AuthResponse)
+@router.post("/auth/oauth/{provider}", response_model=AuthResponse, response_model_exclude_none=True)
 def oauth_login(
     provider: str,
     payload: OAuthLoginRequest,
@@ -192,7 +312,17 @@ def oauth_login(
     if not provider_user_id:
         raise HTTPException(status_code=400, detail="OAuth subject is missing")
 
-    email = str(claims.get("email", payload.email or "")).strip().lower()
+    verified_marker = claims.get("email_verified")
+    email_is_verified = verified_marker is True or (
+        isinstance(verified_marker, str) and verified_marker.lower() == "true"
+    )
+    # Client payload fields are never proof of ownership. Apple may omit email
+    # after the first login, which is safe once the provider subject is linked.
+    email = (
+        str(claims.get("email") or "").strip().lower()
+        if email_is_verified
+        else ""
+    )
     identity = (
         db.query(OAuthIdentity)
         .filter(
@@ -209,44 +339,25 @@ def oauth_login(
         if not email:
             raise HTTPException(status_code=400, detail="OAuth email is missing")
 
-        user = db.query(User).filter(User.email == email).first()
-        if not user:
-            random_password = secrets.token_urlsafe(48)
-            user = User(
-                email=email,
-                password_hash=hash_password(random_password),
-                full_name=display_name,
+        # Do not silently attach a provider identity to a pre-existing account.
+        # Password registrations currently have no verified-email marker, so
+        # matching an OAuth email alone cannot prove control of that account.
+        if db.query(User.id).filter(User.email == email).first():
+            raise HTTPException(
+                status_code=409,
+                detail="An account with this email already exists. Sign in before linking OAuth.",
             )
-            try:
-                db.add(user)
-                db.commit()
-                db.refresh(user)
-            except IntegrityError:
-                db.rollback()
-                user = db.query(User).filter(User.email == email).first()
-                if not user:
-                    raise HTTPException(status_code=500, detail="Failed to create OAuth user")
-            record_activity(
-                db,
-                user_id=user.id,
-                action="Account created",
-                meta={"method": provider_name},
-            )
-        elif display_name and not user.full_name:
-            user.full_name = display_name
-            db.add(user)
-            db.commit()
 
-        identity = OAuthIdentity(
-            user_id=user.id,
-            provider=provider_name,
-            provider_user_id=provider_user_id,
-            email=email or None,
+        random_password = secrets.token_urlsafe(48)
+        user = User(
+            email=email,
+            password_hash=hash_password(random_password),
+            full_name=display_name,
         )
         try:
-            db.add(identity)
+            db.add(user)
             db.commit()
-            db.refresh(identity)
+            db.refresh(user)
         except IntegrityError:
             db.rollback()
             identity = (
@@ -257,11 +368,45 @@ def oauth_login(
                 )
                 .first()
             )
-            if identity is None:
-                raise HTTPException(status_code=500, detail="Failed to link OAuth identity")
-            user = db.query(User).filter(User.id == identity.user_id).first()
-            if user is None:
-                raise HTTPException(status_code=500, detail="OAuth identity is linked to a missing user")
+            user = db.query(User).filter(User.id == identity.user_id).first() if identity else None
+            if not identity or not user:
+                raise HTTPException(
+                    status_code=409,
+                    detail="An account with this email already exists. Sign in before linking OAuth.",
+                )
+        if identity is None:
+            record_activity(
+                db,
+                user_id=user.id,
+                action="Account created",
+                meta={"method": provider_name},
+            )
+
+            identity = OAuthIdentity(
+                user_id=user.id,
+                provider=provider_name,
+                provider_user_id=provider_user_id,
+                email=email or None,
+            )
+            try:
+                db.add(identity)
+                db.commit()
+                db.refresh(identity)
+            except IntegrityError:
+                db.rollback()
+                identity = (
+                    db.query(OAuthIdentity)
+                    .filter(
+                        OAuthIdentity.provider == provider_name,
+                        OAuthIdentity.provider_user_id == provider_user_id,
+                    )
+                    .first()
+                )
+                if identity is None:
+                    raise HTTPException(status_code=500, detail="Failed to link OAuth identity")
+                user = db.query(User).filter(User.id == identity.user_id).first()
+                if user is None:
+                    raise HTTPException(status_code=500, detail="OAuth identity is linked to a missing user")
     else:
         needs_commit = False
         if display_name and not user.full_name:
@@ -279,7 +424,21 @@ def oauth_login(
     record_activity(db, user_id=user.id, action="Signed in", meta={"method": provider_name})
     token = create_access_token(user)
     _set_auth_cookie(request, response, token)
-    return AuthResponse(access_token=token, email=user.email)
+    return _auth_response(request, user, token)
+
+
+def _require_native_client(
+    request: Request,
+    native_client_key: str | None = Header(default=None, alias="X-Native-Client-Key"),
+) -> None:
+    if _is_browser_request(request):
+        raise HTTPException(status_code=403, detail="Native token exchange rejects browser requests.")
+    expected = (settings.native_auth_client_key or "").strip()
+    provided = (native_client_key or "").strip()
+    if not expected:
+        raise HTTPException(status_code=404, detail="Native token exchange is unavailable.")
+    if not provided or not hmac.compare_digest(provided, expected):
+        raise HTTPException(status_code=401, detail="Invalid native client credentials.")
 
 
 @router.post("/auth/logout")
@@ -305,6 +464,10 @@ def get_current_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
+    try:
+        validate_access_token_for_user(payload, user)
+    except Exception as exc:
+        raise HTTPException(status_code=401, detail="Invalid token") from exc
     return user
 
 
@@ -321,7 +484,29 @@ def get_current_user_optional(
         user_id = int(payload.get("sub", "0"))
     except Exception:
         return None
-    return db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return None
+    try:
+        validate_access_token_for_user(payload, user)
+    except Exception:
+        return None
+    return user
+
+
+@router.post("/auth/native/token", response_model=NativeTokenResponse)
+def issue_native_token(
+    _native_client: None = Depends(_require_native_client),
+    current_user: User = Depends(get_current_user),
+) -> NativeTokenResponse:
+    """Exchange the HttpOnly login session for a native bearer token.
+
+    Browser auth endpoints never place the bearer token in JavaScript-visible
+    response bodies. Native releases use this separately configured contract.
+    """
+
+    token = create_access_token(current_user)
+    return NativeTokenResponse(access_token=token, email=current_user.email)
 
 
 @router.delete("/auth/account", status_code=status.HTTP_204_NO_CONTENT)
@@ -330,6 +515,23 @@ def delete_account(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> Response:
+    if (current_user.paddle_subscription_id or "").strip():
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Cancel the active Stripe subscription before deleting the account "
+                "so future charges are not orphaned."
+            ),
+        )
+    app_store_entitlement = refresh_app_store_entitlement_from_transactions(db, current_user.id)
+    if app_store_entitlement and app_store_entitlement.is_active:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Cancel the App Store subscription and wait until its current period ends "
+                "before deleting the account."
+            ),
+        )
     _delete_user_related_rows(db, current_user.id)
     db.delete(current_user)
 
@@ -374,9 +576,10 @@ def change_password(
     )
     if not current_valid:
         raise HTTPException(status_code=400, detail="Current password is incorrect")
-    new_password_normalized = normalize_password_input(payload.new_password)
-    if len(new_password_normalized) < 8:
-        raise HTTPException(status_code=400, detail="New password must be at least 8 characters.")
+    try:
+        new_password_normalized = validate_new_password(payload.new_password)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if verify_password(new_password_normalized, current_user.password_hash):
         raise HTTPException(status_code=400, detail="New password must be different")
     current_user.password_hash = hash_password(new_password_normalized)
@@ -389,30 +592,35 @@ def change_password(
 @router.post("/auth/forgot-password")
 def forgot_password(
     payload: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ) -> dict:
     # Always return the same response to prevent email enumeration.
     response = {"status": "ok", "message": "If this email exists, reset instructions were sent."}
     user = db.query(User).filter(User.email == payload.email.lower().strip()).first()
-    if not user:
-        return response
-
     try:
-        token = create_password_reset_token(user)
+        timing_user = user or User(
+            id=0,
+            email="nobody.invalid@example.invalid",
+            password_hash=_DUMMY_PASSWORD_HASH,
+        )
+        token = create_password_reset_token(timing_user)
         reset_link = build_password_reset_link(token)
         if not reset_link:
-            print(
-                "[password-reset] reset link is empty. Set PASSWORD_RESET_FRONTEND_URL or HTTPS CORS origin."
-            )
+            logger.warning("Password reset frontend URL is not configured")
             return response
-        sent = send_password_reset_email(to_email=user.email, reset_link=reset_link)
-        if sent:
-            record_activity(db, user_id=user.id, action="Password reset requested", meta={})
-        else:
-            print(f"[password-reset] failed to send reset email to {user.email}")
+        if user:
+            # Network SMTP work runs after the response has been sent, keeping
+            # existing and absent accounts on the same synchronous path.
+            background_tasks.add_task(
+                _deliver_password_reset,
+                user.id,
+                user.email,
+                reset_link,
+            )
     except Exception:
         # Keep response generic to avoid account/email leaks.
-        print(f"[password-reset] unexpected error while preparing reset for {user.email}")
+        logger.warning("Password reset preparation failed")
         return response
     return response
 
@@ -421,6 +629,7 @@ def forgot_password(
 def reset_password(
     payload: ResetPasswordRequest,
     db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
     try:
         token_payload = decode_password_reset_token(payload.token)
@@ -432,22 +641,68 @@ def reset_password(
     if not user:
         raise HTTPException(status_code=400, detail="Invalid or expired reset link.")
 
+    normalized_key = normalize_idempotency_key(idempotency_key)
+    idempotency_attempt = None
+    if normalized_key:
+        idempotency_attempt = begin_idempotent_request(
+            db,
+            operation="auth.password.reset",
+            scope=f"user:{user.id}",
+            key=normalized_key,
+            request_hash=canonical_request_hash(
+                {
+                    "token": payload.token,
+                    "new_password": payload.new_password,
+                }
+            ),
+            user_id=user.id,
+        )
+        # This check intentionally precedes validation against the current
+        # password hash. A successful first request revokes its own reset token,
+        # so a network retry must replay the atomic committed result instead.
+        if idempotency_attempt.is_replay:
+            return idempotency_attempt.replay_response
+
     try:
         validate_password_reset_token_for_user(token_payload, user)
     except Exception as exc:
+        fail_idempotent_request(db, attempt=idempotency_attempt)
         raise HTTPException(status_code=400, detail="Invalid or expired reset link.") from exc
 
-    new_password_normalized = normalize_password_input(payload.new_password)
-    if len(new_password_normalized) < 8:
-        raise HTTPException(status_code=400, detail="New password must be at least 8 characters.")
-    if verify_password(new_password_normalized, user.password_hash):
-        raise HTTPException(status_code=400, detail="New password must be different.")
+    try:
+        try:
+            new_password_normalized = validate_new_password(payload.new_password)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        if verify_password(new_password_normalized, user.password_hash):
+            raise HTTPException(status_code=400, detail="New password must be different.")
 
-    user.password_hash = hash_password(new_password_normalized)
-    db.add(user)
-    db.commit()
+        user.password_hash = hash_password(new_password_normalized)
+        db.add(user)
+        response_payload = {"status": "ok"}
+        if idempotency_attempt:
+            complete_idempotent_request(
+                db,
+                attempt=idempotency_attempt,
+                user_id=user.id,
+                response=response_payload,
+                commit=False,
+            )
+        # Password rotation and replay record are committed atomically.
+        db.commit()
+    except HTTPException:
+        db.rollback()
+        fail_idempotent_request(db, attempt=idempotency_attempt)
+        raise
+    except Exception as exc:
+        db.rollback()
+        fail_idempotent_request(db, attempt=idempotency_attempt)
+        raise HTTPException(
+            status_code=500,
+            detail="Password could not be reset safely. Retry the same request.",
+        ) from exc
     record_activity(db, user_id=user.id, action="Password reset completed", meta={})
-    return {"status": "ok"}
+    return response_payload
 
 
 @router.get("/auth/activity", response_model=ActivityResponse)

@@ -2,19 +2,22 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
-import { trackEvent } from "../lib/analytics";
+import {
+  ANALYTICS_EVENTS,
+  getOrCreateShareReferralCode,
+  trackEvent,
+} from "../lib/analytics";
 import PaywallModal from "../components/PaywallModal";
 import {
-  fetchWorkspaceEmail,
-  migrateLegacyGuestWorkspace,
-  workspaceIdFromEmail,
-  wsFieldKey,
-} from "../lib/workspaceStorage";
+  clearLegacyPersistentFunnelData,
+  loadResultContext,
+  saveResultContext,
+} from "../lib/funnelIntent";
 
 type PdfTemplateId =
   | "classic"
@@ -196,6 +199,8 @@ const PDF_TEMPLATES: PdfTemplate[] = [
 const DEFAULT_PDF_TEMPLATE: PdfTemplateId = "modern";
 const SITE_LAUNCH_DATE_RAW = process.env.NEXT_PUBLIC_SITE_LAUNCH_DATE || "2026-04-21";
 const WATERMARK_GRACE_PERIOD_DAYS = 30;
+const ADVOCACY_PROMPT_KEY = "cvboosta.advocacy-prompt.v1";
+const ADVOCACY_PROMPT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 
 type PreviewBlock =
   | { type: "title"; text: string }
@@ -418,7 +423,7 @@ function ResultsContent() {
   const apiBase = getApiBase();
   const searchParams = useSearchParams();
   const { t, language } = useTranslation();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com").replace(/\/$/, "");
   const [optimizedCv, setOptimizedCv] = useState("");
   const [jobTextForUi, setJobTextForUi] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
@@ -442,26 +447,52 @@ function ResultsContent() {
   const [clError, setClError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"document" | "metrics">("document");
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
+  const [shareReferralCode, setShareReferralCode] = useState("shared_result");
+  const [showAdvocacyPrompt, setShowAdvocacyPrompt] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("unknown");
+  const [resultCanExport, setResultCanExport] = useState<boolean | null>(null);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const advocacyPromptShownRef = useRef(false);
 
   const sessionId = searchParams.get("id");
   const isDemo = searchParams.get("demo") === "1";
   const shareBefore = typeof matchBefore === "number" ? Math.max(0, Math.min(100, Math.round(matchBefore))) : null;
   const shareAfter = typeof matchAfter === "number" ? Math.max(0, Math.min(100, Math.round(matchAfter))) : null;
-  const shareUrl =
-    shareBefore !== null && shareAfter !== null
-      ? `${siteUrl}/share/result?before=${encodeURIComponent(String(shareBefore))}&after=${encodeURIComponent(String(shareAfter))}`
-      : `${siteUrl}/share/result`;
+  const shareQuery = new URLSearchParams({
+    utm_source: "shared_result",
+    utm_medium: "referral",
+    utm_campaign: "results_share",
+    ref: shareReferralCode,
+  });
+  if (shareBefore !== null) shareQuery.set("before", String(shareBefore));
+  if (shareAfter !== null) shareQuery.set("after", String(shareAfter));
+  const shareUrl = `${siteUrl}/share/result?${shareQuery.toString()}`;
   const shareTitle =
     shareAfter !== null
-      ? `My ATS resume score is ${shareAfter}/100`
-      : "I just optimized my CV for ATS";
+      ? `My CV-to-job match score is ${shareAfter}/100`
+      : "I compared my CV with a real vacancy";
   const shareText =
     shareAfter !== null && shareBefore !== null
-      ? `I improved my ATS resume score from ${shareBefore}% to ${shareAfter}% with CVboosta.`
-      : "I just checked and improved my resume for ATS.";
+      ? `I reviewed my CV-to-job match from ${shareBefore}% to ${shareAfter}% with CVboosta.`
+      : "I compared my CV with a real job description using CVboosta.";
   const composedShareMessage = `${shareText} ${shareUrl}`;
+
+  const advocacyCopy = {
+    en: { title: "Was this useful?", body: "You can share a privacy-safe score summary or leave an honest review—positive, negative, or mixed. Your CV and job description are never included.", share: "Share summary", review: "Leave an honest review", later: "Not now" },
+    uk: { title: "Це було корисно?", body: "Можете поділитися безпечним summary score або залишити чесний відгук — позитивний, негативний чи змішаний. CV та опис вакансії не додаються.", share: "Поділитися summary", review: "Залишити чесний відгук", later: "Не зараз" },
+    pl: { title: "Czy to było przydatne?", body: "Możesz udostępnić bezpieczne podsumowanie wyniku albo dodać szczerą opinię — pozytywną, negatywną lub mieszaną. CV i oferta nie są dołączane.", share: "Udostępnij wynik", review: "Dodaj szczerą opinię", later: "Nie teraz" },
+    sk: { title: "Bolo to užitočné?", body: "Môžete zdieľať bezpečné zhrnutie skóre alebo zanechať úprimnú recenziu — pozitívnu, negatívnu či zmiešanú. CV ani popis práce sa nezdieľajú.", share: "Zdieľať zhrnutie", review: "Napísať úprimnú recenziu", later: "Teraz nie" },
+    cs: { title: "Bylo to užitečné?", body: "Můžete sdílet bezpečné shrnutí skóre nebo zanechat upřímnou recenzi — pozitivní, negativní či smíšenou. CV ani popis práce se nesdílí.", share: "Sdílet shrnutí", review: "Napsat upřímnou recenzi", later: "Teď ne" },
+    es: { title: "¿Te resultó útil?", body: "Puedes compartir un resumen seguro del score o dejar una reseña sincera, positiva, negativa o mixta. El CV y la oferta nunca se incluyen.", share: "Compartir resumen", review: "Dejar una reseña sincera", later: "Ahora no" },
+  }[language];
+  const shareControlsCopy = {
+    en: { native: "Share…", copy: "Copy private-safe link", privacy: "Only the before/after match scores are shared. Your CV and job description stay private." },
+    uk: { native: "Поділитися…", copy: "Копіювати безпечне посилання", privacy: "Публікуються лише match score до/після. CV та опис вакансії залишаються приватними." },
+    pl: { native: "Udostępnij…", copy: "Kopiuj bezpieczny link", privacy: "Udostępniane są tylko wyniki przed/po. CV i oferta pozostają prywatne." },
+    sk: { native: "Zdieľať…", copy: "Kopírovať bezpečný odkaz", privacy: "Zdieľa sa iba skóre pred/po. CV a popis práce zostávajú súkromné." },
+    cs: { native: "Sdílet…", copy: "Kopírovat bezpečný odkaz", privacy: "Sdílí se pouze skóre před/po. CV a popis práce zůstávají soukromé." },
+    es: { native: "Compartir…", copy: "Copiar enlace seguro", privacy: "Solo se comparten los scores antes/después. El CV y la oferta siguen siendo privados." },
+  }[language];
 
   const loadHistorySession = useCallback(async () => {
     if (!sessionId) return;
@@ -475,6 +506,13 @@ function ResultsContent() {
       );
       if (res.status === 401) {
         setSessionLoadError(t("results.sessionLoginRequired"));
+        return;
+      }
+      if (res.status === 402) {
+        setResultCanExport(false);
+        setSubscriptionTier("free");
+        setSessionLoadError(null);
+        setShowUnlockModal(true);
         return;
       }
       if (res.status === 404) {
@@ -494,20 +532,9 @@ function ResultsContent() {
       setMatchAfter(data.match_after || 0);
       setCoverLetter(data.cover_letter || "");
       setInterviewQuestions(data.interview_questions || []);
-
-      const email = await fetchWorkspaceEmail(apiBase);
-      const wid = workspaceIdFromEmail(email);
-      migrateLegacyGuestWorkspace(wid);
-
-      localStorage.setItem("optimized_cv", data.optimized_cv || "");
-      localStorage.setItem("missing_skills", JSON.stringify(data.missing_skills || []));
-      localStorage.setItem("added_keywords", JSON.stringify(data.added_keywords || []));
-      localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
-      localStorage.setItem("match_before", (data.match_before || 0).toString());
-      localStorage.setItem("match_after", (data.match_after || 0).toString());
-      localStorage.setItem(
-        wsFieldKey(wid, "job_text"),
-        data.job_description || "",
+      setJobTextForUi(sanitizeCvText(data.job_description || ""));
+      setResultCanExport(
+        typeof data.can_export === "boolean" ? data.can_export : null,
       );
     } catch {
       setSessionLoadError(t("results.sessionLoadFailed"));
@@ -524,12 +551,8 @@ function ResultsContent() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const email = await fetchWorkspaceEmail(apiBase);
-      if (cancelled) return;
-      const wid = workspaceIdFromEmail(email);
-      migrateLegacyGuestWorkspace(wid);
-
-      const storedTemplate = localStorage.getItem("pdf_template");
+      clearLegacyPersistentFunnelData();
+      const storedTemplate = window.localStorage.getItem("pdf_template");
       if (
         storedTemplate === "classic" ||
         storedTemplate === "modern" ||
@@ -543,34 +566,7 @@ function ResultsContent() {
       ) {
         setPdfTemplate(storedTemplate);
       }
-
-      const storedCv = localStorage.getItem("optimized_cv") || "";
-      let storedMissing: string[] = [];
-      let storedAdded: string[] = [];
-      let storedRecs: string[] = [];
-      try {
-        storedMissing = JSON.parse(localStorage.getItem("missing_skills") || "[]");
-        storedAdded = JSON.parse(localStorage.getItem("added_keywords") || "[]");
-        storedRecs = JSON.parse(localStorage.getItem("recommendations") || "[]");
-      } catch (e) {
-        console.error("Failed to parse storage:", e);
-      }
-      const storedBefore = localStorage.getItem("match_before");
-      const storedAfter = localStorage.getItem("match_after");
-      setOptimizedCv(storedCv);
-      setMissing(storedMissing);
-      setAddedKeywords(storedAdded);
-      setRecommendations(storedRecs);
-      if (storedBefore !== null && !Number.isNaN(Number(storedBefore))) {
-        setMatchBefore(Number(storedBefore));
-      }
-      if (storedAfter !== null && !Number.isNaN(Number(storedAfter))) {
-        setMatchAfter(Number(storedAfter));
-      }
-
-      const cvText = localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
-      const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
-      setJobTextForUi(sanitizeCvText(jobText || ""));
+      if (sessionId) return;
 
       if (isDemo) {
         // Demo results are generated server-side via /demo/optimize (real pipeline).
@@ -590,6 +586,7 @@ function ResultsContent() {
           setMatchBefore(typeof data.match_before === "number" ? data.match_before : null);
           setMatchAfter(typeof data.match_after === "number" ? data.match_after : null);
           setJobTextForUi(sanitizeCvText(data.job_description || ""));
+          setResultCanExport(true);
         } catch {
           // Fallback so demo never renders as blank if backend is down.
           setOptimizedCv(DEMO_FALLBACK.optimizedCv);
@@ -599,60 +596,32 @@ function ResultsContent() {
           setMatchBefore(DEMO_FALLBACK.matchBefore);
           setMatchAfter(DEMO_FALLBACK.matchAfter);
           setJobTextForUi(sanitizeCvText(DEMO_FALLBACK.jobText));
+          setResultCanExport(true);
         } finally {
           setIsLoadingDemo(false);
         }
-      } else {
-        if (!cvText || !jobText) {
-          setStatus(t("results.missingInputs"));
-          return;
-        }
-      }
-      if (storedBefore !== null && storedAfter !== null) {
         return;
       }
-      const loadScores = async () => {
-        try {
-          if (isDemo) return;
-          const beforeRes = await fetch(`${apiBase}/analyze/match`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cv_text: cvText, job_text: jobText }),
-          });
-          if (!beforeRes.ok) throw new Error("before");
-          const beforeData = await beforeRes.json();
-          const beforeValue = beforeData.match_percent ?? null;
-          setMatchBefore(beforeValue);
-          if (typeof beforeValue === "number") {
-            localStorage.setItem("match_before", String(beforeValue));
-          }
 
-          if (storedCv) {
-            const afterRes = await fetch(`${apiBase}/analyze/match`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ cv_text: storedCv, job_text: jobText }),
-            });
-            if (!afterRes.ok) throw new Error("after");
-            const afterData = await afterRes.json();
-            const afterValue = afterData.match_percent ?? null;
-            setMatchAfter(afterValue);
-            if (typeof afterValue === "number") {
-              localStorage.setItem("match_after", String(afterValue));
-            }
-          } else {
-            setMatchAfter(null);
-          }
-        } catch {
-          setStatus(t("results.matchLoadFailed"));
-        }
-      };
-      void loadScores();
+      const context = loadResultContext();
+      if (!context) {
+        setStatus(t("results.missingInputs"));
+        return;
+      }
+      if (cancelled) return;
+      setOptimizedCv(context.optimizedCv);
+      setJobTextForUi(sanitizeCvText(context.jobText));
+      setMissing(context.missingSkills);
+      setAddedKeywords(context.addedKeywords);
+      setRecommendations(context.recommendations);
+      setMatchBefore(context.matchBefore);
+      setMatchAfter(context.matchAfter);
+      setResultCanExport(context.canExport);
     })();
     return () => {
       cancelled = true;
     };
-  }, [apiBase]);
+  }, [apiBase, isDemo, sessionId, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -729,8 +698,21 @@ function ResultsContent() {
   }, [previewBlocks, headerDetails]);
 
   const remainingKeywords = missing;
-  const isFreeTier = subscriptionTier === "free";
-  const isPreviewOnly = isFreeTier;
+  const normalizedTier = subscriptionTier.toLowerCase();
+  const hasPaidTier = ["single", "go", "pro", "lifetime"].includes(normalizedTier);
+  const hasPaidEntitlement =
+    resultCanExport === true ||
+    hasPaidTier;
+  // A per-result denial is authoritative. In particular, the API can return
+  // it when generation failed after billing access was verified; the user's
+  // original CV must never be downloadable as an "optimized" result.
+  const canExportCurrentResult = hasPaidEntitlement && resultCanExport !== false;
+  const entitlementResolved =
+    isDemo || resultCanExport !== null || normalizedTier !== "unknown";
+  // Fail closed while billing is loading or unavailable. Demo content is
+  // synthetic and can remain fully visible.
+  const isFreeTier = !hasPaidEntitlement && !isDemo;
+  const isPreviewOnly = !hasPaidEntitlement && !isDemo;
   const isWithinFirstMonthFromLaunch = useMemo(() => {
     const launchDate = new Date(SITE_LAUNCH_DATE_RAW);
     if (Number.isNaN(launchDate.getTime())) return false;
@@ -741,6 +723,13 @@ function ResultsContent() {
   const showFullPageWatermark = isFreeTier && !isWithinFirstMonthFromLaunch;
 
   useEffect(() => {
+    if (resultCanExport === false && hasPaidTier) {
+      setStatus(t("app.optimizationFailedTryAgain"));
+    }
+  }, [hasPaidTier, resultCanExport, t]);
+
+  useEffect(() => {
+    if (!entitlementResolved) return;
     if (!isPreviewOnly) return;
     if (!optimizedCv) return;
     if (sessionLoadError) return;
@@ -762,7 +751,11 @@ function ResultsContent() {
     } catch {
       setShowUnlockModal(true);
     }
-  }, [isPreviewOnly, optimizedCv, sessionLoadError, sessionId]);
+  }, [entitlementResolved, isDemo, isPreviewOnly, optimizedCv, sessionLoadError, sessionId]);
+
+  useEffect(() => {
+    if (hasPaidEntitlement) setShowUnlockModal(false);
+  }, [hasPaidEntitlement]);
 
   // Keep modal centered with fixed overlay; allow background to scroll behind it.
 
@@ -784,11 +777,10 @@ function ResultsContent() {
   }, [jobTextForUi]);
 
   const criticalIssuesCount = useMemo(() => {
-    const raw =
+    return (
       (Array.isArray(missing) ? missing.length : 0) +
-      (Array.isArray(recommendations) ? recommendations.length : 0);
-    if (raw >= 15) return raw;
-    return 15 + Math.min(10, Math.max(0, raw));
+      (Array.isArray(recommendations) ? recommendations.length : 0)
+    );
   }, [missing, recommendations]);
 
   const previewBullets = useMemo(() => {
@@ -808,32 +800,13 @@ function ResultsContent() {
     return experienceSection.lines.filter((line) => line.trim()).slice(0, 10);
   }, [parsedCv.sections]);
 
-  useEffect(() => {
-    const clearTransientResults = () => {
-      try {
-        localStorage.removeItem("optimized_cv");
-        localStorage.removeItem("missing_skills");
-        localStorage.removeItem("added_keywords");
-        localStorage.removeItem("recommendations");
-        localStorage.removeItem("match_before");
-        localStorage.removeItem("match_after");
-        localStorage.removeItem("current_analysis_id");
-      } catch {
-        // ignore
-      }
-    };
-
-    const onBeforeUnload = () => clearTransientResults();
-    window.addEventListener("beforeunload", onBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onBeforeUnload);
-      clearTransientResults();
-    };
-  }, []);
-
   const copyCv = async () => {
     if (!optimizedCv) {
       setStatus(t("results.noOptimizedCv"));
+      return;
+    }
+    if (!isPreviewOnly && !canExportCurrentResult) {
+      setStatus(t("app.optimizationFailedTryAgain"));
       return;
     }
     try {
@@ -869,60 +842,102 @@ function ResultsContent() {
       setStatus(t("results.matchLoadFailed"));
       return;
     }
+    setShareReferralCode(getOrCreateShareReferralCode());
+    trackEvent(ANALYTICS_EVENTS.resultShareOpened, { location: "results" });
     setIsShareSheetOpen(true);
   };
 
-  const openShareWindow = (url: string) => {
+  const recordShare = (channel: string) => {
+    trackEvent(ANALYTICS_EVENTS.resultShared, {
+      channel,
+      score_included: shareBefore !== null && shareAfter !== null,
+    });
+  };
+
+  const openShareWindow = (url: string, channel: string) => {
+    recordShare(channel);
+    setIsShareSheetOpen(false);
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const shareNatively = async () => {
+    if (typeof navigator.share !== "function") {
+      try {
+        await navigator.clipboard.writeText(composedShareMessage);
+        recordShare("copy");
+        setStatus(t("results.copiedToClipboard"));
+        setIsShareSheetOpen(false);
+      } catch {
+        setStatus(t("results.copyFailed"));
+      }
+      return;
+    }
+    try {
+      await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+      recordShare("native");
+      setIsShareSheetOpen(false);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      setStatus(t("results.copyFailed"));
+    }
+  };
+
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      recordShare("copy_link");
+      setStatus(t("results.copiedToClipboard"));
+      setIsShareSheetOpen(false);
+    } catch {
+      setStatus(t("results.copyFailed"));
+    }
+  };
+
   const shareOnWhatsApp = () => {
-    setIsShareSheetOpen(false);
     openShareWindow(
       `https://wa.me/?text=${encodeURIComponent(composedShareMessage)}`,
+      "whatsapp",
     );
   };
 
-  const shareOnFacebook = () => {
-    setIsShareSheetOpen(false);
+  const shareOnLinkedIn = () => {
     openShareWindow(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      "linkedin",
     );
   };
 
-  const shareOnMessages = () => {
-    setIsShareSheetOpen(false);
-    const smsUrl = `sms:?&body=${encodeURIComponent(composedShareMessage)}`;
-    window.location.href = smsUrl;
-  };
-
-  const shareOnTelegram = () => {
-    setIsShareSheetOpen(false);
+  const shareOnX = () => {
     openShareWindow(
-      `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      "x",
     );
   };
 
-  const shareForInstagram = async () => {
+  const maybeShowAdvocacyPrompt = () => {
+    if (isDemo || showAdvocacyPrompt || advocacyPromptShownRef.current) return;
     try {
-      await navigator.clipboard.writeText(composedShareMessage);
-      setStatus(t("results.shareForInstagramCopied"));
-      setIsShareSheetOpen(false);
-      openShareWindow("https://www.instagram.com/");
+      const raw = window.localStorage.getItem(ADVOCACY_PROMPT_KEY);
+      const parsed = raw ? JSON.parse(raw) as { shownAt?: number } : null;
+      if (
+        typeof parsed?.shownAt === "number" &&
+        Date.now() - parsed.shownAt < ADVOCACY_PROMPT_TTL_MS
+      ) {
+        advocacyPromptShownRef.current = true;
+        return;
+      }
+      window.localStorage.setItem(
+        ADVOCACY_PROMPT_KEY,
+        JSON.stringify({ shownAt: Date.now() }),
+      );
     } catch {
-      setStatus(t("results.copyFailed"));
+      // The in-memory guard still prevents repeats within this page view.
     }
-  };
-
-  const shareForTikTok = async () => {
-    try {
-      await navigator.clipboard.writeText(composedShareMessage);
-      setStatus(t("results.shareForTikTokCopied"));
-      setIsShareSheetOpen(false);
-      openShareWindow("https://www.tiktok.com/upload");
-    } catch {
-      setStatus(t("results.copyFailed"));
-    }
+    advocacyPromptShownRef.current = true;
+    setShowAdvocacyPrompt(true);
+    trackEvent(ANALYTICS_EVENTS.advocacyPromptViewed, {
+      trigger: "successful_export",
+    });
   };
 
   const fetchInterviewPrep = async () => {
@@ -931,12 +946,9 @@ function ResultsContent() {
       setShowUnlockModal(true);
       return;
     }
-    const email = await fetchWorkspaceEmail(apiBase);
-    const wid = workspaceIdFromEmail(email);
-    migrateLegacyGuestWorkspace(wid);
-    const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
+    const jobText = jobTextForUi;
     if (!jobText) {
-      console.warn("No job_text found in localStorage");
+      console.warn("No job description is available for interview prep");
       return;
     }
 
@@ -990,10 +1002,8 @@ function ResultsContent() {
       setShowUnlockModal(true);
       return;
     }
-    const email = await fetchWorkspaceEmail(apiBase);
-    const wid = workspaceIdFromEmail(email);
-    const jobText = localStorage.getItem(wsFieldKey(wid, "job_text")) || "";
-    const cvText = optimizedCv || localStorage.getItem(wsFieldKey(wid, "cv_text")) || "";
+    const jobText = jobTextForUi;
+    const cvText = optimizedCv;
     
     if (!jobText || !cvText) {
       console.warn("Required text not found for cover letter");
@@ -1043,7 +1053,6 @@ function ResultsContent() {
   const downloadCoverLetterPdf = async () => {
     if (!coverLetter) return;
     try {
-      trackEvent("optimization_download", { asset_type: "cover_letter_pdf" });
       const { jsPDF } = await loadJsPdf();
       const doc = new jsPDF({
         orientation: "portrait",
@@ -1084,6 +1093,8 @@ function ResultsContent() {
       }
 
       doc.save(showBrandingFooter || showFullPageWatermark ? "Cover_Letter_CVboosta.pdf" : "Cover_Letter.pdf");
+      trackEvent(ANALYTICS_EVENTS.assetDownloaded, { asset_type: "cover_letter_pdf" });
+      maybeShowAdvocacyPrompt();
     } catch (err) {
       console.error(err);
     }
@@ -1104,7 +1115,6 @@ function ResultsContent() {
       return;
     }
     try {
-      trackEvent("optimization_download", { asset_type: "resume_pdf" });
       const template = activeTemplate;
       const accent = template.accent;
       const { jsPDF } = await loadJsPdf();
@@ -1349,6 +1359,8 @@ function ResultsContent() {
         ? `${safeFileTitle}_CVboosta_${template.id}.pdf`
         : `${safeFileTitle}_${template.id}.pdf`;
       doc.save(fileName);
+      trackEvent(ANALYTICS_EVENTS.assetDownloaded, { asset_type: "resume_pdf" });
+      maybeShowAdvocacyPrompt();
       setStatus(t("results.pdfDownloaded"));
     } catch (err) {
       console.error(err);
@@ -1362,7 +1374,6 @@ function ResultsContent() {
       return;
     }
     try {
-      trackEvent("optimization_download", { asset_type: "resume_pdf_preview" });
       const { jsPDF } = await loadJsPdf();
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const margin = 50;
@@ -1419,6 +1430,7 @@ function ResultsContent() {
       doc.text(rightText, rightX, pageHeight - 20);
 
       doc.save("Resume_Preview_CVboosta.pdf");
+      trackEvent(ANALYTICS_EVENTS.assetDownloaded, { asset_type: "resume_pdf_preview" });
       setStatus(t("results.pdfDownloaded"));
     } catch (err) {
       console.error(err);
@@ -1431,6 +1443,10 @@ function ResultsContent() {
       setShowUnlockModal(true);
       return;
     }
+    if (!canExportCurrentResult) {
+      setStatus(t("app.optimizationFailedTryAgain"));
+      return;
+    }
     void downloadPdf();
   };
 
@@ -1440,7 +1456,6 @@ function ResultsContent() {
       return;
     }
     try {
-      trackEvent("optimization_download", { asset_type: "resume_docx" });
       const docx = await import("docx");
       const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
 
@@ -1497,6 +1512,8 @@ function ResultsContent() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      trackEvent(ANALYTICS_EVENTS.assetDownloaded, { asset_type: "resume_docx" });
+      maybeShowAdvocacyPrompt();
     } catch (err) {
       console.error(err);
       setStatus(t("results.pdfFailed"));
@@ -1506,6 +1523,10 @@ function ResultsContent() {
   const requestDownloadDocx = () => {
     if (isPreviewOnly) {
       setShowUnlockModal(true);
+      return;
+    }
+    if (!canExportCurrentResult) {
+      setStatus(t("app.optimizationFailedTryAgain"));
       return;
     }
     void downloadDocx();
@@ -1523,12 +1544,16 @@ function ResultsContent() {
       if (!res.ok) throw new Error("demo_failed");
       const data = await res.json();
       try {
-        localStorage.setItem("optimized_cv", data.optimized_cv || "");
-        localStorage.setItem("missing_skills", JSON.stringify(data.missing_skills || []));
-        localStorage.setItem("added_keywords", JSON.stringify(data.added_keywords || []));
-        localStorage.setItem("recommendations", JSON.stringify(data.recommendations || []));
-        localStorage.setItem("match_before", String(data.match_before ?? ""));
-        localStorage.setItem("match_after", String(data.match_after ?? ""));
+        saveResultContext({
+          optimizedCv: data.optimized_cv || "",
+          jobText: data.job_description || "",
+          missingSkills: data.missing_skills || [],
+          addedKeywords: data.added_keywords || [],
+          recommendations: data.recommendations || [],
+          matchBefore: typeof data.match_before === "number" ? data.match_before : null,
+          matchAfter: typeof data.match_after === "number" ? data.match_after : null,
+          canExport: true,
+        });
         localStorage.setItem("results_skip_paywall_once", "1");
       } catch {
         // ignore
@@ -1537,12 +1562,16 @@ function ResultsContent() {
     } catch {
       // If backend is down, still show something usable.
       try {
-        localStorage.setItem("optimized_cv", DEMO_FALLBACK.optimizedCv);
-        localStorage.setItem("missing_skills", JSON.stringify(DEMO_FALLBACK.missing));
-        localStorage.setItem("added_keywords", JSON.stringify(DEMO_FALLBACK.addedKeywords));
-        localStorage.setItem("recommendations", JSON.stringify(DEMO_FALLBACK.recommendations));
-        localStorage.setItem("match_before", String(DEMO_FALLBACK.matchBefore));
-        localStorage.setItem("match_after", String(DEMO_FALLBACK.matchAfter));
+        saveResultContext({
+          optimizedCv: DEMO_FALLBACK.optimizedCv,
+          jobText: DEMO_FALLBACK.jobText,
+          missingSkills: [...DEMO_FALLBACK.missing],
+          addedKeywords: [...DEMO_FALLBACK.addedKeywords],
+          recommendations: [...DEMO_FALLBACK.recommendations],
+          matchBefore: DEMO_FALLBACK.matchBefore,
+          matchAfter: DEMO_FALLBACK.matchAfter,
+          canExport: true,
+        });
         localStorage.setItem("results_skip_paywall_once", "1");
       } catch {
         // ignore
@@ -1656,7 +1685,9 @@ function ResultsContent() {
                   <div className="result-box">
                     <div className="result-box-head">
                       <h3>{t("results.verdictTitle")}</h3>
-                      <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
+                      {criticalIssuesCount > 0 ? (
+                        <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
+                      ) : null}
                     </div>
                     <p className="summary-snippet">{t("results.verdictCopy")}</p>
                   </div>
@@ -1820,13 +1851,25 @@ function ResultsContent() {
                 )}
               </div>
               <div className="nav-actions main-actions">
-                <button className="btn primary" onClick={copyCv}>
+                <button
+                  className="btn primary"
+                  onClick={copyCv}
+                  disabled={!isPreviewOnly && !canExportCurrentResult}
+                >
                   {isPreviewOnly ? t("results.copyPreview") : t("results.copyFullCv")}
                 </button>
-                <button className="btn secondary" onClick={isPreviewOnly ? startUnlockFlow : requestDownloadPdf}>
+                <button
+                  className="btn secondary"
+                  onClick={isPreviewOnly ? startUnlockFlow : requestDownloadPdf}
+                  disabled={!isPreviewOnly && !canExportCurrentResult}
+                >
                   {isPreviewOnly ? t("results.unlockToDownload") : t("results.downloadPdf")}
                 </button>
-                <button className="btn ghost desktop-only" onClick={requestDownloadDocx}>
+                <button
+                  className="btn ghost desktop-only"
+                  onClick={requestDownloadDocx}
+                  disabled={!isPreviewOnly && !canExportCurrentResult}
+                >
                   {t("results.downloadDocx")}
                 </button>
                 <button className="btn ghost" onClick={shareResult}>
@@ -1850,24 +1893,68 @@ function ResultsContent() {
                       {t("common.dismiss")}
                     </button>
                   </div>
+                  <p className="muted" style={{ fontSize: "13px", margin: "0 0 14px" }}>
+                    {shareControlsCopy.privacy}
+                  </p>
                   <div className="share-modal-actions">
+                    <button className="btn primary" type="button" onClick={() => void shareNatively()}>
+                      {shareControlsCopy.native}
+                    </button>
+                    <button className="btn ghost" type="button" onClick={() => void copyShareLink()}>
+                      {shareControlsCopy.copy}
+                    </button>
+                    <button className="btn ghost" type="button" onClick={shareOnLinkedIn}>
+                      LinkedIn
+                    </button>
+                    <button className="btn ghost" type="button" onClick={shareOnX}>
+                      X
+                    </button>
                     <button className="btn ghost" type="button" onClick={shareOnWhatsApp}>
-                      {t("results.shareOnWhatsApp")}
+                      WhatsApp
                     </button>
-                    <button className="btn ghost" type="button" onClick={shareOnFacebook}>
-                      {t("results.shareOnFacebook")}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showAdvocacyPrompt && (
+              <div className="modal-backdrop" onClick={() => setShowAdvocacyPrompt(false)}>
+                <div
+                  className="modal-card fade-up share-modal-card"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="advocacy-title"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <h3 id="advocacy-title" className="share-modal-title">{advocacyCopy.title}</h3>
+                  <p className="muted" style={{ lineHeight: 1.6 }}>{advocacyCopy.body}</p>
+                  <div className="share-modal-actions">
+                    <button
+                      className="btn primary"
+                      type="button"
+                      onClick={() => {
+                        setShowAdvocacyPrompt(false);
+                        setShareReferralCode(getOrCreateShareReferralCode());
+                        trackEvent(ANALYTICS_EVENTS.resultShareOpened, { location: "post_export_prompt" });
+                        setIsShareSheetOpen(true);
+                      }}
+                    >
+                      {advocacyCopy.share}
                     </button>
-                    <button className="btn ghost" type="button" onClick={shareOnMessages}>
-                      {t("results.shareOnMessages")}
-                    </button>
-                    <button className="btn ghost" type="button" onClick={shareOnTelegram}>
-                      {t("results.shareOnTelegram")}
-                    </button>
-                    <button className="btn ghost" type="button" onClick={shareForInstagram}>
-                      {t("results.shareForInstagram")}
-                    </button>
-                    <button className="btn ghost" type="button" onClick={shareForTikTok}>
-                      {t("results.shareForTikTok")}
+                    <a
+                      className="btn ghost"
+                      href="https://www.trustpilot.com/evaluate/cvboosta.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        trackEvent(ANALYTICS_EVENTS.honestReviewOpened, { location: "post_export_prompt" });
+                        setShowAdvocacyPrompt(false);
+                      }}
+                    >
+                      {advocacyCopy.review}
+                    </a>
+                    <button className="btn ghost" type="button" onClick={() => setShowAdvocacyPrompt(false)}>
+                      {advocacyCopy.later}
                     </button>
                   </div>
                 </div>
@@ -1945,7 +2032,9 @@ function ResultsContent() {
                     </span>
                   )}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginTop: extractedJobTitle ? "10px" : 0 }}>
-                    <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
+                    {criticalIssuesCount > 0 ? (
+                      <span className="tag">{t("results.issuesFound").replace("{count}", String(criticalIssuesCount))}</span>
+                    ) : null}
                     <span className="tag">
                       {t("results.keywordMatchLine")
                         .replace("{before}", matchBefore !== null ? `${matchBefore}%` : "—")

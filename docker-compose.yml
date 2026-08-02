@@ -5,7 +5,8 @@ services:
     restart: unless-stopped
     env_file: .env
     ports:
-      - "5432:5432"
+      # Keep local developer access without exposing PostgreSQL to the LAN.
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -25,15 +26,32 @@ services:
       # If .env does not provide DATABASE_URL explicitly, we can construct it 
       # or override the host to point to 'postgres' inside docker network.
       # The user's .env uses localhost string, so we force-override the URL here:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       PORT: "8000"
+      TRUSTED_PROXY_IPS: ""
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-172.16.0.0/12}
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     # We no longer expose port 8000 externally since Nginx handles everything,
     # but we can optionally allow it for debug
     expose:
       - "8000"
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["python", "/app/scripts/run_migrations.py"]
 
   ai_core:
     build:
@@ -41,9 +59,24 @@ services:
       dockerfile: Dockerfile
     container_name: cvboosta_ai_core
     restart: unless-stopped
-    env_file: .env
     environment:
+      # The isolated AI worker receives only what it needs, not database,
+      # billing, email, OAuth, or push-provider credentials.
+      APP_ENV: internal
       PORT: "8001"
+      # Satisfies the shared config model only; this worker never signs auth
+      # tokens and must not receive the backend's real JWT signing secret.
+      JWT_SECRET: internal-worker-unused-secret-0000000000000000
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
+      INTERNAL_ALLOWED_CIDRS: ${INTERNAL_ALLOWED_CIDRS:-172.16.0.0/12}
+      TRUSTED_PROXY_IPS: ""
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-172.16.0.0/12}
+      MAX_CV_CHARS: ${MAX_CV_CHARS:-12000}
+      MAX_JOB_CHARS: ${MAX_JOB_CHARS:-12000}
+      MAX_ATS_KEYWORDS: ${MAX_ATS_KEYWORDS:-45}
     command: ["sh", "-c", "uvicorn app.internal_main:app --host 0.0.0.0 --port ${PORT:-8001} --proxy-headers"]
     expose:
       - "8001"
@@ -52,12 +85,22 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE: /api
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        NEXT_PUBLIC_GTM_ID: ${NEXT_PUBLIC_GTM_ID:-}
+        NEXT_PUBLIC_GOOGLE_ADS_ID: ${NEXT_PUBLIC_GOOGLE_ADS_ID:-}
     container_name: cvboosta_frontend
     restart: unless-stopped
-    env_file: .env
     environment:
-      # Use /api so nginx captures all calls transparently and proxies to backend!
+      # Never inject backend secrets into the internet-facing Next.js process.
+      # Only explicitly public values belong here.
       NEXT_PUBLIC_API_BASE: /api
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+      NEXT_PUBLIC_GTM_ID: ${NEXT_PUBLIC_GTM_ID:-}
+      NEXT_PUBLIC_GOOGLE_ADS_ID: ${NEXT_PUBLIC_GOOGLE_ADS_ID:-}
     depends_on:
       - backend
     expose:

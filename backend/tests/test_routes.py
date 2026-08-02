@@ -13,6 +13,7 @@ from app.models.live_activity_push_token import LiveActivityPushToken
 from app.models.live_activity_start_token import LiveActivityStartToken
 from app.models.oauth_identity import OAuthIdentity
 from app.models.request_log import RequestLog
+from app.models.user import User
 
 
 def test_health(client):
@@ -36,48 +37,29 @@ def test_upload_cv_text(client):
 
 
 def test_analyze_cv_route(client, monkeypatch):
-    from app.api.routes import analyze as analyze_routes
-    monkeypatch.setattr(analyze_routes, "analyze_cv_text", lambda text: "OK")
     response = client.post("/analyze/cv", json={"cv_text": "My CV"})
     assert response.status_code == 200
-    assert response.json()["cv_analysis"] == "OK"
+    assert "approximately 2 words" in response.json()["cv_analysis"]
 
 
 def test_analyze_job_route(client, monkeypatch):
-    from app.api.routes import analyze as analyze_routes
-    monkeypatch.setattr(analyze_routes, "analyze_job_text", lambda text: "OK")
-    response = client.post("/analyze/job", json={"job_text": "Job"})
+    response = client.post("/analyze/job", json={"job_text": "Python SQL developer"})
     assert response.status_code == 200
-    assert response.json()["job_analysis"] == "OK"
+    assert "Python" in response.json()["job_analysis"]
 
 
 def test_extract_keywords_route(client, monkeypatch):
-    from app.api.routes import analyze as analyze_routes
-    from app.schemas.keywords import KeywordExtractionResult
-    monkeypatch.setattr(
-        analyze_routes,
-        "extract_keywords_transformer",
-        lambda text: KeywordExtractionResult(skills=["Python"], requirements=["SQL"]),
-    )
-    monkeypatch.setattr(analyze_routes, "save_keyword_list", lambda **_: 123)
-    response = client.post("/analyze/keywords", json={"job_text": "Job"})
+    response = client.post("/analyze/keywords", json={"job_text": "Python SQL developer"})
     assert response.status_code == 200
     payload = response.json()
     assert "Python" in payload["skills"]
-    assert payload["keyword_list_id"] == 123
+    assert payload["keyword_list_id"] is None
 
 
 def test_match_cv_job_route(client, monkeypatch):
-    from app.api.routes import analyze as analyze_routes
-    from app.schemas.keywords import KeywordExtractionResult
-    monkeypatch.setattr(
-        analyze_routes,
-        "extract_keywords_transformer",
-        lambda text: KeywordExtractionResult(skills=["Python"], requirements=["SQL"]),
-    )
     response = client.post(
         "/analyze/match",
-        json={"cv_text": "Python SQL", "job_text": "Job"},
+        json={"cv_text": "Python SQL", "job_text": "Python SQL developer"},
     )
     assert response.status_code == 200
     payload = response.json()
@@ -124,10 +106,17 @@ def test_optimize_route(client, monkeypatch):
 
     reg = client.post(
         "/auth/register",
-        json={"email": "u@example.com", "password": "password123", "full_name": "U"},
+        json={"email": "u@example.com", "password": "password123!", "full_name": "U"},
     )
     assert reg.status_code == 200
-    token = reg.json()["access_token"]
+    token = _native_token(client)
+    with Session(get_engine()) as db:
+        user = db.query(User).filter(User.email == "u@example.com").one()
+        user.subscription_tier = "single"
+        user.daily_scans_count = 1
+        user.daily_cl_count = 1
+        user.daily_prep_count = 1
+        db.commit()
     response = client.post(
         "/optimize",
         json={
@@ -146,7 +135,7 @@ def test_optimize_route(client, monkeypatch):
     assert live_activity_calls == [(1, payload["match_after"])]
     assert [round(call[1], 2) for call in progress_calls] == [0.08, 0.24, 0.48, 0.76, 0.92]
 
-    # Free tier is limited to 1 scan/day.
+    # The purchased single scan has been consumed.
     response2 = client.post(
         "/optimize",
         json={
@@ -183,9 +172,16 @@ def test_csrf_blocks_cookie_auth_without_origin(client, monkeypatch):
 
     reg = client.post(
         "/auth/register",
-        json={"email": "csrf@example.com", "password": "password123", "full_name": "U"},
+        json={"email": "csrf@example.com", "password": "password123!", "full_name": "U"},
     )
     assert reg.status_code == 200
+    with Session(get_engine()) as db:
+        user = db.query(User).filter(User.email == "csrf@example.com").one()
+        user.subscription_tier = "single"
+        user.daily_scans_count = 1
+        user.daily_cl_count = 1
+        user.daily_prep_count = 1
+        db.commit()
 
     # Cookie-based auth is now protected by Origin/Referer checks.
     blocked = client.post(
@@ -500,7 +496,7 @@ def test_apple_oauth_registers_then_reuses_identity_without_email(client, monkey
         },
     )
     assert first.status_code == 200
-    first_token = first.json()["access_token"]
+    first_token = _native_token(client)
 
     me = client.get("/auth/me", headers={"Authorization": f"Bearer {first_token}"})
     assert me.status_code == 200
@@ -632,7 +628,7 @@ def test_delete_account_removes_related_rows_and_allows_re_registration(client):
 
     register_again_response = client.post(
         "/auth/register",
-        json={"email": email, "password": "password123", "full_name": "User"},
+        json={"email": email, "password": "password123!", "full_name": "User"},
     )
     assert register_again_response.status_code == 200
 
@@ -640,7 +636,16 @@ def test_delete_account_removes_related_rows_and_allows_re_registration(client):
 def _register_and_get_token(client, email: str) -> str:
     response = client.post(
         "/auth/register",
-        json={"email": email, "password": "password123", "full_name": "User"},
+        json={"email": email, "password": "password123!", "full_name": "User"},
+    )
+    assert response.status_code == 200
+    return _native_token(client)
+
+
+def _native_token(client) -> str:
+    response = client.post(
+        "/auth/native/token",
+        headers={"X-Native-Client-Key": "unit-test-native-client-key-0123456789"},
     )
     assert response.status_code == 200
     return response.json()["access_token"]
@@ -691,7 +696,7 @@ def test_app_store_sync_activates_plan_and_extends_status(client, monkeypatch):
             "product_id": "com.cvboosta.app.go.monthly",
             "transaction_id": "tx-go-001",
             "original_transaction_id": "orig-go-001",
-            "transaction_jws": "signed-jws",
+            "transaction_jws": "signed-jws-placeholder-value",
             "environment": "sandbox",
             "quantity": 1,
         },
@@ -729,7 +734,7 @@ def test_app_store_single_scan_sync_is_idempotent(client, monkeypatch):
             product_id="com.cvboosta.app.single_scan",
             transaction_id="tx-credit-001",
             original_transaction_id="orig-credit-001",
-            quantity=2,
+            quantity=1,
         ),
     )
 
@@ -739,14 +744,14 @@ def test_app_store_single_scan_sync_is_idempotent(client, monkeypatch):
             "product_id": "com.cvboosta.app.single_scan",
             "transaction_id": "tx-credit-001",
             "original_transaction_id": "orig-credit-001",
-            "transaction_jws": "signed-jws",
+            "transaction_jws": "signed-jws-placeholder-value",
             "environment": "sandbox",
-            "quantity": 2,
+            "quantity": 1,
         },
         headers={"Authorization": f"Bearer {token}"},
     )
     assert first.status_code == 200
-    assert first.json()["scan_credit_balance"] == 2
+    assert first.json()["scan_credit_balance"] == 1
 
     second = client.post(
         "/billing/app-store/sync",
@@ -754,14 +759,14 @@ def test_app_store_single_scan_sync_is_idempotent(client, monkeypatch):
             "product_id": "com.cvboosta.app.single_scan",
             "transaction_id": "tx-credit-001",
             "original_transaction_id": "orig-credit-001",
-            "transaction_jws": "signed-jws",
+            "transaction_jws": "signed-jws-placeholder-value",
             "environment": "sandbox",
-            "quantity": 2,
+            "quantity": 1,
         },
         headers={"Authorization": f"Bearer {token}"},
     )
     assert second.status_code == 200
-    assert second.json()["scan_credit_balance"] == 2
+    assert second.json()["scan_credit_balance"] == 1
 
 
 def test_optimize_uses_app_store_scan_credit_after_free_limit(client, monkeypatch):
@@ -801,7 +806,7 @@ def test_optimize_uses_app_store_scan_credit_after_free_limit(client, monkeypatc
             "product_id": "com.cvboosta.app.single_scan",
             "transaction_id": "tx-credit-002",
             "original_transaction_id": "orig-credit-002",
-            "transaction_jws": "signed-jws",
+            "transaction_jws": "signed-jws-placeholder-value",
             "environment": "sandbox",
             "quantity": 1,
         },
@@ -832,7 +837,7 @@ def test_optimize_uses_app_store_scan_credit_after_free_limit(client, monkeypatc
     )
 
     assert first.status_code == 200
-    assert second.status_code == 200
+    assert second.status_code == 402
     assert third.status_code == 402
 
     status_response = client.get(

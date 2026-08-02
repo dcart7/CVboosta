@@ -33,9 +33,19 @@ COPY ml ./ml
 
 # Copy all backend code explicitly
 COPY backend/app /app/app
+COPY backend/migrations /app/migrations
+COPY backend/scripts/run_migrations.py /app/scripts/run_migrations.py
 
 # Add PYTHONPATH so absolute paths like "app.core" can resolve cleanly
 ENV PYTHONPATH=/app
+
+# Run the public API and AI worker without root privileges. The application
+# only needs read access to its code/models and writes temporary files to /tmp.
+RUN groupadd --gid 10001 cvboosta \
+    && useradd --uid 10001 --gid cvboosta --no-create-home --shell /usr/sbin/nologin cvboosta \
+    && chown -R cvboosta:cvboosta /app
+
+USER cvboosta
 
 EXPOSE 8080
 

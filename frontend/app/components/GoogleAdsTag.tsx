@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Script from "next/script";
+import { usePathname } from "next/navigation";
+import {
+  CONSENT_UPDATED_EVENT,
+  readConsent,
+  type ConsentPreferences,
+} from "../lib/consent";
+import { isSensitiveCredentialRoute } from "../lib/sensitiveRoutes";
 
 declare global {
   interface Window {
@@ -10,87 +17,44 @@ declare global {
   }
 }
 
-const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-18110089986";
+const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "";
 
-type ConsentModeState = {
-  ad_storage: "granted" | "denied";
-  analytics_storage: "granted" | "denied";
-  ad_user_data: "granted" | "denied";
-  ad_personalization: "granted" | "denied";
-};
-
-function resolveConsentState(): ConsentModeState {
-  const consent = localStorage.getItem("cookie-consent");
-  const rawPrefs = localStorage.getItem("cookie-preferences");
-
-  if (!consent) {
-    return {
-      ad_storage: "denied",
-      analytics_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-    };
-  }
-
-  if (consent === "accepted-all") {
-    return {
-      ad_storage: "granted",
-      analytics_storage: "granted",
-      ad_user_data: "granted",
-      ad_personalization: "granted",
-    };
-  }
-
-  if (consent === "rejected-all") {
-    return {
-      ad_storage: "denied",
-      analytics_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-    };
-  }
-
-  // consent === "custom"
-  try {
-    const prefs = rawPrefs ? (JSON.parse(rawPrefs) as { analytics?: boolean; marketing?: boolean }) : {};
-    const analyticsGranted = Boolean(prefs.analytics);
-    const marketingGranted = Boolean(prefs.marketing);
-    return {
-      ad_storage: marketingGranted ? "granted" : "denied",
-      analytics_storage: analyticsGranted ? "granted" : "denied",
-      ad_user_data: marketingGranted ? "granted" : "denied",
-      ad_personalization: marketingGranted ? "granted" : "denied",
-    };
-  } catch {
-    return {
-      ad_storage: "denied",
-      analytics_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-    };
-  }
+function updateAdsConsent(granted: boolean) {
+  if (typeof window.gtag !== "function") return;
+  const state = granted ? "granted" : "denied";
+  window.gtag("consent", "update", {
+    ad_storage: state,
+    ad_user_data: state,
+    ad_personalization: state,
+  });
 }
 
 export default function GoogleAdsTag() {
-  const enabled = Boolean(ADS_ID);
-  if (!enabled) return null;
+  const [enabled, setEnabled] = useState(false);
+  const pathname = usePathname();
+  const sensitiveRoute = isSensitiveCredentialRoute(pathname);
 
   useEffect(() => {
-    window.dataLayer = window.dataLayer || [];
-    const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag;
-    if (typeof gtag !== "function") return;
+    if (sensitiveRoute) {
+      setEnabled(false);
+      updateAdsConsent(false);
+      return;
+    }
+    const initial = readConsent();
+    setEnabled(Boolean(ADS_ID) && initial?.marketing === true);
+    updateAdsConsent(initial?.marketing === true);
 
-    const state = resolveConsentState();
-    gtag("consent", "default", state);
-    gtag("consent", "update", state);
-
-    const handler = () => {
-      const next = resolveConsentState();
-      gtag("consent", "update", next);
+    const onConsentUpdated = (event: Event) => {
+      const preferences = (event as CustomEvent<ConsentPreferences>).detail || readConsent();
+      const granted = preferences?.marketing === true;
+      updateAdsConsent(granted);
+      setEnabled(Boolean(ADS_ID) && granted);
     };
-    window.addEventListener("cookie-consent-updated", handler);
-    return () => window.removeEventListener("cookie-consent-updated", handler);
-  }, []);
+    window.addEventListener(CONSENT_UPDATED_EVENT, onConsentUpdated);
+    return () => window.removeEventListener(CONSENT_UPDATED_EVENT, onConsentUpdated);
+  }, [sensitiveRoute]);
+
+  if (!ADS_ID || !enabled || sensitiveRoute) return null;
 
   return (
     <>
@@ -102,13 +66,16 @@ export default function GoogleAdsTag() {
       <Script id="google-ads-gtag-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = window.gtag || gtag;
-          gtag('js', new Date());
-          gtag('config', '${ADS_ID}');
+          window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
+          window.gtag('consent', 'update', {
+            ad_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted'
+          });
+          window.gtag('js', new Date());
+          window.gtag('config', '${ADS_ID}', { send_page_view: false });
         `}
       </Script>
     </>
   );
 }
-

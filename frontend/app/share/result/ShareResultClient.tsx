@@ -1,14 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import TopNav from "../../components/TopNav";
 import { useTranslation } from "../../lib/LanguageContext";
+import { ANALYTICS_EVENTS, trackEvent } from "../../lib/analytics";
+import {
+  CONSENT_UPDATED_EVENT,
+  hasAnalyticsConsent,
+  type ConsentPreferences,
+} from "../../lib/consent";
 
 function parsePercent(raw: string | null): number | null {
-  if (!raw) return null;
-  const value = Number.parseInt(raw, 10);
+  if (!raw || !/^\d{1,3}$/.test(raw)) return null;
+  const value = Number(raw);
   if (!Number.isFinite(value)) return null;
   return Math.max(0, Math.min(100, value));
 }
@@ -38,6 +44,36 @@ export default function ShareResultClient() {
       cs: "nárůst skóre",
       es: "mejora del puntaje",
     }[language] || "score lift";
+  const verificationNotice =
+    {
+      en: "Scores were submitted by the person sharing this link and are not independently verified by CVboosta.",
+      uk: "Бали вказані людиною, яка поділилася посиланням, і не перевірені CVboosta незалежно.",
+      pl: "Wyniki podała osoba udostępniająca link i nie zostały niezależnie zweryfikowane przez CVboosta.",
+      sk: "Skóre uviedla osoba, ktorá zdieľala odkaz, a CVboosta ho nezávisle neoverila.",
+      cs: "Skóre uvedla osoba, která odkaz sdílela, a CVboosta je nezávisle neověřila.",
+      es: "Las puntuaciones las proporcionó quien compartió el enlace y CVboosta no las verificó de forma independiente.",
+    }[language] ||
+    "Scores were submitted by the person sharing this link and are not independently verified by CVboosta.";
+
+  useEffect(() => {
+    let tracked = hasAnalyticsConsent();
+    const emit = () => trackEvent(ANALYTICS_EVENTS.sharedResultViewed, {
+      score_included: before !== null && after !== null,
+    });
+    emit();
+    const onConsentUpdated = (event: Event) => {
+      const preferences = (event as CustomEvent<ConsentPreferences>).detail;
+      if (!preferences?.analytics) {
+        tracked = false;
+        return;
+      }
+      if (tracked) return;
+      tracked = true;
+      emit();
+    };
+    window.addEventListener(CONSENT_UPDATED_EVENT, onConsentUpdated);
+    return () => window.removeEventListener(CONSENT_UPDATED_EVENT, onConsentUpdated);
+  }, [after, before]);
 
   return (
     <main className="page">
@@ -68,14 +104,31 @@ export default function ShareResultClient() {
               <p>{scoreLiftLabel}</p>
             </div>
           </div>
+          {before !== null || after !== null ? (
+            <p className="hero-subtitle" style={{ marginTop: "12px", textAlign: "center", fontSize: "0.9rem" }}>
+              {verificationNotice}
+            </p>
+          ) : null}
         </section>
 
         <section className="section fade-up" style={{ marginTop: "8px" }}>
           <div className="nav-actions" style={{ justifyContent: "center" }}>
-            <Link className="btn primary" href="/free-ats-resume-checker">
+            <Link
+              className="btn primary"
+              href="/app"
+              onClick={() => trackEvent(ANALYTICS_EVENTS.sharedResultCtaClicked, {
+                cta_type: "start_cv_match",
+              })}
+            >
               {t("common.runAnalysis")}
             </Link>
-            <Link className="btn ghost" href="/pricing">
+            <Link
+              className="btn ghost"
+              href="/pricing"
+              onClick={() => trackEvent(ANALYTICS_EVENTS.sharedResultCtaClicked, {
+                cta_type: "view_pricing",
+              })}
+            >
               {t("nav.pricing")}
             </Link>
           </div>

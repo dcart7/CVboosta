@@ -14,7 +14,11 @@ _ENC_PREFIX = "enc:v1:"
 
 
 def _key_materials() -> list[str]:
-    primary = (settings.analysis_encryption_key or settings.jwt_secret or "").strip()
+    configured = (settings.analysis_encryption_key or "").strip()
+    if settings.app_env.lower() in {"production", "prod"}:
+        primary = configured
+    else:
+        primary = configured or (settings.jwt_secret or "").strip()
     legacy = [str(item).strip() for item in (settings.analysis_encryption_legacy_keys or []) if str(item).strip()]
     materials = [primary] if primary else []
     for item in legacy:

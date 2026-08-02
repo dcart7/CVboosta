@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field, field_validator
 class OptimizeRequest(BaseModel):
     cv_text: str = Field(min_length=1, max_length=12000)
     job_text: str = Field(min_length=1, max_length=12000)
-    cv_analysis: str = Field(default="", max_length=20000)
-    job_analysis: str = Field(default="", max_length=20000)
+    cv_analysis: str = Field(default="", max_length=12000)
+    job_analysis: str = Field(default="", max_length=12000)
     target_role: str = Field(default="", max_length=200)
     target_company: str = Field(default="", max_length=200)
 
@@ -36,6 +36,8 @@ class OptimizeResponse(BaseModel):
     match_before: int | None = None
     match_after: int | None = None
     analysis_id: int | None = None
+    can_export: bool = False
+    access_entitlement: str | None = None
 
 
 class CoverLetterRequest(BaseModel):

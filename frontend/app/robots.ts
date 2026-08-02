@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com";
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://cvboosta.com").replace(/\/$/, "");
   const host = new URL(baseUrl).host;
   const privatePaths = [
     "/account",
@@ -10,6 +10,9 @@ export default function robots(): MetadataRoute.Robots {
     "/results",
     "/login",
     "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/share",
   ];
   return {
     rules: [

@@ -2,13 +2,18 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TopNav from "../components/TopNav";
 import SocialAuthButtons from "../components/SocialAuthButtons";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
 import { errorDetailToMessage } from "../lib/errorDetail";
 import { fetchWithRetry } from "../lib/fetchRetry";
+import {
+  authHref,
+  createIdempotencyKey,
+  nextDestinationFromSearch,
+} from "../lib/funnelIntent";
 import { useTranslation } from "../lib/LanguageContext";
 
 export default function RegisterPage() {
@@ -20,9 +25,20 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [nextDestination, setNextDestination] = useState("/account");
+  const registrationInFlightRef = useRef(false);
+  const registrationAttemptRef = useRef<{
+    requestBody: string;
+    idempotencyKey: string;
+  } | null>(null);
   const apiBase = getApiBase();
 
+  useEffect(() => {
+    setNextDestination(nextDestinationFromSearch("/account"));
+  }, []);
+
   const submit = async () => {
+    if (registrationInFlightRef.current) return;
     setError("");
     
     // Password security validation
@@ -35,40 +51,75 @@ export default function RegisterPage() {
       return;
     }
 
+    registrationInFlightRef.current = true;
     setLoading(true);
+    const requestBody = JSON.stringify({ email, password, full_name: name });
+    const previousAttempt = registrationAttemptRef.current;
+    const idempotencyKey =
+      previousAttempt?.requestBody === requestBody
+        ? previousAttempt.idempotencyKey
+        : createIdempotencyKey("register");
+    registrationAttemptRef.current = { requestBody, idempotencyKey };
+    trackEvent("cta_click", {
+      cta_name: "auth_submit",
+      method: "email",
+      source: nextDestination.startsWith("/pricing")
+        ? "checkout"
+        : nextDestination.startsWith("/app")
+          ? "optimization"
+          : "direct",
+    });
     try {
       const response = await fetchWithRetry(
         `${apiBase}/auth/register`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, full_name: name }),
+          headers: {
+            "Content-Type": "application/json",
+            "Idempotency-Key": idempotencyKey,
+          },
+          body: requestBody,
         },
         { attempts: 5, baseDelayMs: 400, timeoutMs: 25_000 },
       );
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
         const message = errorDetailToMessage(payload.detail);
-        throw new Error(message || "Registration failed");
+        const failure = new Error(message || "Registration failed") as Error & {
+          status?: number;
+        };
+        failure.status = response.status;
+        throw failure;
       }
-      const data = await response.json();
-      localStorage.setItem("user_email", email.trim().toLowerCase());
-      if (data?.access_token) {
-        localStorage.setItem("access_token", String(data.access_token));
-      }
+      await response.json();
+      registrationAttemptRef.current = null;
       trackEvent("sign_up", { method: "email" });
       window.dispatchEvent(new Event("auth-change"));
-      router.push("/account");
+      router.replace(nextDestination);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       const network =
         err instanceof TypeError ||
         (err instanceof Error && err.name === "AbortError") ||
         /failed to fetch|load failed|networkerror/i.test(msg);
+      const status =
+        err && typeof err === "object" && "status" in err
+          ? Number((err as { status?: unknown }).status)
+          : null;
+      const ambiguous =
+        network ||
+        status === null ||
+        status === 408 ||
+        status === 409 ||
+        status === 425 ||
+        status === 429 ||
+        status >= 500;
+      if (!ambiguous) registrationAttemptRef.current = null;
       setError(
         network ? t("auth.networkError") : msg || t("auth.registerFailed"),
       );
     } finally {
+      registrationInFlightRef.current = false;
       setLoading(false);
     }
   };
@@ -84,11 +135,19 @@ export default function RegisterPage() {
               {t("auth.registerSubtitle")}
             </p>
           </div>
-          <form className="form-card form-grid auth-form register-form">
+          <form
+            className="form-card form-grid auth-form register-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!loading) void submit();
+            }}
+          >
             <div>
               <div className="label">{t("auth.fullName")}</div>
               <input
                 className="input"
+                autoComplete="name"
+                required
                 placeholder={t("auth.fullNamePlaceholder")}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -98,6 +157,9 @@ export default function RegisterPage() {
               <div className="label">{t("auth.email")}</div>
               <input
                 className="input"
+                type="email"
+                autoComplete="email"
+                required
                 placeholder="you@domain.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -110,6 +172,8 @@ export default function RegisterPage() {
                   className="input password-input"
                   placeholder={t("auth.passwordPlaceholder")}
                   type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
@@ -139,22 +203,19 @@ export default function RegisterPage() {
                     : t("auth.registerFailed"),
                 )
               }
-              onSuccess={(data) => {
-                if (data.email) {
-                  localStorage.setItem("user_email", data.email.trim().toLowerCase());
-                }
-                if (data.access_token) {
-                  localStorage.setItem("access_token", String(data.access_token));
-                }
+              onSuccess={() => {
                 trackEvent("sign_up", { method: "oauth" });
                 window.dispatchEvent(new Event("auth-change"));
-                router.push("/account");
+                router.replace(nextDestination);
               }}
             />
-            <button className="btn secondary" type="button" onClick={submit}>
+            <button className="btn secondary" type="submit" disabled={loading}>
               {loading ? t("auth.creating") : t("auth.createBtn")}
             </button>
-            <Link className="btn ghost" href="/login">
+            <Link
+              className="btn ghost"
+              href={authHref("/login", nextDestination)}
+            >
               {t("auth.alreadyHaveAccount")}
             </Link>
           </form>

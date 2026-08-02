@@ -46,7 +46,6 @@ type DeepLocalizedCopy = {
     role: string,
     anchor: string,
     supporting: string,
-    metric: number,
     exampleLine: string,
   ) => string;
 };
@@ -60,10 +59,10 @@ const CONTENT: Record<Language, LocalizedContentPack> = {
       "Mirror vacancy priorities with truthful terminology and concrete evidence.",
     ],
     impactBullets: (role) => [
-      `Led a core ${role.toLowerCase()} initiative and improved delivery speed by X% in two quarters.`,
-      `Redesigned a key ${role.toLowerCase()} workflow and raised quality KPI from X% to Y%.`,
-      `Built reporting cadence for leadership and reduced decision lag by X%.`,
-      `Improved cross-team execution, cutting rework and handoff delays by X%.`,
+      `Illustrative template — led a core ${role.toLowerCase()} initiative and improved verified delivery speed by [X%] within [time period].`,
+      `Illustrative template — redesigned a key ${role.toLowerCase()} workflow and raised a verified quality KPI from [baseline] to [measured result].`,
+      "Illustrative template — built a reporting cadence for leadership and reduced verified decision lag by [X%].",
+      "Illustrative template — improved cross-team execution, cutting verified rework and handoff delays by [X%].",
     ],
     blueprint: (role) => [
       {
@@ -103,10 +102,10 @@ const CONTENT: Record<Language, LocalizedContentPack> = {
       "Використовуйте релевантну термінологію вакансії лише там, де є реальні докази досвіду.",
     ],
     impactBullets: (role) => [
-      `Очолив(ла) ключову ініціативу в напрямку ${role.toLowerCase()} і прискорив(ла) delivery на X% за два квартали.`,
-      `Перебудував(ла) ключовий workflow ${role.toLowerCase()} та підвищив(ла) KPI якості з X% до Y%.`,
-      "Налаштував(ла) регулярну звітність для керівництва й скоротив(ла) затримку прийняття рішень на X%.",
-      "Покращив(ла) кроскомандну взаємодію, зменшивши переробки та затримки handoff на X%.",
+      `Ілюстративний шаблон — очолив(ла) ключову ініціативу в напрямку ${role.toLowerCase()} і прискорив(ла) перевірений delivery на [X%] за [період].`,
+      `Ілюстративний шаблон — перебудував(ла) ключовий workflow ${role.toLowerCase()} та підвищив(ла) перевірений KPI якості з [базового значення] до [виміряного результату].`,
+      "Ілюстративний шаблон — налаштував(ла) звітність для керівництва й скоротив(ла) перевірену затримку прийняття рішень на [X%].",
+      "Ілюстративний шаблон — покращив(ла) кроскомандну взаємодію, зменшивши перевірені переробки та затримки handoff на [X%].",
     ],
     blueprint: (role) => [
       {
@@ -146,10 +145,10 @@ const CONTENT: Record<Language, LocalizedContentPack> = {
       "Stosuj terminologię oferty tylko tam, gdzie masz realne potwierdzenie doświadczenia.",
     ],
     impactBullets: (role) => [
-      `Poprowadziłem(-am) kluczową inicjatywę ${role.toLowerCase()} i przyspieszyłem(-am) delivery o X% w dwa kwartały.`,
-      `Przeprojektowałem(-am) główny workflow ${role.toLowerCase()} i podniosłem(-am) KPI jakości z X% do Y%.`,
-      "Wdrożyłem(-am) stały rytm raportowania dla leadershipu, skracając opóźnienie decyzji o X%.",
-      "Usprawniłem(-am) współpracę między zespołami, redukując poprawki i opóźnienia handoff o X%.",
+      `Szablon ilustracyjny — poprowadziłem(-am) kluczową inicjatywę ${role.toLowerCase()} i przyspieszyłem(-am) zweryfikowany delivery o [X%] w [okresie].`,
+      `Szablon ilustracyjny — przeprojektowałem(-am) główny workflow ${role.toLowerCase()} i podniosłem(-am) zweryfikowany KPI jakości z [wartości bazowej] do [zmierzonego wyniku].`,
+      "Szablon ilustracyjny — wdrożyłem(-am) rytm raportowania dla leadershipu, skracając zweryfikowane opóźnienie decyzji o [X%].",
+      "Szablon ilustracyjny — usprawniłem(-am) współpracę między zespołami, redukując zweryfikowane poprawki i opóźnienia handoff o [X%].",
     ],
     blueprint: (role) => [
       {
@@ -189,10 +188,10 @@ const CONTENT: Record<Language, LocalizedContentPack> = {
       "Terminológiu z pozície používajte len tam, kde ju viete podložiť reálnym dôkazom.",
     ],
     impactBullets: (role) => [
-      `Viedol(a) som kľúčovú iniciatívu ${role.toLowerCase()} a zrýchlil(a) delivery o X% za dva kvartály.`,
-      `Prepracoval(a) som hlavný workflow ${role.toLowerCase()} a zvýšil(a) KPI kvality z X% na Y%.`,
-      "Nastavil(a) som reporting rytmus pre leadership a skrátil(a) oneskorenie rozhodnutí o X%.",
-      "Zlepšil(a) som cross-team spoluprácu a znížil(a) rework aj handoff oneskorenia o X%.",
+      `Ilustračná šablóna — viedol(a) som kľúčovú iniciatívu ${role.toLowerCase()} a zrýchlil(a) overený delivery o [X%] za [časové obdobie].`,
+      `Ilustračná šablóna — prepracoval(a) som hlavný workflow ${role.toLowerCase()} a zvýšil(a) overený KPI kvality z [východiskovej hodnoty] na [nameraný výsledok].`,
+      "Ilustračná šablóna — nastavil(a) som reporting rytmus pre leadership a skrátil(a) overené oneskorenie rozhodnutí o [X%].",
+      "Ilustračná šablóna — zlepšil(a) som cross-team spoluprácu a znížil(a) overený rework aj handoff oneskorenia o [X%].",
     ],
     blueprint: (role) => [
       {
@@ -232,10 +231,10 @@ const CONTENT: Record<Language, LocalizedContentPack> = {
       "Terminologii z inzerátu používejte jen tam, kde ji podpoříte reálným důkazem.",
     ],
     impactBullets: (role) => [
-      `Vedl(a) jsem klíčovou iniciativu ${role.toLowerCase()} a zrychlil(a) delivery o X% během dvou kvartálů.`,
-      `Přepracoval(a) jsem hlavní workflow ${role.toLowerCase()} a zvýšil(a) KPI kvality z X% na Y%.`,
-      "Zavedl(a) jsem pravidelný reporting pro leadership a snížil(a) zpoždění rozhodování o X%.",
-      "Zlepšil(a) jsem cross-team spolupráci a snížil(a) rework i handoff zpoždění o X%.",
+      `Ilustrační šablona — vedl(a) jsem klíčovou iniciativu ${role.toLowerCase()} a zrychlil(a) ověřený delivery o [X%] během [časového období].`,
+      `Ilustrační šablona — přepracoval(a) jsem hlavní workflow ${role.toLowerCase()} a zvýšil(a) ověřený KPI kvality z [výchozí hodnoty] na [naměřený výsledek].`,
+      "Ilustrační šablona — zavedl(a) jsem reporting pro leadership a snížil(a) ověřené zpoždění rozhodování o [X%].",
+      "Ilustrační šablona — zlepšil(a) jsem cross-team spolupráci a snížil(a) ověřený rework i handoff zpoždění o [X%].",
     ],
     blueprint: (role) => [
       {
@@ -275,10 +274,10 @@ const CONTENT: Record<Language, LocalizedContentPack> = {
       "Usa la terminología de la vacante solo cuando puedas respaldarla con evidencia real.",
     ],
     impactBullets: (role) => [
-      `Lideré una iniciativa clave de ${role.toLowerCase()} y mejoré la velocidad de delivery en X% en dos trimestres.`,
-      `Rediseñé un workflow principal de ${role.toLowerCase()} y elevé el KPI de calidad de X% a Y%.`,
-      "Implementé una cadencia de reporting para liderazgo y reduje el retraso de decisión en X%.",
-      "Mejoré la ejecución entre equipos, reduciendo retrabajo y retrasos de handoff en X%.",
+      `Plantilla ilustrativa — lideré una iniciativa clave de ${role.toLowerCase()} y mejoré la velocidad verificada de delivery en [X%] durante [periodo].`,
+      `Plantilla ilustrativa — rediseñé un workflow principal de ${role.toLowerCase()} y elevé un KPI verificado de calidad de [valor inicial] a [resultado medido].`,
+      "Plantilla ilustrativa — implementé una cadencia de reporting para liderazgo y reduje el retraso verificado de decisión en [X%].",
+      "Plantilla ilustrativa — mejoré la ejecución entre equipos, reduciendo retrabajo y retrasos verificados de handoff en [X%].",
     ],
     blueprint: (role) => [
       {
@@ -325,8 +324,8 @@ const DEEP_COPY: Record<Language, DeepLocalizedCopy> = {
       `Examples and FAQ were updated to strengthen specificity for ${role.toLowerCase()} applicants, with extra emphasis on ${lane}.`,
     introParagraphA: (role, kwA, kwB) =>
       `${role} hiring pipelines are comparison-driven: recruiters benchmark role relevance, vocabulary fit, and measurable impact very quickly. This guide keeps the same practical structure while grounding it in role-specific signals such as ${kwA} and ${kwB}, plus evidence patterns that are easier for ATS and humans to interpret.`,
-    introParagraphB: (role, anchor, supporting, metric, exampleLine) =>
-      `For this role, strong resume versions usually show ownership and outcomes like ${anchor} and ${supporting}. In many review flows, moving those signals into summary and lead bullets can raise match quality by ${metric}% or more versus baseline drafts built from responsibilities only. A good target line is: ${exampleLine}.`,
+    introParagraphB: (role, anchor, supporting, exampleLine) =>
+      `For this role, strong resume versions usually show ownership and verified outcomes like ${anchor} and ${supporting}. Moving those signals into the summary and lead bullets makes the evidence easier to review, without promising a fabricated score lift. Illustrative template for ${role}: ${exampleLine}. Replace every bracketed placeholder with a fact you can verify.`,
   },
   uk: {
     strategyLead: (role) =>
@@ -340,8 +339,8 @@ const DEEP_COPY: Record<Language, DeepLocalizedCopy> = {
       `Приклади й FAQ оновлено для більшої специфіки під кандидатів на ${role.toLowerCase()}, з додатковим фокусом на ${lane}.`,
     introParagraphA: (role, kwA, kwB) =>
       `Найм на роль ${role.toLowerCase()} дуже порівняльний: рекрутери швидко оцінюють релевантність профілю, лексику ролі та вимірюваний бізнес-вплив. Цей гайд зберігає практичну структуру, але підсилює її сигналами саме для цієї ролі, зокрема ${kwA} і ${kwB}.`,
-    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
-      `Для цієї ролі найсильніші резюме показують ownership і результати на кшталт ${anchor} та ${supporting}. У багатьох сценаріях перенесення цих сигналів у summary та перші bullet-пункти підвищує якість матчингу на ${metric}% і більше. Орієнтир формулювання: ${exampleLine}.`,
+    introParagraphB: (_role, anchor, supporting, exampleLine) =>
+      `Для цієї ролі сильні резюме показують ownership і перевірені результати на кшталт ${anchor} та ${supporting}. Перенесення цих сигналів у summary та перші bullet-пункти робить докази зрозумілішими без вигаданої обіцянки зростання score. Ілюстративний шаблон: ${exampleLine}. Замініть усі плейсхолдери фактами, які можете підтвердити.`,
   },
   pl: {
     strategyLead: (role) =>
@@ -355,8 +354,8 @@ const DEEP_COPY: Record<Language, DeepLocalizedCopy> = {
       `Przykłady i FAQ zaktualizowano, aby były bardziej konkretne dla kandydatów na ${role.toLowerCase()}, ze szczególnym naciskiem na ${lane}.`,
     introParagraphA: (role, kwA, kwB) =>
       `Proces rekrutacyjny dla ${role.toLowerCase()} jest porównawczy: rekruterzy szybko benchmarkują trafność profilu, słownictwo roli i mierzalny wpływ. Ten poradnik zachowuje praktyczną strukturę i wzmacnia ją sygnałami specyficznymi dla roli, takimi jak ${kwA} i ${kwB}.`,
-    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
-      `W tej roli najlepsze CV pokazują ownership i wyniki takie jak ${anchor} oraz ${supporting}. W wielu przeglądach przesunięcie tych sygnałów do podsumowania i lead bulletów podnosi jakość dopasowania o ${metric}% lub więcej. Dobra linia docelowa: ${exampleLine}.`,
+    introParagraphB: (_role, anchor, supporting, exampleLine) =>
+      `W tej roli mocne CV pokazują ownership i zweryfikowane wyniki, takie jak ${anchor} oraz ${supporting}. Przeniesienie tych sygnałów do podsumowania i głównych bulletów ułatwia ocenę dowodów bez obiecywania zmyślonego wzrostu wyniku. Szablon ilustracyjny: ${exampleLine}. Zastąp wszystkie placeholdery faktami, które możesz potwierdzić.`,
   },
   sk: {
     strategyLead: (role) =>
@@ -370,8 +369,8 @@ const DEEP_COPY: Record<Language, DeepLocalizedCopy> = {
       `Príklady a FAQ boli upravené pre vyššiu špecificitu pre kandidátov na ${role.toLowerCase()}, s dôrazom na ${lane}.`,
     introParagraphA: (role, kwA, kwB) =>
       `Hiring pipeline pre ${role.toLowerCase()} je porovnávací: recruiteri rýchlo porovnávajú relevanciu profilu, slovník role a merateľný dopad. Tento návod zachováva praktickú štruktúru a opiera ju o role-signály ako ${kwA} a ${kwB}.`,
-    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
-      `Pri tejto role najsilnejšie životopisy ukazujú ownership a výsledky ako ${anchor} a ${supporting}. V mnohých review flow presun týchto signálov do summary a lead bulletov zvýši match kvalitu o ${metric}% a viac. Dobrý cieľový riadok: ${exampleLine}.`,
+    introParagraphB: (_role, anchor, supporting, exampleLine) =>
+      `Pri tejto role silné životopisy ukazujú ownership a overené výsledky ako ${anchor} a ${supporting}. Presun týchto signálov do summary a hlavných bulletov uľahčí kontrolu dôkazov bez sľubu vymysleného rastu skóre. Ilustračná šablóna: ${exampleLine}. Všetky placeholdery nahraďte faktmi, ktoré viete overiť.`,
   },
   cs: {
     strategyLead: (role) =>
@@ -385,8 +384,8 @@ const DEEP_COPY: Record<Language, DeepLocalizedCopy> = {
       `Příklady a FAQ byly upraveny pro vyšší specifičnost pro kandidáty na ${role.toLowerCase()}, s důrazem na ${lane}.`,
     introParagraphA: (role, kwA, kwB) =>
       `Hiring pipeline pro ${role.toLowerCase()} je porovnávací: recruiteri rychle porovnávají relevanci profilu, slovník role a měřitelný dopad. Tento průvodce zachovává praktickou strukturu a opírá ji o role-signály jako ${kwA} a ${kwB}.`,
-    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
-      `U této role nejsilnější životopisy ukazují ownership a výsledky jako ${anchor} a ${supporting}. V mnoha review flow přesun těchto signálů do summary a lead bulletů zvyšuje kvalitu shody o ${metric}% a více. Dobrý cílový řádek: ${exampleLine}.`,
+    introParagraphB: (_role, anchor, supporting, exampleLine) =>
+      `U této role silné životopisy ukazují ownership a ověřené výsledky jako ${anchor} a ${supporting}. Přesun těchto signálů do summary a hlavních bulletů usnadní kontrolu důkazů bez slibu vymyšleného růstu skóre. Ilustrační šablona: ${exampleLine}. Všechny placeholdery nahraďte fakty, která můžete ověřit.`,
   },
   es: {
     strategyLead: (role) =>
@@ -400,8 +399,8 @@ const DEEP_COPY: Record<Language, DeepLocalizedCopy> = {
       `Se actualizaron ejemplos y FAQ para mayor especificidad para candidatos de ${role.toLowerCase()}, con énfasis adicional en ${lane}.`,
     introParagraphA: (role, kwA, kwB) =>
       `Los procesos de contratación para ${role.toLowerCase()} son comparativos: los reclutadores benchmarkean muy rápido la relevancia del perfil, el vocabulario del rol y el impacto medible. Esta guía mantiene una estructura práctica y la aterriza con señales específicas del rol como ${kwA} y ${kwB}.`,
-    introParagraphB: (_role, anchor, supporting, metric, exampleLine) =>
-      `En este rol, los CV más sólidos muestran ownership y resultados como ${anchor} y ${supporting}. En muchos flujos de revisión, mover esas señales al resumen y a los primeros bullets puede elevar la calidad de match en ${metric}% o más. Una línea objetivo útil es: ${exampleLine}.`,
+    introParagraphB: (_role, anchor, supporting, exampleLine) =>
+      `En este rol, los CV sólidos muestran ownership y resultados verificados como ${anchor} y ${supporting}. Mover esas señales al resumen y a los primeros bullets facilita la revisión de la evidencia sin prometer una mejora inventada del score. Plantilla ilustrativa: ${exampleLine}. Sustituye cada placeholder por un dato que puedas verificar.`,
   },
 };
 
@@ -805,62 +804,54 @@ function buildEngineeringContent(cluster: ResumeKeywordCluster, _language: Langu
     10,
   );
 
-  const services = 2 + (h % 6);
-  const latency = 18 + (h % 37);
-  const incidents = 20 + (h % 45);
-  const deploys = 35 + (h % 120);
-  const months = 2 + (h % 7);
-  const cost = 9 + (h % 18);
-  const coverage = 14 + (h % 22);
-
   const bulletsByLane: Record<Lane, string[]> = {
     frontend: [
-      `Reduced LCP by ${1.2 + ((h % 10) / 10)}s on key pages via bundle splitting and render profiling → improved conversion by ${6 + (h % 9)}% in ${months} months.`,
-      `Implemented design-system components with accessibility checks (WCAG) → cut UI defects by ${18 + (h % 20)}% and sped up feature delivery across ${services} teams.`,
-      `Built E2E test suite (Playwright/Cypress) for critical flows → reduced escaped regressions by ${incidents}% and stabilized releases.`,
-      `Instrumented frontend error monitoring (Sentry) and created weekly triage → reduced crash-free sessions gap by ${12 + (h % 16)}%.`,
-      `Optimized client-side data fetching + caching → decreased time-to-interactive by ${10 + (h % 18)}% under peak traffic.`,
-      `Partnered with design on interaction audits → improved task completion rate by ${8 + (h % 12)}% without increasing scope.`,
+      "Illustrative template — reduced LCP by [measured duration] on key pages via bundle splitting and render profiling → improved verified conversion by [X%] within [time period].",
+      "Illustrative template — implemented design-system components with accessibility checks (WCAG) → cut verified UI defects by [X%] and sped up feature delivery across [number] teams.",
+      "Illustrative template — built an E2E test suite (Playwright/Cypress) for critical flows → reduced verified escaped regressions by [X%] and stabilized releases.",
+      "Illustrative template — instrumented frontend error monitoring (Sentry) and created a triage cadence → reduced a verified reliability gap by [X%].",
+      "Illustrative template — optimized client-side data fetching and caching → decreased verified time-to-interactive by [X%] under peak traffic.",
+      "Illustrative template — partnered with design on interaction audits → improved verified task completion by [X%] without increasing scope.",
     ],
     backend: [
-      `Cut p99 API latency by ${latency}% by optimizing queries and caching hot paths → improved ${impact} and reduced timeouts in ${months} months.`,
-      `Designed idempotent payment/order workflows with retries and deduplication → reduced duplicate processing incidents by ${18 + (h % 22)}%.`,
-      `Introduced async processing (queue + workers) for heavy tasks → improved throughput by ${22 + (h % 24)}% while keeping SLA.`,
-      `Implemented OpenTelemetry tracing and alert tuning → reduced MTTR by ${12 + (h % 18)}% across ${services} services.`,
-      `Shipped zero-downtime schema migrations and rollback plan → eliminated release-related incidents for ${3 + (h % 4)} consecutive months.`,
-      `Hardened authZ checks and added audit logs → closed ${9 + (h % 12)} high-risk gaps found in security review.`,
+      `Illustrative template — cut p99 API latency by [X%] by optimizing queries and caching hot paths → improved ${impact} and reduced verified timeouts within [time period].`,
+      "Illustrative template — designed idempotent payment/order workflows with retries and deduplication → reduced verified duplicate-processing incidents by [X%].",
+      "Illustrative template — introduced async processing (queue + workers) for heavy tasks → improved verified throughput by [X%] while meeting the stated SLA.",
+      "Illustrative template — implemented OpenTelemetry tracing and alert tuning → reduced verified MTTR by [X%] across [number] services.",
+      "Illustrative template — shipped zero-downtime schema migrations and a rollback plan → prevented verified release-related incidents throughout [time period].",
+      "Illustrative template — hardened authZ checks and added audit logs → closed [number] high-risk gaps documented in a security review.",
     ],
     fullstack: [
-      `Owned feature end-to-end (UI→API→DB) and shipped in ${weeksToString(2 + (h % 4))} weeks → increased activation by ${8 + (h % 14)}% with measurable instrumentation.`,
-      `Implemented feature flags and gradual rollouts → cut rollout-related incidents by ${18 + (h % 20)}% and improved release confidence.`,
-      `Added observability standards (logs/metrics/traces) for new endpoints → reduced debugging time by ${22 + (h % 26)}%.`,
-      `Improved CI pipeline and test parallelism → reduced build time by ${cost}% while increasing coverage by ${coverage}%.`,
-      `Refactored critical flow to remove race condition → reduced error rate by ${12 + (h % 16)}% at peak load.`,
-      `Built internal admin tooling for ops team → reduced manual processing time by ${25 + (h % 25)}%.`,
+      "Illustrative template — owned a feature end-to-end (UI→API→DB) and shipped within [time period] → increased verified activation by [X%] with measurable instrumentation.",
+      "Illustrative template — implemented feature flags and gradual rollouts → cut verified rollout-related incidents by [X%] and improved release confidence.",
+      "Illustrative template — added observability standards (logs/metrics/traces) for new endpoints → reduced verified debugging time by [X%].",
+      "Illustrative template — improved CI pipeline and test parallelism → reduced verified build time by [X%] while increasing verified coverage by [X%].",
+      "Illustrative template — refactored a critical flow to remove a race condition → reduced verified error rate by [X%] at peak load.",
+      "Illustrative template — built internal admin tooling for the operations team → reduced verified manual-processing time by [X%].",
     ],
     devops: [
-      `Built Terraform modules and standardized environments → reduced provisioning time by ${25 + (h % 30)}% and improved auditability.`,
-      `Implemented SLOs + alert tuning with error budgets → reduced noisy alerts by ${30 + (h % 35)}% and improved on-call focus.`,
-      `Migrated workloads to Kubernetes with progressive delivery → increased deployment frequency to ${deploys}/month while reducing incidents by ${12 + (h % 18)}%.`,
-      `Optimized cloud spend (rightsizing + autoscaling) → reduced monthly infra cost by ${cost}% without degrading SLOs.`,
-      `Created incident runbooks and DR checks → cut MTTR by ${12 + (h % 18)}% and reduced repeat incidents.`,
-      `Hardened secrets management and rotation → eliminated long-lived credentials in ${months} months.`,
+      "Illustrative template — built Terraform modules and standardized environments → reduced verified provisioning time by [X%] and improved auditability.",
+      "Illustrative template — implemented SLOs and alert tuning with error budgets → reduced verified noisy alerts by [X%] and improved on-call focus.",
+      "Illustrative template — migrated workloads to Kubernetes with progressive delivery → increased verified deployment frequency to [measured result] while reducing incidents by [X%].",
+      "Illustrative template — optimized cloud spend through rightsizing and autoscaling → reduced verified monthly infrastructure cost by [X%] without degrading SLOs.",
+      "Illustrative template — created incident runbooks and DR checks → cut verified MTTR by [X%] and reduced repeat incidents.",
+      "Illustrative template — hardened secrets management and rotation → removed verified long-lived credentials within [time period].",
     ],
     ml: [
-      `Built feature pipeline and training orchestration → reduced model training time by ${18 + (h % 24)}% and improved experiment throughput.`,
-      `Deployed model serving with latency budget → reduced p95 inference latency by ${10 + (h % 18)}% while maintaining quality.`,
-      `Implemented drift monitoring and alerting → detected data shift ${weeksToString(1 + (h % 3))} earlier and prevented performance drops.`,
-      `Ran offline/online evaluation and A/B rollout → improved key metric by ${6 + (h % 12)}% with statistically-sound reporting.`,
-      `Versioned models/prompts and added rollback strategy → reduced production incidents related to model updates by ${16 + (h % 18)}%.`,
-      `Partnered with product on acceptance criteria → reduced rework by ${12 + (h % 16)}% and clarified success metrics.`,
+      "Illustrative template — built a feature pipeline and training orchestration → reduced verified model-training time by [X%] and improved experiment throughput.",
+      "Illustrative template — deployed model serving with a latency budget → reduced verified p95 inference latency by [X%] while maintaining a stated quality threshold.",
+      "Illustrative template — implemented drift monitoring and alerting → detected data shift [measured duration] earlier and prevented a documented performance drop.",
+      "Illustrative template — ran offline/online evaluation and an A/B rollout → improved a verified key metric by [X%] with statistically sound reporting.",
+      "Illustrative template — versioned models/prompts and added a rollback strategy → reduced verified model-update incidents by [X%].",
+      "Illustrative template — partnered with product on acceptance criteria → reduced verified rework by [X%] and clarified success metrics.",
     ],
     default: [
-      `Led system design change across ${services} services → improved ${impact} by ${12 + (h % 22)}% in ${months} months.`,
-      `Reduced production incidents by ${incidents}% by hardening monitoring, alerting, and runbooks.`,
-      `Improved CI and test strategy → increased coverage by ${coverage}% and reduced release regressions.`,
-      `Optimized performance hot path → cut latency by ${latency}% and improved customer-facing SLA.`,
-      `Owned on-call improvements and postmortems → reduced repeat incidents by ${18 + (h % 20)}%.`,
-      `Delivered technical debt roadmap → improved delivery predictability and release quality.`,
+      `Illustrative template — led a system-design change across [number] services → improved verified ${impact} by [X%] within [time period].`,
+      "Illustrative template — reduced verified production incidents by [X%] by hardening monitoring, alerting, and runbooks.",
+      "Illustrative template — improved CI and test strategy → increased verified coverage by [X%] and reduced release regressions.",
+      "Illustrative template — optimized a performance hot path → cut verified latency by [X%] and improved a customer-facing SLA.",
+      "Illustrative template — owned on-call improvements and postmortems → reduced verified repeat incidents by [X%].",
+      "Illustrative template — delivered a technical-debt roadmap → improved delivery predictability and release quality, measured by [verified KPI].",
     ],
     data_analyst: [],
     data_engineer: [],
@@ -911,11 +902,6 @@ function buildEngineeringContent(cluster: ResumeKeywordCluster, _language: Langu
   );
 
   return { hook, keywordGroups, resumeBullets, atsTips, commonMistakes, proTips };
-}
-
-function weeksToString(weeks: number): string {
-  if (weeks <= 1) return "1 week";
-  return `${weeks} weeks`;
 }
 
 function buildDataContent(cluster: ResumeKeywordCluster, _language: Language): ResumeKeywordLandingContent {
@@ -1061,36 +1047,30 @@ function buildDataContent(cluster: ResumeKeywordCluster, _language: Language): R
     },
   ]);
 
-  const weeks = 3 + (h % 10);
-  const freshness = 25 + (h % 35);
-  const accuracy = 8 + (h % 18);
-  const savings = 10 + (h % 22);
-  const stakeholders = 4 + (h % 10);
-
   const bulletsByLane: Record<Lane, string[]> = {
     data_analyst: [
-      `Built KPI definitions and a dashboard info architecture → reduced weekly reporting time by ${freshness}% for ${stakeholders} stakeholder groups.`,
-      `Ran cohort analysis on activation funnel → identified drop-off driver and increased activation by ${6 + (h % 12)}% over ${weeks} weeks.`,
-      `Delivered experiment readouts (lift + confidence) for ${8 + (h % 14)} tests → improved decision speed and cut “analysis paralysis” loops.`,
-      `Automated recurring SQL reports → reduced manual work by ${savings}% and improved data consistency across teams.`,
-      `Introduced data QA checks on key metrics → reduced metric discrepancies by ${accuracy}% month-over-month.`,
-      `Partnered with product/marketing to define event taxonomy → improved attribution of ${impact} and reduced “unknown” traffic buckets.`,
+      "Illustrative template — built KPI definitions and dashboard information architecture → reduced verified reporting time by [X%] for [number] stakeholder groups.",
+      "Illustrative template — ran cohort analysis on the activation funnel → identified a drop-off driver and increased verified activation by [X%] within [time period].",
+      "Illustrative template — delivered experiment readouts for [number] tests → improved verified decision speed and reduced analysis loops.",
+      "Illustrative template — automated recurring SQL reports → reduced verified manual work by [X%] and improved data consistency across teams.",
+      "Illustrative template — introduced data QA checks on key metrics → reduced verified metric discrepancies by [X%] within [time period].",
+      `Illustrative template — partnered with product/marketing to define an event taxonomy → improved verified attribution of ${impact} and reduced unknown traffic by [X%].`,
     ],
     data_engineer: [
-      `Built dbt models and incremental ELT pipelines → improved data freshness by ${freshness}% and met SLA for executive dashboards.`,
-      `Implemented data quality monitoring and alerting → reduced broken dashboards by ${accuracy}% and improved trust in reporting.`,
-      `Optimized warehouse cost (partitioning + pruning + materializations) → reduced monthly spend by ${savings}%.`,
-      `Designed event ingestion pipeline with backfill strategy → enabled reliable cohort analysis across ${12 + (h % 30)} events.`,
-      `Introduced PII access controls and audit logs → improved compliance posture without blocking analytics workflows.`,
-      `Standardized lineage and documentation → reduced onboarding time for analysts by ${10 + (h % 18)}%.`,
+      "Illustrative template — built dbt models and incremental ELT pipelines → improved verified data freshness by [X%] and met the stated dashboard SLA.",
+      "Illustrative template — implemented data-quality monitoring and alerting → reduced verified broken dashboards by [X%] and improved trust in reporting.",
+      "Illustrative template — optimized warehouse cost through partitioning, pruning, and materializations → reduced verified monthly spend by [X%].",
+      "Illustrative template — designed an event-ingestion pipeline with a backfill strategy → enabled reliable cohort analysis across [number] events.",
+      "Illustrative template — introduced PII access controls and audit logs → improved a documented compliance outcome without blocking analytics workflows.",
+      "Illustrative template — standardized lineage and documentation → reduced verified analyst-onboarding time by [X%].",
     ],
     data_scientist: [
-      `Built forecasting model and evaluation framework → improved forecast accuracy by ${accuracy}% and reduced planning error.`,
-      `Designed A/B tests with guardrails and power checks → increased confidence in decisions and reduced false-positive launches.`,
-      `Shipped segmentation model for targeting → improved conversion by ${6 + (h % 12)}% while controlling CAC.`,
-      `Implemented model monitoring (drift + performance) → detected degradation ${2 + (h % 3)} weeks earlier and prevented metric regression.`,
-      `Partnered with engineering on productionization requirements → reduced time-to-deploy from ${8 + (h % 8)} weeks to ${4 + (h % 4)} weeks.`,
-      `Built feature pipeline and reproducible training runs → increased experiment throughput by ${18 + (h % 22)}%.`,
+      "Illustrative template — built a forecasting model and evaluation framework → improved verified forecast accuracy by [X%] and reduced planning error.",
+      "Illustrative template — designed A/B tests with guardrails and power checks → reduced a verified false-positive launch rate by [X%].",
+      "Illustrative template — shipped a segmentation model for targeting → improved verified conversion by [X%] while controlling CAC.",
+      "Illustrative template — implemented model monitoring for drift and performance → detected degradation [measured duration] earlier and prevented a documented regression.",
+      "Illustrative template — partnered with engineering on productionization requirements → reduced verified time-to-deploy from [baseline] to [measured result].",
+      "Illustrative template — built a feature pipeline and reproducible training runs → increased verified experiment throughput by [X%].",
     ],
     default: [],
     frontend: [],
@@ -1377,62 +1357,54 @@ function buildMarketingContent(cluster: ResumeKeywordCluster, _language: Languag
     { title: groupTitles.advanced, keywords: advanced },
   ]);
 
-  const budget = 15 + (h % 55);
-  const roasLift = 18 + (h % 42);
-  const cvrLift = 9 + (h % 17);
-  const pipeline = 0.6 + ((h % 24) / 10);
-  const months = 3 + (h % 7);
-  const ctrLift = 12 + (h % 26);
-  const churnCut = 6 + (h % 11);
-
   const bulletsByLane: Record<Lane, string[]> = {
     default: [
-      `Built quarterly channel plan and reallocated budget weekly → improved CAC payback by ${8 + (h % 10)}% while holding spend flat ($${budget}k/month).`,
-      `Launched 12-week campaign across paid + email + landing pages → increased demo requests by ${14 + (h % 21)}% and lifted landing-page CVR by ${cvrLift}%.`,
-      `Implemented UTM governance + dashboarding in Looker Studio → reduced “unknown source” pipeline from ${22 + (h % 18)}% to ${8 + (h % 7)}% in ${months} months.`,
-      `Partnered with Sales on lead routing + MQL definitions → raised MQL→SQL conversion from ${18 + (h % 10)}% to ${28 + (h % 12)}% within one quarter.`,
-      `Standardized creative testing matrix (hooks × offers × audiences) → improved click-through rate by ${ctrLift}% and decreased CPA by ${10 + (h % 18)}%.`,
-      `Owned agency relationship and weekly KPI reviews → delivered ${pipeline.toFixed(1)}M in sourced pipeline and improved forecast accuracy by ${7 + (h % 10)}%.`,
+      "Illustrative template — built a channel plan and reallocated budget using verified performance data → improved CAC payback by [X%] while holding spend at [budget].",
+      "Illustrative template — launched a campaign across paid, email, and landing pages → increased verified demo requests by [X%] and lifted landing-page CVR by [X%] within [time period].",
+      "Illustrative template — implemented UTM governance and Looker Studio dashboards → reduced verified unknown-source pipeline from [baseline] to [measured result] within [time period].",
+      "Illustrative template — partnered with Sales on lead routing and MQL definitions → raised verified MQL-to-SQL conversion from [baseline] to [measured result].",
+      "Illustrative template — standardized a creative testing matrix (hooks × offers × audiences) → improved verified CTR by [X%] and decreased CPA by [X%].",
+      "Illustrative template — owned the agency relationship and KPI reviews → delivered [pipeline value] in verified sourced pipeline and improved forecast accuracy by [X%].",
     ],
     seo: [
-      `Ran technical SEO audit (indexing, canonicals, CWV) and shipped fixes with engineering → lifted non-brand organic sessions by ${22 + (h % 26)}% in ${months} months.`,
-      `Built keyword-to-page map and rewrote titles/meta for ${55 + (h % 120)} priority URLs → increased top-3 rankings by ${14 + (h % 18)}% and improved CTR by ${ctrLift}%.`,
-      `Set up Search Console + GA4 content dashboards → cut time-to-diagnose traffic drops from ${10 + (h % 8)} days to ${3 + (h % 3)} days.`,
-      `Designed internal linking strategy for topic clusters → increased pages per session from ${2.1 + ((h % 9) / 10)} to ${2.8 + ((h % 10) / 10)} and reduced bounce by ${7 + (h % 9)}%.`,
-      `Partnered on schema markup rollout (FAQ, Product, Article) → increased rich-result impressions by ${28 + (h % 35)}% over ${months} months.`,
-      `Built SEO content brief template (intent + SERP gap + internal links) → improved publish-to-rank time by ${18 + (h % 20)}% across ${12 + (h % 20)} articles.`,
+      "Illustrative template — ran a technical SEO audit and shipped verified fixes with engineering → lifted non-brand organic sessions by [X%] within [time period].",
+      "Illustrative template — built a keyword-to-page map and rewrote metadata for [number] priority URLs → improved verified ranking coverage by [X%] and CTR by [X%].",
+      "Illustrative template — set up Search Console and GA4 dashboards → cut verified time-to-diagnose traffic drops from [baseline] to [measured result].",
+      "Illustrative template — designed an internal-linking strategy for topic clusters → increased verified pages per session from [baseline] to [measured result] and reduced bounce by [X%].",
+      "Illustrative template — partnered on a schema-markup rollout → increased verified rich-result impressions by [X%] within [time period].",
+      "Illustrative template — built an SEO content-brief template → improved verified publish-to-rank time by [X%] across [number] articles.",
     ],
     paid: [
-      `Restructured Google Ads account (themes, match types, negatives) → improved ROAS by ${roasLift}% and reduced wasted spend by ${9 + (h % 14)}% in ${months} months.`,
-      `Implemented conversion tracking QA in GTM + GA4 (deduping + attribution sanity checks) → decreased “unattributed” conversions by ${16 + (h % 14)}%.`,
-      `Built creative iteration cadence (weekly winners/losers) → improved CTR by ${ctrLift}% and lifted landing-page CVR by ${cvrLift}%.`,
-      `Scaled retargeting with frequency caps and audience exclusions → reduced CPA by ${12 + (h % 20)}% while keeping conversion volume within ±${3 + (h % 5)}%.`,
-      `Introduced budget pacing alerts and reallocation rules → avoided end-of-month overspend and improved budget efficiency by ${11 + (h % 14)}%.`,
-      `Ran incrementality test (geo split) on branded search → reallocated ${6 + (h % 9)}% of spend to higher-lift campaigns without losing revenue.`,
+      "Illustrative template — restructured a Google Ads account → improved verified ROAS by [X%] and reduced wasted spend by [X%] within [time period].",
+      "Illustrative template — implemented conversion-tracking QA in GTM and GA4 → decreased verified unattributed conversions by [X%].",
+      "Illustrative template — built a creative iteration cadence → improved verified CTR by [X%] and landing-page CVR by [X%].",
+      "Illustrative template — scaled retargeting with frequency caps and audience exclusions → reduced verified CPA by [X%] while keeping conversion volume within [measured range].",
+      "Illustrative template — introduced budget-pacing alerts and reallocation rules → prevented verified overspend and improved budget efficiency by [X%].",
+      "Illustrative template — ran an incrementality test on branded search → reallocated [X%] of spend to higher-lift campaigns without a verified revenue loss.",
     ],
     lifecycle: [
-      `Built lifecycle segmentation (activation, onboarding, expansion) and launched triggered flows → increased activation rate by ${12 + (h % 16)}% in ${months} months.`,
-      `Improved deliverability (domain warmup, list hygiene, suppression rules) → raised inbox placement by ${8 + (h % 10)}% and reduced spam complaints by ${2 + (h % 3)}x.`,
-      `Designed nurture sequences tied to sales stages → improved SQL progression by ${10 + (h % 12)}% and shortened cycle time by ${6 + (h % 9)}%.`,
-      `Implemented holdout testing for winback flows → quantified churn impact and reduced churn by ${churnCut}% over one quarter.`,
-      `Aligned CRM fields + lead scoring with Sales Ops → reduced misrouted leads by ${18 + (h % 18)}% and improved follow-up SLA compliance.`,
-      `Built lifecycle dashboard (cohorts, retention, conversion) → created weekly operating cadence and improved decision turnaround by ${9 + (h % 11)}%.`,
+      "Illustrative template — built lifecycle segmentation and triggered flows → increased verified activation by [X%] within [time period].",
+      "Illustrative template — improved deliverability through domain warmup, list hygiene, and suppression rules → raised verified inbox placement by [X%] and reduced spam complaints by [X%].",
+      "Illustrative template — designed nurture sequences tied to sales stages → improved verified SQL progression by [X%] and shortened cycle time by [X%].",
+      "Illustrative template — implemented holdout testing for winback flows → quantified churn impact and reduced verified churn by [X%] within [time period].",
+      "Illustrative template — aligned CRM fields and lead scoring with Sales Ops → reduced verified misrouted leads by [X%] and improved follow-up SLA compliance.",
+      "Illustrative template — built a lifecycle dashboard and operating cadence → improved verified decision turnaround by [X%].",
     ],
     brand: [
-      `Led brand campaign narrative and creative briefing → increased aided awareness by ${8 + (h % 12)}pp and improved consideration by ${5 + (h % 9)}pp in post-campaign survey.`,
-      `Owned agency workflow (briefs, deadlines, QA) across ${3 + (h % 4)} concurrent launches → shipped on time with <${2 + (h % 3)}% rework.`,
-      `Built GTM messaging hierarchy (ICP pain → proof → offer) → improved landing-page engagement by ${10 + (h % 16)}% and reduced bounce by ${7 + (h % 9)}%.`,
-      `Coordinated PR + partner co-marketing → delivered ${14 + (h % 24)} placements and drove ${18 + (h % 30)}% lift in direct traffic during launch window.`,
-      `Set up social listening + weekly insights → identified ${4 + (h % 7)} recurring objections and fed them into copy updates across channels.`,
-      `Standardized content QA and approvals → reduced review cycles from ${5 + (h % 3)} rounds to ${2 + (h % 2)} rounds.`,
+      "Illustrative template — led a brand-campaign narrative and creative brief → increased verified aided awareness by [measured result] and consideration by [measured result].",
+      "Illustrative template — owned an agency workflow across [number] concurrent launches → met [delivery target] with [X%] verified rework.",
+      "Illustrative template — built a GTM messaging hierarchy → improved verified landing-page engagement by [X%] and reduced bounce by [X%].",
+      "Illustrative template — coordinated PR and partner co-marketing → delivered [number] verified placements and lifted direct traffic by [X%] during [time period].",
+      "Illustrative template — set up social listening and an insight cadence → identified [number] recurring objections and used them in documented copy updates.",
+      "Illustrative template — standardized content QA and approvals → reduced verified review cycles from [baseline] to [measured result].",
     ],
     growth: [
-      `Built growth experiment backlog and ran ${10 + (h % 18)} tests across onboarding + pricing → improved activation by ${12 + (h % 18)}% in ${months} months.`,
-      `Instrumented funnel events and fixed tracking gaps → reduced analysis time per experiment by ${25 + (h % 20)}% and improved confidence in readouts.`,
-      `Launched pricing page message-match experiments → increased self-serve conversion by ${9 + (h % 14)}% and improved trial-to-paid by ${6 + (h % 11)}%.`,
-      `Combined paid + organic loops (retargeting + content) → improved blended CAC by ${10 + (h % 16)}% while scaling spend $${10 + (h % 30)}k/month.`,
-      `Created exec-ready experiment readouts (hypothesis, lift, next steps) → increased adoption of winning changes across teams.`,
-      `Built cohort reporting by acquisition channel → identified churn driver and reduced early churn by ${churnCut}% over one quarter.`,
+      "Illustrative template — built a growth-experiment backlog and ran [number] tests across onboarding and pricing → improved verified activation by [X%] within [time period].",
+      "Illustrative template — instrumented funnel events and fixed tracking gaps → reduced verified analysis time per experiment by [X%].",
+      "Illustrative template — launched pricing-page message-match experiments → increased verified self-serve conversion by [X%] and trial-to-paid conversion by [X%].",
+      "Illustrative template — combined paid and organic loops → improved verified blended CAC by [X%] while scaling spend to [budget].",
+      "Illustrative template — created executive-ready experiment readouts → increased verified adoption of winning changes by [X%] across [number] teams.",
+      "Illustrative template — built cohort reporting by acquisition channel → identified a churn driver and reduced verified early churn by [X%] within [time period].",
     ],
     frontend: [],
     backend: [],
@@ -1451,7 +1423,7 @@ function buildMarketingContent(cluster: ResumeKeywordCluster, _language: Languag
   const atsTips = clampList(
     [
       lane === "seo"
-        ? "If you claim SEO, put proof near the top: one line with tool + scope + outcome (e.g., Search Console + crawl audit → +X% organic sessions)."
+        ? "If you claim SEO, put proof near the top: one line with tool + scope + outcome (e.g., Search Console + crawl audit → [X%] verified organic-session change)."
         : "Put your funnel metric in the summary (ROAS, CAC payback, pipeline sourced) so ATS and recruiters see role fit before they scroll.",
       lane === "paid"
         ? "Don’t write “paid ads” — name platforms and levers (match types/negatives, audiences, pacing rules, tracking QA)."
@@ -1531,20 +1503,14 @@ function buildGenericCategoryContent(cluster: ResumeKeywordCluster, _language: L
     },
   ]);
 
-  const months = 2 + (h % 7);
-  const deltaA = 10 + (h % 21);
-  const deltaB = 6 + (h % 14);
-  const baselineA = 70 + (h % 16);
-  const baselineB = baselineA + 8 + (h % 10);
-
   const resumeBullets = clampList(
     [
-      `Led ${keywordA} initiative → improved ${impact} by ${deltaA}% in ${months} months.`,
-      `Redesigned core ${roleLower} workflow → raised quality KPI from ${baselineA}% to ${baselineB}% within two quarters.`,
-      `Built weekly reporting cadence for leadership → reduced decision lag by ${14 + (h % 18)}% and increased follow-through.`,
-      `Implemented QA checks and escalation path → reduced repeat issues by ${12 + (h % 18)}% while maintaining throughput.`,
-      `Partnered cross-functionally to remove handoff bottleneck → cut cycle time by ${deltaB}% and reduced rework.`,
-      `Owned stakeholder updates and tradeoffs → improved delivery reliability and clarity on next steps.`,
+      `Illustrative template — led a ${keywordA} initiative → improved verified ${impact} by [X%] within [time period].`,
+      `Illustrative template — redesigned a core ${roleLower} workflow → raised a verified quality KPI from [baseline] to [measured result] within [time period].`,
+      "Illustrative template — built a reporting cadence for leadership → reduced verified decision lag by [X%] and increased follow-through.",
+      "Illustrative template — implemented QA checks and an escalation path → reduced verified repeat issues by [X%] while maintaining throughput.",
+      "Illustrative template — partnered cross-functionally to remove a handoff bottleneck → cut verified cycle time by [X%] and reduced rework.",
+      "Illustrative template — owned stakeholder updates and tradeoffs → improved delivery reliability from [baseline] to [measured result].",
     ],
     6,
     10,
@@ -1589,12 +1555,6 @@ function buildProductContent(cluster: ResumeKeywordCluster, _language: Language)
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.product, h);
   const roleLower = cluster.role.toLowerCase();
-  const users = 40_000 + (h % 260_000);
-  const weeks = 6 + (h % 10);
-  const lift = 6 + (h % 14);
-  const churnCut = 4 + (h % 9);
-  const adoption = 12 + (h % 22);
-
   const hook = [
     `Product resumes fail ATS screens when they read like meeting notes: “worked with stakeholders”, “owned roadmap”, “wrote PRDs” — with no product metrics, no constraints, and no proof of impact.`,
     `Use the keywords and bullet examples below to make your ${cluster.role} resume read like a shipped product story: problem → decision → measurable outcome.`,
@@ -1673,13 +1633,13 @@ function buildProductContent(cluster: ResumeKeywordCluster, _language: Language)
 
   const resumeBullets = clampList(
     [
-      `Defined problem statement + success metrics, shipped MVP in ${weeks} weeks → increased ${impact} by ${lift}% across ${users.toLocaleString()} active users.`,
-      `Built discovery pipeline (interviews + surveys + support logs) → identified top friction point and improved activation by ${adoption}% within one quarter.`,
-      `Owned instrumentation plan and event taxonomy → reduced “unknown” funnel steps by ${18 + (h % 22)}% and improved decision confidence.`,
-      `Ran A/B experiments with guardrails → improved conversion by ${lift}% while holding retention flat (no regression).`,
-      `Partnered with engineering on rollout plan (feature flags + monitoring) → reduced launch incidents by ${12 + (h % 16)}% and improved release predictability.`,
-      `Analyzed churn drivers and shipped targeted fixes → reduced churn by ${churnCut}% over ${8 + (h % 8)} weeks.`,
-      `Created sales enablement assets and positioning doc → increased adoption in sales-led deals by ${10 + (h % 16)}% and improved cycle time.`,
+      `Illustrative template — defined a problem statement and success metrics, then shipped an MVP within [time period] → increased verified ${impact} by [X%] across [number] active users.`,
+      "Illustrative template — built a discovery pipeline from interviews, surveys, and support logs → identified a friction point and improved verified activation by [X%] within [time period].",
+      "Illustrative template — owned the instrumentation plan and event taxonomy → reduced verified unknown funnel steps by [X%] and improved decision confidence.",
+      "Illustrative template — ran A/B experiments with guardrails → improved verified conversion by [X%] while keeping retention within [measured range].",
+      "Illustrative template — partnered with engineering on a rollout plan → reduced verified launch incidents by [X%] and improved release predictability.",
+      "Illustrative template — analyzed churn drivers and shipped targeted fixes → reduced verified churn by [X%] within [time period].",
+      "Illustrative template — created sales-enablement assets and a positioning document → increased verified adoption in sales-led deals by [X%] and improved cycle time.",
     ],
     6,
     10,
@@ -1725,12 +1685,6 @@ function buildSalesContent(cluster: ResumeKeywordCluster, _language: Language): 
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const roleLower = cluster.role.toLowerCase();
-  const quota = 600 + (h % 1400);
-  const attainment = 92 + (h % 28);
-  const winRate = 18 + (h % 18);
-  const cycle = 45 + (h % 55);
-  const pipeline = 1.2 + ((h % 28) / 10);
-
   const hook = [
     `Sales ATS screens are ruthless because the bar is numeric. If your ${cluster.role} resume doesn’t show quota context, motion, and results, it reads like “sales responsibilities” and gets filtered.`,
     `Use the keywords and bullet examples below to make your resume look like a revenue operator: territory, pipeline math, and outcomes.`,
@@ -1807,13 +1761,13 @@ function buildSalesContent(cluster: ResumeKeywordCluster, _language: Language): 
 
   const resumeBullets = clampList(
     [
-      `Closed $${pipeline.toFixed(1)}M in new ARR and finished at ${attainment}% of $${quota}k annual quota by running weekly pipeline hygiene and deal reviews.`,
-      `Improved win rate to ${winRate}% by tightening discovery (MEDDICC) and building mutual action plans for late-stage deals.`,
-      `Built outbound sequences by ICP segment → generated ${38 + (h % 70)} SQLs and created $${0.7 + ((h % 18) / 10)}M in pipeline in one quarter.`,
-      `Reduced sales cycle from ${cycle} to ${cycle - (8 + (h % 14))} days by multi-threading accounts and aligning procurement early.`,
-      `Partnered with Solutions Engineering to run demos + POCs → increased stage conversion by ${9 + (h % 14)}% without increasing discounting.`,
-      `Improved forecast accuracy by ${10 + (h % 14)}% through commit criteria and slippage retro reviews (Clari/Salesforce).`,
-      `Executed renewals and expansion motion → increased renewal rate by ${6 + (h % 10)}pp and expanded key accounts by $${80 + (h % 220)}k.`,
+      "Illustrative template — closed [ARR value] in verified new ARR and reached [X%] of [quota value] annual quota by running pipeline hygiene and deal reviews.",
+      "Illustrative template — improved verified win rate from [baseline] to [measured result] by tightening discovery and building mutual action plans.",
+      "Illustrative template — built outbound sequences by ICP segment → generated [number] verified SQLs and created [pipeline value] in pipeline within [time period].",
+      "Illustrative template — reduced verified sales cycle from [baseline] to [measured result] by multi-threading accounts and aligning procurement early.",
+      "Illustrative template — partnered with Solutions Engineering on demos and POCs → increased verified stage conversion by [X%] without increasing discounting.",
+      "Illustrative template — improved verified forecast accuracy by [X%] through commit criteria and slippage reviews.",
+      "Illustrative template — executed renewals and expansion → increased verified renewal rate by [measured result] and expanded key accounts by [ARR value].",
     ],
     6,
     10,
@@ -1836,7 +1790,7 @@ function buildSalesContent(cluster: ResumeKeywordCluster, _language: Language): 
       "Listing tools (Salesforce, Outreach) with no proof of usage (sequence strategy, hygiene, forecasting).",
       "Not clarifying motion (new logo vs expansion) which makes the resume feel mismatched to the JD.",
       "Using vague verbs (“built relationships”) instead of deal evidence (multi-threaded, MAP, exec sponsor, procurement).",
-      "Hiding performance in a paragraph instead of bullets that can be scanned in 10 seconds.",
+      "Hiding performance in a paragraph instead of using concise bullets that can be reviewed quickly.",
     ],
     4,
     6,
@@ -1860,10 +1814,6 @@ function buildDesignContent(cluster: ResumeKeywordCluster, _language: Language):
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.design, h);
   const roleLower = cluster.role.toLowerCase();
-  const lift = 8 + (h % 18);
-  const time = 2 + (h % 6);
-  const flows = 4 + (h % 10);
-
   const hook = [
     `Design resumes get filtered when they list tools (Figma) but don’t prove design outcomes: usability, accessibility, conversion, or consistency at scale.`,
     `Use the keywords and bullet examples below to make your ${cluster.role} resume read like a product impact portfolio — even without linking the work.`,
@@ -1939,12 +1889,12 @@ function buildDesignContent(cluster: ResumeKeywordCluster, _language: Language):
 
   const resumeBullets = clampList(
     [
-      `Redesigned ${flows} critical user flows and validated via usability tests → increased ${impact} by ${lift}% within ${time} months.`,
-      `Built design system components (tokens, variants, states) → reduced UI inconsistencies by ${18 + (h % 22)}% and sped up delivery across teams.`,
-      `Ran accessibility audit and partnered on fixes → improved WCAG compliance and reduced support tickets by ${10 + (h % 16)}%.`,
-      `Shipped error/empty state patterns and UX copy standards → reduced task failure rate by ${8 + (h % 12)}%.`,
-      `Created handoff specs and production QA checklist → cut design-to-dev rework by ${14 + (h % 20)}% across releases.`,
-      `Synthesized user interviews into opportunity areas → influenced roadmap and improved stakeholder decision speed.`,
+      `Illustrative template — redesigned [number] critical user flows and validated them through usability tests → increased verified ${impact} by [X%] within [time period].`,
+      "Illustrative template — built design-system components → reduced verified UI inconsistencies by [X%] and sped up delivery across [number] teams.",
+      "Illustrative template — ran an accessibility audit and partnered on fixes → improved a documented WCAG outcome and reduced verified support tickets by [X%].",
+      "Illustrative template — shipped error/empty-state patterns and UX copy standards → reduced verified task-failure rate by [X%].",
+      "Illustrative template — created handoff specifications and a production-QA checklist → cut verified design-to-development rework by [X%].",
+      "Illustrative template — synthesized user interviews into opportunity areas → influenced a documented roadmap decision and improved decision speed by [X%].",
     ],
     6,
     10,
@@ -1989,9 +1939,6 @@ function buildFinanceContent(cluster: ResumeKeywordCluster, _language: Language)
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.finance, h);
-  const closeDays = 7 + (h % 6);
-  const accuracy = 4 + (h % 10);
-  const savings = 6 + (h % 14);
   const roleLower = cluster.role.toLowerCase();
 
   const hook = [
@@ -2069,12 +2016,12 @@ function buildFinanceContent(cluster: ResumeKeywordCluster, _language: Language)
 
   const resumeBullets = clampList(
     [
-      `Owned rolling forecast and improved forecast accuracy by ${accuracy}% by tightening assumptions and weekly variance reviews.`,
-      `Built driver-based model for ${roleLower} planning → improved ${impact} visibility and reduced decision lag in exec reviews.`,
-      `Shortened monthly close cycle by ${closeDays} days by enforcing close calendar and automating reconciliations with finance ops.`,
-      `Identified cost leakage via spend analysis → reduced opex by ${savings}% without impacting delivery SLAs.`,
-      `Created board-ready reporting pack (KPI trends + risks + scenarios) → improved stakeholder alignment on runway and priorities.`,
-      `Standardized budget vs actuals cadence across departments → reduced reforecast churn and improved accountability.`,
+      "Illustrative template — owned a rolling forecast and improved verified forecast accuracy by [X%] by tightening assumptions and variance reviews.",
+      `Illustrative template — built a driver-based model for ${roleLower} planning → improved verified ${impact} visibility and reduced decision lag by [X%].`,
+      "Illustrative template — shortened the verified monthly-close cycle from [baseline] to [measured result] by enforcing the close calendar and automating reconciliations.",
+      "Illustrative template — identified cost leakage through spend analysis → reduced verified operating expense by [X%] without affecting delivery SLAs.",
+      "Illustrative template — created a board-ready reporting pack → improved a documented stakeholder-alignment outcome from [baseline] to [measured result].",
+      "Illustrative template — standardized budget-versus-actuals cadence across departments → reduced verified reforecast churn by [X%].",
     ],
     6,
     10,
@@ -2118,9 +2065,6 @@ function buildHRContent(cluster: ResumeKeywordCluster, _language: Language): Res
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.hr, h);
-  const tth = 28 + (h % 35);
-  const passThrough = 16 + (h % 20);
-  const retention = 6 + (h % 10);
   const roleLower = cluster.role.toLowerCase();
 
   const hook = [
@@ -2198,12 +2142,12 @@ function buildHRContent(cluster: ResumeKeywordCluster, _language: Language): Res
 
   const resumeBullets = clampList(
     [
-      `Redesigned interview loops and structured scorecards → increased onsite-to-offer pass-through by ${passThrough}% and reduced time-to-hire to ${tth} days.`,
-      `Built recruiting dashboard (stage conversion + aging) → improved ${impact} and reduced stalled candidates by ${18 + (h % 22)}%.`,
-      `Implemented onboarding program and manager checklists → reduced ramp time by ${10 + (h % 18)}% and improved 90-day retention by ${retention}pp.`,
-      `Owned employee relations cases with clear documentation → reduced repeat incidents and improved policy compliance.`,
-      `Launched performance review cadence and calibration process → improved manager consistency and reduced review-cycle delays.`,
-      `Partnered with leadership on headcount planning → aligned hiring priorities to business goals with monthly reporting.`,
+      "Illustrative template — redesigned interview loops and structured scorecards → increased verified onsite-to-offer pass-through by [X%] and reduced time-to-hire from [baseline] to [measured result].",
+      `Illustrative template — built a recruiting dashboard → improved verified ${impact} and reduced stalled candidates by [X%].`,
+      "Illustrative template — implemented an onboarding program and manager checklists → reduced verified ramp time by [X%] and improved retention by [measured result].",
+      "Illustrative template — owned employee-relations cases with clear documentation → reduced verified repeat incidents by [X%] and improved a documented policy-compliance outcome.",
+      "Illustrative template — launched a performance-review cadence and calibration process → improved verified manager consistency by [X%] and reduced review-cycle delays.",
+      "Illustrative template — partnered with leadership on headcount planning → aligned hiring priorities to documented business goals using a reporting cadence.",
     ],
     6,
     10,
@@ -2247,10 +2191,6 @@ function buildSecurityContent(cluster: ResumeKeywordCluster, _language: Language
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.security, h);
-  const mttd = 18 + (h % 35);
-  const mttr = 22 + (h % 45);
-  const vulns = 30 + (h % 90);
-
   const hook = [
     `Security resumes get filtered when they list tools (SIEM, Splunk) but don’t show security outcomes: detection coverage, response time, vuln closure, or audit readiness.`,
     `Use the keywords and bullet examples below to make your ${cluster.role} resume read like security work: controls, incidents, and measurable risk reduction.`,
@@ -2303,12 +2243,12 @@ function buildSecurityContent(cluster: ResumeKeywordCluster, _language: Language
 
   const resumeBullets = clampList(
     [
-      `Implemented detection rules and alert tuning → reduced MTTD by ${mttd}% and lowered false positives by ${18 + (h % 22)}%.`,
-      `Built incident response playbooks and comms cadence → reduced MTTR by ${mttr}% across high-severity incidents.`,
-      `Owned vulnerability management program → closed ${vulns} critical/high vulns and improved patch SLA compliance by ${10 + (h % 16)}%.`,
-      `Hardened IAM (least privilege + access reviews) → reduced privileged access sprawl and improved audit readiness.`,
-      `Automated triage via Python scripts → reduced analyst manual workload by ${12 + (h % 18)}% and improved response consistency.`,
-      `Partnered with engineering on security tickets and acceptance criteria → improved ${impact} and reduced repeat findings.`,
+      "Illustrative template — implemented detection rules and alert tuning → reduced verified MTTD by [X%] and false positives by [X%].",
+      "Illustrative template — built incident-response playbooks and a communication cadence → reduced verified MTTR by [X%] across [number] high-severity incidents.",
+      "Illustrative template — owned a vulnerability-management program → closed [number] documented critical/high vulnerabilities and improved patch-SLA compliance by [X%].",
+      "Illustrative template — hardened IAM through least privilege and access reviews → reduced verified privileged-access sprawl by [X%] and improved a documented audit-readiness outcome.",
+      "Illustrative template — automated triage through Python scripts → reduced verified analyst manual workload by [X%] and improved response consistency.",
+      `Illustrative template — partnered with engineering on security tickets and acceptance criteria → improved verified ${impact} by [X%] and reduced repeat findings.`,
     ],
     6,
     10,
@@ -2352,10 +2292,6 @@ function buildOperationsContent(cluster: ResumeKeywordCluster, _language: Langua
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.operations, h);
-  const cycle = 12 + (h % 28);
-  const sla = 8 + (h % 16);
-  const cost = 6 + (h % 14);
-
   const hook = [
     `Operations resumes get filtered when they say “process improvement” without naming the process, the SLA, and the measured delta.`,
     `Use the keywords and bullet examples below to make your ${cluster.role} resume read like ops work: workflows, SLAs, throughput, and cost control.`,
@@ -2408,12 +2344,12 @@ function buildOperationsContent(cluster: ResumeKeywordCluster, _language: Langua
 
   const resumeBullets = clampList(
     [
-      `Mapped end-to-end workflow and removed handoff bottleneck → reduced cycle time by ${cycle}% and improved ${impact} within one quarter.`,
-      `Defined SLAs and built queue dashboard → improved SLA compliance by ${sla}% and reduced backlog volatility.`,
-      `Standardized SOPs and QA checks → reduced error rate by ${12 + (h % 18)}% while maintaining throughput.`,
-      `Optimized vendor process (scorecards + QBRs) → reduced cost per unit by ${cost}% without degrading quality.`,
-      `Automated recurring reporting and handoffs → reduced manual ops effort by ${18 + (h % 24)}% and improved predictability.`,
-      `Created weekly ops readout (KPIs + risks + actions) → reduced decision lag and improved accountability.`,
+      `Illustrative template — mapped an end-to-end workflow and removed a handoff bottleneck → reduced verified cycle time by [X%] and improved ${impact} within [time period].`,
+      "Illustrative template — defined SLAs and built a queue dashboard → improved verified SLA compliance by [X%] and reduced backlog volatility.",
+      "Illustrative template — standardized SOPs and QA checks → reduced verified error rate by [X%] while maintaining throughput.",
+      "Illustrative template — optimized a vendor process with scorecards and QBRs → reduced verified cost per unit by [X%] without degrading quality.",
+      "Illustrative template — automated recurring reporting and handoffs → reduced verified manual operations effort by [X%] and improved predictability.",
+      "Illustrative template — created an operations readout with KPIs, risks, and actions → reduced verified decision lag by [X%] and improved accountability.",
     ],
     6,
     10,
@@ -2457,10 +2393,6 @@ function buildCustomerContent(cluster: ResumeKeywordCluster, _language: Language
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.customer, h);
-  const nrr = 102 + (h % 25);
-  const churn = 4 + (h % 10);
-  const time = 14 + (h % 26);
-
   const hook = [
     `Customer Success resumes get filtered when they say “managed accounts” without renewal, adoption, and risk signals. Hiring teams screen for retention math.`,
     `Use the keywords and bullet examples below to position your ${cluster.role} resume around adoption, renewals, and measurable account outcomes.`,
@@ -2513,12 +2445,12 @@ function buildCustomerContent(cluster: ResumeKeywordCluster, _language: Language
 
   const resumeBullets = clampList(
     [
-      `Owned portfolio renewals and delivered ${nrr}% NRR by running weekly risk reviews and executive QBRs with success plans.`,
-      `Reduced churn by ${churn}% by building risk playbooks (usage drops, support escalations) and coordinating product fixes.`,
-      `Improved time-to-value from ${time} to ${time - (4 + (h % 6))} days by rebuilding onboarding plan and stakeholder mapping.`,
-      `Implemented account health scoring and adoption dashboards → increased adoption by ${10 + (h % 18)}% across key accounts.`,
-      `Partnered with Sales on expansion plays → sourced $${120 + (h % 380)}k in expansion ARR and improved forecast confidence.`,
-      `Created escalation process with product/engineering → reduced repeat high-severity incidents by ${12 + (h % 18)}%.`,
+      "Illustrative template — owned portfolio renewals and delivered [measured NRR] by running risk reviews and executive QBRs with success plans.",
+      "Illustrative template — reduced verified churn by [X%] by building risk playbooks and coordinating product fixes.",
+      "Illustrative template — improved verified time-to-value from [baseline] to [measured result] by rebuilding the onboarding plan and stakeholder map.",
+      "Illustrative template — implemented account-health scoring and adoption dashboards → increased verified adoption by [X%] across [number] key accounts.",
+      "Illustrative template — partnered with Sales on expansion plays → sourced [ARR value] in verified expansion ARR and improved forecast confidence by [X%].",
+      "Illustrative template — created an escalation process with Product and Engineering → reduced verified repeat high-severity incidents by [X%].",
     ],
     6,
     10,
@@ -2562,9 +2494,6 @@ function buildLegalContent(cluster: ResumeKeywordCluster, _language: Language): 
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.legal, h);
-  const days = 10 + (h % 25);
-  const risk = 12 + (h % 22);
-
   const hook = [
     `Legal resumes get filtered when they list “contract review” without scope: contract types, turnaround time, risk posture, and stakeholder outcomes.`,
     `Use the keywords and bullet examples below to make your ${cluster.role} resume read like legal work: risk, governance, and measurable turnaround.`,
@@ -2617,12 +2546,12 @@ function buildLegalContent(cluster: ResumeKeywordCluster, _language: Language): 
 
   const resumeBullets = clampList(
     [
-      `Reduced contract turnaround time by ${days}% by standardizing templates and routing intake through CLM workflows.`,
-      `Negotiated MSAs/SOWs with clear fallback positions → reduced legal risk exposure by ${risk}% while keeping deal velocity.`,
-      `Built legal intake process and queue triage → improved ${impact} and reduced stakeholder wait times.`,
-      `Drafted and rolled out policy updates with training → improved compliance posture and reduced repeat issues.`,
-      `Partnered with Sales/Procurement on redlines → increased close rate and reduced late-stage surprises.`,
-      `Created clause library and playbook → improved consistency across negotiations and reduced rework.`,
+      "Illustrative template — reduced verified contract-turnaround time by [X%] by standardizing templates and routing intake through CLM workflows.",
+      "Illustrative template — negotiated MSAs/SOWs with documented fallback positions → reduced verified legal-risk exposure by [X%] while maintaining deal velocity.",
+      `Illustrative template — built a legal-intake process and queue triage → improved verified ${impact} by [X%] and reduced stakeholder wait time.`,
+      "Illustrative template — drafted and rolled out policy updates with training → improved a documented compliance outcome and reduced repeat issues by [X%].",
+      "Illustrative template — partnered with Sales and Procurement on redlines → increased verified close rate by [X%] and reduced late-stage issues.",
+      "Illustrative template — created a clause library and playbook → improved verified negotiation consistency by [X%] and reduced rework.",
     ],
     6,
     10,
@@ -2666,8 +2595,6 @@ function buildHealthcareContent(cluster: ResumeKeywordCluster, _language: Langua
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.healthcare, h);
-  const throughput = 8 + (h % 18);
-  const errors = 10 + (h % 22);
   const roleLower = cluster.role.toLowerCase();
 
   const hook = [
@@ -2722,12 +2649,12 @@ function buildHealthcareContent(cluster: ResumeKeywordCluster, _language: Langua
 
   const resumeBullets = clampList(
     [
-      `Improved ${impact} by standardizing documentation and handoff checks → reduced documentation errors by ${errors}% within one quarter.`,
-      `Coordinated care plans across multidisciplinary team → improved patient throughput by ${throughput}% while maintaining safety protocols.`,
-      `Implemented discharge planning checklist → reduced readmission risk flags and improved follow-up compliance.`,
-      `Partnered on QI initiative and tracked outcomes weekly → improved protocol adherence and reduced avoidable incidents.`,
-      `Maintained HIPAA-safe workflows and accurate charting → improved audit readiness with consistent documentation.`,
-      `Educated patients/families with clear plans → improved adherence and reduced confusion-related callbacks.`,
+      `Illustrative template — improved verified ${impact} by standardizing documentation and handoff checks → reduced documented errors by [X%] within [time period].`,
+      "Illustrative template — coordinated care plans across a multidisciplinary team → improved verified patient throughput by [X%] while maintaining documented safety protocols.",
+      "Illustrative template — implemented a discharge-planning checklist → reduced verified readmission-risk flags by [X%] and improved follow-up compliance.",
+      "Illustrative template — partnered on a QI initiative and tracked outcomes → improved verified protocol adherence by [X%] and reduced avoidable incidents.",
+      "Illustrative template — maintained HIPAA-safe workflows and accurate charting → improved a documented audit-readiness outcome.",
+      "Illustrative template — educated patients/families with clear plans → improved verified adherence by [X%] and reduced confusion-related callbacks.",
     ],
     6,
     10,
@@ -2771,7 +2698,6 @@ function buildEducationContent(cluster: ResumeKeywordCluster, _language: Languag
   const groupTitles = GROUP_TITLES[_language] || GROUP_TITLES.en;
   const h = hashForRole(cluster);
   const impact = pick(CATEGORY_IMPACT_AREAS.education, h);
-  const completion = 8 + (h % 18);
   const roleLower = cluster.role.toLowerCase();
 
   const hook = [
@@ -2826,12 +2752,12 @@ function buildEducationContent(cluster: ResumeKeywordCluster, _language: Languag
 
   const resumeBullets = clampList(
     [
-      `Redesigned curriculum and assessments → improved ${impact} and increased completion rate by ${completion}% over one term.`,
-      `Mapped learning outcomes to lesson plans and rubrics → improved student performance consistency and reduced gaps.`,
-      `Implemented progress monitoring cadence → identified at-risk students earlier and improved intervention success.`,
-      `Built engagement plan for remote/hybrid classes → increased participation by ${10 + (h % 16)}% with measurable attendance improvement.`,
-      `Partnered with counselors/parents on support plans → improved student follow-through and reduced missed deadlines.`,
-      `Led instructional coaching sessions → improved lesson quality and alignment across teaching team.`,
+      `Illustrative template — redesigned curriculum and assessments → improved verified ${impact} and increased completion by [X%] within [time period].`,
+      "Illustrative template — mapped learning outcomes to lesson plans and rubrics → improved a verified performance-consistency metric from [baseline] to [measured result].",
+      "Illustrative template — implemented progress monitoring → identified at-risk students [measured duration] earlier and improved verified intervention success by [X%].",
+      "Illustrative template — built an engagement plan for remote/hybrid classes → increased verified participation by [X%] and improved attendance by [X%].",
+      "Illustrative template — partnered with counselors and parents on support plans → improved verified follow-through by [X%] and reduced missed deadlines.",
+      "Illustrative template — led instructional-coaching sessions → improved verified lesson-quality alignment by [X%] across [number] educators.",
     ],
     6,
     10,
@@ -2998,9 +2924,6 @@ export function getRoleLongFormSections(
   const mainOutcome = outcomes[h % outcomes.length];
   const secondOutcome = outcomes[(h + 1) % outcomes.length];
   const thirdOutcome = outcomes[(h + 2) % outcomes.length];
-  const metricA = 9 + (h % 27);
-  const metricB = 14 + (h % 31);
-  const metricC = 18 + (h % 23);
   const keywordA = getClusterKeywordSlice(cluster, 0, 1)[0] ?? "role alignment";
   const keywordB = getClusterKeywordSlice(cluster, 1, 1)[0] ?? "impact evidence";
   const keywordC = getClusterKeywordSlice(cluster, 2, 1)[0] ?? "ats readability";
@@ -3030,14 +2953,14 @@ export function getRoleLongFormSections(
         heading: `Фреймворк сильних bullet-пунктів для ${cluster.role}`,
         paragraphs: [
           `${copy.bulletLead} Формула: дія + контекст + вимірюваний результат. Для цієї ролі корисно підсвічувати результати на кшталт ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
-          `Оновіть 3-5 перших bullet-пунктів і синхронізуйте їх з термінами вакансії (${keywordA}, ${keywordB}). Це часто підвищує релевантність на ${metricA}-${metricB}%.`,
+          `Оновіть найсильніші lead bullet-пункти й синхронізуйте їх з термінами вакансії (${keywordA}, ${keywordB}). Оцінюйте покращення лише за перевіреними результатами, а не за вигаданим відсотком релевантності.`,
         ],
       },
       {
         heading: `Фінальний чекліст і місячний цикл оновлення для ${cluster.role}`,
         paragraphs: [
           `Перед відправкою перевірте: summary, skills і lead bullets мають підтримувати одну цільову роль. ${copy.qaPromptLabel}: "${faqPrompt}".`,
-          `Оновлюйте резюме щотижня: додавайте нові результати, коригуйте ключові слова та прибирайте слабкі формулювання. Навіть невеликі ітерації можуть дати +${metricC}% до якості матчингу.`,
+          "Оновлюйте резюме під час пошуку роботи: додавайте нові перевірені результати, коригуйте ключові слова та прибирайте слабкі формулювання. Фіксуйте реальний вплив змін замість обіцянки вигаданого приросту матчингу.",
         ],
       },
     ];
@@ -3063,14 +2986,14 @@ export function getRoleLongFormSections(
         heading: `Framework mocnych bullet pointów dla ${cluster.role}`,
         paragraphs: [
           `${copy.bulletLead} Najlepszy schemat to: działanie + kontekst + mierzalny rezultat. Dla tej roli warto eksponować efekty jak ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
-          `Popraw 3-5 pierwszych bulletów i dopasuj je do języka oferty (${keywordA}, ${keywordB}). To często podnosi trafność o ${metricA}-${metricB}%.`,
+          `Popraw najmocniejsze lead bullety i dopasuj je do języka oferty (${keywordA}, ${keywordB}). Oceniaj poprawę wyłącznie na podstawie zweryfikowanych wyników, a nie zmyślonego procentu trafności.`,
         ],
       },
       {
         heading: `Końcowa checklista i miesięczny rytm aktualizacji dla ${cluster.role}`,
         paragraphs: [
           `Przed wysyłką sprawdź, czy summary, skills i lead bullets wspierają ten sam target role. ${copy.qaPromptLabel}: "${faqPrompt}".`,
-          `Aktualizuj CV co tydzień: dodawaj wyniki, koryguj słowa kluczowe i usuwaj słabe sformułowania. Nawet małe iteracje mogą dać +${metricC}% jakości dopasowania.`,
+          "Aktualizuj CV podczas poszukiwania pracy: dodawaj nowe, zweryfikowane wyniki, koryguj słowa kluczowe i usuwaj słabe sformułowania. Mierz realny efekt zmian zamiast obiecywać zmyślony wzrost dopasowania.",
         ],
       },
     ];
@@ -3096,14 +3019,14 @@ export function getRoleLongFormSections(
         heading: `Framework silných bullet bodov pre ${cluster.role}`,
         paragraphs: [
           `${copy.bulletLead} Najlepší vzorec: akcia + kontext + merateľný výsledok. Pri tejto role fungujú výsledky ako ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
-          `Upravte 3-5 lead bulletov a prepojte ich s jazykom pozície (${keywordA}, ${keywordB}). To často zlepší relevanciu o ${metricA}-${metricB}%.`,
+          `Upravte najsilnejšie lead bullety a prepojte ich s jazykom pozície (${keywordA}, ${keywordB}). Zlepšenie hodnotťe len podľa overených výsledkov, nie podľa vymysleného percenta relevancie.`,
         ],
       },
       {
         heading: `Finálny checklist a mesačný update cyklus pre ${cluster.role}`,
         paragraphs: [
           `Pred odoslaním skontrolujte, že summary, skills a lead bullets podporujú tú istú cieľovú rolu. ${copy.qaPromptLabel}: "${faqPrompt}".`,
-          `Aktualizujte životopis týždenne: pridajte nové výsledky, dolaďte keywordy a odstráňte slabé formulácie. Aj malé iterácie môžu priniesť +${metricC}% quality matchu.`,
+          "Aktualizujte životopis počas hľadania práce: pridávajte nové overené výsledky, dolaďte keywordy a odstráňte slabé formulácie. Sledujte skutočný vplyv zmien namiesto sľubu vymysleného rastu matchu.",
         ],
       },
     ];
@@ -3129,14 +3052,14 @@ export function getRoleLongFormSections(
         heading: `Framework silných bullet bodů pro ${cluster.role}`,
         paragraphs: [
           `${copy.bulletLead} Nejlepší vzorec: akce + kontext + měřitelný výsledek. Pro tuto roli fungují výsledky jako ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
-          `Upravte 3-5 lead bulletů a slaďte je s jazykem inzerátu (${keywordA}, ${keywordB}). To často zvýší relevanci o ${metricA}-${metricB}%.`,
+          `Upravte nejsilnější lead bullety a slaďte je s jazykem inzerátu (${keywordA}, ${keywordB}). Zlepšení hodnoťte jen podle ověřených výsledků, ne podle vymyšleného procenta relevance.`,
         ],
       },
       {
         heading: `Finální checklist a měsíční rytmus aktualizace pro ${cluster.role}`,
         paragraphs: [
           `Před odesláním ověřte, že summary, skills a lead bullets podporují stejnou cílovou roli. ${copy.qaPromptLabel}: "${faqPrompt}".`,
-          `Aktualizujte životopis každý týden: přidávejte nové výsledky, upravujte keywordy a odstraňujte slabé formulace. I malé iterace mohou přinést +${metricC}% kvalitnější match.`,
+          "Aktualizujte životopis během hledání práce: přidávejte nové ověřené výsledky, upravujte keywordy a odstraňujte slabé formulace. Sledujte skutečný vliv změn místo slibu vymyšleného růstu shody.",
         ],
       },
     ];
@@ -3162,14 +3085,14 @@ export function getRoleLongFormSections(
         heading: `Framework de bullets de alto impacto para ${cluster.role}`,
         paragraphs: [
           `${copy.bulletLead} Fórmula recomendada: acción + contexto + resultado medible. Para este rol, destaca impactos como ${mainOutcome}, ${secondOutcome}, ${thirdOutcome}.`,
-          `Reescribe 3-5 bullets principales y alínealos con el lenguaje de la vacante (${keywordA}, ${keywordB}). Esto suele mejorar la relevancia entre ${metricA}% y ${metricB}%.`,
+          `Reescribe tus bullets principales y alínealos con el lenguaje de la vacante (${keywordA}, ${keywordB}). Evalúa la mejora solo con resultados verificables, no con un porcentaje inventado de relevancia.`,
         ],
       },
       {
         heading: `Checklist final y cadencia mensual de optimización para ${cluster.role}`,
         paragraphs: [
           `Antes de enviar, valida que summary, skills y lead bullets soporten el mismo target role. ${copy.qaPromptLabel}: "${faqPrompt}".`,
-          `Actualiza tu CV cada semana: añade resultados nuevos, ajusta keywords y elimina frases débiles. Incluso iteraciones pequeñas pueden aportar +${metricC}% en calidad de match.`,
+          "Actualiza tu CV durante la búsqueda: añade resultados verificados, ajusta keywords y elimina frases débiles. Mide el efecto real de los cambios en lugar de prometer una mejora inventada del match.",
         ],
       },
     ];
@@ -3179,7 +3102,7 @@ export function getRoleLongFormSections(
     {
       heading: `How to position your ${cluster.role} resume for ATS and hiring managers`,
       paragraphs: [
-        `${copy.strategyLead(cluster.role)} Recruiters usually scan the document in seconds and look for role fit, ownership, and measurable outcomes. To pass that first screen, surface practical evidence around ${keywordA}, ${keywordB}, and ${keywordC} near the top, then support it with concise context in experience bullets.`,
+        `${copy.strategyLead(cluster.role)} During the initial review, recruiters look for role fit, ownership, and measurable outcomes. Surface practical evidence around ${keywordA}, ${keywordB}, and ${keywordC} near the top, then support it with concise context in experience bullets.`,
         `A reliable structure is headline, summary, skills, and recent experience, in that order. In summary, state target scope. In skills, prioritize terms actually requested in vacancies (${keywordPack}). In experience, replace responsibility language with evidence language: what changed, by how much, and under what constraints. For this role page, the current focus lane is ${focusLane}.`,
       ],
     },
@@ -3194,14 +3117,14 @@ export function getRoleLongFormSections(
       heading: `Evidence framework: turn generic bullets into high-impact ${cluster.role} achievements`,
       paragraphs: [
         `${copy.bulletLead} A high-performing bullet follows one pattern: action, context, measurable outcome. Instead of saying you "supported initiatives," specify scope and result. When true for your experience, show outcomes such as ${mainOutcome}, ${secondOutcome}, or ${thirdOutcome}. A strong baseline format is: ${sampleAfter}.`,
-        `Use 3 to 5 lead bullets in your latest role as a conversion layer and mirror the vacancy language around ${keywordA} and ${keywordB}. In review samples across these role pages, resumes with quantified lead bullets typically outperform text-heavy drafts by roughly ${metricA}% to ${metricB}% on relevance signals.`,
+        `Use your strongest lead bullets in the latest relevant role and mirror truthful vacancy language around ${keywordA} and ${keywordB}. Quantified bullets are useful only when the values are verified; this guide does not claim an invented relevance uplift. Treat ${sampleAfter} as an illustrative template and replace every bracketed placeholder with your own facts.`,
       ],
     },
     {
       heading: `Submission checklist and monthly optimization cadence for ${cluster.role} candidates`,
       paragraphs: [
         `Before sending applications, run a final review pass. Confirm that summary, skills, and lead bullets all support the same target role. Remove duplicates, generic fillers, and unsupported tool names. Keep formatting ATS-safe and avoid decorative elements that can break parsing. ${copy.qaPromptLabel}: "${faqPrompt}".`,
-        `Treat your resume as a living asset, not a one-time file. Update it weekly while applying: add quantified wins, rebalance keyword priorities, and refine phrasing against current vacancies. Even incremental revisions can lift fit quality by ${metricC}% or more over several iterations when changes stay tied to evidence and role language.`,
+        "Treat your resume as a living asset, not a one-time file. Update it while applying: add verified wins, rebalance keyword priorities, and refine phrasing against current vacancies. Judge each revision by evidence and role alignment rather than a fabricated percentage gain.",
       ],
     },
   ];
@@ -3213,14 +3136,10 @@ export function getRoleFreshnessNotes(
 ): string[] {
   const h = hashString(cluster.slug);
   const copy = DEEP_COPY[language] ?? DEEP_COPY.en;
-  const baseDay = 2 + (h % 25);
-  const baseMonth = 1 + (h % 12);
-  const month = `${baseMonth}`.padStart(2, "0");
-  const day = `${baseDay}`.padStart(2, "0");
   const focusLane = `${pickByHash(FOCUS_LANES_A, h)} and ${pickByHash(FOCUS_LANES_B, h, 5)}`;
 
   return [
-    `Last structured review: 2026-${month}-${day}.`,
+    "Content review note: all examples are illustrative templates; replace bracketed placeholders with verified facts from your experience.",
     copy.updatesRefreshed(
       cluster.category,
       getClusterKeywordSlice(cluster, 0, 1)[0] ?? "keywords",
@@ -3239,13 +3158,12 @@ export function getRoleUniqueIntro(
   const outcomes = CATEGORY_OUTCOMES[cluster.category];
   const anchor = outcomes[h % outcomes.length];
   const supporting = outcomes[(h + 2) % outcomes.length];
-  const metric = 11 + (h % 24);
   const keywordA = getClusterKeywordSlice(cluster, 0, 1)[0] ?? "role fit";
   const keywordB = getClusterKeywordSlice(cluster, 1, 1)[0] ?? "measurable impact";
   const exampleLine = toSentence(cluster.examples[0]?.after ?? "Demonstrated measurable outcomes aligned to role priorities");
 
   return [
     copy.introParagraphA(cluster.role, keywordA, keywordB),
-    copy.introParagraphB(cluster.role, anchor, supporting, metric, exampleLine),
+    copy.introParagraphB(cluster.role, anchor, supporting, exampleLine),
   ];
 }

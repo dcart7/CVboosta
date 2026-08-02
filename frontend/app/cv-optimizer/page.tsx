@@ -2,7 +2,6 @@ import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
 import TopNav from "../components/TopNav";
-import BrandMarquee from "../components/BrandMarquee";
 import { getFeaturedCvOptimizerGuides } from "../lib/cvOptimizerCluster";
 
 export const revalidate = 3600;
@@ -26,21 +25,6 @@ export const metadata: Metadata = {
     canonical: "/cv-optimizer",
   },
 };
-
-const EMPLOYER_LOGOS = [
-  "apple",
-  "google",
-  "amazon",
-  "meta",
-  "spotify",
-  "ibm",
-  "openai",
-  "microsoft",
-  "netflix",
-  "nvidia",
-  "salesforce",
-  "uber",
-] as const;
 
 const FAQ_ITEMS = [
   {
@@ -370,19 +354,6 @@ export default function CvOptimizerPage() {
             </p>
           </section>
 
-          <section
-            className="section fade-up optimized-for-section"
-            aria-label="Candidates used CVboosta to optimize resumes for applications to:"
-          >
-            <p className="optimized-for-line">
-              Candidates used CVboosta to optimize resumes for applications to:
-            </p>
-            <BrandMarquee brands={[...EMPLOYER_LOGOS]} />
-            <p className="optimized-for-disclaimer">
-              Examples shown for familiarity; no affiliation or endorsement implied.
-            </p>
-          </section>
-
           <article className="section fade-up blog-post-wrap">
             <div className="blog-post-section card resume-example-toc">
               <h2 className="seo-anchor" id="on-this-page">
@@ -675,13 +646,13 @@ export default function CvOptimizerPage() {
               </p>
               <div className="score-proof">
                 <div className="score-proof-card before">
-                  <span className="score-proof-label">ATS</span>
-                  <strong>46</strong>
+                  <span className="score-proof-label">Original</span>
+                  <strong>CV</strong>
                 </div>
                 <span className="score-proof-arrow">→</span>
                 <div className="score-proof-card score-proof-card-up after">
-                  <span className="score-proof-label">ATS</span>
-                  <strong>89</strong>
+                  <span className="score-proof-label">Reframed</span>
+                  <strong>Draft</strong>
                   <span className="score-proof-microcopy">
                     Stronger role language and clearer proof
                   </span>
@@ -698,8 +669,8 @@ export default function CvOptimizerPage() {
                 <article className="card before-after-card after-card">
                   <h3>Optimized version</h3>
                   <p>
-                    “Led quarterly roadmap across three squads, prioritized six high-impact
-                    features, and improved activation by 21% within two release cycles.”
+                    “Owned roadmap planning, coordinated priorities across teams, and supported
+                    feature delivery.”
                   </p>
                 </article>
                 <article className="card before-after-card before-card">
@@ -711,9 +682,7 @@ export default function CvOptimizerPage() {
                 <article className="card before-after-card after-card">
                   <h3>Optimized version</h3>
                   <p>
-                    “Built and maintained REST APIs for high-traffic services, reduced average
-                    response time by 34%, and resolved production defects linked to payment
-                    reliability.”
+                    “Built and maintained APIs, resolved defects, and supported backend delivery.”
                   </p>
                 </article>
                 <article className="card before-after-card before-card">
@@ -725,25 +694,23 @@ export default function CvOptimizerPage() {
                 <article className="card before-after-card after-card">
                   <h3>Optimized version</h3>
                   <p>
-                    “Built weekly reporting dashboards in SQL and Power BI, automated manual
-                    tracking workflows, and improved campaign reporting accuracy across three
-                    business units.”
+                    “Created stakeholder reports and helped the team track performance.”
                   </p>
                 </article>
               </div>
               <div className="card before-after-impact">
                 <h3>What changed</h3>
                 <ul>
-                  <li>Task-heavy language became outcome-heavy language.</li>
-                  <li>Tools, scope, and business context became visible earlier.</li>
+                  <li>Task-heavy language became clearer ownership language.</li>
+                  <li>Supported tools, scope, and context became visible earlier.</li>
                   <li>Role-relevant keywords were added without turning the text into filler.</li>
-                  <li>The score improved because the proof became clearer, not because facts were exaggerated.</li>
+                  <li>No metric, tool, or outcome should be added unless the candidate can verify it.</li>
                 </ul>
               </div>
               <p>
                 If you want more proof-oriented transformations, open{" "}
-                <Link href="/cases">real CVBoosta cases</Link> and compare the before-and-after
-                logic there. The pattern is consistent: better evidence, clearer relevance, cleaner
+                <Link href="/cases">illustrative CVboosta method examples</Link> and compare the before-and-after
+                logic there. The intended pattern is better evidence, clearer relevance, and cleaner
                 structure. The document improves because the same experience becomes easier to parse
                 and easier to trust.
               </p>
@@ -1004,34 +971,23 @@ export default function CvOptimizerPage() {
             </div>
 
             <div className="blog-takeaway card">
-              <h3>Trust from real beta users</h3>
+              <h3>How to evaluate the result responsibly</h3>
               <p>
-                The strongest proof on a CV page is not a slogan. It is evidence that the workflow
-                improves actual applications. The cases below are anonymized beta users where
-                before-and-after files, tracked score deltas, or application outcomes were
-                available to verify.
+                CVboosta does not publish anonymous interview claims here as proof. Evaluate the
+                output against the source CV and vacancy, and reject any suggestion you cannot verify.
               </p>
               <div className="grid" style={{ marginTop: "14px" }}>
                 <article className="card trust-card">
-                  <span className="trust-badge">Verified beta user</span>
-                  <h3>A. M.</h3>
-                  <p className="trust-role">Product Manager, B2B SaaS</p>
-                  <p className="trust-outcome">ATS match score: 52 → 89. Interview invite in 4 days.</p>
-                  <p className="trust-note">Profile redacted by request. Role, timeline, and score delta confirmed during onboarding.</p>
+                  <h3>Check factual accuracy</h3>
+                  <p className="trust-note">Every skill, metric, tool, and outcome must be supported by your real experience.</p>
                 </article>
                 <article className="card trust-card">
-                  <span className="trust-badge">Verified beta user</span>
-                  <h3>S. K.</h3>
-                  <p className="trust-role">Backend Engineer, Fintech</p>
-                  <p className="trust-outcome">Missing critical keywords: 7 → 1 after rewrite and keyword map pass.</p>
-                  <p className="trust-note">Anonymous beta case. Role, country, and before/after snapshot verified.</p>
+                  <h3>Read the score correctly</h3>
+                  <p className="trust-note">It describes text overlap with one vacancy; it is not an ATS certification.</p>
                 </article>
                 <article className="card trust-card">
-                  <span className="trust-badge">Verified beta user</span>
-                  <h3>E. R.</h3>
-                  <p className="trust-role">UX Researcher, HealthTech</p>
-                  <p className="trust-outcome">Application-to-interview ratio improved from 1/18 to 1/7 in 3 weeks.</p>
-                  <p className="trust-note">Identity redacted; progress benchmark tracked on the same role family.</p>
+                  <h3>Keep human control</h3>
+                  <p className="trust-note">Review the draft before export. CVboosta never submits it to an employer for you.</p>
                 </article>
               </div>
               <p style={{ marginTop: "14px" }}>

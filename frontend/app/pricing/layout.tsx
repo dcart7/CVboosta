@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pricing | CVboosta",
   description:
-    "Choose a CVboosta plan: single scan, Go, Pro, or Lifetime. Improve ATS match and application clarity faster.",
+    "Compare CVboosta plans for resume analysis and vacancy-aligned drafting: Single, Go, Pro, or Lifetime.",
   alternates: {
     canonical: "/pricing",
   },

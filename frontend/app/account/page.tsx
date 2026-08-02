@@ -9,6 +9,12 @@ import { fetchWithRetry } from "../lib/fetchRetry";
 import { useTranslation } from "../lib/LanguageContext";
 import { errorDetailToMessage } from "../lib/errorDetail";
 import { trackEvent } from "../lib/analytics";
+import {
+  clearBillingFinalizeIntent,
+  getOrCreateBillingFinalizeIntent,
+  loadBillingFinalizeIntent,
+  type BillingFinalizeIntent,
+} from "../lib/funnelIntent";
 
 type MeResponse = {
   email: string;
@@ -39,10 +45,25 @@ type BillingStatusResponse = {
   subscription_active_until?: string | null;
 };
 
+function stripeMinorAmountToMajor(amount: unknown, currency: unknown): number | null {
+  if (typeof amount !== "number" || !Number.isFinite(amount) || amount < 0) return null;
+  if (typeof currency !== "string" || !/^[A-Za-z]{3}$/.test(currency)) return null;
+  try {
+    const fractionDigits = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    }).resolvedOptions().maximumFractionDigits;
+    return amount / 10 ** fractionDigits;
+  } catch {
+    return null;
+  }
+}
+
 export default function AccountPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const finalizedSessionRef = useRef<string | null>(null);
+  const billingFinalizeInFlightRef = useRef(false);
   const [user, setUser] = useState<MeResponse | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
@@ -53,6 +74,9 @@ export default function AccountPage() {
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
   const [billingStatus, setBillingStatus] = useState<BillingStatusResponse | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+  const [billingFinalizeIntent, setBillingFinalizeIntent] =
+    useState<BillingFinalizeIntent | null>(null);
+  const [billingFinalizeLoading, setBillingFinalizeLoading] = useState(false);
   const [profileError, setProfileError] = useState<"unauthorized" | "offline" | null>(
     null,
   );
@@ -166,44 +190,98 @@ export default function AccountPage() {
     void loadAccount();
   }, [loadAccount]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const billing = params.get("billing");
-    const sessionId = params.get("session_id");
-    if (billing !== "success" || !sessionId) return;
-    if (finalizedSessionRef.current === sessionId) return;
-    finalizedSessionRef.current = sessionId;
-
-    (async () => {
+  const finalizeBillingSession = useCallback(
+    async (intent: BillingFinalizeIntent) => {
+      if (billingFinalizeInFlightRef.current) return;
+      billingFinalizeInFlightRef.current = true;
+      setBillingFinalizeLoading(true);
+      setMessageTone("ok");
+      setMessage("Confirming your payment…");
       try {
         const response = await fetchWithRetry(
-          `${apiBase}/billing/stripe/finalize-session?session_id=${encodeURIComponent(sessionId)}`,
+          `${apiBase}/billing/stripe/finalize-session?session_id=${encodeURIComponent(intent.sessionId)}`,
           {
             method: "POST",
+            headers: { "Idempotency-Key": intent.idempotencyKey },
           },
-          { attempts: 3, baseDelayMs: 300, timeoutMs: 20_000 },
+          { attempts: 5, baseDelayMs: 500, timeoutMs: 25_000 },
         );
         const payload = await response.json().catch(() => ({}));
         if (response.ok) {
+          const tier = typeof payload?.tier === "string"
+            ? payload.tier.trim().toLowerCase()
+            : "unknown";
+          const currency = typeof payload?.currency === "string"
+            ? payload.currency.trim().toUpperCase()
+            : null;
           trackEvent("payment_success", {
-            product_type: "optimization",
-            plan: String(payload?.billing_cycle || payload?.plan || payload?.tier || "unknown"),
-            price: typeof payload?.price === "number" ? payload.price : null,
+            product_type: tier,
+            plan: String(payload?.billing_cycle || tier),
+            price: stripeMinorAmountToMajor(payload?.amount, currency),
+            currency,
+            transaction_id:
+              typeof payload?.transaction_id === "string"
+                ? payload.transaction_id
+                : intent.sessionId,
           });
+          clearBillingFinalizeIntent();
+          setBillingFinalizeIntent(null);
           setMessageTone("ok");
           setMessage("Payment confirmed. Your plan was activated.");
+          router.replace("/account");
           await loadAccount();
+          return;
         }
+
+        // A 400 from older API versions can mean Stripe is still processing or
+        // temporarily unreachable. Preserve recovery unless ownership/input is
+        // definitively rejected.
+        const terminalFailure = [403, 404, 422].includes(response.status);
+        if (terminalFailure) {
+          clearBillingFinalizeIntent();
+          setBillingFinalizeIntent(null);
+          router.replace("/account");
+        }
+        setMessageTone("error");
+        setMessage(
+          errorDetailToMessage(payload?.detail) ||
+            (terminalFailure
+              ? "We could not verify this checkout session."
+              : "Payment confirmation is taking longer than expected. Retry safely below."),
+        );
+      } catch {
+        setMessageTone("error");
+        setMessage(
+          "Payment confirmation was interrupted. Your payment is not lost; retry safely below.",
+        );
       } finally {
-        router.replace("/account");
+        billingFinalizeInFlightRef.current = false;
+        setBillingFinalizeLoading(false);
       }
-    })();
-  }, [apiBase, loadAccount, router]);
+    },
+    [apiBase, loadAccount, router],
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const billing = params.get("billing");
+    const querySessionId = params.get("session_id");
+    const intent =
+      billing === "success" && querySessionId
+        ? getOrCreateBillingFinalizeIntent(querySessionId)
+        : loadBillingFinalizeIntent();
+    if (!intent) return;
+    setBillingFinalizeIntent(intent);
+    if (finalizedSessionRef.current === intent.sessionId) return;
+    finalizedSessionRef.current = intent.sessionId;
+    void finalizeBillingSession(intent);
+  }, [finalizeBillingSession]);
 
   const changePassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage("");
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const current_password = String(form.get("current_password") || "");
     const new_password = String(form.get("new_password") || "");
     const confirm_password = String(form.get("confirm_password") || "");
@@ -212,30 +290,35 @@ export default function AccountPage() {
       setMessage("Passwords do not match.");
       return;
     }
-    const response = await fetchWithRetry(
-      `${apiBase}/auth/change-password`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    try {
+      const response = await fetchWithRetry(
+        `${apiBase}/auth/change-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ current_password, new_password }),
         },
-        body: JSON.stringify({ current_password, new_password }),
-      },
-      { attempts: 2, baseDelayMs: 250, timeoutMs: 20_000 },
-    );
-    if (response.status === 401) {
-      router.push("/login");
-      return;
+        { attempts: 1, timeoutMs: 20_000 },
+      );
+      if (response.status === 401) {
+        router.push("/login");
+        return;
+      }
+      if (response.ok) {
+        setMessageTone("ok");
+        setMessage("Password updated.");
+        formElement.reset();
+        return;
+      }
+      const payload = await response.json().catch(() => ({}));
+      setMessageTone("error");
+      setMessage(errorDetailToMessage(payload.detail) || "Failed to update password.");
+    } catch {
+      setMessageTone("error");
+      setMessage("Connection interrupted. Check your network before trying again.");
     }
-    if (response.ok) {
-      setMessageTone("ok");
-      setMessage("Password updated.");
-      event.currentTarget.reset();
-      return;
-    }
-    const payload = await response.json().catch(() => ({}));
-    setMessageTone("error");
-    setMessage(errorDetailToMessage(payload.detail) || "Failed to update password.");
   };
 
   const formatDate = (value: string) =>
@@ -401,6 +484,17 @@ export default function AccountPage() {
                   <p style={{ color: messageTone === "ok" ? "#0f766e" : "#b42318" }}>
                     {message}
                   </p>
+                  {billingFinalizeIntent && messageTone === "error" ? (
+                    <button
+                      className="btn primary"
+                      type="button"
+                      disabled={billingFinalizeLoading}
+                      onClick={() => void finalizeBillingSession(billingFinalizeIntent)}
+                      style={{ marginTop: 10 }}
+                    >
+                      {billingFinalizeLoading ? "Confirming…" : "Retry payment confirmation"}
+                    </button>
+                  ) : null}
                 </div>
               )}
             </>

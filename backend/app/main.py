@@ -1,6 +1,10 @@
 import time
 import logging
-from fastapi import FastAPI, Request
+import re
+import uuid
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -16,13 +20,32 @@ from app.api.routes.push_internal import router as push_internal_router
 from app.api.routes.demo import router as demo_router
 from app.core.api_key import api_key_middleware
 from app.core.csrf import csrf_protect_middleware
-from app.core.rate_limit import rate_limit_middleware
+from app.core.rate_limit import rate_limit_middleware, shared_rate_limit_ready
+from app.db.session import get_engine
+from sqlalchemy import inspect, text
 from app.services.request_logger import capture_response_body, log_request_response
 from app.services.llm import LLMServiceError
 
 logger = logging.getLogger(__name__)
+_REQUEST_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{8,64}$")
 
-app = FastAPI(title="Smart CV Optimizer API")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):  # type: ignore[no-untyped-def]
+    logger.info(
+        "Application startup",
+        extra={
+            "database_configured": settings.database_url is not None,
+            "cors_origin_count": len(get_cors_origins()),
+        },
+    )
+
+    # Schema changes are an explicit deployment step. Startup and readiness
+    # probes never run CREATE/ALTER statements.
+    yield
+
+
+app = FastAPI(title="Smart CV Optimizer API", lifespan=lifespan)
 
 app.middleware("http")(csrf_protect_middleware)
 app.middleware("http")(rate_limit_middleware)
@@ -47,7 +70,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         extra={
             "path": request.url.path,
             "method": request.method,
-            "client_ip": request.client.host if request.client else None,
+            "request_id": getattr(request.state, "request_id", None),
         },
     )
     return JSONResponse(
@@ -59,12 +82,22 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.middleware("http")
 async def request_logger_middleware(request: Request, call_next):  # type: ignore[no-untyped-def]
     start_time = time.perf_counter()
-    content_type = request.headers.get("content-type", "")
-    if "multipart/form-data" in content_type:
-        body = b""
-    else:
-        body = await request.body()
-        request._body = body
+    supplied_request_id = (request.headers.get("x-request-id") or "").strip()
+    request_id = (
+        supplied_request_id
+        if _REQUEST_ID_PATTERN.fullmatch(supplied_request_id)
+        else uuid.uuid4().hex
+    )
+    request.state.request_id = request_id
+
+    # Fast path: avoid reading request bodies or buffering response streams when
+    # persistent request logging is disabled (the production default).
+    body = b""
+    if settings.request_logging_enabled:
+        content_type = request.headers.get("content-type", "")
+        if "multipart/form-data" not in content_type:
+            body = await request.body()
+            request._body = body
     response = await call_next(request)
     # Add Security Headers
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -74,6 +107,7 @@ async def request_logger_middleware(request: Request, call_next):  # type: ignor
     response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
     response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
     response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
+    response.headers["X-Request-ID"] = request_id
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
         "base-uri 'self'; "
@@ -86,17 +120,25 @@ async def request_logger_middleware(request: Request, call_next):  # type: ignor
         "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com; "
         "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com;"
     )
-    if request.headers.get("x-forwarded-proto", "").lower() == "https":
+    is_https = (
+        request.url.scheme.lower() == "https"
+        or request.headers.get("x-forwarded-proto", "").split(",")[0].strip().lower() == "https"
+    )
+    if is_https:
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
 
-    response, response_body = await capture_response_body(response)
-    await log_request_response(
-        request,
-        response,
-        start_time=start_time,
-        request_body=body,
-        response_body=response_body,
-    )
+    if request.url.path.startswith(("/auth", "/billing", "/history", "/optimize", "/analyze")):
+        response.headers["Cache-Control"] = "no-store"
+
+    if settings.request_logging_enabled:
+        response, response_body = await capture_response_body(response)
+        await log_request_response(
+            request,
+            response,
+            start_time=start_time,
+            request_body=body,
+            response_body=response_body,
+        )
     return response
 
 origins = get_cors_origins()
@@ -120,25 +162,39 @@ app.include_router(billing_router, prefix="/billing", tags=["billing"])
 app.include_router(push_internal_router, prefix="/internal", tags=["internal"])
 
 
-@app.on_event("startup")
-def on_startup() -> None:
-    print("STARTUP: Application is booting...")
-    print(f"STARTUP: Database URL present: {settings.database_url is not None}")
-    print(f"STARTUP: CORS Origins: {get_cors_origins()}")
-    
-    # Verify model files
-    from pathlib import Path
-    crf_path = Path("/app") / settings.keyword_crf_model_path
-    transformer_path = Path("/app") / settings.keyword_transformer_model_path
-    print(f"STARTUP: CRF Model file exists at {crf_path}: {crf_path.exists()}")
-    print(f"STARTUP: Transformer Model dir exists at {transformer_path}: {transformer_path.exists()}")
-
-    # We no longer run init_db here to ensure fastest possible port binding for Cloud Run health checks.
-    # DB initialization is handled lazily in get_db().
-    print("STARTUP: Boot process complete. Ready for requests.")
-    pass
-
-
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "environment": "production"}
+    return {"status": "ok", "environment": settings.app_env}
+
+
+@app.get("/health/live")
+def health_live() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.get("/health/ready")
+async def health_ready() -> dict[str, str]:
+    engine = get_engine()
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    required_tables = {
+        "users",
+        "analyses",
+        "idempotency_records",
+        "stripe_payment_applications",
+        "app_store_purchase_owners",
+        "pending_stripe_checkouts",
+        "keyword_lists",
+    }
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+        missing = sorted(name for name in required_tables if not inspect(engine).has_table(name))
+    except Exception as exc:
+        logger.warning("Readiness database check failed", exc_info=exc)
+        raise HTTPException(status_code=503, detail="Database is unavailable.") from exc
+    if missing:
+        raise HTTPException(status_code=503, detail="Database migrations are pending.")
+    if not await shared_rate_limit_ready():
+        raise HTTPException(status_code=503, detail="Shared abuse protection is unavailable.")
+    return {"status": "ready"}

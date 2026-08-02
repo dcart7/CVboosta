@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import html
+import logging
 import smtplib
 from email.message import EmailMessage
 
 from app.core.config import get_cors_origins, settings
+
+logger = logging.getLogger(__name__)
 
 
 def _build_reset_base_url() -> str | None:
@@ -22,14 +25,18 @@ def build_password_reset_link(token: str) -> str:
     base = _build_reset_base_url()
     if not base:
         return ""
-    return f"{base}/reset-password?token={token}"
+    # Keep the credential in the URL fragment. Fragments are handled by the
+    # browser but are not sent to the web server, reverse proxy, analytics, or
+    # referrer headers. The frontend middleware still upgrades older query-
+    # string links that may already exist in users' inboxes.
+    return f"{base}/reset-password#token={token}"
 
 
 def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
     host = (settings.smtp_host or "").strip()
     if not host:
         # SMTP not configured; keep API flow successful to avoid email enumeration.
-        print(f"[password-reset] SMTP_HOST missing. Link for {to_email}: {reset_link}")
+        logger.warning("Password reset email skipped because SMTP is not configured")
         return False
 
     message = EmailMessage()
@@ -92,18 +99,8 @@ def send_password_reset_email(*, to_email: str, reset_link: str) -> bool:
                 server.login(username, password)
             server.send_message(message)
         return True
-    except Exception as exc:
-        error_text = str(exc)
-        print(
-            "[password-reset] SMTP send failed:",
-            {
-                "to": to_email,
-                "host": host,
-                "port": port,
-                "username_set": bool(username),
-                "tls": settings.smtp_use_tls,
-                "ssl": settings.smtp_use_ssl,
-                "error": error_text,
-            },
-        )
+    except Exception:
+        # SMTP exception strings may echo a recipient; keep logs deliberately
+        # generic and expose operational detail through provider metrics.
+        logger.warning("Password reset SMTP delivery failed")
         return False

@@ -65,7 +65,7 @@ type SeoSeed = {
   pageType?: string;
 };
 
-const TODAY = "2026-06-03";
+const CONTENT_REVIEWED_AT = "2026-08-03";
 const TARGET_TOTAL = 1000;
 
 const ATS_VENDORS = [
@@ -751,8 +751,7 @@ function buildIntro(seed: SeoSeed, roleContext: ReturnType<typeof getRoleContext
   return `${opening}\n\n${roleLine}\n\n${familyLine}`;
 }
 
-function buildContextSection(seed: SeoSeed, roleContext: ReturnType<typeof getRoleContext>, h: number): SeoGuideSection {
-  const recruiterScan = 8 + (h % 18);
+function buildContextSection(seed: SeoSeed, roleContext: ReturnType<typeof getRoleContext>): SeoGuideSection {
   const keywordA = roleContext?.keywords?.[0] || "role alignment";
   const keywordB = roleContext?.keywords?.[1] || "clear outcomes";
   const specific = seed.company
@@ -771,7 +770,7 @@ function buildContextSection(seed: SeoSeed, roleContext: ReturnType<typeof getRo
       `${specific}\n\n` +
       `A practical screening flow usually looks like this:\n` +
       `1. **System layer:** file becomes text, sections, and searchable fields.\n` +
-      `2. **Recruiter scan:** first ${recruiterScan}–25 seconds focus on fit, scope, and credibility.\n` +
+      "2. **Recruiter scan:** the initial review focuses on fit, scope, and credibility.\n" +
       `3. **Deeper review:** strong candidates prove terms like **${keywordA}** and **${keywordB}** with measurable evidence.\n\n` +
       "That is why most high-performing pages in this cluster focus on structure first, proof second, and keyword placement third.",
   };
@@ -840,18 +839,16 @@ function buildPlaybookSection(seed: SeoSeed, roleContext: ReturnType<typeof getR
   };
 }
 
-function buildExamplesSection(seed: SeoSeed, roleContext: ReturnType<typeof getRoleContext>, h: number): SeoGuideSection {
+function buildExamplesSection(seed: SeoSeed, roleContext: ReturnType<typeof getRoleContext>): SeoGuideSection {
   const role = roleContext?.role || "candidate";
   const keywordA = roleContext?.keywords?.[0] || "keyword match";
   const keywordB = roleContext?.keywords?.[3] || "measurable impact";
-  const metricA = 12 + (h % 31);
-  const metricB = 8 + ((h >> 2) % 24);
 
   const table = [
     "| Weak version | Better version | Why it works |",
     "| --- | --- | --- |",
-    `| Worked on ${keywordA}. | Improved ${keywordA} outcomes by ${metricA}% by clarifying ownership and removing rework. | Names the skill and proves the result. |`,
-    `| Helped stakeholders. | Built a weekly review cadence; reduced decision lag by ${metricB}% with clearer metrics. | Turns generic support into measurable scope. |`,
+    `| Worked on ${keywordA}. | Improved ${keywordA} outcomes by [X%] by clarifying ownership and removing rework. | Names the skill and provides a place for a verified result. |`,
+    "| Helped stakeholders. | Built a review cadence; reduced verified decision lag by [X%] with clearer metrics. | Turns generic support into measurable scope. |",
     `| Responsible for projects. | Led one high-signal initiative end-to-end with visible impact, risk control, and handoff quality. | Shows ownership instead of activity. |`,
   ].join("\n");
 
@@ -867,7 +864,8 @@ function buildExamplesSection(seed: SeoSeed, roleContext: ReturnType<typeof getR
   return {
     title: "Examples and mini transformations",
     body:
-      "### Before / after patterns\n" +
+      "### Illustrative before / after templates\n" +
+      "Replace every bracketed placeholder with a result you can verify; do not copy sample claims as facts.\n\n" +
       `${table}\n\n` +
       `### Context note\n${familyExample}`,
   };
@@ -971,9 +969,9 @@ function buildSections(seed: SeoSeed): SeoGuideSection[] {
   const h = hashString(`${seed.family}:${seed.slug}`);
   const sections = [
     { title: "Introduction", body: buildIntro(seed, roleContext, h) },
-    buildContextSection(seed, roleContext, h),
+    buildContextSection(seed, roleContext),
     buildPlaybookSection(seed, roleContext, h),
-    buildExamplesSection(seed, roleContext, h),
+    buildExamplesSection(seed, roleContext),
     buildMistakesSection(seed, roleContext, h),
     buildFaqSection(seed, roleContext),
     buildInternalLinksSection(seed, roleContext),
@@ -1056,7 +1054,7 @@ function buildGuidePage(seed: SeoSeed): SeoGuidePage {
     metaDescription,
     h1,
     lead,
-    updatedAt: TODAY,
+    updatedAt: CONTENT_REVIEWED_AT,
     estimatedWordCount,
     sections,
     relatedPages: buildRelatedPages(seed),

@@ -8,6 +8,7 @@ from app.db.session import get_db
 from app.models.analysis import Analysis
 from app.schemas.history import HistoryItem, HistoryResponse, HistoryDetailResponse
 from app.services.analysis_crypto import decrypt_json_for_user, decrypt_text_for_user
+from app.services.entitlements import require_paid_entitlement
 
 router = APIRouter()
 
@@ -59,6 +60,13 @@ def get_history_item(
         raise HTTPException(status_code=404, detail="History item not found")
 
     result = row.result_json or {}
+    if result.get("access_entitlement") != "single_purchase":
+        require_paid_entitlement(
+            db,
+            current_user,
+            detail="An active paid entitlement is required to open full optimized documents.",
+            code="history_entitlement_required",
+        )
     optimized_cv = decrypt_text_for_user(current_user.id, result.get("optimized_cv_enc"))
     job_description = decrypt_text_for_user(current_user.id, result.get("job_description_enc"))
     cover_letter = decrypt_text_for_user(current_user.id, result.get("cover_letter_enc"))
@@ -88,4 +96,6 @@ def get_history_item(
         match_after=result.get("match_after"),
         cover_letter=cover_letter,
         interview_questions=interview_questions,
+        can_export=True,
+        access_entitlement=result.get("access_entitlement"),
     )

@@ -29,7 +29,6 @@ async def global_exception_handler(request: Request, exc: Exception):
         extra={
             "path": request.url.path,
             "method": request.method,
-            "client_ip": request.client.host if request.client else None,
         },
     )
     return JSONResponse(
@@ -39,4 +38,3 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 app.include_router(internal_router, prefix="/internal", tags=["internal"])
-

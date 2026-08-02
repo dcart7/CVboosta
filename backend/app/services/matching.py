@@ -1,4 +1,4 @@
-import re
+import unicodedata
 
 
 def compute_match_score(cv_text: str, keywords: list[str]) -> tuple[int, list[str], list[str]]:
@@ -7,7 +7,11 @@ def compute_match_score(cv_text: str, keywords: list[str]) -> tuple[int, list[st
     
     # Improved stemming logic
     def get_stems(t: str) -> set[str]:
-        if len(t) <= 3: return {t}
+        # The suffix rules below are intentionally limited to ASCII English.
+        # Applying them to Ukrainian/Polish/Slovak/Czech/Spanish words creates
+        # false positives (for example, a legitimate trailing "s" in a name).
+        if len(t) <= 3 or not t.isascii() or not t.isalpha():
+            return {t}
         stems = {t}
         if t.endswith('s'): stems.add(t[:-1])
         if t.endswith('es'): stems.add(t[:-2])
@@ -31,7 +35,9 @@ def compute_match_score(cv_text: str, keywords: list[str]) -> tuple[int, list[st
         if not normalized_kw:
             continue
             
-        if normalized_kw in normalized_cv:
+        # Phrase matching must respect token boundaries.  The old substring
+        # check treated short skills such as "Go" as present in "ongoing".
+        if f" {normalized_kw} " in f" {normalized_cv} ":
             matched.append(keyword)
             continue
             
@@ -46,8 +52,10 @@ def compute_match_score(cv_text: str, keywords: list[str]) -> tuple[int, list[st
             if kt in cv_tokens or any(s in stemmed_cv_tokens for s in kw_stems if len(s) > 2):
                 matches_found.append(kt)
                 
-        # Lower threshold for complex keywords to be more permissive
-        if len(matches_found) / len(kw_tokens) >= 0.5:
+        # One shared word must not become a claimed phrase match (for example,
+        # "project" alone is not "project manager"). Exact phrases already
+        # take the fast path above; token fallback requires strong coverage.
+        if len(matches_found) / len(kw_tokens) >= 0.75:
             matched.append(keyword)
         else:
             missing.append(keyword)
@@ -60,19 +68,30 @@ def compute_match_score(cv_text: str, keywords: list[str]) -> tuple[int, list[st
 
 
 def _normalize_text(text: str) -> str:
-    # Preserve dots in technical terms like node.js or react.js
-    # but otherwise clean to lowercase alpha-numeric
-    cleaned = re.sub(r"[^a-z0-9.]+", " ", text.lower())
-    # Clean leading/trailing dots that aren't part of a term
-    cleaned = re.sub(r"\s+\.|\.\s+", " ", cleaned).strip()
-    return " ".join(cleaned.split())
+    """Normalize text without discarding non-ASCII alphabets.
+
+    ``str.isalnum`` is Unicode-aware, so Cyrillic and accented Latin text are
+    kept.  NFKC/casefold also makes visually equivalent forms compare
+    consistently.  A small set of separators is retained for technical skills
+    such as ``Node.js``, ``C++``, ``C#`` and ``CI/CD``.
+    """
+    normalized = unicodedata.normalize("NFKC", text or "").casefold()
+    cleaned: list[str] = []
+    technical_punctuation = {".", "+", "#", "/", "-"}
+    for character in normalized:
+        if character.isalnum() or character in technical_punctuation:
+            cleaned.append(character)
+        else:
+            cleaned.append(" ")
+    tokens = [token.strip("./-") for token in "".join(cleaned).split()]
+    return " ".join(token for token in tokens if token)
 
 
 def _unique_preserve_order(items: list[str]) -> list[str]:
     seen: set[str] = set()
     result: list[str] = []
     for item in items:
-        key = item.strip().lower()
+        key = _normalize_text(item)
         if not key or key in seen:
             continue
         seen.add(key)

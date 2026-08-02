@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import Script from "next/script";
 import { useTranslation } from "../lib/LanguageContext";
 
 export default function Footer() {
@@ -46,7 +45,7 @@ export default function Footer() {
 
             <div className="footer-social-row">
               <a
-                href="https://apps.apple.com/ua/app/cvboosta/id6778948945?l=ru"
+                href="https://apps.apple.com/app/cvboosta/id6778948945"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="footer-app-btn"
@@ -74,46 +73,6 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="footer-row footer-row-2" aria-label="Review links">
-            <div className="footer-review-head">LEAVE A REVIEW ON</div>
-            <div className="footer-review-grid">
-              <a
-                href="https://www.producthunt.com/products/cvboosta-ai-resume-optimizer/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-cvboosta-ai-resume-optimizer"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-review-badge"
-                aria-label="Leave a review on Product Hunt"
-              >
-                <img
-                  src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1209906&theme=light"
-                  alt="Leave a review on Product Hunt"
-                  width={250}
-                  height={54}
-                  loading="lazy"
-                />
-              </a>
-
-              <Script
-                id="trustpilot-widget"
-                strategy="afterInteractive"
-                src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
-              />
-              <div
-                className="trustpilot-widget footer-review-trustpilot"
-                data-locale="en-US"
-                data-template-id="56278e9abfbbba0bdcd568bc"
-                data-businessunit-id="69f3862ed92de14a6b52d88c"
-                data-style-height="52px"
-                data-style-width="100%"
-                data-token="16fdccf2-5744-4915-8d1d-5b1fcc003d22"
-              >
-                <a href="https://www.trustpilot.com/review/cvboosta.com" target="_blank" rel="noopener noreferrer">
-                  Trustpilot
-                </a>
-              </div>
-            </div>
-          </div>
-
           <div className="footer-row footer-row-3">
             <div className="footer-links">
               <Link href="/privacy" className="footer-link">
@@ -128,6 +87,14 @@ export default function Footer() {
               <Link href="/resume-keywords" className="footer-link">
                 {t("footer.resumeKeywords")}
               </Link>
+              <button
+                type="button"
+                className="footer-link"
+                style={{ background: "none", border: 0, padding: 0, cursor: "pointer" }}
+                onClick={() => window.dispatchEvent(new Event("cvboosta:open-cookie-settings"))}
+              >
+                {t("legal.cookiePreferences") || "Cookie preferences"}
+              </button>
             </div>
           </div>
         </div>
@@ -167,34 +134,6 @@ export default function Footer() {
           align-items: center;
           width: fit-content;
           gap: 16px;
-        }
-        .footer-review-head {
-          font-size: 12px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          font-weight: 800;
-          color: var(--muted);
-          opacity: 0.88;
-        }
-        .footer-review-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
-          gap: 12px 16px;
-          align-items: center;
-          width: 100%;
-          max-width: 860px;
-        }
-        .footer-review-badge {
-          display: inline-flex;
-          width: fit-content;
-          text-decoration: none;
-        }
-        .footer-review-badge img {
-          border-radius: 12px;
-          box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
-        }
-        .footer-review-trustpilot {
-          width: 100%;
         }
         .footer-social-btn {
           display: inline-flex;
@@ -358,9 +297,6 @@ export default function Footer() {
         @media (max-width: 640px) {
           .footer-social-row {
             width: 100%;
-          }
-          .footer-review-grid {
-            grid-template-columns: 1fr;
           }
         }
       `}</style>

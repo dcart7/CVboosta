@@ -32,3 +32,5 @@ class HistoryDetailResponse(BaseModel):
     match_after: int | None
     cover_letter: str | None = None
     interview_questions: list[dict] | None = None
+    can_export: bool
+    access_entitlement: str | None = None

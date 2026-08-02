@@ -1,13 +1,17 @@
 import json
 import os
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     app_env: str = "production"
     database_url: str | None = None
+    db_pool_size: int = 5
+    db_max_overflow: int = 5
+    db_pool_timeout_seconds: int = 10
+    db_pool_recycle_seconds: int = 300
     
     @field_validator("database_url", mode="before")
     @classmethod
@@ -31,8 +35,14 @@ class Settings(BaseSettings):
     rate_limit_enabled: bool = True
     rate_limit_requests: int = 60
     rate_limit_window_seconds: int = 60
+    rate_limit_max_keys: int = 50000
+    redis_url: str | None = None
+    rate_limit_shared_required: bool = False
+    expensive_rate_limit_requests: int = 15
+    expensive_rate_limit_window_seconds: int = 60
     auth_rate_limit_requests: int = 8
     auth_rate_limit_window_seconds: int = 300
+    auth_subject_rate_limit_requests: int = 40
     api_key_enabled: bool = False
     api_key: str | None = None
     request_logging_enabled: bool = False
@@ -49,6 +59,7 @@ class Settings(BaseSettings):
     auth_cookie_secure: bool = True
     auth_cookie_samesite: str = "lax"
     auth_cookie_domain: str | None = None
+    native_auth_client_key: str | None = None
     google_oauth_client_id: str | None = None
     apple_oauth_client_id: str | None = None
     apple_oauth_client_ids: list[str] = Field(default_factory=list)
@@ -63,12 +74,9 @@ class Settings(BaseSettings):
         default_factory=lambda: [
             "127.0.0.0/8",
             "::1/128",
-            "10.0.0.0/8",
-            "172.16.0.0/12",
-            "192.168.0.0/16",
-            "fc00::/7",
         ]
     )
+    paddle_enabled: bool = False
     paddle_webhook_secret: str | None = None
     paddle_price_single_scan: str | None = None
     paddle_price_go_weekly: str | None = None
@@ -144,6 +152,21 @@ class Settings(BaseSettings):
         if value.lower() in insecure_defaults:
             raise ValueError("JWT_SECRET uses an insecure default value.")
         return value
+
+    @model_validator(mode="after")
+    def validate_production_secrets(self) -> "Settings":
+        if self.app_env.lower() in {"production", "prod"}:
+            encryption_key = (self.analysis_encryption_key or "").strip()
+            if len(encryption_key) < 32:
+                raise ValueError(
+                    "ANALYSIS_ENCRYPTION_KEY must be at least 32 characters in production."
+                )
+            if encryption_key == self.jwt_secret:
+                raise ValueError("ANALYSIS_ENCRYPTION_KEY must differ from JWT_SECRET.")
+            native_key = (self.native_auth_client_key or "").strip()
+            if native_key and len(native_key) < 32:
+                raise ValueError("NATIVE_AUTH_CLIENT_KEY must be at least 32 characters.")
+        return self
 
 
 def get_cors_origins() -> list[str]:

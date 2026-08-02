@@ -138,24 +138,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
               ? 0.82
               : 0.8);
 
-    const changeFrequency =
-      route.startsWith("/resume-keywords/") ||
-      route.startsWith("/cv-optimizer/") ||
-      route.startsWith("/resume-examples/") ||
-      route.startsWith("/resume-guides/") ||
-      route.startsWith("/resume-for/") ||
-      route.startsWith("/ats/") ||
-      route.startsWith("/ats-comparisons/") ||
-      route.startsWith("/resume-industry/") ||
-      route.startsWith("/interview-resume/") ||
-      route.startsWith("/job-description/") ||
-      route.startsWith("/skills/") ||
-      route.startsWith("/tools/") ||
-      route.startsWith("/datasets/") ||
-      route.startsWith("/best/") ||
-      route.startsWith("/blog/")
-        ? ("weekly" as const)
-        : ("monthly" as const);
+    // Most guide pages change only after an editorial update. Claiming a
+    // weekly cadence for thousands of static pages sends a misleading signal.
+    const changeFrequency = route.startsWith("/blog/")
+      ? ("weekly" as const)
+      : ("monthly" as const);
 
     return {
       url: `${baseUrl}${route}`,

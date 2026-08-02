@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TopNav from "../components/TopNav";
 import SocialAuthButtons from "../components/SocialAuthButtons";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
 import { fetchWithRetry } from "../lib/fetchRetry";
+import {
+  authHref,
+  nextDestinationFromSearch,
+} from "../lib/funnelIntent";
 import { useTranslation } from "../lib/LanguageContext";
 
 function extractErrorMessage(payload: unknown): string {
@@ -54,11 +58,25 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [nextDestination, setNextDestination] = useState("/account");
   const apiBase = getApiBase();
+
+  useEffect(() => {
+    setNextDestination(nextDestinationFromSearch("/account"));
+  }, []);
 
   const submit = async () => {
     setError("");
     setLoading(true);
+    trackEvent("cta_click", {
+      cta_name: "auth_submit",
+      method: "email",
+      source: nextDestination.startsWith("/pricing")
+        ? "checkout"
+        : nextDestination.startsWith("/app")
+          ? "optimization"
+          : "direct",
+    });
     try {
       const response = await fetchWithRetry(
         `${apiBase}/auth/login`,
@@ -73,14 +91,10 @@ export default function LoginPage() {
         const payload = await response.json().catch(() => ({}));
         throw new Error(extractErrorMessage(payload) || "Login failed");
       }
-      const data = await response.json();
-      localStorage.setItem("user_email", email.trim().toLowerCase());
-      if (data?.access_token) {
-        localStorage.setItem("access_token", String(data.access_token));
-      }
+      await response.json();
       trackEvent("login", { method: "email" });
       window.dispatchEvent(new Event("auth-change"));
-      router.push("/account");
+      router.replace(nextDestination);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       const network =
@@ -113,11 +127,20 @@ export default function LoginPage() {
               {t("auth.loginSubtitle")}
             </p>
           </div>
-          <form className="form-card form-grid auth-form">
+          <form
+            className="form-card form-grid auth-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!loading) void submit();
+            }}
+          >
             <div>
               <div className="label">{t("auth.email")}</div>
               <input
                 className="input"
+                type="email"
+                autoComplete="email"
+                required
                 placeholder="you@domain.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -130,6 +153,8 @@ export default function LoginPage() {
                   className="input password-input"
                   placeholder="••••••••"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
@@ -153,22 +178,19 @@ export default function LoginPage() {
               mode="login"
               disabled={loading}
               onError={(message) => setError(message || t("auth.loginFailed"))}
-              onSuccess={(data) => {
-                if (data.email) {
-                  localStorage.setItem("user_email", data.email.trim().toLowerCase());
-                }
-                if (data.access_token) {
-                  localStorage.setItem("access_token", String(data.access_token));
-                }
+              onSuccess={() => {
                 trackEvent("login", { method: "oauth" });
                 window.dispatchEvent(new Event("auth-change"));
-                router.push("/account");
+                router.replace(nextDestination);
               }}
             />
-            <button className="btn primary" type="button" onClick={submit}>
+            <button className="btn primary" type="submit" disabled={loading}>
               {loading ? t("auth.signingIn") : t("auth.logIn")}
             </button>
-            <Link className="btn ghost" href="/register">
+            <Link
+              className="btn ghost"
+              href={authHref("/register", nextDestination)}
+            >
               {t("auth.createAccount")}
             </Link>
           </form>

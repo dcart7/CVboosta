@@ -3,12 +3,6 @@ from sqlalchemy.sql import func
 
 from app.db.model_base import Base
 
-LIFETIME_WHITELIST_EMAILS = {
-    "dcartheartist@gmail.com",
-    "virelsolutions@gmail.com",
-}
-
-
 class User(Base):
     __tablename__ = "users"
 
@@ -45,9 +39,6 @@ class User(Base):
         return False
 
     def get_limits(self) -> dict:
-        if (self.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
-            return {"scans": 999999, "cl": 999999, "prep": 999999}
-            
         # Tiers: free, single, go, pro, lifetime
         # Go: 15 per day
         # Single: remaining credits are stored directly in counters.
@@ -67,10 +58,6 @@ class User(Base):
         return limits.get(self.subscription_tier, limits["free"])
 
     def can_use(self, feature: str) -> bool:
-        # God mode for superuser
-        if (self.email or "").lower() in LIFETIME_WHITELIST_EMAILS:
-            return True
-
         # Single Scan is modeled as remaining credits kept in counters.
         if self.subscription_tier == "single":
             if feature == "scan":

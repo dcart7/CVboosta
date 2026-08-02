@@ -8,18 +8,61 @@ import PremiumModal from "../components/PremiumModal";
 import { getApiBase } from "../lib/apiBase";
 import { errorDetailToMessage } from "../lib/errorDetail";
 import { fetchWithRetry } from "../lib/fetchRetry";
+import {
+  authHref,
+  clearLegacyPersistentFunnelData,
+  clearWorkspaceFunnelDraft,
+  createIdempotencyKey,
+  loadWorkspaceFunnelDraft,
+  saveResultContext,
+  saveWorkspaceFunnelDraft,
+  type WorkspacePendingAction,
+} from "../lib/funnelIntent";
 import { useTranslation } from "../lib/LanguageContext";
 import { trackEvent } from "../lib/analytics";
 import {
   clearWorkspaceDraftData,
   fetchWorkspaceEmail,
   GUEST_WORKSPACE_ID,
-  migrateLegacyGuestWorkspace,
-  parsedCvStorageKey,
-  sessionCvParsedKey,
   workspaceIdFromEmail,
   wsFieldKey,
 } from "../lib/workspaceStorage";
+
+type OptimizationRequest = {
+  cv_text: string;
+  job_text: string;
+  cv_analysis: string;
+  job_analysis: string;
+  target_role: string;
+  target_company: string;
+};
+
+async function requestFingerprint(value: string): Promise<string> {
+  try {
+    const bytes = new TextEncoder().encode(value);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  } catch {
+    // Stable non-cryptographic fallback. The fingerprint is only used to avoid
+    // reusing a key for a changed request; the server verifies the real body.
+    let first = 2166136261;
+    let second = 2246822519;
+    for (let index = 0; index < value.length; index += 1) {
+      const code = value.charCodeAt(index);
+      first = Math.imul(first ^ code, 16777619);
+      second = Math.imul(second ^ code, 3266489917);
+    }
+    return [first, second, value.length, first ^ second]
+      .map((part) => (part >>> 0).toString(16).padStart(8, "0"))
+      .join("");
+  }
+}
+
+function isAmbiguousOptimizationStatus(status: number): boolean {
+  return status === 408 || status === 409 || status === 425 || status === 429 || status >= 500;
+}
 
 export default function WorkspacePage() {
   const router = useRouter();
@@ -58,6 +101,8 @@ export default function WorkspacePage() {
     kind: "info" | "error";
   } | null>(null);
   const noticeTimerRef = useRef<number | null>(null);
+  const resumeAttemptedRef = useRef(false);
+  const optimizationInFlightRef = useRef(false);
   
   useEffect(() => {
     if (!isOptimizing) {
@@ -75,6 +120,15 @@ export default function WorkspacePage() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
+  const [pendingAction, setPendingAction] =
+    useState<WorkspacePendingAction>(null);
+  const [pendingIdempotencyKey, setPendingIdempotencyKey] = useState<
+    string | null
+  >(null);
+  const [pendingRequestFingerprint, setPendingRequestFingerprint] = useState<
+    string | null
+  >(null);
   const [mobileDashboardTab, setMobileDashboardTab] = useState<"editor" | "preview">("editor");
 
   const showNotice = (message: string, kind: "info" | "error" = "info") => {
@@ -117,17 +171,6 @@ export default function WorkspacePage() {
       }
       const data = await response.json();
       setParsed(data);
-      const email = userEmail ?? (await fetchWorkspaceEmail(apiBase));
-      const wid = workspaceIdFromEmail(email);
-      if (userEmail === null && email) setUserEmail(email);
-      if (workspaceId === null) setWorkspaceId(wid);
-      localStorage.setItem(parsedCvStorageKey(email), JSON.stringify(data));
-      localStorage.setItem(wsFieldKey(wid, "cv_text"), data.raw_text || "");
-      try {
-        sessionStorage.setItem(sessionCvParsedKey(wid), "1");
-      } catch {
-        /* private mode */
-      }
       setShowDetectedSkillsSession(true);
       setStatus("CV parsed successfully.");
     } catch (err) {
@@ -141,12 +184,6 @@ export default function WorkspacePage() {
     setFile(selected);
     setStatus("");
     setParsed(null);
-    const wid = workspaceId ?? GUEST_WORKSPACE_ID;
-    try {
-      sessionStorage.removeItem(sessionCvParsedKey(wid));
-    } catch {
-      /* ignore */
-    }
     setShowDetectedSkillsSession(false);
   };
 
@@ -164,21 +201,28 @@ export default function WorkspacePage() {
   const loadWorkspace = useCallback(async () => {
     setWorkspaceReady(false);
     try {
+      clearLegacyPersistentFunnelData();
       const email = await fetchWorkspaceEmail(apiBase);
       const wid = workspaceIdFromEmail(email);
-      migrateLegacyGuestWorkspace(wid);
+      const draft = loadWorkspaceFunnelDraft();
       setUserEmail(email);
       setWorkspaceId(wid);
 
-      // Dashboard should always open empty (new visit / after previous scan).
+      // Remove legacy persistent CV copies. The active draft is tab-scoped with a TTL.
       clearWorkspaceDraftData(wid, email);
+      if (wid !== GUEST_WORKSPACE_ID) {
+        clearWorkspaceDraftData(GUEST_WORKSPACE_ID, null);
+      }
       setFile(null);
-      setParsed(null);
-      setTargetRole("");
-      setTargetCompany("");
-      setJobText("");
-      setShowDetectedSkillsSession(false);
-      setStatus("");
+      setParsed(draft?.parsed ?? null);
+      setTargetRole(draft?.targetRole ?? "");
+      setTargetCompany(draft?.targetCompany ?? "");
+      setJobText(draft?.jobText ?? "");
+      setPendingAction(draft?.pendingAction ?? null);
+      setPendingIdempotencyKey(draft?.pendingIdempotencyKey ?? null);
+      setPendingRequestFingerprint(draft?.pendingRequestFingerprint ?? null);
+      setShowDetectedSkillsSession(Boolean(draft?.parsed));
+      setStatus(draft?.parsed ? "Your CV draft was restored securely." : "");
       setAnalysisStatus("");
       setOptimizeStatus("");
       setKeywordCache([]);
@@ -189,14 +233,18 @@ export default function WorkspacePage() {
       setOptimizedSummary("");
       setRecommendations([]);
     } catch {
+      const draft = loadWorkspaceFunnelDraft();
       setUserEmail(null);
       setWorkspaceId(GUEST_WORKSPACE_ID);
-      setParsed(null);
-      setTargetRole("");
-      setTargetCompany("");
-      setJobText("");
-      setShowDetectedSkillsSession(false);
-      setStatus("");
+      setParsed(draft?.parsed ?? null);
+      setTargetRole(draft?.targetRole ?? "");
+      setTargetCompany(draft?.targetCompany ?? "");
+      setJobText(draft?.jobText ?? "");
+      setPendingAction(draft?.pendingAction ?? null);
+      setPendingIdempotencyKey(draft?.pendingIdempotencyKey ?? null);
+      setPendingRequestFingerprint(draft?.pendingRequestFingerprint ?? null);
+      setShowDetectedSkillsSession(Boolean(draft?.parsed));
+      setStatus(draft?.parsed ? "Your CV draft was restored securely." : "");
       setAnalysisStatus("");
       setOptimizeStatus("");
       setKeywordCache([]);
@@ -223,14 +271,30 @@ export default function WorkspacePage() {
   }, [loadWorkspace]);
 
   useEffect(() => {
-    if (!workspaceReady || workspaceId === null) return;
-    localStorage.setItem(wsFieldKey(workspaceId, "target_role"), targetRole);
-    localStorage.setItem(
-      wsFieldKey(workspaceId, "target_company"),
+    if (!workspaceReady) return;
+    if (!parsed && !targetRole && !targetCompany && !jobText && !pendingAction) {
+      clearWorkspaceFunnelDraft();
+      return;
+    }
+    saveWorkspaceFunnelDraft({
+      parsed,
+      targetRole,
       targetCompany,
-    );
-    localStorage.setItem(wsFieldKey(workspaceId, "job_text"), jobText);
-  }, [workspaceReady, workspaceId, targetRole, targetCompany, jobText]);
+      jobText,
+      pendingAction,
+      pendingIdempotencyKey,
+      pendingRequestFingerprint,
+    });
+  }, [
+    workspaceReady,
+    parsed,
+    targetRole,
+    targetCompany,
+    jobText,
+    pendingAction,
+    pendingIdempotencyKey,
+    pendingRequestFingerprint,
+  ]);
 
   useEffect(() => {
     if (!workspaceReady || workspaceId === null) return;
@@ -241,23 +305,23 @@ export default function WorkspacePage() {
     if (!text) {
       setKeywordCache([]);
       setKeywordSource("");
-      localStorage.removeItem(kwKey);
-      localStorage.removeItem(hashKey);
-      localStorage.removeItem(srcKey);
+      sessionStorage.removeItem(kwKey);
+      sessionStorage.removeItem(hashKey);
+      sessionStorage.removeItem(srcKey);
       return;
     }
     const currentHash = hashText(text);
-    const storedHash = localStorage.getItem(hashKey);
+    const storedHash = sessionStorage.getItem(hashKey);
     if (storedHash === currentHash) {
-      const cached = JSON.parse(localStorage.getItem(kwKey) || "[]");
+      const cached = JSON.parse(sessionStorage.getItem(kwKey) || "[]");
       setKeywordCache(Array.isArray(cached) ? cached : []);
-      setKeywordSource(localStorage.getItem(srcKey) || "");
+      setKeywordSource(sessionStorage.getItem(srcKey) || "");
     } else {
       setKeywordCache([]);
       setKeywordSource("");
-      localStorage.removeItem(kwKey);
-      localStorage.removeItem(hashKey);
-      localStorage.removeItem(srcKey);
+      sessionStorage.removeItem(kwKey);
+      sessionStorage.removeItem(hashKey);
+      sessionStorage.removeItem(srcKey);
     }
   }, [jobText, workspaceId, workspaceReady]);
 
@@ -299,11 +363,11 @@ export default function WorkspacePage() {
       const kwKey = wsFieldKey(workspaceId, "job_keywords");
       const hashKey = wsFieldKey(workspaceId, "job_keywords_hash");
       const srcKey = wsFieldKey(workspaceId, "job_keywords_source");
-      localStorage.setItem(kwKey, JSON.stringify(unique));
-      localStorage.setItem(hashKey, hashText(jobText.trim()));
+      sessionStorage.setItem(kwKey, JSON.stringify(unique));
+      sessionStorage.setItem(hashKey, hashText(jobText.trim()));
       const sourceText = data.feedback || "Keywords extracted.";
       setKeywordSource(sourceText);
-      localStorage.setItem(srcKey, sourceText);
+      sessionStorage.setItem(srcKey, sourceText);
       setAnalysisStatus(sourceText);
       trackEvent("ats_analysis_completed", { stage: "keyword_extraction" });
     } catch (err) {
@@ -319,12 +383,12 @@ export default function WorkspacePage() {
     if (workspaceId === null) return;
     const next = keywordCache.filter((item) => item !== value);
     setKeywordCache(next);
-    localStorage.setItem(
+    sessionStorage.setItem(
       wsFieldKey(workspaceId, "job_keywords"),
       JSON.stringify(next),
     );
     if (jobText.trim()) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         wsFieldKey(workspaceId, "job_keywords_hash"),
         hashText(jobText.trim()),
       );
@@ -340,12 +404,12 @@ export default function WorkspacePage() {
     );
     const next = exists ? keywordCache : [...keywordCache, cleaned];
     setKeywordCache(next);
-    localStorage.setItem(
+    sessionStorage.setItem(
       wsFieldKey(workspaceId, "job_keywords"),
       JSON.stringify(next),
     );
     if (jobText.trim()) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         wsFieldKey(workspaceId, "job_keywords_hash"),
         hashText(jobText.trim()),
       );
@@ -357,9 +421,9 @@ export default function WorkspacePage() {
     setKeywordCache([]);
     setKeywordSource("");
     if (workspaceId !== null) {
-      localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords"));
-      localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_hash"));
-      localStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_source"));
+      sessionStorage.removeItem(wsFieldKey(workspaceId, "job_keywords"));
+      sessionStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_hash"));
+      sessionStorage.removeItem(wsFieldKey(workspaceId, "job_keywords_source"));
     }
     setAnalysisStatus("Keywords cleared.");
   };
@@ -384,16 +448,6 @@ export default function WorkspacePage() {
       setAnalysisStatus(msg);
       return;
     }
-    localStorage.setItem(wsFieldKey(workspaceId, "target_role"), targetRole);
-    localStorage.setItem(
-      wsFieldKey(workspaceId, "target_company"),
-      targetCompany,
-    );
-    localStorage.setItem(wsFieldKey(workspaceId, "job_text"), jobText);
-    localStorage.setItem(
-      wsFieldKey(workspaceId, "cv_text"),
-      parsed.raw_text || "",
-    );
     setAnalysisStatus("Analyzing...");
     trackEvent("ats_analysis_started", { stage: "match" });
     setIsAnalyzing(true);
@@ -430,7 +484,8 @@ export default function WorkspacePage() {
     }
   };
 
-  const runOptimization = async () => {
+  const runOptimization = async (resumeIdempotencyKey?: string) => {
+    if (optimizationInFlightRef.current || isOptimizing) return;
     if (!parsed?.raw_text) {
       const msg = t("dashboard.step1") || "Upload a CV first.";
       setOptimizeStatus(msg);
@@ -447,18 +502,45 @@ export default function WorkspacePage() {
       setOptimizeStatus("Loading workspace…");
       return;
     }
-    localStorage.setItem(wsFieldKey(workspaceId, "target_role"), targetRole);
-    localStorage.setItem(
-      wsFieldKey(workspaceId, "target_company"),
+    optimizationInFlightRef.current = true;
+    const requestPayload: OptimizationRequest = {
+      cv_text: parsed.raw_text,
+      job_text: jobText,
+      cv_analysis: "",
+      job_analysis: "",
+      target_role: targetRole,
+      target_company: targetCompany,
+    };
+    const serializedPayload = JSON.stringify(requestPayload);
+    const fingerprint = await requestFingerprint(serializedPayload);
+    const canReusePendingKey =
+      pendingAction === "optimize" &&
+      typeof pendingIdempotencyKey === "string" &&
+      pendingIdempotencyKey.length > 0 &&
+      pendingRequestFingerprint === fingerprint;
+    const idempotencyKey =
+      resumeIdempotencyKey ||
+      (canReusePendingKey ? pendingIdempotencyKey : createIdempotencyKey("optimize"));
+
+    // Persist before sending. A timeout or dropped response can mean the server
+    // completed the work, so every safe retry must use this exact key.
+    const pendingSaved = saveWorkspaceFunnelDraft({
+      parsed,
+      targetRole,
       targetCompany,
-    );
-    localStorage.setItem(wsFieldKey(workspaceId, "job_text"), jobText);
-    localStorage.setItem(
-      wsFieldKey(workspaceId, "cv_text"),
-      parsed.raw_text || "",
-    );
+      jobText,
+      pendingAction: "optimize",
+      pendingIdempotencyKey: idempotencyKey,
+      pendingRequestFingerprint: fingerprint,
+    });
+    setPendingAction("optimize");
+    setPendingIdempotencyKey(idempotencyKey);
+    setPendingRequestFingerprint(fingerprint);
     setOptimizeStatus("Optimizing...");
-    trackEvent("optimization_started", { product_type: "optimization" });
+    trackEvent("optimization_started", {
+      product_type: "optimization",
+      resumed_after_auth: Boolean(resumeIdempotencyKey),
+    });
     setIsOptimizing(true);
     try {
       const response = await fetchWithRetry(
@@ -467,49 +549,63 @@ export default function WorkspacePage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Idempotency-Key": idempotencyKey,
           },
-          body: JSON.stringify({
-            cv_text: parsed.raw_text || "",
-            job_text: jobText,
-            cv_analysis: "",
-            job_analysis: "",
-            target_role: targetRole,
-            target_company: targetCompany,
-          }),
+          body: serializedPayload,
         },
         // Optimization can take longer than analysis (LLM + matching + recommendations).
-        { attempts: 3, baseDelayMs: 300, timeoutMs: 90_000 },
+        { attempts: 3, baseDelayMs: 300, timeoutMs: 150_000 },
       );
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        setShowAuthGate(true);
+        setOptimizeStatus(
+          pendingSaved
+            ? "Sign in to continue. Your CV and vacancy are saved in this tab for 30 minutes."
+            : "Sign in to continue. Keep this page open so your draft is not lost.",
+        );
+        trackEvent("cta_click", {
+          cta_name: "auth_gate_view",
+          source: "optimization",
+          draft_saved: pendingSaved,
+        });
+        return;
+      }
       if (response.status === 402) {
+        setPendingAction(null);
+        setPendingIdempotencyKey(null);
+        setPendingRequestFingerprint(null);
         setShowUpgradeModal(true);
         setOptimizeStatus("");
-        setIsOptimizing(false);
         return;
       }
       if (!response.ok) {
-        setOptimizeStatus(data.detail || "Optimization failed.");
+        if (isAmbiguousOptimizationStatus(response.status)) {
+          setOptimizeStatus(
+            "The result is still uncertain. Try again — the same request will resume safely without charging twice.",
+          );
+        } else {
+          setPendingAction(null);
+          setPendingIdempotencyKey(null);
+          setPendingRequestFingerprint(null);
+          setOptimizeStatus(errorDetailToMessage(data.detail) || "Optimization failed.");
+        }
         return;
       }
-      localStorage.setItem("optimized_cv", data.optimized_cv || "");
-      localStorage.setItem(
-        "missing_skills",
-        JSON.stringify(data.missing_skills || []),
-      );
-      localStorage.setItem(
-        "recommendations",
-        JSON.stringify(data.recommendations || []),
-      );
-      localStorage.setItem(
-        "added_keywords",
-        JSON.stringify(data.added_keywords || []),
-      );
-      if (typeof data.match_before === "number") {
-        localStorage.setItem("match_before", String(data.match_before));
-      }
-      if (typeof data.match_after === "number") {
-        localStorage.setItem("match_after", String(data.match_after));
-      }
+      saveResultContext({
+        optimizedCv: data.optimized_cv || "",
+        jobText,
+        missingSkills: data.missing_skills || [],
+        addedKeywords: data.added_keywords || [],
+        recommendations: data.recommendations || [],
+        matchBefore:
+          typeof data.match_before === "number" ? data.match_before : null,
+        matchAfter:
+          typeof data.match_after === "number" ? data.match_after : null,
+        // A successful server-side paid optimization owns this result. Newer
+        // API versions return the explicit per-analysis entitlement.
+        canExport: typeof data.can_export === "boolean" ? data.can_export : true,
+      });
       setOptimizedSummary((data.optimized_cv || "").split("\n")[0] || "—");
       setRecommendations(data.recommendations || []);
       setOptimizeStatus("Optimization complete.");
@@ -534,24 +630,71 @@ export default function WorkspacePage() {
       setMatchPercent(null);
       setMissingKeywords([]);
       setAnalysisStatus("");
+      setPendingAction(null);
+      setPendingIdempotencyKey(null);
+      setPendingRequestFingerprint(null);
+      clearWorkspaceFunnelDraft();
       clearWorkspaceDraftData(workspaceId, userEmail);
 
       if (data.analysis_id) {
         // Automatically inject the ID into localStorage so when /results mounts, it has a fallback if search params fail
-        localStorage.setItem("current_analysis_id", String(data.analysis_id));
+        sessionStorage.setItem("current_analysis_id", String(data.analysis_id));
         trackEvent("ats_view_results", { location: "auto_redirect" });
         router.push(`/results?id=${data.analysis_id}`);
       } else {
         trackEvent("ats_view_results", { location: "auto_redirect" });
         router.push("/results");
       }
-    } catch (err) {
-      console.error("Optimization error:", err);
-      setOptimizeStatus(t("optimize.optimizationFailedTryAgain"));
+    } catch {
+      setOptimizeStatus(
+        "Connection interrupted. Try again — the same request will resume safely without charging twice.",
+      );
     } finally {
+      optimizationInFlightRef.current = false;
       setIsOptimizing(false);
     }
   };
+
+  useEffect(() => {
+    if (
+      resumeAttemptedRef.current ||
+      !workspaceReady ||
+      !userEmail ||
+      pendingAction !== "optimize" ||
+      !parsed?.raw_text ||
+      !jobText.trim() ||
+      typeof window === "undefined"
+    ) {
+      return;
+    }
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("resume") !== "optimize") return;
+
+    resumeAttemptedRef.current = true;
+    const idempotencyKey =
+      pendingIdempotencyKey || createIdempotencyKey("optimize");
+    url.searchParams.delete("resume");
+    window.history.replaceState(
+      {},
+      "",
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+    trackEvent("cta_click", {
+      cta_name: "auth_intent_resumed",
+      source: "optimization",
+    });
+    void runOptimization(idempotencyKey);
+  }, [
+    workspaceReady,
+    userEmail,
+    pendingAction,
+    pendingIdempotencyKey,
+    pendingRequestFingerprint,
+    parsed,
+    jobText,
+    targetRole,
+    targetCompany,
+  ]);
 
   return (
     <main className="page">
@@ -764,7 +907,7 @@ export default function WorkspacePage() {
               <button
                 className="btn secondary"
                 type="button"
-                onClick={runOptimization}
+                onClick={() => void runOptimization()}
                 disabled={isOptimizing}
               >
                 Generate optimized CV
@@ -858,31 +1001,74 @@ export default function WorkspacePage() {
           </div>
         </section>
 
-        <section className="testimonials-section fade-up" style={{ marginTop: "4rem", marginBottom: "2rem" }}>
-          <h2 className="section-title" style={{ textAlign: "center", marginBottom: "2rem" }}>
-            {t("testimonials.title")}
-          </h2>
-          <div className="marquee-wrapper">
-            <div className="marquee-track">
-              {[1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6].map((num, idx) => (
-                <div key={`${num}-${idx}`} className="card testi-card">
-                  <p style={{ fontStyle: "italic", opacity: 0.9, marginBottom: "1.5rem" }}>
-                     "{t(`testimonials.quote${num}`)}"
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: "12px", color: "white" }}>
-                      {t(`testimonials.author${num}`)[0]}
-                    </div>
-                    <span style={{ fontSize: "13px", fontWeight: "600", opacity: 0.8 }}>
-                      {t(`testimonials.author${num}`)}
-                    </span>
-                  </div>
-                </div>
-              ))}
+      </div>
+      {showAuthGate && (
+        <div className="modal-backdrop" onClick={() => setShowAuthGate(false)}>
+          <div
+            className="modal-card fade-up paywall-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-gate-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="paywall-modal-close"
+              type="button"
+              aria-label={t("common.dismiss")}
+              onClick={() => setShowAuthGate(false)}
+            >
+              ×
+            </button>
+            <div className="paywall-modal-hero">
+              <div className="paywall-modal-icon" aria-hidden="true">
+                🔒
+              </div>
+              <h3 className="paywall-modal-title" id="auth-gate-title">
+                Sign in to generate your optimized CV
+              </h3>
+              <p className="paywall-modal-sub">
+                Your CV and vacancy will stay securely in this tab for 30 minutes.
+                We will continue automatically after you sign in.
+              </p>
+            </div>
+            <div className="paywall-modal-actions">
+              <Link
+                className="btn primary"
+                href={authHref("/login", "/app?resume=optimize")}
+                onClick={() =>
+                  trackEvent("cta_click", {
+                    cta_name: "auth_started",
+                    method: "email_or_oauth",
+                    source: "optimization",
+                  })
+                }
+              >
+                {t("auth.logIn")}
+              </Link>
+              <Link
+                className="btn secondary"
+                href={authHref("/register", "/app?resume=optimize")}
+                onClick={() =>
+                  trackEvent("cta_click", {
+                    cta_name: "auth_started",
+                    method: "email_or_oauth",
+                    source: "optimization",
+                  })
+                }
+              >
+                {t("auth.createBtn")}
+              </Link>
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={() => setShowAuthGate(false)}
+              >
+                {t("common.dismiss")}
+              </button>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      )}
       <PremiumModal 
         isOpen={showUpgradeModal} 
         onClose={() => setShowUpgradeModal(false)} 

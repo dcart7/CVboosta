@@ -11,7 +11,7 @@ async def api_key_middleware(request: Request, call_next):  # type: ignore[no-un
         return await call_next(request)
 
     path = request.url.path
-    if path in {"/health"} or path.startswith("/docs") or path == "/openapi.json":
+    if path in {"/health", "/health/live", "/health/ready"} or path.startswith("/docs") or path == "/openapi.json":
         return await call_next(request)
     if path.startswith("/auth"):
         return await call_next(request)

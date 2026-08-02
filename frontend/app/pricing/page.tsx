@@ -1,12 +1,33 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "../lib/LanguageContext";
 import TopNav from "../components/TopNav";
 import { getApiBase } from "../lib/apiBase";
 import { trackEvent } from "../lib/analytics";
 import { fetchWithRetry } from "../lib/fetchRetry";
+import {
+  authHref,
+  clearCheckoutIntent,
+  createIdempotencyKey,
+  loadCheckoutIntent,
+  saveCheckoutIntent,
+  type CheckoutBillingCycle,
+  type CheckoutTier,
+} from "../lib/funnelIntent";
+
+function verifiedStripeCheckoutUrl(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "checkout.stripe.com"
+      ? url.toString()
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function PricingPage() {
   const { t, language } = useTranslation();
@@ -17,6 +38,7 @@ export default function PricingPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [activeTier, setActiveTier] = useState<string | null>(null);
   const [activeBillingCycle, setActiveBillingCycle] = useState<"week" | "month" | null>(null);
+  const checkoutResumeAttemptedRef = useRef(false);
   const tierRank: Record<string, number> = {
     single: 1,
     go: 2,
@@ -24,17 +46,20 @@ export default function PricingPage() {
     lifetime: 4,
   };
   const pricingUiCopy = {
-    en: { notUpgrade: "Not an upgrade" },
-    uk: { notUpgrade: "Не є апгрейдом" },
-    pl: { notUpgrade: "To nie upgrade" },
-    sk: { notUpgrade: "Nie je to upgrade" },
-    cs: { notUpgrade: "Není to upgrade" },
-    es: { notUpgrade: "No es una mejora" },
+    en: { notUpgrade: "Not an upgrade", managePlan: "Manage current plan" },
+    uk: { notUpgrade: "Не є апгрейдом", managePlan: "Керувати поточним планом" },
+    pl: { notUpgrade: "To nie upgrade", managePlan: "Zarządzaj bieżącym planem" },
+    sk: { notUpgrade: "Nie je to upgrade", managePlan: "Spravovať aktuálny plán" },
+    cs: { notUpgrade: "Není to upgrade", managePlan: "Spravovat aktuální plán" },
+    es: { notUpgrade: "No es una mejora", managePlan: "Gestionar el plan actual" },
   } as const;
 
   useEffect(() => {
     setMounted(true);
     trackEvent("pricing_view", { page_type: "pricing" });
+    if (new URLSearchParams(window.location.search).get("billing") === "cancel") {
+      clearCheckoutIntent();
+    }
   }, []);
 
   useEffect(() => {
@@ -65,21 +90,50 @@ export default function PricingPage() {
     };
   }, [apiBase]);
 
-  const openCheckout = async (tierId: string) => {
-    const plan = tierId === "go" || tierId === "pro" ? billingCycle : "one_time";
+  const openCheckout = async (
+    tierId: string,
+    requestedBillingCycle: "week" | "month" = billingCycle,
+    resumeIdempotencyKey?: string,
+  ) => {
+    if (checkoutLoading) return;
+    const validTiers: CheckoutTier[] = ["single", "go", "pro", "lifetime"];
+    if (!validTiers.includes(tierId as CheckoutTier)) return;
+    const tier = tierId as CheckoutTier;
+    const isSubscription = tier === "go" || tier === "pro";
+    const checkoutCycle: CheckoutBillingCycle = isSubscription
+      ? requestedBillingCycle
+      : "one_time";
+    const storedIntent = loadCheckoutIntent();
+    const matchingStoredIntent =
+      storedIntent?.tier === tier && storedIntent.billingCycle === checkoutCycle
+        ? storedIntent
+        : null;
+    const idempotencyKey =
+      resumeIdempotencyKey ||
+      matchingStoredIntent?.idempotencyKey ||
+      createIdempotencyKey("checkout");
+    const plan = checkoutCycle;
     const price =
-      tierId === "single" ? 1
-        : tierId === "go" ? (billingCycle === "week" ? 3 : 8)
-          : tierId === "pro" ? (billingCycle === "week" ? 10 : 20)
+      tier === "single" ? 1
+        : tier === "go" ? (requestedBillingCycle === "week" ? 3 : 8)
+          : tier === "pro" ? (requestedBillingCycle === "week" ? 10 : 20)
             : 119.99;
 
-    trackEvent("payment_started", {
-      product_type: "optimization",
+    saveCheckoutIntent({
+      tier,
+      billingCycle: checkoutCycle,
+      idempotencyKey,
+    });
+    trackEvent("cta_click", {
+      cta_name: "checkout_selected",
+      product_type: tier,
       plan,
       price,
+      resumed_after_auth: Boolean(resumeIdempotencyKey),
+      resumed_after_retry: !resumeIdempotencyKey && Boolean(matchingStoredIntent),
     });
 
-    setCheckoutLoading(tierId);
+    setCheckoutLoading(tier);
     try {
       const response = await fetchWithRetry(
         `${apiBase}/billing/stripe/checkout-session`,
@@ -87,10 +141,11 @@ export default function PricingPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Idempotency-Key": idempotencyKey,
           },
           body: JSON.stringify({
-            tier: tierId,
-            billing_cycle: tierId === "go" || tierId === "pro" ? billingCycle : null,
+            tier,
+            billing_cycle: isSubscription ? requestedBillingCycle : null,
             success_url: `${window.location.origin}/account?billing=success&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${window.location.origin}/pricing?billing=cancel`,
           }),
@@ -99,19 +154,96 @@ export default function PricingPage() {
       );
       const data = await response.json().catch(() => ({}));
       if (response.status === 401) {
-        router.push("/login");
+        trackEvent("cta_click", {
+          cta_name: "auth_gate_view",
+          source: "checkout",
+          product_type: tier,
+          plan,
+        });
+        const resumePath = "/pricing?resume=checkout";
+        router.push(authHref("/login", resumePath));
         return;
       }
-      if (!response.ok || !data?.checkout_url) {
-        throw new Error(data?.detail || t("pricing.paddleLoading"));
+      const checkoutUrl = verifiedStripeCheckoutUrl(data?.checkout_url);
+      if (!response.ok || !checkoutUrl) {
+        const detail = typeof data?.detail === "string"
+          ? data.detail
+          : t("pricing.paddleLoading");
+        const checkoutError = new Error(detail) as Error & { status?: number };
+        checkoutError.status = response.status;
+        throw checkoutError;
       }
-      window.location.href = data.checkout_url;
+      clearCheckoutIntent();
+      trackEvent("payment_started", {
+        product_type: tier,
+        plan,
+        price,
+      });
+      window.location.assign(checkoutUrl);
     } catch (err) {
+      const status =
+        err && typeof err === "object" && "status" in err
+          ? Number((err as { status?: unknown }).status)
+          : null;
+      const canReplay =
+        status === null ||
+        status === 408 ||
+        status === 409 ||
+        status === 425 ||
+        status === 429 ||
+        status >= 500;
+      if (!canReplay) clearCheckoutIntent();
+      trackEvent("cta_click", {
+        cta_name: "checkout_failed",
+        product_type: tier,
+        plan,
+        replay_available: canReplay,
+      });
       alert(err instanceof Error ? err.message : t("pricing.paddleLoading"));
     } finally {
       setCheckoutLoading(null);
     }
   };
+
+  useEffect(() => {
+    if (!mounted || checkoutResumeAttemptedRef.current || typeof window === "undefined") {
+      return;
+    }
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("resume") !== "checkout") return;
+    checkoutResumeAttemptedRef.current = true;
+
+    const stored = loadCheckoutIntent();
+    const tier = stored?.tier ?? null;
+    const cycle = stored?.billingCycle ?? null;
+
+    url.searchParams.delete("resume");
+    window.history.replaceState(
+      {},
+      "",
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+
+    if (!tier || !cycle) {
+      clearCheckoutIntent();
+      trackEvent("cta_click", {
+        cta_name: "checkout_resume_failed",
+        reason: "missing_intent",
+      });
+      return;
+    }
+    const requestedCycle = cycle === "week" ? "week" : "month";
+    if (tier === "go" || tier === "pro") {
+      setBillingCycle(requestedCycle);
+    }
+    trackEvent("cta_click", {
+      cta_name: "auth_intent_resumed",
+      source: "checkout",
+      product_type: tier,
+      plan: cycle,
+    });
+    void openCheckout(tier, requestedCycle, stored?.idempotencyKey);
+  }, [mounted]);
 
   const tiers = [
     {
@@ -231,10 +363,17 @@ export default function PricingPage() {
                 activeTier && activeTier !== "single" && tierRank[activeTier]
                   ? tierRank[activeTier]
                   : 0;
+              const hasBlockingPlan = ["go", "pro", "lifetime"].includes(
+                activeTier || "",
+              );
               const isUpgrade =
                 isSingleTier || isCycleSwitch || activeRank === 0 || tierRank[tier.id] > activeRank;
-              const canCheckout = isSingleTier ? true : isCycleSwitch || (!isActive && isUpgrade);
-              const ctaLabel = isActive
+              const canCheckout =
+                !hasBlockingPlan &&
+                (isSingleTier ? true : isCycleSwitch || (!isActive && isUpgrade));
+              const ctaLabel = hasBlockingPlan
+                ? pricingUiCopy[language].managePlan
+                : isActive
                 ? t("pricing.activePlan")
                 : isCycleSwitch
                 ? t("pricing.switchCycleCta")
@@ -278,6 +417,10 @@ export default function PricingPage() {
 
               <button
                 onClick={() => {
+                  if (hasBlockingPlan) {
+                    router.push("/account");
+                    return;
+                  }
                   if (!canCheckout) return;
                   if (isDowngradeCycleSwitch) {
                     const confirmed = window.confirm(t("pricing.confirmCycleDowngrade"));
@@ -285,8 +428,8 @@ export default function PricingPage() {
                   }
                   openCheckout(tier.id);
                 }}
-                className={`cta-button ${!canCheckout ? "is-disabled" : ""}`}
-                disabled={checkoutLoading === tier.id || !canCheckout}
+                className={`cta-button ${!canCheckout && !hasBlockingPlan ? "is-disabled" : ""}`}
+                disabled={checkoutLoading === tier.id || (!canCheckout && !hasBlockingPlan)}
               >
                 {checkoutLoading === tier.id ? "Redirecting..." : ctaLabel}
               </button>
