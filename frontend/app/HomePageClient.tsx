@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import TopNav from "./components/TopNav";
 import HeroActions from "./components/HeroActions";
