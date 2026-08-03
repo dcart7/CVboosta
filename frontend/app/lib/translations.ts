@@ -32,6 +32,8 @@ export const translations = {
     },
     home: {
       optimizeCta: "Optimize My Resume",
+      optimizedForLine: "Optimized for screening standards and job requirements at leading companies",
+      optimizedForDisclaimer: "CVboosta is an independent optimization tool. Company names and logos are trademarks of their respective owners and imply no affiliation or endorsement.",
       whatYouGet: {
         title: "What you get",
         rewrite: {
@@ -59,7 +61,7 @@ export const translations = {
         },
         step3: {
           title: "Review results",
-          desc: "Get a new draft and improvement tips.",
+          desc: "Get an optimized CV and improvement tips.",
         },
       },
     },
@@ -654,6 +656,8 @@ export const translations = {
     },
     home: {
       optimizeCta: "Оптимізувати моє резюме",
+      optimizedForLine: "Оптимізовано під вимоги та стандарти відбору провідних компаній",
+      optimizedForDisclaimer: "CVboosta — це незалежний інструмент оптимізації. Логотипи та назви компаній є торговими марками їхніх власників і не означають офіційного партнерства.",
       whatYouGet: {
         title: "Що ви отримаєте",
         rewrite: {
@@ -675,7 +679,7 @@ export const translations = {
         step2: { title: "Додайте вакансію", desc: "Ми витягнемо навички та пріоритети ролі." },
         step3: {
           title: "Перевірте результат",
-          desc: "Отримайте нову чернетку та поради для покращення.",
+          desc: "Отримайте оптимізоване CV та інсайти щодо покращення.",
         },
       },
     },
@@ -1267,6 +1271,8 @@ export const translations = {
     },
     home: {
       optimizeCta: "Zoptymalizuj moje CV",
+      optimizedForLine: "Zoptymalizowane pod kątem wymagań i standardów rekrutacji w wiodących firmach",
+      optimizedForDisclaimer: "CVboosta to niezależne narzędzie. Nazwy i logo firm należą do ich właścicieli i nie oznaczają oficjalnej współpracy.",
       whatYouGet: {
         title: "Co zyskujesz",
         rewrite: {
@@ -1288,7 +1294,7 @@ export const translations = {
         step2: { title: "Dodaj ofertę", desc: "Wyodrębniamy umiejętności i priorytety roli." },
         step3: {
           title: "Sprawdź wyniki",
-          desc: "Otrzymaj nowy szkic i wskazówki dotyczące ulepszeń.",
+          desc: "Otrzymaj zoptymalizowane CV i wskazówki dotyczące poprawek.",
         },
       },
     },
@@ -1873,6 +1879,8 @@ export const translations = {
     },
     home: {
       optimizeCta: "Optimalizovať moje CV",
+      optimizedForLine: "Optimalizované pre požiadavky a štandardy výberu vedúcich spoločností",
+      optimizedForDisclaimer: "CVboosta je nezávislý nástroj. Názvy a logá spoločností sú ochrannými známkami príslušných vlastníkov.",
       whatYouGet: {
         title: "Čo získate",
         rewrite: {
@@ -1892,7 +1900,7 @@ export const translations = {
         title: "Ako to funguje",
         step1: { title: "Nahrajte CV", desc: "PDF alebo text — štruktúrujeme údaje." },
         step2: { title: "Pridajte prácu", desc: "Extrahujeme zručnosti a priority roly." },
-        step3: { title: "Skontrolujte výsledky", desc: "Získajte nový návrh a tipy na zlepšenie." },
+        step3: { title: "Skontrolujte výsledky", desc: "Získajte optimalizované CV a tipy na zlepšenie." },
       },
     },
     blog: {
@@ -2149,7 +2157,6 @@ export const translations = {
       keywordMatchLine: "Zhoda kľúčových slov: {before} → {after}",
       jobDescriptionMissing:
         "Pridajte popis práce, aby ste odomkli optimalizáciu podľa ponuky (odporúčané).",
-      previewPdfTitle: "Náhľad CV (vodoznak)",
       previewPdfJobLine: "Cieľová pozícia: {jobTitle}",
       previewPdfJobLineFallback: "Cieľová pozícia: (neuvedené)",
       previewPdfImprovementsTitle: "Zlepšenia (náhľad)",
@@ -3089,6 +3096,8 @@ export const translations = {
     },
     home: {
       optimizeCta: "Optimizar mi CV",
+      optimizedForLine: "Optimizado para los estándares de selección y requisitos de las empresas líderes",
+      optimizedForDisclaimer: "CVboosta es una herramienta independiente. Los nombres y logotipos pertenecen a sus respectivos propietarios.",
       whatYouGet: {
         title: "Lo que obtienes",
         rewrite: {
@@ -3110,7 +3119,7 @@ export const translations = {
         step2: { title: "Añade el puesto", desc: "Extraemos habilidades y prioridades del rol." },
         step3: {
           title: "Revisa resultados",
-          desc: "Obtén un nuevo borrador y consejos de mejora.",
+          desc: "Obtén un CV optimizado y consejos de mejora.",
         },
       },
     },

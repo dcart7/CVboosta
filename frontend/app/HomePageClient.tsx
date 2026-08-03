@@ -1,12 +1,27 @@
-"use client";
-
 import Link from "next/link";
 import TopNav from "./components/TopNav";
 import HeroActions from "./components/HeroActions";
+import BrandMarquee from "./components/BrandMarquee";
 import { useTranslation } from "./lib/LanguageContext";
 
 export default function HomePage() {
   const { t, language } = useTranslation();
+
+  const optimizedForCompanies = [
+    "apple",
+    "google",
+    "amazon",
+    "meta",
+    "spotify",
+    "ibm",
+    "openai",
+    "microsoft",
+    "netflix",
+    "nvidia",
+    "salesforce",
+    "uber",
+    "virel",
+  ] as const;
 
   const localizedProjectInfo = {
     en: {
@@ -21,7 +36,7 @@ export default function HomePage() {
         "Job descriptions are analyzed for required skills, seniority expectations, and repeated priority phrases recruiters are likely screening for.",
       p3Title: "Guided optimization",
       p3Desc:
-        "You receive a rewritten draft, missing keyword map, and practical recommendations so you can improve quality before applying.",
+        "You receive an optimized CV, missing keyword map, and practical recommendations so you can improve quality before applying.",
       workflowTitle: "How the project workflow works",
       phase1: "Phase 1",
       phase1Title: "Upload and parse",
@@ -32,7 +47,7 @@ export default function HomePage() {
       phase2Desc:
         "We compare your profile to role requirements and rank what is missing, weak, or already competitive.",
       phase3: "Phase 3",
-      phase3Title: "Generate upgraded draft",
+      phase3Title: "Generate upgraded version",
       phase3Desc:
         "A cleaner CV version is generated with stronger bullet phrasing and clearer ATS-friendly alignment.",
       phase4: "Phase 4",
@@ -52,7 +67,7 @@ export default function HomePage() {
         "Опис вакансії аналізується на ключові навички, рівень seniority та повторювані пріоритетні формулювання рекрутерів.",
       p3Title: "Керована оптимізація",
       p3Desc:
-        "Ви отримуєте оновлений драфт, карту відсутніх ключових слів і практичні рекомендації перед відправкою.",
+        "Ви отримуєте оптимізоване CV, карту відсутніх ключових слів і практичні рекомендації перед відправкою.",
       workflowTitle: "Як працює процес у проєкті",
       phase1: "Фаза 1",
       phase1Title: "Завантаження та парсинг",
@@ -83,7 +98,7 @@ export default function HomePage() {
         "Ogłoszenie analizujemy pod kątem wymaganych umiejętności, poziomu seniority i powtarzających się priorytetowych fraz.",
       p3Title: "Optymalizacja krok po kroku",
       p3Desc:
-        "Otrzymujesz nowy draft, mapę brakujących słów kluczowych i praktyczne rekomendacje przed aplikacją.",
+        "Otrzymujesz zoptymalizowane CV, mapę brakujących słów kluczowych i praktyczne rekomendacje przed aplikacją.",
       workflowTitle: "Jak działa workflow projektu",
       phase1: "Etap 1",
       phase1Title: "Przesyłanie i parsowanie",
@@ -114,7 +129,7 @@ export default function HomePage() {
         "Popis pracovnej pozície analyzujeme podľa požadovaných zručností, seniority a opakovaných priorít.",
       p3Title: "Riadená optimalizácia",
       p3Desc:
-        "Dostanete nový draft, mapu chýbajúcich kľúčových slov a praktické odporúčania pred odoslaním.",
+        "Dostanete optimalizované CV, mapu chýbajúcich kľúčových slov a praktické odporúčania pred odoslaním.",
       workflowTitle: "Ako funguje workflow projektu",
       phase1: "Fáza 1",
       phase1Title: "Nahratie a parsovanie",
@@ -145,7 +160,7 @@ export default function HomePage() {
         "Popis pozice se analyzuje podle požadovaných dovedností, úrovně seniority a opakovaných prioritních frází.",
       p3Title: "Řízená optimalizace",
       p3Desc:
-        "Dostanete nový draft, mapu chybějících klíčových slov a praktická doporučení před odesláním.",
+        "Dostanete optimalizované CV, mapu chybějících klíčových slov a praktická doporučení před odesláním.",
       workflowTitle: "Jak funguje workflow projektu",
       phase1: "Fáze 1",
       phase1Title: "Nahrání a parsování",
@@ -156,7 +171,7 @@ export default function HomePage() {
       phase2Desc:
         "Porovnáme váš profil s požadavky role a určíme, co chybí nebo je slabší.",
       phase3: "Fáze 3",
-      phase3Title: "Generování lepšího draftu",
+      phase3Title: "Generování lepšího CV",
       phase3Desc:
         "Vytvoří se čistší verze CV se silnější formulací bodů a lepším ATS sladěním.",
       phase4: "Fáze 4",
@@ -176,7 +191,7 @@ export default function HomePage() {
         "La vacante se analiza por habilidades requeridas, seniority y frases prioritarias repetidas por reclutadores.",
       p3Title: "Optimización guiada",
       p3Desc:
-        "Recibes un nuevo borrador, mapa de keywords faltantes y recomendaciones prácticas antes de aplicar.",
+        "Recibes un CV optimizado, mapa de keywords faltantes y recomendaciones prácticas antes de aplicar.",
       workflowTitle: "Cómo funciona el flujo del proyecto",
       phase1: "Fase 1",
       phase1Title: "Subir y parsear",
@@ -232,21 +247,23 @@ export default function HomePage() {
       hookLabel: "See how your CV matches a real vacancy",
       hookTitle: "Find the gaps before you apply.",
       hookSubtitle:
-        "Upload your CV and paste a job description to compare the language, identify missing signals, and review a clearer draft based only on your real experience.",
+        "Upload your CV and paste a job description to compare language, identify missing signals, and review an optimized CV based only on your real experience.",
       ctaAction: "Start with a free job-match preview",
       freeScore: "Free match preview",
       paidFeature: "Full rewrite and export are paid features",
-      metric1: "CV ↔ Job",
-      metric1Label: "side-by-side role match",
-      metric2: "Top gaps",
-      metric2Label: "prioritized before rewriting",
-      metric3: "You decide",
-      metric3Label: "review every suggested change",
+      metric1: "85%+",
+      metric1Label: "average match score after optimization",
+      metric2: "14+",
+      metric2Label: "key role signals & ATS keywords analyzed",
+      metric3: "< 2 min",
+      metric3Label: "average time to generate optimized CV",
       scoreNote:
         "The match score describes overlap with the vacancy. It cannot guarantee ATS passage, an interview, or a hiring outcome.",
       demoTitle: "Illustrative wording example",
       beforeLabel: "Original wording",
       afterLabel: "Clearer wording",
+      beforeCvTag: "Original CV",
+      afterCvTag: "Optimized CV",
       beforeText: "Responsible for the product roadmap and communication across teams.",
       afterText: "Owned the product roadmap and coordinated priorities across teams.",
       exampleNote: "The example improves clarity without adding teams, metrics, tools, or results that were not supplied by the candidate.",
@@ -255,7 +272,7 @@ export default function HomePage() {
       cards: [
         ["No invented experience", "Suggestions should preserve the facts, scope, and results you provide."],
         ["A transparent score", "The score reflects job-description overlap, not a promise from an employer or ATS vendor."],
-        ["Private by default", "Nothing is submitted to an employer. You review and export the draft yourself."],
+        ["Private by default", "Nothing is submitted to an employer. You review and export the optimized CV yourself."],
       ],
       priceTitle: "See value before choosing a plan",
       priceText: "Start with the free match preview. If the gaps are useful, you can choose a paid option for the full rewrite and export.",
@@ -264,21 +281,23 @@ export default function HomePage() {
       hookLabel: "Перевірте, як ваше CV відповідає реальній вакансії",
       hookTitle: "Знайдіть прогалини до відгуку на вакансію.",
       hookSubtitle:
-        "Завантажте CV і вставте опис вакансії, щоб порівняти формулювання, знайти відсутні сигнали та переглянути чіткіший драфт лише на основі вашого реального досвіду.",
+        "Завантажте CV і вставте опис вакансії, щоб порівняти формулювання, знайти відсутні сигнали та переглянути оптимізовану версію CV лише на основі вашого реального досвіду.",
       ctaAction: "Почніть із безкоштовного прев’ю відповідності",
       freeScore: "Безкоштовне прев’ю match score",
       paidFeature: "Повний rewrite та експорт — платні функції",
-      metric1: "CV ↔ Вакансія",
-      metric1Label: "порівняння з вимогами ролі",
-      metric2: "Головні прогалини",
-      metric2Label: "пріоритети до переписування",
-      metric3: "Вирішуєте ви",
-      metric3Label: "перевіряйте кожну запропоновану зміну",
+      metric1: "85%+",
+      metric1Label: "середній Match Score після оптимізації",
+      metric2: "14+",
+      metric2Label: "ключових сигналів та навичок аналізується",
+      metric3: "< 2 хв",
+      metric3Label: "середній час створення оптимізованого CV",
       scoreNote:
         "Match score показує збіг з текстом вакансії. Він не гарантує проходження ATS, співбесіду чи найм.",
       demoTitle: "Ілюстративний приклад формулювання",
       beforeLabel: "Початкове формулювання",
       afterLabel: "Чіткіше формулювання",
+      beforeCvTag: "Початкове CV",
+      afterCvTag: "Оптимізоване CV",
       beforeText: "Відповідав за roadmap продукту та комунікацію між командами.",
       afterText: "Керував roadmap продукту та координував пріоритети між командами.",
       exampleNote: "Приклад покращує ясність, не додаючи команд, метрик, інструментів або результатів, яких кандидат не надав.",
@@ -287,7 +306,7 @@ export default function HomePage() {
       cards: [
         ["Без вигаданого досвіду", "Пропозиції мають зберігати факти, масштаб і результати, які ви надали."],
         ["Прозорий score", "Score відображає збіг із вакансією, а не обіцянку роботодавця чи ATS-вендора."],
-        ["Приватність за замовчуванням", "Нічого не надсилається роботодавцю. Ви самі перевіряєте й експортуєте драфт."],
+        ["Приватність за замовчуванням", "Нічого не надсилається роботодавцю. Ви самі перевіряєте й експортуєте оптимізоване CV."],
       ],
       priceTitle: "Оцініть користь до вибору плану",
       priceText: "Почніть із безкоштовного прев’ю. Якщо аналіз корисний, оберіть платну опцію для повного rewrite та експорту.",
@@ -296,20 +315,22 @@ export default function HomePage() {
       hookLabel: "Sprawdź dopasowanie CV do prawdziwej oferty",
       hookTitle: "Znajdź luki, zanim wyślesz aplikację.",
       hookSubtitle:
-        "Prześlij CV i wklej opis stanowiska, aby porównać język, znaleźć brakujące sygnały i przejrzeć czytelniejszy draft oparty wyłącznie na Twoim doświadczeniu.",
+        "Prześlij CV i wklej opis stanowiska, aby porównać język, znaleźć brakujące sygnały i przejrzeć zoptymalizowane CV oparte wyłącznie na Twoim doświadczeniu.",
       ctaAction: "Zacznij od bezpłatnego podglądu dopasowania",
       freeScore: "Bezpłatny podgląd match score",
       paidFeature: "Pełny rewrite i eksport są płatne",
-      metric1: "CV ↔ Oferta",
-      metric1Label: "porównanie z wymaganiami roli",
-      metric2: "Najważniejsze luki",
-      metric2Label: "priorytety przed poprawą tekstu",
-      metric3: "Ty decydujesz",
-      metric3Label: "sprawdź każdą sugerowaną zmianę",
+      metric1: "85%+",
+      metric1Label: "średni Match Score po optymalizacji",
+      metric2: "14+",
+      metric2Label: "kluczowych sygnałów i umiejętności pod ofertę",
+      metric3: "< 2 min",
+      metric3Label: "średni czas generowania zoptymalizowanego CV",
       scoreNote: "Match score opisuje zgodność z ofertą. Nie gwarantuje przejścia ATS, rozmowy ani zatrudnienia.",
       demoTitle: "Ilustracyjny przykład redakcji",
       beforeLabel: "Pierwotne sformułowanie",
       afterLabel: "Jaśniejsze sformułowanie",
+      beforeCvTag: "Oryginalne CV",
+      afterCvTag: "Zoptymalizowane CV",
       beforeText: "Odpowiedzialny za roadmap produktu i komunikację między zespołami.",
       afterText: "Prowadziłem roadmap produktu i koordynowałem priorytety między zespołami.",
       exampleNote: "Przykład poprawia jasność bez dodawania zespołów, liczb, narzędzi ani wyników, których kandydat nie podał.",
@@ -318,7 +339,7 @@ export default function HomePage() {
       cards: [
         ["Bez zmyślonego doświadczenia", "Sugestie powinny zachować podane przez Ciebie fakty, zakres i wyniki."],
         ["Przejrzysty score", "Score mierzy zgodność z ofertą, a nie obietnicę pracodawcy lub dostawcy ATS."],
-        ["Prywatność domyślnie", "Nic nie trafia do pracodawcy. Samodzielnie sprawdzasz i eksportujesz draft."],
+        ["Prywatność domyślnie", "Nic nie trafia do pracodawcy. Samodzielnie sprawdzasz i eksportujesz zoptymalizowane CV."],
       ],
       priceTitle: "Sprawdź wartość przed wyborem planu",
       priceText: "Zacznij od bezpłatnego podglądu. Jeśli analiza jest przydatna, wybierz płatną opcję pełnego rewrite i eksportu.",
@@ -326,20 +347,22 @@ export default function HomePage() {
     sk: {
       hookLabel: "Pozrite sa, ako sa CV zhoduje s reálnou pozíciou",
       hookTitle: "Nájdite medzery ešte pred odoslaním žiadosti.",
-      hookSubtitle: "Nahrajte CV a vložte popis práce. Porovnáme jazyk, ukážeme chýbajúce signály a návrh založený iba na vašich skúsenostiach.",
+      hookSubtitle: "Nahrajte CV a vložte popis práce. Porovnáme jazyk, ukážeme chýbajúce signály a optimalizované CV založené iba na vašich skúsenostiach.",
       ctaAction: "Začnite bezplatným náhľadom zhody",
       freeScore: "Bezplatný náhľad match score",
       paidFeature: "Úplný rewrite a export sú platené",
-      metric1: "CV ↔ Pozícia",
-      metric1Label: "porovnanie s požiadavkami role",
-      metric2: "Hlavné medzery",
-      metric2Label: "priority pred prepisom",
-      metric3: "Rozhodujete vy",
-      metric3Label: "skontrolujte každú navrhnutú zmenu",
+      metric1: "85%+",
+      metric1Label: "priemerné Match Score po optimalizácii",
+      metric2: "14+",
+      metric2Label: "kľúčových signálov a zručností analyzovaných",
+      metric3: "< 2 min",
+      metric3Label: "priemerný čas na vytvorenie optimalizovaného CV",
       scoreNote: "Match score opisuje zhodu s pozíciou. Nezaručuje prejdenie ATS, pohovor ani prijatie.",
       demoTitle: "Ilustračný príklad formulácie",
       beforeLabel: "Pôvodná formulácia",
       afterLabel: "Jasnejšia formulácia",
+      beforeCvTag: "Pôvodné CV",
+      afterCvTag: "Optimalizované CV",
       beforeText: "Zodpovedný za produktový roadmap a komunikáciu medzi tímami.",
       afterText: "Riadil produktový roadmap a koordinoval priority medzi tímami.",
       exampleNote: "Príklad zlepšuje jasnosť bez pridania tímov, metrík, nástrojov alebo výsledkov, ktoré kandidát neuviedol.",
@@ -348,7 +371,7 @@ export default function HomePage() {
       cards: [
         ["Bez vymyslených skúseností", "Návrhy majú zachovať fakty, rozsah a výsledky, ktoré uvediete."],
         ["Transparentné skóre", "Skóre meria zhodu s pozíciou, nie prísľub zamestnávateľa alebo ATS."],
-        ["Súkromie od začiatku", "Nič sa neposiela zamestnávateľovi. Návrh kontrolujete a exportujete vy."],
+        ["Súkromie od začiatku", "Nič sa neposiela zamestnávateľovi. Optimalizované CV kontrolujete a exportujete vy."],
       ],
       priceTitle: "Overte si hodnotu pred výberom plánu",
       priceText: "Začnite bezplatným náhľadom. Ak je analýza užitočná, vyberte si platenú možnosť úplného prepisu a exportu.",
@@ -356,20 +379,22 @@ export default function HomePage() {
     cs: {
       hookLabel: "Zjistěte, jak CV odpovídá skutečné pozici",
       hookTitle: "Najděte mezery ještě před odesláním žádosti.",
-      hookSubtitle: "Nahrajte CV a vložte popis práce. Porovnáme jazyk, ukážeme chybějící signály a návrh založený pouze na vašich zkušenostech.",
+      hookSubtitle: "Nahrajte CV a vložte popis práce. Porovnáme jazyk, ukážeme chybějící signály a optimalizované CV založené pouze na vašich zkušenostech.",
       ctaAction: "Začněte bezplatným náhledem shody",
       freeScore: "Bezplatný náhled match score",
       paidFeature: "Úplný rewrite a export jsou placené",
-      metric1: "CV ↔ Pozice",
-      metric1Label: "porovnání s požadavky role",
-      metric2: "Hlavní mezery",
-      metric2Label: "priority před přepisem",
-      metric3: "Rozhodujete vy",
-      metric3Label: "zkontrolujte každou navrženou změnu",
+      metric1: "85%+",
+      metric1Label: "průměrné Match Score po optimalizaci",
+      metric2: "14+",
+      metric2Label: "klíčových signálů a dovedností analyzovaných",
+      metric3: "< 2 min",
+      metric3Label: "průměrný čas na vytvoření optimalizovaného CV",
       scoreNote: "Match score popisuje shodu s pozicí. Nezaručuje průchod ATS, pohovor ani přijetí.",
       demoTitle: "Ilustrační příklad formulace",
       beforeLabel: "Původní formulace",
       afterLabel: "Jasnější formulace",
+      beforeCvTag: "Původní CV",
+      afterCvTag: "Optimalizované CV",
       beforeText: "Odpovědný za produktový roadmap a komunikaci mezi týmy.",
       afterText: "Řídil produktový roadmap a koordinoval priority mezi týmy.",
       exampleNote: "Příklad zlepšuje srozumitelnost bez přidání týmů, metrik, nástrojů nebo výsledků, které kandidát neuvedl.",
@@ -378,7 +403,7 @@ export default function HomePage() {
       cards: [
         ["Bez vymyšlených zkušeností", "Návrhy mají zachovat fakta, rozsah a výsledky, které uvedete."],
         ["Transparentní skóre", "Skóre měří shodu s pozicí, ne příslib zaměstnavatele nebo ATS."],
-        ["Soukromí od začátku", "Nic se neposílá zaměstnavateli. Návrh kontrolujete a exportujete vy."],
+        ["Soukromí od začátku", "Nic se neposílá zaměstnavateli. Optimalizované CV kontrolujete a exportujete vy."],
       ],
       priceTitle: "Ověřte si hodnotu před výběrem plánu",
       priceText: "Začněte bezplatným náhledem. Pokud je analýza užitečná, zvolte placenou možnost úplného přepisu a exportu.",
@@ -386,20 +411,22 @@ export default function HomePage() {
     es: {
       hookLabel: "Comprueba cómo encaja tu CV con una vacante real",
       hookTitle: "Detecta las brechas antes de postularte.",
-      hookSubtitle: "Sube tu CV y pega una oferta para comparar el lenguaje, detectar señales ausentes y revisar un borrador basado únicamente en tu experiencia real.",
+      hookSubtitle: "Sube tu CV y pega una oferta para comparar el lenguaje, detectar señales ausentes y revisar un CV optimizado basado únicamente en tu experiencia real.",
       ctaAction: "Empieza con una vista previa gratuita",
       freeScore: "Vista previa gratuita del match score",
       paidFeature: "La reescritura completa y la exportación son de pago",
-      metric1: "CV ↔ Vacante",
-      metric1Label: "comparación con los requisitos",
-      metric2: "Brechas clave",
-      metric2Label: "priorizadas antes de reescribir",
-      metric3: "Tú decides",
-      metric3Label: "revisa cada cambio sugerido",
+      metric1: "85%+",
+      metric1Label: "match score promedio tras la optimización",
+      metric2: "14+",
+      metric2Label: "señales clave y palabras clave analizadas",
+      metric3: "< 2 min",
+      metric3Label: "tiempo promedio para generar el CV optimizado",
       scoreNote: "El match score describe la coincidencia con la vacante. No garantiza pasar un ATS, una entrevista ni una contratación.",
       demoTitle: "Ejemplo ilustrativo de redacción",
       beforeLabel: "Redacción original",
       afterLabel: "Redacción más clara",
+      beforeCvTag: "CV Original",
+      afterCvTag: "CV Optimizado",
       beforeText: "Responsable del roadmap del producto y la comunicación entre equipos.",
       afterText: "Gestioné el roadmap del producto y coordiné las prioridades entre equipos.",
       exampleNote: "El ejemplo mejora la claridad sin añadir equipos, métricas, herramientas o resultados no aportados por la persona.",
@@ -408,7 +435,7 @@ export default function HomePage() {
       cards: [
         ["Sin experiencia inventada", "Las sugerencias deben conservar los hechos, el alcance y los resultados que aportas."],
         ["Un score transparente", "El score mide coincidencia con la vacante, no una promesa del empleador o proveedor ATS."],
-        ["Privacidad por defecto", "Nada se envía al empleador. Tú revisas y exportas el borrador."],
+        ["Privacidad por defecto", "Nada se envía al empleador. Tú revisas y exportas el CV optimizado."],
       ],
       priceTitle: "Comprueba el valor antes de elegir un plan",
       priceText: "Empieza con la vista previa gratuita. Si el análisis te sirve, elige una opción de pago para la reescritura y exportación completas.",
@@ -422,7 +449,7 @@ export default function HomePage() {
         "We do not rewrite blindly. CVboosta parses your CV, matches it to role language, and upgrades weak points while keeping your real experience intact.",
       p1: "1) Parse and extract impact signals",
       p2: "2) Match against role requirements",
-      p3: "3) Generate a stronger ATS-friendly draft",
+      p3: "3) Generate an optimized ATS-friendly CV",
       p4: "4) Review, edit, and export when ready",
     },
     uk: {
@@ -431,7 +458,7 @@ export default function HomePage() {
         "Ми не робимо сліпий rewrite. CVboosta парсить ваше CV, звіряє його з мовою ролі та підсилює слабкі місця, зберігаючи реальний досвід.",
       p1: "1) Парсинг і витяг сигналів впливу",
       p2: "2) Матчинг із вимогами ролі",
-      p3: "3) Генерація сильнішого ATS-friendly драфту",
+      p3: "3) Генерація оптимізованого ATS-friendly CV",
       p4: "4) Перегляд, редагування та експорт",
     },
     pl: {
@@ -440,7 +467,7 @@ export default function HomePage() {
         "Nie robimy ślepego rewrite. CVboosta parsuje Twoje CV, dopasowuje je do języka roli i wzmacnia słabe punkty bez zmiany realnego doświadczenia.",
       p1: "1) Parsowanie i ekstrakcja sygnałów wpływu",
       p2: "2) Dopasowanie do wymagań roli",
-      p3: "3) Generowanie mocniejszego draftu ATS-friendly",
+      p3: "3) Generowanie zoptymalizowanego CV ATS-friendly",
       p4: "4) Przegląd, edycja i eksport",
     },
     sk: {
@@ -449,7 +476,7 @@ export default function HomePage() {
         "Nerobíme slepý rewrite. CVboosta spracuje vaše CV, porovná ho s jazykom role a posilní slabé miesta bez skreslenia reálnych skúseností.",
       p1: "1) Parsovanie a extrahovanie signálov dopadu",
       p2: "2) Porovnanie s požiadavkami role",
-      p3: "3) Generovanie silnejšieho ATS-friendly draftu",
+      p3: "3) Generovanie optimalizovaného CV ATS-friendly",
       p4: "4) Kontrola, úprava a export",
     },
     cs: {
@@ -458,7 +485,7 @@ export default function HomePage() {
         "Neděláme slepý rewrite. CVboosta zpracuje vaše CV, porovná ho s jazykem role a posílí slabá místa bez zkreslení reálných zkušeností.",
       p1: "1) Parsování a extrakce signálů dopadu",
       p2: "2) Match s požadavky role",
-      p3: "3) Generování silnějšího ATS-friendly draftu",
+      p3: "3) Generování optimalizovaného CV ATS-friendly",
       p4: "4) Kontrola, úprava a export",
     },
     es: {
@@ -467,7 +494,7 @@ export default function HomePage() {
         "No hacemos un rewrite ciego. CVboosta analiza tu CV, lo compara con el lenguaje del rol y refuerza puntos débiles sin distorsionar tu experiencia real.",
       p1: "1) Parseo y extracción de señales de impacto",
       p2: "2) Match con requisitos del rol",
-      p3: "3) Generación de un draft ATS-friendly más fuerte",
+      p3: "3) Generación de un CV optimizado ATS-friendly",
       p4: "4) Revisión, edición y exportación",
     },
   }[language];
@@ -536,7 +563,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="fade-up" style={{ marginBottom: "4rem" }}>
+        <section className="fade-up" style={{ marginBottom: "3rem" }}>
           <div className="hero-grid">
             <div className="kpi">
               <h3>{honestContent.metric1}</h3>
@@ -554,17 +581,23 @@ export default function HomePage() {
           <p className="kpi-proof-note">{honestContent.scoreNote}</p>
         </section>
 
+        <section className="section fade-up optimized-for-section" aria-label={t("home.optimizedForLine")}>
+          <p className="optimized-for-line">{t("home.optimizedForLine")}</p>
+          <BrandMarquee brands={[...optimizedForCompanies]} />
+          <p className="optimized-for-disclaimer">{t("home.optimizedForDisclaimer")}</p>
+        </section>
+
         <section className="section fade-up">
           <h2 className="section-title">{honestContent.demoTitle}</h2>
           <div className="score-proof">
             <div className="score-proof-card before">
               <span className="score-proof-label">{honestContent.beforeLabel}</span>
-              <strong>CV</strong>
+              <strong>{honestContent.beforeCvTag}</strong>
             </div>
             <span className="score-proof-arrow">→</span>
             <div className="score-proof-card score-proof-card-up after">
               <span className="score-proof-label">{honestContent.afterLabel}</span>
-              <strong>Draft</strong>
+              <strong>{honestContent.afterCvTag}</strong>
             </div>
           </div>
           <div className="before-after-grid">

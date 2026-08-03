@@ -14,8 +14,17 @@ def main() -> None:
         raise SystemExit("DATABASE_URL must point to PostgreSQL for production migrations")
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
-    if database_url.startswith("postgresql+psycopg://"):
-        database_url = database_url.replace("postgresql+psycopg://", "postgresql://", 1)
+    if database_url.startswith("postgresql://"):
+        try:
+            import psycopg  # noqa: F401
+            database_url = database_url.replace("postgresql://", "postgresql://", 1)
+            # If psycopg3 is installed and psycopg2 is not, use postgresql+psycopg://
+            try:
+                import psycopg2  # noqa: F401
+            except ImportError:
+                database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+        except ImportError:
+            pass
 
     migrations_dir = Path(__file__).resolve().parents[1] / "migrations"
     engine = create_engine(database_url, pool_pre_ping=True)

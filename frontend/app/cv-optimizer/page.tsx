@@ -647,12 +647,12 @@ export default function CvOptimizerPage() {
               <div className="score-proof">
                 <div className="score-proof-card before">
                   <span className="score-proof-label">Original</span>
-                  <strong>CV</strong>
+                  <strong>Original CV</strong>
                 </div>
                 <span className="score-proof-arrow">→</span>
                 <div className="score-proof-card score-proof-card-up after">
                   <span className="score-proof-label">Reframed</span>
-                  <strong>Draft</strong>
+                  <strong>Optimized CV</strong>
                   <span className="score-proof-microcopy">
                     Stronger role language and clearer proof
                   </span>
