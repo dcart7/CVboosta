@@ -75,6 +75,24 @@ def test_browser_auth_is_cookie_only_and_native_rollout_is_backward_compatible(c
     assert legacy_token and len(legacy_token) > 20
 
 
+def test_legacy_ios_login_keeps_bearer_token_even_with_origin_header(client):
+    _register(client, "ios-origin@example.com")
+    client.cookies.clear()
+
+    response = client.post(
+        "/auth/login",
+        json={"email": "ios-origin@example.com", "password": "password123!"},
+        headers={
+            "Origin": "cvboosta://app",
+            "User-Agent": "CVBoosta/1.0 CFNetwork/1496.0.7 Darwin/23.5.0",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json().get("access_token")
+    assert response.json().get("token_type") == "bearer"
+
+
 def test_password_change_revokes_existing_access_token(client):
     _, token = _register(client, "revoke-token@example.com")
     assert token

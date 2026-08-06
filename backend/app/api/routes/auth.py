@@ -139,11 +139,35 @@ def _is_browser_request(request: Request) -> bool:
     )
 
 
+def _is_legacy_native_request(request: Request) -> bool:
+    """Identify installed app clients that still expect bearer tokens on login.
+
+    Some native networking stacks can attach an Origin header, which would make
+    the hardening rollout classify the request as browser traffic.  Keep the
+    compatibility path narrow: browser-like user agents remain cookie-only.
+    """
+    user_agent = (request.headers.get("user-agent") or "").lower()
+    if not user_agent:
+        return False
+    if "mozilla/" in user_agent or "safari/" in user_agent or "chrome/" in user_agent:
+        return False
+    return any(
+        marker in user_agent
+        for marker in (
+            "cfnetwork",
+            "darwin",
+            "cvboosta",
+            "cvboostaios",
+            "cvboosta-ios",
+        )
+    )
+
+
 def _auth_response(request: Request, user: User, token: str) -> AuthResponse:
     # Browsers authenticate solely through the HttpOnly cookie. Existing iOS
     # releases do not send browser Fetch Metadata headers and retain the legacy
     # bearer response during the native-token-exchange rollout.
-    if _is_browser_request(request):
+    if _is_browser_request(request) and not _is_legacy_native_request(request):
         return AuthResponse(email=user.email)
     return AuthResponse(access_token=token, token_type="bearer", email=user.email)
 
